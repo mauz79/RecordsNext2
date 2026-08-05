@@ -9,6 +9,8 @@ import it.alterlega.recordsnext.app.core.CoreJsExporter;
 import it.alterlega.recordsnext.app.core.LeagueMetadata;
 import it.alterlega.recordsnext.app.classics.ClassicsFamilyJsExporter;
 import it.alterlega.recordsnext.app.ru.RuFamilyJsExporter;
+import it.alterlega.recordsnext.app.series.SeriesFamilyJsExporter;
+import it.alterlega.recordsnext.app.model.RecordFamily;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +43,7 @@ public final class Records2026SitePublisher {
     private static final String CORE_FILE = "fcmRecordsNext_Core.js";
     private static final String CLASSICS_2_FILE = ClassicsFamilyJsExporter.FILE_NAME;
     private static final String RU_2_FILE = RuFamilyJsExporter.FILE_NAME;
+    private static final String SERIES_2_FILE = SeriesFamilyJsExporter.FILE_NAME;
     private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
     private static final String RU_FILE = "records2026.recordstagionali.ru.js";
     private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -178,6 +181,7 @@ public final class Records2026SitePublisher {
             Path database,
             LeagueMetadata leagueMetadata) throws IOException {
 
+        boolean includeSeries = options != null && options.familyEnabled(RecordFamily.SERIES);
         boolean includeRecordsNextManifest = options != null
                 && preflight != null
                 && manifestMetadata != null;
@@ -185,10 +189,10 @@ public final class Records2026SitePublisher {
                 && database != null
                 && leagueMetadata != null;
 
-        if (!includeClassic && !includeRu && !includeRecordsNextManifest && !includeRecordsNextCore) {
+        if (!includeClassic && !includeRu && !includeSeries && !includeRecordsNextManifest && !includeRecordsNextCore) {
             throw new IOException("Nessun modulo selezionato per la generazione JS");
         }
-        if (includeClassic) requireDirectory(classicArchive, "Archivio classic");
+        if (includeClassic || includeSeries) requireDirectory(classicArchive, "Archivio classic");
         if (includeRu) requireDirectory(ruArchive, "Archivio RU");
         Files.createDirectories(stagingRoot);
 
@@ -207,6 +211,9 @@ public final class Records2026SitePublisher {
             classicEntries = classic.entryCount();
             ClassicsFamilyJsExporter.export(
                     classicArchive, generatedDir.resolve(CLASSICS_2_FILE));
+        }
+        if (includeSeries) {
+            SeriesFamilyJsExporter.export(classicArchive, generatedDir.resolve(SERIES_2_FILE));
         }
         if (includeRu) {
             var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
@@ -243,6 +250,7 @@ public final class Records2026SitePublisher {
                 annualFiles,
                 includeClassic,
                 includeRu,
+                includeSeries,
                 includeRecordsNextManifest,
                 includeRecordsNextCore
         );
@@ -260,6 +268,7 @@ public final class Records2026SitePublisher {
             int expectedAnnualFiles,
             boolean includeClassic,
             boolean includeRu,
+            boolean includeSeries,
             boolean includeRecordsNextManifest,
             boolean includeRecordsNextCore) throws IOException {
 
@@ -281,6 +290,10 @@ public final class Records2026SitePublisher {
             validatePrefix(byName.get(CLASSIC_FILE), "window.RECORDS2026_PREVIEW_CLASSIC");
             requireFile(byName, CLASSICS_2_FILE);
             validatePrefix(byName.get(CLASSICS_2_FILE), "window.fcmRecordsNextClassics");
+        }
+        if (includeSeries) {
+            requireFile(byName, SERIES_2_FILE);
+            validatePrefix(byName.get(SERIES_2_FILE), "window.fcmRecordsNextSeries");
         }
         List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
         if (includeRu) {
@@ -310,6 +323,7 @@ public final class Records2026SitePublisher {
             );
         }
         int expectedTotal = (includeClassic ? 2 : 0)
+                + (includeSeries ? 1 : 0)
                 + (includeRu ? expectedAnnualFiles + 3 : 0)
                 + (includeRecordsNextCore ? 1 : 0)
                 + (includeRecordsNextManifest ? 1 : 0);

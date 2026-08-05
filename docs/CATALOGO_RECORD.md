@@ -34,13 +34,13 @@
 
 | ID provvisorio | Nome | Dipendenze | Stato |
 |---|---|---|---|
-| series.unbeaten | Serie positiva | Risultati ordinati | DA_CATALOGARE |
+| series.unbeaten | Serie positiva | Risultati ordinati | IMPLEMENTATO |
 | series.winless | Serie negativa | Risultati ordinati | DA_CATALOGARE |
 | series.wins | Vittorie consecutive | Risultati ordinati | DA_CATALOGARE |
 | series.draws | Pareggi consecutivi | Risultati ordinati | DA_CATALOGARE |
 | series.losses | Sconfitte consecutive | Risultati ordinati | DA_CATALOGARE |
-| series.clean-sheets | Clean sheet consecutivi | Clean sheet elaborati | DA_CATALOGARE |
-| series.captain-bonus | Bonus Capitano consecutivo | Modificatore Capitano | DA_CATALOGARE |
+| series.clean-sheets | Clean sheet consecutivi | Clean sheet elaborati | IMPLEMENTATO |
+| series.captain-bonus | Bonus Capitano consecutivo | Modificatore Capitano | IMPLEMENTATO |
 
 ## Riserve d'Ufficio
 

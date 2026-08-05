@@ -991,3 +991,8 @@ Restano da definire:
 - formato finale della configurazione Culometro;
 - struttura definitiva della GUI;
 - strategia di migrazione o confronto con RecordsNext 1.0.2.
+
+
+## Output famiglia Serie implementato
+
+`fcmRecordsNext_Series.js` espone `window.fcmRecordsNextSeries`. La prima versione riusa gli archivi normalizzati 1.0.2 e pubblica le sezioni disponibili: imbattibilita, serie Capitano e serie clean sheet. Lo stato e `GENERATED_PARTIAL` finche non saranno aggiunte vittorie, pareggi, sconfitte e serie senza vittorie.

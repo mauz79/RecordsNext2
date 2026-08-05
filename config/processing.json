@@ -1,4 +1,4 @@
-﻿{
+{
   "schemaVersion": "2.0",
   "processing": {
     "families": {
@@ -7,7 +7,7 @@
         "children": "ALL"
       },
       "series": {
-        "enabled": false,
+        "enabled": true,
         "children": "ALL"
       },
       "ru": {

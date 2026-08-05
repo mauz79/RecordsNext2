@@ -40,10 +40,10 @@ class ProcessingOptionsIntegrationTest {
     }
 
     @Test
-    void pipelineRejectsFamiliesNotYetImplementedInsteadOfIgnoringThem() {
+    void pipelineRejectsFamiliesStillNotImplementedInsteadOfIgnoringThem() {
         ProcessingOptions options = ProcessingOptions.modular(
                 new ProcessingSelection(
-                        Set.of(RecordFamily.SERIES),
+                        Set.of(RecordFamily.MODIFIERS),
                         Set.of(),
                         false,
                         false,
@@ -58,10 +58,14 @@ class ProcessingOptionsIntegrationTest {
     }
 
     @Test
-    void pipelineAcceptsCurrentClassicAndRuBridge() {
+    void pipelineAcceptsCurrentClassicRuAndSeriesBridge() {
         ProcessingOptions options = ProcessingOptions.modular(
                 new ProcessingSelection(
-                        Set.of(RecordFamily.CLASSICS, RecordFamily.RU),
+                        Set.of(
+                                RecordFamily.CLASSICS,
+                                RecordFamily.RU,
+                                RecordFamily.SERIES
+                        ),
                         Set.of(),
                         false,
                         true,
