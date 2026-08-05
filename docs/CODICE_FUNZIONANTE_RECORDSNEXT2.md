@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-05 19:19:50 +02:00
+> Data generazione: 2026-08-05 19:25:22 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -4905,30 +4905,55 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
                 matchRows += matches.size();
                 for (Map<String,Object> match : matches) {
                     BigDecimal score = number(match.get("puntiFatti"));
+                    BigDecimal scoreAgainst = number(match.get("puntiSubiti"));
                     int goalsFor = integer(match.get("golFatti"));
                     int goalsAgainst = integer(match.get("golSubiti"));
-                    String result = string(match.get("esito"));
+                    String result = string(match.get("esito")).trim().toUpperCase();
                     Band current = currentBand(bands, score);
                     BigDecimal nextMin = nextBandMin(bands, score);
                     BigDecimal distance = nextMin == null ? null : nextMin.subtract(score);
+                    BigDecimal bandSurplus = current == null ? BigDecimal.ZERO : score.subtract(current.min());
     
                     if (current != null && score.compareTo(current.min()) == 0) {
                         addEvent(events, aggregates, match, "EXACT_THRESHOLD", "NEUTRAL", BigDecimal.ZERO,
-                                "Punteggio esattamente sul minimo della fascia gol");
+                                BigDecimal.ZERO, "Punteggio esattamente sul minimo della fascia gol");
                     }
-                    if ("V".equals(result) && current != null && score.compareTo(current.min()) == 0
+                    if (isWin(result) && current != null && score.compareTo(current.min()) == 0
                             && goalsFor == goalsAgainst + 1) {
                         addEvent(events, aggregates, match, "JUST_ENOUGH", "FAVOURABLE", BigDecimal.ZERO,
-                                "Vittoria con punteggio sul minimo della fascia decisiva");
+                                BigDecimal.ZERO, "Vittoria con punteggio sul minimo della fascia decisiva");
                     }
                     if (distance != null && distance.compareTo(new BigDecimal("0.5")) == 0) {
-                        if ("P".equals(result) && goalsFor == goalsAgainst) {
+                        if (isDraw(result) && goalsFor == goalsAgainst) {
                             addEvent(events, aggregates, match, "MISSED_WIN_HALF_POINT", "UNFAVOURABLE", distance,
-                                    "Mezzo punto dalla fascia successiva che avrebbe prodotto la vittoria");
-                        } else if ("S".equals(result) && goalsFor + 1 == goalsAgainst) {
+                                    bandSurplus, "Mezzo punto dalla fascia successiva che avrebbe prodotto la vittoria");
+                        } else if (isLoss(result) && goalsFor + 1 == goalsAgainst) {
                             addEvent(events, aggregates, match, "LOSS_BY_A_WHISKER", "UNFAVOURABLE", distance,
-                                    "Mezzo punto dalla fascia successiva che avrebbe prodotto il pareggio");
+                                    bandSurplus, "Mezzo punto dalla fascia successiva che avrebbe prodotto il pareggio");
                         }
+                    }
+                    if (isDraw(result) && goalsFor == goalsAgainst) {
+                        if (score.compareTo(scoreAgainst) < 0) {
+                            addEvent(events, aggregates, match, "MIRACLE_DRAW", "FAVOURABLE",
+                                    distance, bandSurplus,
+                                    "Pareggio ottenuto con punteggio inferiore all'avversaria nella stessa fascia gol");
+                        } else if (score.compareTo(scoreAgainst) > 0) {
+                            addEvent(events, aggregates, match, "TIGHT_DRAW", "UNFAVOURABLE",
+                                    distance, bandSurplus,
+                                    "Pareggio nonostante un punteggio superiore all'avversaria nella stessa fascia gol");
+                        }
+                    }
+                    if (isWin(result) && goalsFor == goalsAgainst + 1) {
+                        addEvent(events, aggregates, match, "ONE_GOAL_WIN", "FAVOURABLE",
+                                distance, bandSurplus, "Vittoria con un solo gol di margine");
+                    } else if (isLoss(result) && goalsFor + 1 == goalsAgainst) {
+                        addEvent(events, aggregates, match, "ONE_GOAL_LOSS", "UNFAVOURABLE",
+                                distance, bandSurplus, "Sconfitta con un solo gol di margine");
+                    }
+                    if (current != null && bandSurplus.compareTo(BigDecimal.ZERO) > 0) {
+                        addEvent(events, aggregates, match, "UNUSED_BAND_POINTS", "NEUTRAL",
+                                distance, bandSurplus,
+                                "Punti oltre il minimo della fascia che non hanno prodotto un gol aggiuntivo");
                     }
                 }
             }
@@ -4950,7 +4975,9 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
             metadata.put("teamMatchRowCount", matchRows);
             metadata.put("eventCount", events.size());
             metadata.put("implementedEventTypes", List.of(
-                    "EXACT_THRESHOLD", "JUST_ENOUGH", "MISSED_WIN_HALF_POINT", "LOSS_BY_A_WHISKER"));
+                    "EXACT_THRESHOLD", "JUST_ENOUGH", "MISSED_WIN_HALF_POINT", "LOSS_BY_A_WHISKER",
+                    "MIRACLE_DRAW", "TIGHT_DRAW", "ONE_GOAL_WIN", "ONE_GOAL_LOSS",
+                    "UNUSED_BAND_POINTS"));
             metadata.put("culometroGenerated", false);
     
             Map<String,Object> root = new LinkedHashMap<>();
@@ -4962,8 +4989,8 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
             root.put("globalAggregates", List.of());
             root.put("absoluteOccurrences", List.of());
             root.put("outputStatus", List.of(Map.of(
-                    "status", "GENERATED_PARTIAL",
-                    "detail", "Eventi oggettivi su fasce gol disponibili; regole beffa/miracolato/spreco ancora da catalogare. Culometro escluso."
+                    "status", "GENERATED_COMPLETE",
+                    "detail", "Indicatori oggettivi completi basati su esiti, fasce gol, margini e punti inutilizzati. Culometro escluso."
             )));
     
             Files.writeString(outputFile, GLOBAL_NAME + " = " + JsonWriter.write(root) + ";\n",
@@ -4974,7 +5001,7 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
     
         private static void addEvent(List<Object> events, Map<String,Aggregate> aggregates,
                                      Map<String,Object> match, String type, String direction,
-                                     BigDecimal distance, String detail) {
+                                     BigDecimal distance, BigDecimal bandSurplus, String detail) {
             Map<String,Object> event = new LinkedHashMap<>();
             event.put("eventId", "threshold:" + string(match.get("stagione")) + ":" + string(match.get("idIncontro"))
                     + ":" + string(match.get("idSquadra")) + ":" + type.toLowerCase());
@@ -4997,11 +5024,13 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
             event.put("goalsAgainst", match.get("golSubiti"));
             event.put("result", match.get("esito"));
             event.put("distanceToNextThreshold", distance);
+            event.put("unusedBandPoints", bandSurplus);
             event.put("detail", detail);
             events.add(event);
     
             String key = string(match.get("stagione")) + "|" + string(match.get("idSquadra"));
-            aggregates.computeIfAbsent(key, ignored -> new Aggregate(match)).add(direction, type);
+            aggregates.computeIfAbsent(key, ignored -> new Aggregate(match))
+                    .add(direction, type, bandSurplus);
         }
     
         private static Band currentBand(List<Map<String,Object>> bands, BigDecimal score) {
@@ -5045,6 +5074,9 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
             return new BigDecimal(string(value).replace(',', '.'));
         }
         private static int integer(Object value) { return number(value).intValue(); }
+        private static boolean isWin(String result) { return "V".equals(result); }
+        private static boolean isDraw(String result) { return "P".equals(result) || "N".equals(result); }
+        private static boolean isLoss(String result) { return "S".equals(result); }
     
         public record ExportResult(int normalizedFileCount, int teamMatchRowCount, int eventCount,
                                    int aggregateCount, Path outputFile) {}
@@ -5053,17 +5085,22 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
         private static final class Aggregate {
             private final Object seasonId, teamId, team;
             private int favourable, unfavourable, neutral;
+            private BigDecimal unusedBandPoints = BigDecimal.ZERO;
             private final Map<String,Integer> byType = new LinkedHashMap<>();
             Aggregate(Map<String,Object> match) { seasonId=match.get("stagione"); teamId=match.get("idSquadra"); team=match.get("squadra"); }
-            void add(String direction, String type) {
+            void add(String direction, String type, BigDecimal surplus) {
                 switch (direction) { case "FAVOURABLE" -> favourable++; case "UNFAVOURABLE" -> unfavourable++; default -> neutral++; }
                 byType.merge(type, 1, Integer::sum);
+                if ("UNUSED_BAND_POINTS".equals(type) && surplus != null) {
+                    unusedBandPoints = unusedBandPoints.add(surplus);
+                }
             }
             Map<String,Object> toMap() {
                 Map<String,Object> out = new LinkedHashMap<>();
                 out.put("seasonId", seasonId); out.put("teamId", teamId); out.put("team", team);
                 out.put("favourableEvents", favourable); out.put("unfavourableEvents", unfavourable);
                 out.put("neutralEvents", neutral); out.put("luckBalance", favourable - unfavourable);
+                out.put("unusedBandPoints", unusedBandPoints);
                 out.put("eventsByType", byType); return out;
             }
         }
@@ -21450,13 +21487,14 @@ File: src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
     import java.nio.file.Files;
     import java.nio.file.Path;
     
+    import static org.junit.jupiter.api.Assertions.assertFalse;
     import static org.junit.jupiter.api.Assertions.assertTrue;
     
     class ThresholdsLuckFamilyJsExporterTest {
         @TempDir Path temp;
     
         @Test
-        void exportsObjectiveThresholdEventsWithoutCulometro() throws Exception {
+        void exportsCompleteObjectiveThresholdAndLuckEventsWithoutCulometro() throws Exception {
             Path reports = temp.resolve("reports/2025_2026");
             Files.createDirectories(reports);
             Files.writeString(reports.resolve("season_normalized_serie_a.json"), """
@@ -21469,7 +21507,11 @@ File: src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
                     {"stagione":"2025_2026","competizioneStoricaId":"serie_a","competizioneNome":"Serie A",
                      "idIncontro":"2","giornata":"2a","giornataDiA":2,"urlTabellino":"ris.htm?Gio=2",
                      "idSquadra":"10","squadra":"Alpha","idAvversaria":"12","avversaria":"Gamma",
-                     "puntiFatti":65.5,"puntiSubiti":65.5,"golFatti":0,"golSubiti":0,"esito":"P"}
+                     "puntiFatti":65.5,"puntiSubiti":64,"golFatti":0,"golSubiti":0,"esito":"P"},
+                    {"stagione":"2025_2026","competizioneStoricaId":"serie_a","competizioneNome":"Serie A",
+                     "idIncontro":"3","giornata":"3a","giornataDiA":3,"urlTabellino":"ris.htm?Gio=3",
+                     "idSquadra":"10","squadra":"Alpha","idAvversaria":"13","avversaria":"Delta",
+                     "puntiFatti":71.5,"puntiSubiti":72,"golFatti":1,"golSubiti":2,"esito":"S"}
                   ],
                   "fasceGolDettaglio": [
                     {"idCompetizioneFcm":1,"idFascia":"1","min":0,"max":65.5,"gol":0},
@@ -21483,8 +21525,14 @@ File: src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
             String js = Files.readString(output);
             assertTrue(js.startsWith("window.fcmRecordsNextThresholdsLuck = "));
             assertTrue(js.contains("JUST_ENOUGH"));
-            assertTrue(js.contains("MISSED_WIN_HALF_POINT"));
+            assertTrue(js.contains("TIGHT_DRAW"));
+            assertTrue(js.contains("LOSS_BY_A_WHISKER"));
+            assertTrue(js.contains("ONE_GOAL_WIN"));
+            assertTrue(js.contains("ONE_GOAL_LOSS"));
+            assertTrue(js.contains("UNUSED_BAND_POINTS"));
+            assertTrue(js.contains("\"status\":\"GENERATED_COMPLETE\""));
             assertTrue(js.contains("\"culometroGenerated\":false"));
+            assertFalse(js.contains("GENERATED_PARTIAL"));
         }
     }
 
