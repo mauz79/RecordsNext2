@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-05 15:43:27 +02:00
+> Data generazione: 2026-08-05 16:50:34 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -1601,23 +1601,116 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner
     import it.alterlega.recordsnext.app.ProcessingMode;
     import it.alterlega.recordsnext.app.RecordsNextPipeline;
     
+    import java.nio.file.Files;
     import java.nio.file.Path;
     
     public final class ConfiguredPipelineRunner {
-        private ConfiguredPipelineRunner() {}
+        private ConfiguredPipelineRunner() {
+        }
+    
+        public static void main(String[] args) throws Exception {
+            if (args.length < 1 || args.length > 3) {
+                System.err.println(
+                    "Uso: ConfiguredPipelineRunner "
+                        + "<processing.json> [FULL|CONSOLIDATED] [projectRoot]"
+                );
+                System.exit(2);
+            }
+    
+            Path processingConfig = Path.of(args[0]).toAbsolutePath().normalize();
+    
+            if (!Files.isRegularFile(processingConfig)) {
+                throw new IllegalArgumentException(
+                    "File di configurazione elaborazione non trovato: " + processingConfig
+                );
+            }
+    
+            Path inferredRoot = processingConfig.getParent() == null
+                ? null
+                : processingConfig.getParent().getParent();
+    
+            Path projectRoot = args.length == 3
+                ? Path.of(args[2]).toAbsolutePath().normalize()
+                : inferredRoot;
+    
+            if (projectRoot == null) {
+                throw new IllegalArgumentException(
+                    "Impossibile ricavare la root progetto da: " + processingConfig
+                );
+            }
+    
+            Path propertiesFile = projectRoot
+                .resolve("config")
+                .resolve("recordsnext-gui.properties");
+    
+            PipelineConfig pipelineConfig = Files.isRegularFile(propertiesFile)
+                ? PipelineConfig.load(projectRoot, propertiesFile)
+                : PipelineConfig.defaults(projectRoot);
+    
+            RecordsNextPipeline pipeline = new RecordsNextPipeline();
+    
+            ProcessingMode mode;
+            if (args.length >= 2 && !args[1].isBlank()) {
+                mode = ProcessingMode.valueOf(args[1].trim().toUpperCase());
+            } else {
+                mode = pipeline.hasConsolidation(pipelineConfig)
+                    ? ProcessingMode.CONSOLIDATED
+                    : ProcessingMode.FULL;
+            }
+    
+            System.out.println("RecordsNext 2.0 - esecuzione configurata");
+            System.out.println("Project root : " + projectRoot);
+            System.out.println("Processing   : " + processingConfig);
+            System.out.println(
+                "Pipeline cfg : "
+                    + (Files.isRegularFile(propertiesFile)
+                        ? propertiesFile
+                        : "[default PipelineConfig]")
+            );
+            System.out.println("Mode         : " + mode);
+            System.out.println();
+    
+            RecordsNextPipeline.Result result = run(
+                pipelineConfig,
+                processingConfig,
+                mode,
+                new ConsoleListener()
+            );
+    
+            System.out.println();
+            System.out.println("Elaborazione completata.");
+            System.out.println("Classic entries : " + result.classicEntries());
+            System.out.println("RU seasons      : " + result.ruSeasons());
+            System.out.println("File validi     : " + result.files());
+            System.out.println("File pubblicati : " + result.published());
+        }
     
         public static RecordsNextPipeline.Result run(
-                PipelineConfig pipelineConfig,
-                Path processingConfig,
-                ProcessingMode mode,
-                RecordsNextPipeline.Listener listener
+            PipelineConfig pipelineConfig,
+            Path processingConfig,
+            ProcessingMode mode,
+            RecordsNextPipeline.Listener listener
         ) throws Exception {
             return new RecordsNextPipeline().run(
-                    pipelineConfig,
-                    ProcessingConfigLoader.load(processingConfig),
-                    mode,
-                    listener
+                pipelineConfig,
+                ProcessingConfigLoader.load(processingConfig),
+                mode,
+                listener
             );
+        }
+    
+        private static final class ConsoleListener
+            implements RecordsNextPipeline.Listener {
+    
+            @Override
+            public void phase(String text, int percent) {
+                System.out.println("[" + percent + "%] " + text);
+            }
+    
+            @Override
+            public void timing(String text) {
+                System.out.println("TEMPO " + text);
+            }
         }
     }
 
@@ -1854,6 +1947,342 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.j
         private static String string(Object value, String name) {
             if (value instanceof String s && !s.isBlank()) return s;
             throw new IllegalArgumentException("Stringa JSON mancante o non valida: " + name);
+        }
+    }
+
+## src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
+
+File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
+
+    package it.alterlega.recordsnext.app.core;
+    
+    import java.io.IOException;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.sql.Connection;
+    import java.sql.DriverManager;
+    import java.sql.ResultSet;
+    import java.sql.Statement;
+    import java.time.Instant;
+    import java.util.ArrayList;
+    import java.util.LinkedHashMap;
+    import java.util.List;
+    import java.util.Map;
+    
+    public final class CoreJsExporter {
+        private CoreJsExporter() {
+        }
+    
+        public static ExportResult export(
+                Path database,
+                Path outputFile,
+                String leagueId,
+                String leagueName) throws Exception {
+    
+            Path db = database.toAbsolutePath().normalize();
+            Path out = outputFile.toAbsolutePath().normalize();
+            if (!Files.isRegularFile(db)) {
+                throw new IllegalArgumentException("Database SQLite non trovato: " + db);
+            }
+            if (leagueId == null || leagueId.isBlank()) {
+                throw new IllegalArgumentException("leagueId obbligatorio");
+            }
+            if (leagueName == null || leagueName.isBlank()) {
+                throw new IllegalArgumentException("leagueName obbligatorio");
+            }
+    
+            Class.forName("org.sqlite.JDBC");
+            CoreData data;
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db)) {
+                data = read(c, leagueId.trim(), leagueName.trim());
+            }
+    
+            Path parent = out.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            Files.writeString(out, toJavascript(data), StandardCharsets.UTF_8);
+            return new ExportResult(
+                data.seasons().size(),
+                data.canonicalTeams().size(),
+                data.seasonTeams().size(),
+                data.canonicalCompetitions().size(),
+                data.seasonCompetitions().size(),
+                out
+            );
+        }
+    
+        private static CoreData read(Connection c, String leagueId, String leagueName)
+                throws Exception {
+            List<Map<String, Object>> seasons = readRows(c, """
+                SELECT
+                    s.season_id,
+                    s.display_name,
+                    s.sort_order,
+                    s.is_anchor,
+                    COALESCE(sc.management_type, 'NON_CONFIGURATA') AS management_type,
+                    COALESCE(sc.configuration_status, 'DA_CONFIGURARE') AS configuration_status,
+                    sc.local_site_path,
+                    sc.online_site_url,
+                    sc.dataa_path
+                FROM rn_season s
+                LEFT JOIN rn_season_configuration sc
+                  ON sc.season_id = s.season_id
+                ORDER BY COALESCE(s.sort_order, 999999), s.season_id
+                """);
+    
+            List<Map<String, Object>> canonicalTeams = readRows(c, """
+                SELECT
+                    team_identity_id AS canonical_team_id,
+                    canonical_name,
+                    anchor_season_id,
+                    anchor_team_season_id
+                FROM rn_team_identity
+                ORDER BY canonical_name COLLATE NOCASE, team_identity_id
+                """);
+    
+            List<Map<String, Object>> seasonTeams = readRows(c, """
+                SELECT
+                    team_season_id,
+                    season_id,
+                    source_file_id,
+                    source_team_id,
+                    source_name,
+                    normalized_name,
+                    source_division_id,
+                    source_team_number,
+                    team_identity_id AS canonical_team_id,
+                    canonical_name,
+                    mapping_status,
+                    mapping_method,
+                    notes
+                FROM rn_configured_team
+                ORDER BY season_id, canonical_name COLLATE NOCASE, source_name COLLATE NOCASE
+                """);
+    
+            List<Map<String, Object>> canonicalCompetitions = readRows(c, """
+                SELECT
+                    competition_identity_id AS canonical_competition_id,
+                    canonical_name,
+                    anchor_season_id,
+                    anchor_competition_season_id
+                FROM rn_competition_identity
+                ORDER BY canonical_name COLLATE NOCASE, competition_identity_id
+                """);
+    
+            List<Map<String, Object>> seasonCompetitions = readRows(c, """
+                SELECT
+                    competition_season_id,
+                    season_id,
+                    source_file_id,
+                    source_competition_id,
+                    source_name,
+                    normalized_name,
+                    competition_identity_id AS canonical_competition_id,
+                    canonical_name,
+                    mapping_status,
+                    mapping_method,
+                    notes
+                FROM rn_configured_competition
+                ORDER BY season_id, canonical_name COLLATE NOCASE, source_name COLLATE NOCASE
+                """);
+    
+            return new CoreData(
+                "2.0",
+                Instant.now().toString(),
+                leagueId,
+                leagueName,
+                seasons,
+                canonicalTeams,
+                seasonTeams,
+                canonicalCompetitions,
+                seasonCompetitions
+            );
+        }
+    
+        private static List<Map<String, Object>> readRows(Connection c, String sql)
+                throws Exception {
+            List<Map<String, Object>> rows = new ArrayList<>();
+            try (Statement s = c.createStatement(); ResultSet rs = s.executeQuery(sql)) {
+                int columns = rs.getMetaData().getColumnCount();
+                while (rs.next()) {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    for (int i = 1; i <= columns; i++) {
+                        String name = rs.getMetaData().getColumnLabel(i);
+                        Object value = rs.getObject(i);
+                        row.put(toCamelCase(name), value);
+                    }
+                    rows.add(row);
+                }
+            }
+            return rows;
+        }
+    
+        static String toJavascript(CoreData data) {
+            return "window.fcmRecordsNextCore = " + toJson(data) + ";\n";
+        }
+    
+        private static String toJson(Object value) {
+            if (value == null) return "null";
+            if (value instanceof String s) return quote(s);
+            if (value instanceof Boolean || value instanceof Number) return value.toString();
+            if (value instanceof CoreData d) {
+                Map<String, Object> map = new LinkedHashMap<>();
+                map.put("schemaVersion", d.schemaVersion());
+                map.put("generatedAt", d.generatedAt());
+                map.put("league", Map.of("leagueId", d.leagueId(), "leagueName", d.leagueName()));
+                map.put("seasons", d.seasons());
+                map.put("canonicalTeams", d.canonicalTeams());
+                map.put("seasonTeams", d.seasonTeams());
+                map.put("canonicalCompetitions", d.canonicalCompetitions());
+                map.put("seasonCompetitions", d.seasonCompetitions());
+                return toJson(map);
+            }
+            if (value instanceof Map<?, ?> map) {
+                StringBuilder b = new StringBuilder("{");
+                boolean first = true;
+                for (Map.Entry<?, ?> e : map.entrySet()) {
+                    if (!first) b.append(',');
+                    first = false;
+                    b.append(quote(String.valueOf(e.getKey()))).append(':').append(toJson(e.getValue()));
+                }
+                return b.append('}').toString();
+            }
+            if (value instanceof Iterable<?> values) {
+                StringBuilder b = new StringBuilder("[");
+                boolean first = true;
+                for (Object item : values) {
+                    if (!first) b.append(',');
+                    first = false;
+                    b.append(toJson(item));
+                }
+                return b.append(']').toString();
+            }
+            throw new IllegalArgumentException("Tipo JSON non supportato: " + value.getClass());
+        }
+    
+        private static String quote(String value) {
+            StringBuilder b = new StringBuilder("\"");
+            for (int i = 0; i < value.length(); i++) {
+                char ch = value.charAt(i);
+                switch (ch) {
+                    case '\\' -> b.append("\\\\");
+                    case '"' -> b.append("\\\"");
+                    case '\n' -> b.append("\\n");
+                    case '\r' -> b.append("\\r");
+                    case '\t' -> b.append("\\t");
+                    default -> {
+                        if (ch < 0x20) b.append(String.format("\\u%04x", (int) ch));
+                        else b.append(ch);
+                    }
+                }
+            }
+            return b.append('"').toString();
+        }
+    
+        private static String toCamelCase(String value) {
+            StringBuilder b = new StringBuilder();
+            boolean upper = false;
+            for (char ch : value.toLowerCase().toCharArray()) {
+                if (ch == '_') {
+                    upper = true;
+                } else if (upper) {
+                    b.append(Character.toUpperCase(ch));
+                    upper = false;
+                } else {
+                    b.append(ch);
+                }
+            }
+            return b.toString();
+        }
+    
+        public record ExportResult(
+            int seasons,
+            int canonicalTeams,
+            int seasonTeams,
+            int canonicalCompetitions,
+            int seasonCompetitions,
+            Path outputFile
+        ) {}
+    
+        record CoreData(
+            String schemaVersion,
+            String generatedAt,
+            String leagueId,
+            String leagueName,
+            List<Map<String, Object>> seasons,
+            List<Map<String, Object>> canonicalTeams,
+            List<Map<String, Object>> seasonTeams,
+            List<Map<String, Object>> canonicalCompetitions,
+            List<Map<String, Object>> seasonCompetitions
+        ) {}
+    }
+
+## src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadata.java
+
+File: src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadata.java
+
+    package it.alterlega.recordsnext.app.core;
+    
+    public record LeagueMetadata(
+            String leagueId,
+            String leagueName,
+            String currentSeasonId
+    ) {
+        public LeagueMetadata {
+            leagueId = require(leagueId, "leagueId");
+            leagueName = require(leagueName, "leagueName");
+            currentSeasonId = require(currentSeasonId, "currentSeasonId");
+        }
+    
+        private static String require(String value, String field) {
+            if (value == null || value.isBlank()) {
+                throw new IllegalArgumentException(field + " obbligatorio");
+            }
+            return value.trim();
+        }
+    }
+
+## src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoader.java
+
+File: src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoader.java
+
+    package it.alterlega.recordsnext.app.core;
+    
+    import java.io.IOException;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+    
+    public final class LeagueMetadataLoader {
+        private LeagueMetadataLoader() {
+        }
+    
+        public static LeagueMetadata load(Path configFile) throws IOException {
+            Path file = configFile.toAbsolutePath().normalize();
+            if (!Files.isRegularFile(file)) {
+                throw new IOException("Configurazione lega non trovata: " + file);
+            }
+            String json = Files.readString(file, StandardCharsets.UTF_8);
+            return new LeagueMetadata(
+                    readString(json, "leagueId"),
+                    readString(json, "leagueName"),
+                    readString(json, "currentSeasonId")
+            );
+        }
+    
+        private static String readString(String json, String key) throws IOException {
+            Pattern pattern = Pattern.compile(
+                    "\"" + Pattern.quote(key) + "\"\\s*:\\s*\"([^\"]*)\""
+            );
+            Matcher matcher = pattern.matcher(json);
+            if (!matcher.find()) {
+                throw new IOException("Campo obbligatorio mancante in league.json: " + key);
+            }
+            return matcher.group(1).trim();
         }
     }
 
@@ -2781,23 +3210,43 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
     public record PipelineConfig(Path projectRoot, Path reports, Path classicArchive, Path ruArchive,
                                  Path staging, Path siteJs, List<String> seasons) {
         public static PipelineConfig load(Path projectRoot, Path file) throws IOException {
-            Properties p = new Properties();
+            Properties properties = new Properties();
             try (InputStream in = Files.newInputStream(file)) {
-                p.load(in);
+                properties.load(in);
             }
-            List<String> seasons = Arrays.stream(p.getProperty("seasons", "").split("\\s*,\\s*"))
-                .filter(s -> !s.isBlank()).toList();
+            return fromProperties(projectRoot, properties);
+        }
+    
+        public static PipelineConfig defaults(Path projectRoot) {
+            return fromProperties(projectRoot, new Properties());
+        }
+    
+        public static PipelineConfig fromProperties(Path projectRoot, Properties properties) {
+            List<String> seasons = Arrays.stream(
+                    properties.getProperty("seasons", "").split("\\s*,\\s*")
+                )
+                .filter(value -> !value.isBlank())
+                .toList();
+    
             Path normalizedRoot = projectRoot.toAbsolutePath().normalize();
-            return new PipelineConfig(normalizedRoot,
-                resolve(normalizedRoot, p.getProperty("reports", "data/reports")),
-                resolve(normalizedRoot, p.getProperty("classicArchive", "data/records-archive/stagioni")),
-                resolve(normalizedRoot, p.getProperty("ruArchive", "data/records-archive/riserveufficio")),
-                resolve(normalizedRoot, p.getProperty("staging", "data/site-export-staging")),
-                resolvePublishDirectory(normalizedRoot, p), seasons);
+    
+            return new PipelineConfig(
+                normalizedRoot,
+                resolve(normalizedRoot, properties.getProperty("reports", "data/reports")),
+                resolve(normalizedRoot,
+                    properties.getProperty("classicArchive", "data/records-archive/stagioni")),
+                resolve(normalizedRoot,
+                    properties.getProperty("ruArchive", "data/records-archive/riserveufficio")),
+                resolve(normalizedRoot,
+                    properties.getProperty("staging", "data/site-export-staging")),
+                resolvePublishDirectory(normalizedRoot, properties),
+                seasons
+            );
         }
     
         public static Path resolvePublishDirectory(Path projectRoot, Properties properties) {
             String mode = properties.getProperty("publish.destinationMode", "currentSeason").trim();
+    
             if ("custom".equalsIgnoreCase(mode)) {
                 String custom = properties.getProperty("publish.customDirectory", "").trim();
                 if (!custom.isEmpty()) {
@@ -2805,8 +3254,11 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
                 }
             }
     
-            Path database = resolve(projectRoot,
-                properties.getProperty("database", "data/database/recordsnext.db"));
+            Path database = resolve(
+                projectRoot,
+                properties.getProperty("database", "data/database/recordsnext.db")
+            );
+    
             if (Files.isRegularFile(database)) {
                 String sql = """
                     SELECT c.local_site_path
@@ -2818,21 +3270,32 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
                     ORDER BY s.sort_order DESC
                     LIMIT 1
                     """;
+    
                 try {
                     Class.forName("org.sqlite.JDBC");
-                    try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + database);
-                         Statement statement = connection.createStatement();
-                         ResultSet result = statement.executeQuery(sql)) {
+    
+                    try (
+                        Connection connection =
+                            DriverManager.getConnection("jdbc:sqlite:" + database);
+                        Statement statement = connection.createStatement();
+                        ResultSet result = statement.executeQuery(sql)
+                    ) {
                         if (result.next()) {
-                            return Path.of(result.getString(1)).resolve("js").toAbsolutePath().normalize();
+                            return Path.of(result.getString(1))
+                                .resolve("js")
+                                .toAbsolutePath()
+                                .normalize();
                         }
                     }
                 } catch (Exception ignored) {
-                    // Fallback to the legacy property below.
+                    // Fallback alla proprieta legacy.
                 }
             }
-            return resolve(projectRoot,
-                properties.getProperty("siteJs", "E:/fantacalcio/Lega2025/js"));
+    
+            return resolve(
+                projectRoot,
+                properties.getProperty("siteJs", "E:/fantacalcio/Lega2025/js")
+            );
         }
     
         private static Path resolve(Path root, String value) {
@@ -3102,6 +3565,8 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
     import it.alterlega.recordsnext.RiserveUfficioArchiveBuilder;
     import it.alterlega.recordsnext.SeasonRecordsArchiveBuilder;
     import it.alterlega.recordsnext.app.manifest.ManifestMetadata;
+    import it.alterlega.recordsnext.app.core.LeagueMetadata;
+    import it.alterlega.recordsnext.app.core.LeagueMetadataLoader;
     import it.alterlega.recordsnext.app.model.RecordFamily;
     
     import java.nio.file.Path;
@@ -3182,13 +3647,16 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                         82
                 );
                 long started = System.nanoTime();
+                LeagueMetadata leagueMetadata = LeagueMetadataLoader.load(
+                        c.projectRoot().resolve("config/league.json")
+                );
                 ManifestMetadata manifestMetadata = new ManifestMetadata(
                         "RecordsNext by mauz79",
                         "2.0.0-dev",
                         "2.0",
                         OffsetDateTime.now(),
-                        "",
-                        "",
+                        leagueMetadata.leagueId(),
+                        leagueMetadata.currentSeasonId(),
                         c.seasons(),
                         List.of()
                 );
@@ -3202,7 +3670,9 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                         o.familyEnabled(RecordFamily.RU),
                         o,
                         preflight,
-                        manifestMetadata
+                        manifestMetadata,
+                        database,
+                        leagueMetadata
                 );
                 l.timing(
                         (o.publish()
@@ -12156,6 +12626,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import it.alterlega.recordsnext.app.manifest.ManifestJsWriter;
     import it.alterlega.recordsnext.app.manifest.ManifestMetadata;
     import it.alterlega.recordsnext.app.manifest.ManifestPublishingSupport;
+    import it.alterlega.recordsnext.app.core.CoreJsExporter;
+    import it.alterlega.recordsnext.app.core.LeagueMetadata;
     
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
@@ -12185,6 +12657,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
      */
     public final class Records2026SitePublisher {
     
+        private static final String CORE_FILE = "fcmRecordsNext_Core.js";
         private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
         private static final String RU_FILE = "records2026.recordstagionali.ru.js";
         private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -12246,6 +12719,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     includeRu,
                     null,
                     null,
+                    null,
+                    null,
                     null
             );
         }
@@ -12271,7 +12746,38 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     includeRu,
                     options,
                     preflight,
-                    manifestMetadata
+                    manifestMetadata,
+                    null,
+                    null
+            );
+        }
+    
+        public static PublishResult run(
+                Path classicArchive,
+                Path ruArchive,
+                Path stagingRoot,
+                Path siteJsDir,
+                boolean generateOnly,
+                boolean includeClassic,
+                boolean includeRu,
+                ProcessingOptions options,
+                PipelinePreflight.Result preflight,
+                ManifestMetadata manifestMetadata,
+                Path database,
+                LeagueMetadata leagueMetadata) throws IOException {
+            return runInternal(
+                    classicArchive,
+                    ruArchive,
+                    stagingRoot,
+                    siteJsDir,
+                    generateOnly,
+                    includeClassic,
+                    includeRu,
+                    options,
+                    preflight,
+                    manifestMetadata,
+                    database,
+                    leagueMetadata
             );
         }
     
@@ -12285,13 +12791,18 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 boolean includeRu,
                 ProcessingOptions options,
                 PipelinePreflight.Result preflight,
-                ManifestMetadata manifestMetadata) throws IOException {
+                ManifestMetadata manifestMetadata,
+                Path database,
+                LeagueMetadata leagueMetadata) throws IOException {
     
             boolean includeRecordsNextManifest = options != null
                     && preflight != null
                     && manifestMetadata != null;
+            boolean includeRecordsNextCore = includeRecordsNextManifest
+                    && database != null
+                    && leagueMetadata != null;
     
-            if (!includeClassic && !includeRu && !includeRecordsNextManifest) {
+            if (!includeClassic && !includeRu && !includeRecordsNextManifest && !includeRecordsNextCore) {
                 throw new IOException("Nessun modulo selezionato per la generazione JS");
             }
             if (includeClassic) requireDirectory(classicArchive, "Archivio classic");
@@ -12318,6 +12829,20 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 annualFiles = ru.annualFiles();
             }
     
+            if (includeRecordsNextCore) {
+                try {
+                    CoreJsExporter.export(
+                            database,
+                            generatedDir.resolve(CORE_FILE),
+                            leagueMetadata.leagueId(),
+                            leagueMetadata.leagueName()
+                    );
+                } catch (Exception ex) {
+                    if (ex instanceof IOException io) throw io;
+                    throw new IOException("Generazione Core 2.0 fallita", ex);
+                }
+            }
+    
             if (includeRecordsNextManifest) {
                 ManifestPublishingSupport.write(
                         generatedDir,
@@ -12332,7 +12857,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     annualFiles,
                     includeClassic,
                     includeRu,
-                    includeRecordsNextManifest
+                    includeRecordsNextManifest,
+                    includeRecordsNextCore
             );
             int published = 0;
             if (!generateOnly) {
@@ -12348,7 +12874,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 int expectedAnnualFiles,
                 boolean includeClassic,
                 boolean includeRu,
-                boolean includeRecordsNextManifest) throws IOException {
+                boolean includeRecordsNextManifest,
+                boolean includeRecordsNextCore) throws IOException {
     
             List<Path> files;
             try (var stream = Files.list(generatedDir)) {
@@ -12381,6 +12908,10 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             } else if (!annuals.isEmpty()) {
                 throw new IOException("File RU annuali generati nonostante il modulo RU sia disattivato");
             }
+            if (includeRecordsNextCore) {
+                requireFile(byName, CORE_FILE);
+                validatePrefix(byName.get(CORE_FILE), "window.fcmRecordsNextCore");
+            }
             if (includeRecordsNextManifest) {
                 requireFile(byName, ManifestJsWriter.FILE_NAME);
                 validatePrefix(
@@ -12390,6 +12921,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             }
             int expectedTotal = (includeClassic ? 1 : 0)
                     + (includeRu ? expectedAnnualFiles + 2 : 0)
+                    + (includeRecordsNextCore ? 1 : 0)
                     + (includeRecordsNextManifest ? 1 : 0);
             if (files.size() != expectedTotal) {
                 throw new IOException("Numero file JS inatteso: " + files.size()
@@ -18862,6 +19394,110 @@ File: src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTe
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
+
+    package it.alterlega.recordsnext.app.core;
+    
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+    
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.sql.Connection;
+    import java.sql.DriverManager;
+    import java.sql.Statement;
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+    
+    class CoreJsExporterTest {
+        @TempDir Path temp;
+    
+        @Test
+        void exportsCanonicalCoreData() throws Exception {
+            Path db = temp.resolve("recordsnext.db");
+            Class.forName("org.sqlite.JDBC");
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db);
+                 Statement s = c.createStatement()) {
+                s.execute("CREATE TABLE rn_season(season_id TEXT,display_name TEXT,sort_order INTEGER,is_anchor INTEGER)");
+                s.execute("CREATE TABLE rn_season_configuration(season_id TEXT,management_type TEXT,configuration_status TEXT,local_site_path TEXT,online_site_url TEXT,dataa_path TEXT)");
+                s.execute("CREATE TABLE rn_team_identity(team_identity_id INTEGER,canonical_name TEXT,anchor_season_id TEXT,anchor_team_season_id INTEGER)");
+                s.execute("CREATE TABLE rn_competition_identity(competition_identity_id INTEGER,canonical_name TEXT,anchor_season_id TEXT,anchor_competition_season_id INTEGER)");
+                s.execute("CREATE TABLE rn_configured_team(team_season_id INTEGER,season_id TEXT,source_file_id INTEGER,source_team_id INTEGER,source_name TEXT,normalized_name TEXT,source_division_id INTEGER,source_team_number INTEGER,team_identity_id INTEGER,canonical_name TEXT,mapping_status TEXT,mapping_method TEXT,notes TEXT)");
+                s.execute("CREATE TABLE rn_configured_competition(competition_season_id INTEGER,season_id TEXT,source_file_id INTEGER,source_competition_id INTEGER,source_name TEXT,normalized_name TEXT,competition_identity_id INTEGER,canonical_name TEXT,mapping_status TEXT,mapping_method TEXT,notes TEXT)");
+                s.execute("INSERT INTO rn_season VALUES('2025_2026','2025/2026',1,1)");
+                s.execute("INSERT INTO rn_season_configuration VALUES('2025_2026','GESTITA','COMPLETA','E:/fantacalcio/Lega2025','https://example.test/lega2025','js/DataA.js')");
+                s.execute("INSERT INTO rn_team_identity VALUES(10,'River Pino','2025_2026',100)");
+                s.execute("INSERT INTO rn_competition_identity VALUES(20,'Serie A','2025_2026',200)");
+                s.execute("INSERT INTO rn_configured_team VALUES(100,'2025_2026',1,7,'River Pino F.C.','river pino fc',1,7,10,'River Pino','ASSOCIATA','ANCHOR',NULL)");
+                s.execute("INSERT INTO rn_configured_competition VALUES(200,'2025_2026',1,1,'Serie A','serie a',20,'Serie A','ASSOCIATA','ANCHOR',NULL)");
+            }
+    
+            Path out = temp.resolve("fcmRecordsNext_Core.js");
+            var result = CoreJsExporter.export(db, out, "alterlega", "AlterLega");
+            String js = Files.readString(out);
+    
+            assertEquals(1, result.seasons());
+            assertEquals(1, result.canonicalTeams());
+            assertEquals(1, result.seasonTeams());
+            assertEquals(1, result.canonicalCompetitions());
+            assertEquals(1, result.seasonCompetitions());
+            assertTrue(js.startsWith("window.fcmRecordsNextCore = "));
+            assertTrue(js.contains("\"canonicalName\":\"River Pino\""));
+            assertTrue(js.contains("\"onlineSiteUrl\":\"https://example.test/lega2025\""));
+        }
+    }
+
+## src\test\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoaderTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoaderTest.java
+
+    package it.alterlega.recordsnext.app.core;
+    
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+    
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+    import static org.junit.jupiter.api.Assertions.assertThrows;
+    
+    class LeagueMetadataLoaderTest {
+        @TempDir
+        Path temp;
+    
+        @Test
+        void readsLeagueMetadataFromNestedConfiguration() throws Exception {
+            Path file = temp.resolve("league.json");
+            Files.writeString(file, """
+                    {
+                      "schemaVersion": "2.0",
+                      "league": {
+                        "leagueId": "alterlega",
+                        "leagueName": "AlterLega",
+                        "currentSeasonId": "2025_2026"
+                      }
+                    }
+                    """);
+    
+            LeagueMetadata metadata = LeagueMetadataLoader.load(file);
+    
+            assertEquals("alterlega", metadata.leagueId());
+            assertEquals("AlterLega", metadata.leagueName());
+            assertEquals("2025_2026", metadata.currentSeasonId());
+        }
+    
+        @Test
+        void rejectsMissingRequiredFields() throws Exception {
+            Path file = temp.resolve("league.json");
+            Files.writeString(file, "{\"leagueId\":\"alterlega\"}");
+    
+            assertThrows(Exception.class, () -> LeagueMetadataLoader.load(file));
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriterTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriterTest.java
@@ -19161,6 +19797,43 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTes
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
+
+    package it.alterlega.recordsnext.app;
+    
+    import org.junit.jupiter.api.Test;
+    
+    import java.nio.file.Path;
+    
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+    
+    class PipelineConfigDefaultsTest {
+        @Test
+        void usesDocumentedDefaultDirectoriesWithoutPropertiesFile() {
+            Path root = Path.of("D:/DEV_APPS/RecordsNext2.0").toAbsolutePath().normalize();
+    
+            PipelineConfig config = PipelineConfig.defaults(root);
+    
+            assertEquals(root.resolve("data/reports"), config.reports());
+            assertEquals(
+                root.resolve("data/records-archive/stagioni"),
+                config.classicArchive()
+            );
+            assertEquals(
+                root.resolve("data/records-archive/riserveufficio"),
+                config.ruArchive()
+            );
+            assertEquals(
+                root.resolve("data/site-export-staging"),
+                config.staging()
+            );
+            assertTrue(config.seasons().isEmpty());
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
@@ -19452,7 +20125,7 @@ File: config\processing.json
             "children": "ALL"
           },
           "series": {
-            "enabled": true,
+            "enabled": false,
             "children": "ALL"
           },
           "ru": {
@@ -19460,15 +20133,15 @@ File: config\processing.json
             "children": "ALL"
           },
           "modifiers": {
-            "enabled": true,
+            "enabled": false,
             "children": {
-              "defence": true,
+              "defence": false,
               "captain": false,
-              "homeField": true
+              "homeField": false
             }
           },
           "thresholdsLuck": {
-            "enabled": true,
+            "enabled": false,
             "children": "ALL"
           }
         },
@@ -19749,6 +20422,9 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner.java
 - src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
 - src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.java
+- src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
+- src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadata.java
+- src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoader.java
 - src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
 - src\main\java\it\alterlega\recordsnext\app\manifest\ManifestMetadata.java
 - src\main\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupport.java
@@ -19798,10 +20474,13 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\main\java\it\alterlega\recordsnext\SerieARoundProbe.java
 - src\main\java\it\alterlega\recordsnext\SqliteAudit.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTest.java
+- src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoaderTest.java
 - src\test\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriterTest.java
 - src\test\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupportTest.java
 - src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
 - src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTest.java
+- src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
 - src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 - src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTest.java
 - src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
