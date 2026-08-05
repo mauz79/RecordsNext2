@@ -45,3 +45,5 @@ data/reports/*
 data/consolidation/
 data/records-archive/
 data/site-export-staging/
+data/calendars/*
+!data/calendars/.gitkeep
