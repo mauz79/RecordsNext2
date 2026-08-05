@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-05 17:01:47 +02:00
+> Data generazione: 2026-08-05 17:52:30 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -4327,6 +4327,100 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             return String.format(java.util.Locale.ROOT, "%.3f s", seconds);
         }
     
+    }
+
+## src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
+
+File: src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
+
+    package it.alterlega.recordsnext.app.ru;
+    
+    import it.alterlega.recordsnext.Records2026RuJsExporter;
+    
+    import java.io.IOException;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.nio.file.StandardOpenOption;
+    
+    /** Genera l'output familiare nativo RecordsNext 2.0 per le Riserve d'Ufficio. */
+    public final class RuFamilyJsExporter {
+        public static final String FILE_NAME = "fcmRecordsNext_RU.js";
+        public static final String GLOBAL_NAME = "window.fcmRecordsNextRU";
+    
+        private static final String LEGACY_FILE = "records2026.recordstagionali.ru.js";
+        private static final String LEGACY_PREFIX = "window.RECORDS2026_PREVIEW_RU = ";
+    
+        private RuFamilyJsExporter() {
+        }
+    
+        public static ExportResult export(Path archiveRoot, Path outputFile) throws IOException {
+            Path parent = outputFile.toAbsolutePath().normalize().getParent();
+            if (parent == null) {
+                throw new IOException("Directory output RU non determinabile: " + outputFile);
+            }
+            Files.createDirectories(parent);
+    
+            Path temporaryDir = Files.createTempDirectory(parent, "recordsnext-ru-legacy-");
+            try {
+                Records2026RuJsExporter.ExportResult legacy =
+                        Records2026RuJsExporter.export(archiveRoot, temporaryDir);
+    
+                Path legacyCompact = temporaryDir.resolve(LEGACY_FILE);
+                String legacyJs = Files.readString(legacyCompact, StandardCharsets.UTF_8).trim();
+                if (!legacyJs.startsWith(LEGACY_PREFIX) || !legacyJs.endsWith(";")) {
+                    throw new IOException("Formato RU legacy inatteso: " + legacyCompact);
+                }
+    
+                String seasonsJson = legacyJs.substring(
+                        LEGACY_PREFIX.length(),
+                        legacyJs.length() - 1
+                ).trim();
+    
+                String javascript = GLOBAL_NAME + " = {"
+                        + "\"schemaVersion\":\"2.0\","
+                        + "\"familyId\":\"office-reserves\","
+                        + "\"metadata\":{"
+                        + "\"source\":\"RecordsNext 1.0.2 normalized RU archive\","
+                        + "\"seasonCount\":" + legacy.seasons() + ","
+                        + "\"annualFileCount\":" + legacy.annualFiles()
+                        + "},"
+                        + "\"events\":[],"
+                        + "\"seasonAggregates\":" + seasonsJson + ","
+                        + "\"globalAggregates\":[],"
+                        + "\"absoluteOccurrences\":[],"
+                        + "\"outputStatus\":[{"
+                        + "\"status\":\"GENERATED_COMPLETE\","
+                        + "\"detail\":\"Migrazione compatibile dai dataset RU consolidati\""
+                        + "}]"
+                        + "};\n";
+    
+                Files.writeString(
+                        outputFile,
+                        javascript,
+                        StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING,
+                        StandardOpenOption.WRITE
+                );
+    
+                return new ExportResult(legacy.seasons(), legacy.annualFiles(), outputFile);
+            } finally {
+                deleteTree(temporaryDir);
+            }
+        }
+    
+        private static void deleteTree(Path root) throws IOException {
+            if (!Files.exists(root)) return;
+            try (var stream = Files.walk(root)) {
+                for (Path path : stream.sorted((a, b) -> b.compareTo(a)).toList()) {
+                    Files.deleteIfExists(path);
+                }
+            }
+        }
+    
+        public record ExportResult(int seasonCount, int annualFileCount, Path outputFile) {
+        }
     }
 
 ## src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
@@ -12733,6 +12827,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import it.alterlega.recordsnext.app.core.CoreJsExporter;
     import it.alterlega.recordsnext.app.core.LeagueMetadata;
     import it.alterlega.recordsnext.app.classics.ClassicsFamilyJsExporter;
+    import it.alterlega.recordsnext.app.ru.RuFamilyJsExporter;
     
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
@@ -12764,6 +12859,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     
         private static final String CORE_FILE = "fcmRecordsNext_Core.js";
         private static final String CLASSICS_2_FILE = ClassicsFamilyJsExporter.FILE_NAME;
+        private static final String RU_2_FILE = RuFamilyJsExporter.FILE_NAME;
         private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
         private static final String RU_FILE = "records2026.recordstagionali.ru.js";
         private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -12935,6 +13031,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
                 ruSeasons = ru.seasons();
                 annualFiles = ru.annualFiles();
+                RuFamilyJsExporter.export(ruArchive, generatedDir.resolve(RU_2_FILE));
             }
     
             if (includeRecordsNextCore) {
@@ -13014,6 +13111,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 }
                 validatePrefix(byName.get(RU_FILE), "window.RECORDS2026_PREVIEW_RU");
                 validatePrefix(byName.get(MANIFEST_FILE), "window.RECORDS2026_STORICO_RU_MANIFEST");
+                requireFile(byName, RU_2_FILE);
+                validatePrefix(byName.get(RU_2_FILE), "window.fcmRecordsNextRU");
                 for (Path annual : annuals) validateContains(annual, "window.RECORDS2026_STORICO_RU");
             } else if (!annuals.isEmpty()) {
                 throw new IOException("File RU annuali generati nonostante il modulo RU sia disattivato");
@@ -13030,7 +13129,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 );
             }
             int expectedTotal = (includeClassic ? 2 : 0)
-                    + (includeRu ? expectedAnnualFiles + 2 : 0)
+                    + (includeRu ? expectedAnnualFiles + 3 : 0)
                     + (includeRecordsNextCore ? 1 : 0)
                     + (includeRecordsNextManifest ? 1 : 0);
             if (files.size() != expectedTotal) {
@@ -20173,6 +20272,49 @@ File: src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTes
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
+
+    package it.alterlega.recordsnext.app.ru;
+    
+    import org.junit.jupiter.api.Test;
+    
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+    
+    class RuFamilyJsExporterTest {
+        @Test
+        void writesNativeRuFamilyOutput() throws Exception {
+            Path root = Files.createTempDirectory("rn2-ru-test-");
+            Path archive = root.resolve("archive");
+            Path season = archive.resolve("2025_2026");
+            Files.createDirectories(season);
+            Files.writeString(
+                    season.resolve("riserveufficio.json"),
+                    "{\"meta\":{\"generato\":\"2026-08-05\"},"
+                            + "\"views\":{\"ru\":[{\"squadra\":\"Test\",\"totale\":2}]},"
+                            + "\"dettaglio\":{\"ruDettaglio\":[]},\"curiosita\":[]}",
+                    StandardCharsets.UTF_8
+            );
+    
+            Path output = root.resolve(RuFamilyJsExporter.FILE_NAME);
+            RuFamilyJsExporter.ExportResult result = RuFamilyJsExporter.export(archive, output);
+    
+            String js = Files.readString(output, StandardCharsets.UTF_8);
+            assertEquals(1, result.seasonCount());
+            assertEquals(1, result.annualFileCount());
+            assertTrue(js.startsWith("window.fcmRecordsNextRU = "));
+            assertTrue(js.contains("\"familyId\":\"office-reserves\""));
+            assertTrue(js.contains("\"stagione\":\"2025_2026\""));
+            assertTrue(js.contains("\"status\":\"GENERATED_COMPLETE\""));
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
 
 File: src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
@@ -20605,6 +20747,7 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\main\java\it\alterlega\recordsnext\app\ProcessingOptions.java
 - src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
 - src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.java
+- src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
 - src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
 - src\main\java\it\alterlega\recordsnext\CanonicalSchemaProbe.java
 - src\main\java\it\alterlega\recordsnext\CanonicalViews.java
@@ -20642,6 +20785,7 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
 - src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 - src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTest.java
+- src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
 - config\competitions.json
 - config\culometro.json
