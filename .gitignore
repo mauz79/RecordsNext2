@@ -34,3 +34,14 @@ fcmRecordsNext_*.js
 .env
 .env.*
 *.secret
+
+# Dati operativi locali RecordsNext
+data/database/*
+!data/database/.gitkeep
+data/raw/*
+!data/raw/.gitkeep
+data/reports/*
+!data/reports/.gitkeep
+data/consolidation/
+data/records-archive/
+data/site-export-staging/
