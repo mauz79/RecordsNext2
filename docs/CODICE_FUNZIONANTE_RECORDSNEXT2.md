@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-05 17:52:30 +02:00
+> Data generazione: 2026-08-05 18:00:19 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -229,13 +229,13 @@ File: docs\CATALOGO_RECORD.md
     
     | ID provvisorio | Nome | Dipendenze | Stato |
     |---|---|---|---|
-    | series.unbeaten | Serie positiva | Risultati ordinati | DA_CATALOGARE |
+    | series.unbeaten | Serie positiva | Risultati ordinati | IMPLEMENTATO |
     | series.winless | Serie negativa | Risultati ordinati | DA_CATALOGARE |
     | series.wins | Vittorie consecutive | Risultati ordinati | DA_CATALOGARE |
     | series.draws | Pareggi consecutivi | Risultati ordinati | DA_CATALOGARE |
     | series.losses | Sconfitte consecutive | Risultati ordinati | DA_CATALOGARE |
-    | series.clean-sheets | Clean sheet consecutivi | Clean sheet elaborati | DA_CATALOGARE |
-    | series.captain-bonus | Bonus Capitano consecutivo | Modificatore Capitano | DA_CATALOGARE |
+    | series.clean-sheets | Clean sheet consecutivi | Clean sheet elaborati | IMPLEMENTATO |
+    | series.captain-bonus | Bonus Capitano consecutivo | Modificatore Capitano | IMPLEMENTATO |
     
     ## Riserve d'Ufficio
     
@@ -1352,6 +1352,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - formato finale della configurazione Culometro;
     - struttura definitiva della GUI;
     - strategia di migrazione o confronto con RecordsNext 1.0.2.
+    
+    
+    ## Output famiglia Serie implementato
+    
+    `fcmRecordsNext_Series.js` espone `window.fcmRecordsNextSeries`. La prima versione riusa gli archivi normalizzati 1.0.2 e pubblica le sezioni disponibili: imbattibilita, serie Capitano e serie clean sheet. Lo stato e `GENERATED_PARTIAL` finche non saranno aggiunte vittorie, pareggi, sconfitte e serie senza vittorie.
 
 ## Configurazione
 
@@ -3682,7 +3687,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
     
     public final class RecordsNextPipeline {
         private static final Set<RecordFamily> IMPLEMENTED_FAMILIES = Set.copyOf(
-                EnumSet.of(RecordFamily.CLASSICS, RecordFamily.RU)
+                EnumSet.of(RecordFamily.CLASSICS, RecordFamily.SERIES, RecordFamily.RU)
         );
     
         public interface Listener {
@@ -4420,6 +4425,199 @@ File: src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
         }
     
         public record ExportResult(int seasonCount, int annualFileCount, Path outputFile) {
+        }
+    }
+
+## src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.java
+
+File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.java
+
+    package it.alterlega.recordsnext.app.series;
+    
+    import it.alterlega.recordsnext.Records2026ClassicJsExporter;
+    
+    import java.io.IOException;
+    import java.math.BigDecimal;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.nio.file.StandardOpenOption;
+    import java.util.ArrayList;
+    import java.util.LinkedHashMap;
+    import java.util.List;
+    import java.util.Map;
+    
+    /** Genera l'output familiare RecordsNext 2.0 dedicato alle serie cronologiche. */
+    public final class SeriesFamilyJsExporter {
+        public static final String FILE_NAME = "fcmRecordsNext_Series.js";
+        public static final String GLOBAL_NAME = "window.fcmRecordsNextSeries";
+    
+        private static final String LEGACY_PREFIX = "window.RECORDS2026_PREVIEW_CLASSIC = ";
+        private static final List<String> AVAILABLE_SECTIONS = List.of(
+                "serieSenzaSconfitte",
+                "capitanoSerieSquadre",
+                "cleanSheetPortiereSerieSquadre"
+        );
+    
+        private SeriesFamilyJsExporter() {
+        }
+    
+        public static ExportResult export(Path archiveRoot, Path outputFile) throws IOException {
+            Path parent = outputFile.toAbsolutePath().normalize().getParent();
+            if (parent == null) throw new IOException("Directory output Serie non determinabile: " + outputFile);
+            Files.createDirectories(parent);
+    
+            Path temporaryLegacy = Files.createTempFile(parent, "recordsnext-series-legacy-", ".js");
+            try {
+                Records2026ClassicJsExporter.ExportResult legacy =
+                        Records2026ClassicJsExporter.export(archiveRoot, temporaryLegacy, List.of());
+                String legacyJs = Files.readString(temporaryLegacy, StandardCharsets.UTF_8).trim();
+                if (!legacyJs.startsWith(LEGACY_PREFIX) || !legacyJs.endsWith(";")) {
+                    throw new IOException("Formato Classic legacy inatteso: " + temporaryLegacy);
+                }
+    
+                String payload = legacyJs.substring(LEGACY_PREFIX.length(), legacyJs.length() - 1).trim();
+                Object parsed = new JsonParser(payload, temporaryLegacy).parse();
+                if (!(parsed instanceof List<?> entries)) {
+                    throw new IOException("Payload Classic legacy non e un array: " + temporaryLegacy);
+                }
+    
+                List<Object> filteredEntries = new ArrayList<>();
+                int sectionCount = 0;
+                for (Object value : entries) {
+                    if (!(value instanceof Map<?, ?> rawEntry)) continue;
+                    Map<String, Object> entry = stringMap(rawEntry);
+                    Object dataValue = entry.get("data");
+                    if (!(dataValue instanceof Map<?, ?> rawData)) continue;
+                    Map<String, Object> data = stringMap(rawData);
+                    Object recordsValue = data.get("records");
+                    if (!(recordsValue instanceof Map<?, ?> rawRecords)) continue;
+                    Map<String, Object> records = stringMap(rawRecords);
+    
+                    Map<String, Object> selected = new LinkedHashMap<>();
+                    for (String section : AVAILABLE_SECTIONS) {
+                        Object rows = records.get(section);
+                        if (rows instanceof List<?> list && !list.isEmpty()) {
+                            selected.put(section, rows);
+                            sectionCount++;
+                        }
+                    }
+                    if (selected.isEmpty()) continue;
+    
+                    Map<String, Object> filteredData = new LinkedHashMap<>();
+                    filteredData.put("records", selected);
+                    Map<String, Object> filteredEntry = new LinkedHashMap<>();
+                    filteredEntry.put("stagione", entry.get("stagione"));
+                    filteredEntry.put("id", entry.get("id"));
+                    filteredEntry.put("file", entry.get("file"));
+                    filteredEntry.put("data", filteredData);
+                    filteredEntries.add(filteredEntry);
+                }
+    
+                Map<String, Object> root = new LinkedHashMap<>();
+                root.put("schemaVersion", "2.0");
+                root.put("familyId", "series");
+                Map<String, Object> metadata = new LinkedHashMap<>();
+                metadata.put("source", "RecordsNext 1.0.2 normalized archive");
+                metadata.put("seasonCount", legacy.seasonCount());
+                metadata.put("entryCount", filteredEntries.size());
+                metadata.put("sectionCount", sectionCount);
+                metadata.put("availableSections", AVAILABLE_SECTIONS);
+                root.put("metadata", metadata);
+                root.put("events", List.of());
+                root.put("seasonAggregates", filteredEntries);
+                root.put("globalAggregates", List.of());
+                root.put("absoluteOccurrences", List.of());
+                root.put("outputStatus", List.of(Map.of(
+                        "status", "GENERATED_PARTIAL",
+                        "detail", "Disponibili: imbattibilita, serie Capitano e serie clean sheet; altre serie ancora da implementare"
+                )));
+    
+                Files.writeString(
+                        outputFile,
+                        GLOBAL_NAME + " = " + JsonWriter.write(root) + ";\n",
+                        StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING,
+                        StandardOpenOption.WRITE
+                );
+                return new ExportResult(legacy.seasonCount(), filteredEntries.size(), sectionCount, outputFile);
+            } finally {
+                Files.deleteIfExists(temporaryLegacy);
+            }
+        }
+    
+        private static Map<String, Object> stringMap(Map<?, ?> raw) {
+            Map<String, Object> result = new LinkedHashMap<>();
+            for (Map.Entry<?, ?> entry : raw.entrySet()) {
+                result.put(String.valueOf(entry.getKey()), entry.getValue());
+            }
+            return result;
+        }
+    
+        public record ExportResult(int seasonCount, int entryCount, int sectionCount, Path outputFile) {
+        }
+    
+        private static final class JsonParser {
+            private final String text;
+            private final Path source;
+            private int index;
+            JsonParser(String text, Path source) { this.text = text; this.source = source; }
+            Object parse() throws IOException {
+                skipWhitespace(); Object value = parseValue(); skipWhitespace();
+                if (index != text.length()) fail("Contenuto dopo la fine del JSON");
+                return value;
+            }
+            private Object parseValue() throws IOException {
+                skipWhitespace(); if (index >= text.length()) fail("Valore mancante");
+                return switch (text.charAt(index)) {
+                    case '{' -> parseObject(); case '[' -> parseArray(); case '"' -> parseString();
+                    case 't' -> parseLiteral("true", Boolean.TRUE); case 'f' -> parseLiteral("false", Boolean.FALSE);
+                    case 'n' -> parseLiteral("null", null); default -> parseNumber();
+                };
+            }
+            private Map<String,Object> parseObject() throws IOException {
+                expect('{'); Map<String,Object> result=new LinkedHashMap<>(); skipWhitespace();
+                if (peek('}')) { index++; return result; }
+                while (true) { String key=parseString(); expect(':'); result.put(key,parseValue()); skipWhitespace();
+                    if (peek('}')) { index++; return result; } expect(','); }
+            }
+            private List<Object> parseArray() throws IOException {
+                expect('['); List<Object> result=new ArrayList<>(); skipWhitespace();
+                if (peek(']')) { index++; return result; }
+                while (true) { result.add(parseValue()); skipWhitespace(); if (peek(']')) { index++; return result; } expect(','); }
+            }
+            private String parseString() throws IOException {
+                expect('"'); StringBuilder result=new StringBuilder();
+                while (index<text.length()) { char ch=text.charAt(index++); if (ch=='"') return result.toString();
+                    if (ch!='\\') { result.append(ch); continue; } if (index>=text.length()) fail("Escape incompleto");
+                    char esc=text.charAt(index++); switch(esc) { case '"','\\','/' -> result.append(esc); case 'b'->result.append('\b');
+                        case 'f'->result.append('\f'); case 'n'->result.append('\n'); case 'r'->result.append('\r'); case 't'->result.append('\t');
+                        case 'u'->result.append(parseUnicode()); default->fail("Escape non valido"); } }
+                fail("Stringa non terminata"); return null;
+            }
+            private char parseUnicode() throws IOException { if(index+4>text.length()) fail("Unicode incompleto"); String h=text.substring(index,index+4); index+=4;
+                try{return(char)Integer.parseInt(h,16);}catch(NumberFormatException ex){fail("Unicode non valido");return 0;} }
+            private Object parseLiteral(String literal,Object value)throws IOException{if(!text.startsWith(literal,index))fail("Token non valido");index+=literal.length();return value;}
+            private BigDecimal parseNumber() throws IOException { int start=index; if(peek('-'))index++; while(index<text.length()&&Character.isDigit(text.charAt(index)))index++;
+                if(peek('.')){index++;while(index<text.length()&&Character.isDigit(text.charAt(index)))index++;} if(peek('e')||peek('E')){index++;if(peek('+')||peek('-'))index++;while(index<text.length()&&Character.isDigit(text.charAt(index)))index++;}
+                if(start==index)fail("Numero non valido"); try{return new BigDecimal(text.substring(start,index));}catch(NumberFormatException ex){fail("Numero non valido");return null;} }
+            private void expect(char expected)throws IOException{skipWhitespace();if(index>=text.length()||text.charAt(index)!=expected)fail("Atteso '"+expected+"'");index++;}
+            private boolean peek(char value){return index<text.length()&&text.charAt(index)==value;}
+            private void skipWhitespace(){while(index<text.length()&&Character.isWhitespace(text.charAt(index)))index++;}
+            private void fail(String message)throws IOException{throw new IOException(message+" in "+source+" alla posizione "+index);}
+        }
+    
+        private static final class JsonWriter {
+            static String write(Object value){StringBuilder out=new StringBuilder();append(out,value);return out.toString();}
+            private static void append(StringBuilder out,Object value){
+                if(value==null){out.append("null");return;} if(value instanceof String s){out.append('"').append(escape(s)).append('"');return;}
+                if(value instanceof Boolean||value instanceof BigDecimal||value instanceof Number){out.append(value);return;}
+                if(value instanceof Map<?,?> map){out.append('{');boolean first=true;for(Map.Entry<?,?> e:map.entrySet()){if(!first)out.append(',');first=false;out.append('"').append(escape(String.valueOf(e.getKey()))).append("\":");append(out,e.getValue());}out.append('}');return;}
+                if(value instanceof List<?> list){out.append('[');for(int i=0;i<list.size();i++){if(i>0)out.append(',');append(out,list.get(i));}out.append(']');return;}
+                throw new IllegalArgumentException("Tipo JSON non supportato: "+value.getClass());
+            }
+            private static String escape(String value){StringBuilder e=new StringBuilder(value.length()+16);for(int i=0;i<value.length();i++){char ch=value.charAt(i);switch(ch){case '\\'->e.append("\\\\");case '"'->e.append("\\\"");case '\b'->e.append("\\b");case '\f'->e.append("\\f");case '\n'->e.append("\\n");case '\r'->e.append("\\r");case '\t'->e.append("\\t");default->{if(ch<0x20)e.append(String.format("\\u%04x",(int)ch));else e.append(ch);}}}return e.toString();}
         }
     }
 
@@ -12828,6 +13026,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import it.alterlega.recordsnext.app.core.LeagueMetadata;
     import it.alterlega.recordsnext.app.classics.ClassicsFamilyJsExporter;
     import it.alterlega.recordsnext.app.ru.RuFamilyJsExporter;
+    import it.alterlega.recordsnext.app.series.SeriesFamilyJsExporter;
+    import it.alterlega.recordsnext.app.model.RecordFamily;
     
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
@@ -12860,6 +13060,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
         private static final String CORE_FILE = "fcmRecordsNext_Core.js";
         private static final String CLASSICS_2_FILE = ClassicsFamilyJsExporter.FILE_NAME;
         private static final String RU_2_FILE = RuFamilyJsExporter.FILE_NAME;
+        private static final String SERIES_2_FILE = SeriesFamilyJsExporter.FILE_NAME;
         private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
         private static final String RU_FILE = "records2026.recordstagionali.ru.js";
         private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -12997,6 +13198,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 Path database,
                 LeagueMetadata leagueMetadata) throws IOException {
     
+            boolean includeSeries = options != null && options.familyEnabled(RecordFamily.SERIES);
             boolean includeRecordsNextManifest = options != null
                     && preflight != null
                     && manifestMetadata != null;
@@ -13004,10 +13206,10 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     && database != null
                     && leagueMetadata != null;
     
-            if (!includeClassic && !includeRu && !includeRecordsNextManifest && !includeRecordsNextCore) {
+            if (!includeClassic && !includeRu && !includeSeries && !includeRecordsNextManifest && !includeRecordsNextCore) {
                 throw new IOException("Nessun modulo selezionato per la generazione JS");
             }
-            if (includeClassic) requireDirectory(classicArchive, "Archivio classic");
+            if (includeClassic || includeSeries) requireDirectory(classicArchive, "Archivio classic");
             if (includeRu) requireDirectory(ruArchive, "Archivio RU");
             Files.createDirectories(stagingRoot);
     
@@ -13026,6 +13228,9 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 classicEntries = classic.entryCount();
                 ClassicsFamilyJsExporter.export(
                         classicArchive, generatedDir.resolve(CLASSICS_2_FILE));
+            }
+            if (includeSeries) {
+                SeriesFamilyJsExporter.export(classicArchive, generatedDir.resolve(SERIES_2_FILE));
             }
             if (includeRu) {
                 var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
@@ -13062,6 +13267,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     annualFiles,
                     includeClassic,
                     includeRu,
+                    includeSeries,
                     includeRecordsNextManifest,
                     includeRecordsNextCore
             );
@@ -13079,6 +13285,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 int expectedAnnualFiles,
                 boolean includeClassic,
                 boolean includeRu,
+                boolean includeSeries,
                 boolean includeRecordsNextManifest,
                 boolean includeRecordsNextCore) throws IOException {
     
@@ -13100,6 +13307,10 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 validatePrefix(byName.get(CLASSIC_FILE), "window.RECORDS2026_PREVIEW_CLASSIC");
                 requireFile(byName, CLASSICS_2_FILE);
                 validatePrefix(byName.get(CLASSICS_2_FILE), "window.fcmRecordsNextClassics");
+            }
+            if (includeSeries) {
+                requireFile(byName, SERIES_2_FILE);
+                validatePrefix(byName.get(SERIES_2_FILE), "window.fcmRecordsNextSeries");
             }
             List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
             if (includeRu) {
@@ -13129,6 +13340,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 );
             }
             int expectedTotal = (includeClassic ? 2 : 0)
+                    + (includeSeries ? 1 : 0)
                     + (includeRu ? expectedAnnualFiles + 3 : 0)
                     + (includeRecordsNextCore ? 1 : 0)
                     + (includeRecordsNextManifest ? 1 : 0);
@@ -20221,10 +20433,10 @@ File: src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTes
         }
     
         @Test
-        void pipelineRejectsFamiliesNotYetImplementedInsteadOfIgnoringThem() {
+        void pipelineRejectsFamiliesStillNotImplementedInsteadOfIgnoringThem() {
             ProcessingOptions options = ProcessingOptions.modular(
                     new ProcessingSelection(
-                            Set.of(RecordFamily.SERIES),
+                            Set.of(RecordFamily.MODIFIERS),
                             Set.of(),
                             false,
                             false,
@@ -20239,10 +20451,14 @@ File: src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTes
         }
     
         @Test
-        void pipelineAcceptsCurrentClassicAndRuBridge() {
+        void pipelineAcceptsCurrentClassicRuAndSeriesBridge() {
             ProcessingOptions options = ProcessingOptions.modular(
                     new ProcessingSelection(
-                            Set.of(RecordFamily.CLASSICS, RecordFamily.RU),
+                            Set.of(
+                                    RecordFamily.CLASSICS,
+                                    RecordFamily.RU,
+                                    RecordFamily.SERIES
+                            ),
                             Set.of(),
                             false,
                             true,
@@ -20312,6 +20528,49 @@ File: src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
             assertTrue(js.contains("\"familyId\":\"office-reserves\""));
             assertTrue(js.contains("\"stagione\":\"2025_2026\""));
             assertTrue(js.contains("\"status\":\"GENERATED_COMPLETE\""));
+        }
+    }
+
+## src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
+
+    package it.alterlega.recordsnext.app.series;
+    
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+    
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    
+    import static org.junit.jupiter.api.Assertions.assertFalse;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+    
+    class SeriesFamilyJsExporterTest {
+        @TempDir Path temp;
+    
+        @Test
+        void exportsOnlyAvailableSeriesSections() throws Exception {
+            Path season = temp.resolve("archive/2025_2026");
+            Files.createDirectories(season);
+            Files.writeString(season.resolve("season_records_serie_a.json"), """
+                {"records":{
+                  "puntiSquadraMax":[{"recordId":"x","valore":99}],
+                  "serieSenzaSconfitte":[{"recordId":"s","valore":10,"squadra":"A"}],
+                  "capitanoSerieSquadre":[{"recordId":"c","valore":3,"squadra":"A"}]
+                }}
+                """, StandardCharsets.UTF_8);
+    
+            Path output = temp.resolve("fcmRecordsNext_Series.js");
+            SeriesFamilyJsExporter.export(temp.resolve("archive"), output);
+            String js = Files.readString(output, StandardCharsets.UTF_8);
+    
+            assertTrue(js.startsWith("window.fcmRecordsNextSeries = "));
+            assertTrue(js.contains("serieSenzaSconfitte"));
+            assertTrue(js.contains("capitanoSerieSquadre"));
+            assertFalse(js.contains("puntiSquadraMax"));
+            assertTrue(js.contains("GENERATED_PARTIAL"));
         }
     }
 
@@ -20424,7 +20683,7 @@ File: config\processing.json
             "children": "ALL"
           },
           "series": {
-            "enabled": false,
+            "enabled": true,
             "children": "ALL"
           },
           "ru": {
@@ -20748,6 +21007,7 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
 - src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.java
 - src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
+- src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.java
 - src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
 - src\main\java\it\alterlega\recordsnext\CanonicalSchemaProbe.java
 - src\main\java\it\alterlega\recordsnext\CanonicalViews.java
@@ -20786,6 +21046,7 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 - src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTest.java
 - src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
 - config\competitions.json
 - config\culometro.json
