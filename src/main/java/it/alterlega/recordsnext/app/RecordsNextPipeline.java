@@ -17,7 +17,7 @@ import java.util.Set;
 
 public final class RecordsNextPipeline {
     private static final Set<RecordFamily> IMPLEMENTED_FAMILIES = Set.copyOf(
-            EnumSet.of(RecordFamily.CLASSICS, RecordFamily.SERIES, RecordFamily.RU, RecordFamily.MODIFIERS)
+            EnumSet.of(RecordFamily.CLASSICS, RecordFamily.SERIES, RecordFamily.RU, RecordFamily.MODIFIERS, RecordFamily.THRESHOLDS_LUCK)
     );
 
     public interface Listener {
@@ -111,7 +111,8 @@ public final class RecordsNextPipeline {
                     preflight,
                     manifestMetadata,
                     database,
-                    leagueMetadata
+                    leagueMetadata,
+                    c.reports()
             );
             l.timing(
                     (o.publish()

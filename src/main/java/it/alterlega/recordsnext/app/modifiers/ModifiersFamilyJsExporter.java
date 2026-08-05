@@ -23,7 +23,11 @@ public final class ModifiersFamilyJsExporter {
             "modDifesaMax",
             "modDifesaTotaleSquadre",
             "capitanoVolteSquadre",
-            "capitanoTotaleSquadre"
+            "capitanoTotaleSquadre",
+            "fattoreCampoDecisivo",
+            "fattoreCampoTotaleSquadre",
+            "fattoreCampoPuntiGuadagnatiSquadre",
+            "fattoreCampoPuntiPersiSquadre"
     );
 
     private ModifiersFamilyJsExporter() {
@@ -96,8 +100,8 @@ public final class ModifiersFamilyJsExporter {
             root.put("globalAggregates", List.of());
             root.put("absoluteOccurrences", List.of());
             root.put("outputStatus", List.of(Map.of(
-                    "status", "GENERATED_PARTIAL",
-                    "detail", "Disponibili: modificatore difesa e Capitano; Fattore Campo ancora da implementare"
+                    "status", "GENERATED_COMPLETE",
+                    "detail", "Modificatore difesa, Capitano e Fattore Campo disponibili"
             )));
 
             Files.writeString(

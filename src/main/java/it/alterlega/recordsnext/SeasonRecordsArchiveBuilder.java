@@ -20,7 +20,7 @@ import java.util.stream.Stream;
  * Costruisce l'archivio season_records_*.json a partire dai JSON normalizzati
  * prodotti da RecordsNext.
  *
- * Genera tutte le 18 sezioni del contratto pubblico Records2026 usando i
+ * Genera tutte le sezioni del contratto pubblico Records2026 usando i
  * dati normalizzati correnti, compresi i bonus capitano presenti in
  * modificatoriB2Dettaglio come tipo=capitano / campoOrigine=ModM2Pers.
  */
@@ -45,7 +45,7 @@ public final class SeasonRecordsArchiveBuilder {
         System.out.println("Archivio     : " + archiveRoot);
         System.out.println("Stagioni     : " + result.seasons());
         System.out.println("Competizioni : " + result.competitions());
-        System.out.println("Sezioni      : 18/18");
+        System.out.println("Sezioni      : 22/22");
     }
 
     public static Result build(Path reportsRoot, Path archiveRoot, List<String> requestedSeasons) throws IOException {
@@ -89,10 +89,19 @@ public final class SeasonRecordsArchiveBuilder {
         List<Map<String, Object>> events = rows(source.get("eventiSquadraDettaglio"));
         List<Map<String, Object>> modifiers = rows(source.get("modificatoriB2Dettaglio"));
         List<Map<String, Object>> cleanSheets = rows(source.get("cleanSheetB3Dettaglio"));
+        List<Map<String, Object>> goalBands = rows(source.get("fasceGolDettaglio"));
 
         Map<String, Object> records = new LinkedHashMap<>();
         records.put("puntiSquadraMax", pointsMax(matches));
         records.put("serieSenzaSconfitte", unbeatenSeries(matches));
+        records.put("serieVittorie", resultSeries(matches, "V", true,
+                "serie_vittorie", "Vittorie consecutive"));
+        records.put("seriePareggi", resultSeries(matches, "N", true,
+                "serie_pareggi", "Pareggi consecutivi"));
+        records.put("serieSconfitte", resultSeries(matches, "S", true,
+                "serie_sconfitte", "Sconfitte consecutive"));
+        records.put("serieSenzaVittorie", resultSeries(matches, "V", false,
+                "serie_senza_vittorie", "Partite consecutive senza vittorie"));
         records.put("espulsioniSquadre", expulsionsByTeam(expulsions));
         records.put("espulsioniGiocatori", expulsionsByPlayer(expulsions));
         records.put("ammonizioniSquadre", eventByTeam(events, "ammonizioniSquadre", "Maggiori ammonizioni"));
@@ -109,12 +118,16 @@ public final class SeasonRecordsArchiveBuilder {
         records.put("cleanSheetPortiereTotaleSquadre", cleanSheetTotal(cleanSheets));
         records.put("cleanSheetPortiereSerieSquadre", cleanSheetSeries(matches, cleanSheets));
         records.put("capitanoSerieSquadre", captainSeries(matches, modifiers));
+        records.put("fattoreCampoDecisivo", homeFieldDecisive(matches, modifiers, goalBands));
+        records.put("fattoreCampoTotaleSquadre", homeFieldTotals(matches, modifiers));
+        records.put("fattoreCampoPuntiGuadagnatiSquadre", homeFieldStandingsImpact(matches, modifiers, goalBands, true));
+        records.put("fattoreCampoPuntiPersiSquadre", homeFieldStandingsImpact(matches, modifiers, goalBands, false));
 
         Map<String, Object> meta = new LinkedHashMap<>();
         meta.putAll(sourceMeta);
         meta.put("builder", "RecordsNext SeasonRecordsArchiveBuilder");
-        meta.put("sezioniGenerate", 18);
-        meta.put("sezioniAttese", 18);
+        meta.put("sezioniGenerate", 26);
+        meta.put("sezioniAttese", 26);
         meta.put("sezioniNonDisponibili", List.of());
 
         Map<String, Object> result = new LinkedHashMap<>();
@@ -205,6 +218,80 @@ public final class SeasonRecordsArchiveBuilder {
                 "vittorie", wins, "pareggi", draws);
         row.put("dettagli", details);
         records.add(row);
+    }
+
+
+    private static List<Object> resultSeries(List<Map<String, Object>> matches,
+                                             String resultCode,
+                                             boolean mustMatch,
+                                             String recordId,
+                                             String name) {
+        Map<String, List<Map<String, Object>>> byTeam = group(matches, "idSquadra");
+        List<Map<String, Object>> records = new ArrayList<>();
+
+        for (List<Map<String, Object>> teamMatches : byTeam.values()) {
+            teamMatches.sort(Comparator
+                    .comparingDouble((Map<String, Object> row) -> number(row.get("ordineGiornata")))
+                    .thenComparing(row -> string(row.get("idIncontro"))));
+
+            List<Map<String, Object>> current = new ArrayList<>();
+            for (Map<String, Object> match : teamMatches) {
+                boolean matchesResult = resultCode.equals(string(match.get("esito")));
+                boolean belongs = mustMatch ? matchesResult : !matchesResult;
+                if (belongs) {
+                    current.add(match);
+                } else {
+                    addResultSeries(records, current, recordId, name);
+                    current = new ArrayList<>();
+                }
+            }
+            addResultSeries(records, current, recordId, name);
+        }
+
+        records.sort(Comparator
+                .comparingDouble((Map<String, Object> row) -> number(row.get("valore"))).reversed()
+                .thenComparing(row -> string(row.get("squadra"))));
+        return new ArrayList<>(records.subList(0, Math.min(20, records.size())));
+    }
+
+    private static void addResultSeries(List<Map<String, Object>> records,
+                                        List<Map<String, Object>> series,
+                                        String recordId,
+                                        String name) {
+        if (series.isEmpty()) return;
+
+        Map<String, Object> first = series.get(0);
+        Map<String, Object> last = series.get(series.size() - 1);
+        List<Object> details = new ArrayList<>();
+        for (Map<String, Object> row : series) {
+            details.add(ordered(
+                    "idIncontro", row.get("idIncontro"),
+                    "giornata", row.get("giornata"),
+                    "giornataDiA", row.get("giornataDiA"),
+                    "urlTabellino", row.get("urlTabellino"),
+                    "avversaria", row.get("avversaria"),
+                    "risultato", row.get("risultato"),
+                    "punteggio", row.get("punteggio"),
+                    "esito", row.get("esito")
+            ));
+        }
+
+        Map<String, Object> record = ordered(
+                "recordId", recordId,
+                "nome", name,
+                "stagione", first.get("stagione"),
+                "competizioneStoricaId", first.get("competizioneStoricaId"),
+                "competizioneNome", first.get("competizioneNome"),
+                "valore", series.size(),
+                "idSquadra", first.get("idSquadra"),
+                "squadra", first.get("squadra"),
+                "daGiornata", first.get("giornata"),
+                "aGiornata", last.get("giornata"),
+                "daGiornataDiA", first.get("giornataDiA"),
+                "aGiornataDiA", last.get("giornataDiA")
+        );
+        record.put("dettagli", details);
+        records.add(record);
     }
 
     private static List<Object> expulsionsByTeam(List<Map<String, Object>> rows) {
@@ -329,6 +416,187 @@ public final class SeasonRecordsArchiveBuilder {
                 .toList();
         return eventSeries(matches, captain, "capitanoSerieSquadre",
                 "Maggior serie bonus capitano");
+    }
+
+
+    private static List<Object> homeFieldDecisive(List<Map<String, Object>> matches,
+                                                   List<Map<String, Object>> modifiers,
+                                                   List<Map<String, Object>> goalBands) {
+        List<HomeFieldImpact> impacts = homeFieldImpacts(matches, modifiers, goalBands);
+        List<Object> out = new ArrayList<>();
+        for (HomeFieldImpact impact : impacts) {
+            if (impact.homePointsDelta() <= 0) continue;
+            Map<String, Object> home = impact.home();
+            Map<String, Object> away = impact.away();
+            out.add(ordered(
+                    "recordId", "fattoreCampoDecisivo",
+                    "nome", "Fattore Campo decisivo",
+                    "valore", cleanNumber(impact.homeBonus()),
+                    "puntiClassificaGuadagnati", impact.homePointsDelta(),
+                    "stagione", home.get("stagione"),
+                    "competizioneStoricaId", home.get("competizioneStoricaId"),
+                    "competizioneNome", home.get("competizioneNome"),
+                    "idSquadra", home.get("idSquadra"),
+                    "squadra", home.get("squadra"),
+                    "idAvversaria", away.get("idSquadra"),
+                    "avversaria", away.get("squadra"),
+                    "idIncontro", home.get("idIncontro"),
+                    "giornata", home.get("giornata"),
+                    "giornataDiA", home.get("giornataDiA"),
+                    "urlTabellino", home.get("urlTabellino"),
+                    "urlTabellinoLocale", home.get("urlTabellinoLocale"),
+                    "urlTabellinoOnline", home.get("urlTabellinoOnline"),
+                    "punteggioConFattoreCampo", home.get("punteggio"),
+                    "risultatoConFattoreCampo", home.get("risultato"),
+                    "puntiCasaSenzaFattoreCampo", cleanNumber(impact.homeScoreWithout()),
+                    "golCasaSenzaFattoreCampo", impact.homeGoalsWithout(),
+                    "risultatoSenzaFattoreCampo", impact.homeGoalsWithout() + "-" + impact.awayGoals()
+            ));
+        }
+        out.sort(Comparator
+                .comparingDouble((Object value) -> number(((Map<?, ?>) value).get("puntiClassificaGuadagnati"))).reversed()
+                .thenComparing(value -> string(((Map<?, ?>) value).get("stagione")))
+                .thenComparing(value -> string(((Map<?, ?>) value).get("idIncontro"))));
+        return out;
+    }
+
+    private static List<Object> homeFieldTotals(List<Map<String, Object>> matches,
+                                                 List<Map<String, Object>> modifiers) {
+        Map<String, Double> modifierTotals = modifierTotalsByMatchTeam(modifiers);
+        Map<String, List<Map<String, Object>>> groups = new LinkedHashMap<>();
+        for (Map<String, Object> match : matches) {
+            if (!"casa".equals(string(match.get("lato")))) continue;
+            groups.computeIfAbsent(string(match.get("idSquadra")), ignored -> new ArrayList<>()).add(match);
+        }
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (List<Map<String, Object>> group : groups.values()) {
+            Map<String, Object> first = group.get(0);
+            double total = 0;
+            List<Object> details = new ArrayList<>();
+            for (Map<String, Object> match : group) {
+                double bonus = homeBonus(match, modifierTotals);
+                total += bonus;
+                details.add(ordered(
+                        "idIncontro", match.get("idIncontro"),
+                        "giornataDiA", match.get("giornataDiA"),
+                        "avversaria", match.get("avversaria"),
+                        "valore", cleanNumber(bonus),
+                        "urlTabellino", match.get("urlTabellino")));
+            }
+            Map<String, Object> item = ordered(
+                    "recordId", "fattoreCampoTotaleSquadre",
+                    "nome", "Maggior totale Fattore Campo",
+                    "valore", cleanNumber(total),
+                    "presenzeCasa", group.size(),
+                    "idSquadra", first.get("idSquadra"),
+                    "squadra", first.get("squadra"));
+            item.put("dettagli", details);
+            out.add(item);
+        }
+        sortValueTeam(out);
+        return new ArrayList<>(out);
+    }
+
+    private static List<Object> homeFieldStandingsImpact(List<Map<String, Object>> matches,
+                                                          List<Map<String, Object>> modifiers,
+                                                          List<Map<String, Object>> goalBands,
+                                                          boolean homeTeam) {
+        Map<String, List<HomeFieldImpact>> groups = new LinkedHashMap<>();
+        for (HomeFieldImpact impact : homeFieldImpacts(matches, modifiers, goalBands)) {
+            if (impact.homePointsDelta() <= 0) continue;
+            Map<String, Object> team = homeTeam ? impact.home() : impact.away();
+            groups.computeIfAbsent(string(team.get("idSquadra")), ignored -> new ArrayList<>()).add(impact);
+        }
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (List<HomeFieldImpact> group : groups.values()) {
+            HomeFieldImpact firstImpact = group.get(0);
+            Map<String, Object> team = homeTeam ? firstImpact.home() : firstImpact.away();
+            int total = group.stream().mapToInt(HomeFieldImpact::homePointsDelta).sum();
+            List<Object> details = new ArrayList<>();
+            for (HomeFieldImpact impact : group) {
+                Map<String, Object> home = impact.home();
+                details.add(ordered(
+                        "idIncontro", home.get("idIncontro"),
+                        "giornataDiA", home.get("giornataDiA"),
+                        "squadraCasa", home.get("squadra"),
+                        "squadraFuori", impact.away().get("squadra"),
+                        "puntiClassifica", impact.homePointsDelta(),
+                        "urlTabellino", home.get("urlTabellino")));
+            }
+            Map<String, Object> item = ordered(
+                    "recordId", homeTeam ? "fattoreCampoPuntiGuadagnatiSquadre" : "fattoreCampoPuntiPersiSquadre",
+                    "nome", homeTeam ? "Punti classifica guadagnati col Fattore Campo" : "Punti classifica persi per il Fattore Campo avversario",
+                    "valore", total,
+                    "idSquadra", team.get("idSquadra"),
+                    "squadra", team.get("squadra"));
+            item.put("dettagli", details);
+            out.add(item);
+        }
+        sortValueTeam(out);
+        return new ArrayList<>(out);
+    }
+
+    private static List<HomeFieldImpact> homeFieldImpacts(List<Map<String, Object>> matches,
+                                                           List<Map<String, Object>> modifiers,
+                                                           List<Map<String, Object>> goalBands) {
+        Map<String, List<Map<String, Object>>> byMatch = group(matches, "idIncontro");
+        Map<String, Double> modifierTotals = modifierTotalsByMatchTeam(modifiers);
+        List<Map<String, Object>> sortedBands = new ArrayList<>(goalBands);
+        sortedBands.sort(Comparator.comparingDouble(row -> number(row.get("min"))));
+        List<HomeFieldImpact> impacts = new ArrayList<>();
+        for (List<Map<String, Object>> pair : byMatch.values()) {
+            Map<String, Object> home = pair.stream().filter(row -> "casa".equals(string(row.get("lato")))).findFirst().orElse(null);
+            Map<String, Object> away = pair.stream().filter(row -> "fuori".equals(string(row.get("lato")))).findFirst().orElse(null);
+            if (home == null || away == null) continue;
+            double bonus = homeBonus(home, modifierTotals);
+            if (bonus <= 0) continue;
+            double scoreWithout = number(home.get("puntiFatti")) - bonus;
+            int goalsWithout = goalsForScore(scoreWithout, sortedBands);
+            int homeGoals = (int) number(home.get("golFatti"));
+            int awayGoals = (int) number(home.get("golSubiti"));
+            int actualPoints = standingsPoints(homeGoals, awayGoals);
+            int pointsWithout = standingsPoints(goalsWithout, awayGoals);
+            impacts.add(new HomeFieldImpact(home, away, bonus, scoreWithout, goalsWithout, awayGoals,
+                    Math.max(0, actualPoints - pointsWithout)));
+        }
+        return impacts;
+    }
+
+    private static Map<String, Double> modifierTotalsByMatchTeam(List<Map<String, Object>> modifiers) {
+        Map<String, Double> totals = new LinkedHashMap<>();
+        for (Map<String, Object> modifier : modifiers) {
+            String key = string(modifier.get("idIncontro")) + "|" + string(modifier.get("idSquadra"));
+            totals.merge(key, number(modifier.get("valore")), Double::sum);
+        }
+        return totals;
+    }
+
+    private static double homeBonus(Map<String, Object> match, Map<String, Double> modifierTotals) {
+        String key = string(match.get("idIncontro")) + "|" + string(match.get("idSquadra"));
+        double residual = number(match.get("puntiFatti")) - number(match.get("parzialeFatto"))
+                - modifierTotals.getOrDefault(key, 0.0);
+        return Math.abs(residual) < 0.000001 ? 0.0 : residual;
+    }
+
+    private static int goalsForScore(double score, List<Map<String, Object>> goalBands) {
+        int goals = 0;
+        for (Map<String, Object> band : goalBands) {
+            if (score + 0.000001 >= number(band.get("min"))) {
+                goals = Math.max(goals, (int) number(band.get("gol")));
+            }
+        }
+        return goals;
+    }
+
+    private static int standingsPoints(int goalsFor, int goalsAgainst) {
+        if (goalsFor > goalsAgainst) return 3;
+        if (goalsFor == goalsAgainst) return 1;
+        return 0;
+    }
+
+    private record HomeFieldImpact(Map<String, Object> home, Map<String, Object> away,
+                                   double homeBonus, double homeScoreWithout,
+                                   int homeGoalsWithout, int awayGoals, int homePointsDelta) {
     }
 
     private static List<Object> cleanSheetCount(List<Map<String, Object>> clean) {

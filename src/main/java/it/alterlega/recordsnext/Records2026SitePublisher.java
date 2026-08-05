@@ -11,6 +11,7 @@ import it.alterlega.recordsnext.app.classics.ClassicsFamilyJsExporter;
 import it.alterlega.recordsnext.app.ru.RuFamilyJsExporter;
 import it.alterlega.recordsnext.app.series.SeriesFamilyJsExporter;
 import it.alterlega.recordsnext.app.modifiers.ModifiersFamilyJsExporter;
+import it.alterlega.recordsnext.app.thresholds.ThresholdsLuckFamilyJsExporter;
 import it.alterlega.recordsnext.app.model.RecordFamily;
 
 import java.io.IOException;
@@ -46,6 +47,7 @@ public final class Records2026SitePublisher {
     private static final String RU_2_FILE = RuFamilyJsExporter.FILE_NAME;
     private static final String SERIES_2_FILE = SeriesFamilyJsExporter.FILE_NAME;
     private static final String MODIFIERS_2_FILE = ModifiersFamilyJsExporter.FILE_NAME;
+    private static final String THRESHOLDS_2_FILE = ThresholdsLuckFamilyJsExporter.FILE_NAME;
     private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
     private static final String RU_FILE = "records2026.recordstagionali.ru.js";
     private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -109,6 +111,7 @@ public final class Records2026SitePublisher {
                 null,
                 null,
                 null,
+                null,
                 null
         );
     }
@@ -136,6 +139,7 @@ public final class Records2026SitePublisher {
                 preflight,
                 manifestMetadata,
                 null,
+                null,
                 null
         );
     }
@@ -152,7 +156,8 @@ public final class Records2026SitePublisher {
             PipelinePreflight.Result preflight,
             ManifestMetadata manifestMetadata,
             Path database,
-            LeagueMetadata leagueMetadata) throws IOException {
+            LeagueMetadata leagueMetadata,
+            Path reportsRoot) throws IOException {
         return runInternal(
                 classicArchive,
                 ruArchive,
@@ -165,7 +170,8 @@ public final class Records2026SitePublisher {
                 preflight,
                 manifestMetadata,
                 database,
-                leagueMetadata
+                leagueMetadata,
+                reportsRoot
         );
     }
 
@@ -181,10 +187,12 @@ public final class Records2026SitePublisher {
             PipelinePreflight.Result preflight,
             ManifestMetadata manifestMetadata,
             Path database,
-            LeagueMetadata leagueMetadata) throws IOException {
+            LeagueMetadata leagueMetadata,
+            Path reportsRoot) throws IOException {
 
         boolean includeSeries = options != null && options.familyEnabled(RecordFamily.SERIES);
         boolean includeModifiers = options != null && options.familyEnabled(RecordFamily.MODIFIERS);
+        boolean includeThresholds = options != null && options.familyEnabled(RecordFamily.THRESHOLDS_LUCK);
         boolean includeRecordsNextManifest = options != null
                 && preflight != null
                 && manifestMetadata != null;
@@ -192,10 +200,11 @@ public final class Records2026SitePublisher {
                 && database != null
                 && leagueMetadata != null;
 
-        if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeRecordsNextManifest && !includeRecordsNextCore) {
+        if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeThresholds && !includeRecordsNextManifest && !includeRecordsNextCore) {
             throw new IOException("Nessun modulo selezionato per la generazione JS");
         }
         if (includeClassic || includeSeries || includeModifiers) requireDirectory(classicArchive, "Archivio classic");
+        if (includeThresholds) requireDirectory(reportsRoot, "Report normalizzati");
         if (includeRu) requireDirectory(ruArchive, "Archivio RU");
         Files.createDirectories(stagingRoot);
 
@@ -220,6 +229,9 @@ public final class Records2026SitePublisher {
         }
         if (includeModifiers) {
             ModifiersFamilyJsExporter.export(classicArchive, generatedDir.resolve(MODIFIERS_2_FILE));
+        }
+        if (includeThresholds) {
+            ThresholdsLuckFamilyJsExporter.export(reportsRoot, generatedDir.resolve(THRESHOLDS_2_FILE));
         }
         if (includeRu) {
             var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
@@ -258,6 +270,7 @@ public final class Records2026SitePublisher {
                 includeRu,
                 includeSeries,
                 includeModifiers,
+                includeThresholds,
                 includeRecordsNextManifest,
                 includeRecordsNextCore
         );
@@ -277,6 +290,7 @@ public final class Records2026SitePublisher {
             boolean includeRu,
             boolean includeSeries,
             boolean includeModifiers,
+            boolean includeThresholds,
             boolean includeRecordsNextManifest,
             boolean includeRecordsNextCore) throws IOException {
 
@@ -306,6 +320,10 @@ public final class Records2026SitePublisher {
         if (includeModifiers) {
             requireFile(byName, MODIFIERS_2_FILE);
             validatePrefix(byName.get(MODIFIERS_2_FILE), "window.fcmRecordsNextModifiers");
+        }
+        if (includeThresholds) {
+            requireFile(byName, THRESHOLDS_2_FILE);
+            validatePrefix(byName.get(THRESHOLDS_2_FILE), "window.fcmRecordsNextThresholdsLuck");
         }
         List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
         if (includeRu) {
@@ -337,6 +355,7 @@ public final class Records2026SitePublisher {
         int expectedTotal = (includeClassic ? 2 : 0)
                 + (includeSeries ? 1 : 0)
                 + (includeModifiers ? 1 : 0)
+                + (includeThresholds ? 1 : 0)
                 + (includeRu ? expectedAnnualFiles + 3 : 0)
                 + (includeRecordsNextCore ? 1 : 0)
                 + (includeRecordsNextManifest ? 1 : 0);

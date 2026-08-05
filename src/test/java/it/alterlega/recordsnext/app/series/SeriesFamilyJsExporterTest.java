@@ -14,14 +14,19 @@ class SeriesFamilyJsExporterTest {
     @TempDir Path temp;
 
     @Test
-    void exportsOnlyAvailableSeriesSections() throws Exception {
+    void exportsAvailableSeriesSectionsAsCompleteFamily() throws Exception {
         Path season = temp.resolve("archive/2025_2026");
         Files.createDirectories(season);
         Files.writeString(season.resolve("season_records_serie_a.json"), """
             {"records":{
               "puntiSquadraMax":[{"recordId":"x","valore":99}],
-              "serieSenzaSconfitte":[{"recordId":"s","valore":10,"squadra":"A"}],
-              "capitanoSerieSquadre":[{"recordId":"c","valore":3,"squadra":"A"}]
+              "serieVittorie":[{"recordId":"v","valore":4,"squadra":"A"}],
+              "seriePareggi":[{"recordId":"p","valore":2,"squadra":"A"}],
+              "serieSconfitte":[{"recordId":"s","valore":3,"squadra":"A"}],
+              "serieSenzaSconfitte":[{"recordId":"i","valore":10,"squadra":"A"}],
+              "serieSenzaVittorie":[{"recordId":"n","valore":5,"squadra":"A"}],
+              "capitanoSerieSquadre":[{"recordId":"c","valore":3,"squadra":"A"}],
+              "cleanSheetPortiereSerieSquadre":[{"recordId":"g","valore":4,"squadra":"A"}]
             }}
             """, StandardCharsets.UTF_8);
 
@@ -30,9 +35,15 @@ class SeriesFamilyJsExporterTest {
         String js = Files.readString(output, StandardCharsets.UTF_8);
 
         assertTrue(js.startsWith("window.fcmRecordsNextSeries = "));
+        assertTrue(js.contains("serieVittorie"));
+        assertTrue(js.contains("seriePareggi"));
+        assertTrue(js.contains("serieSconfitte"));
         assertTrue(js.contains("serieSenzaSconfitte"));
+        assertTrue(js.contains("serieSenzaVittorie"));
         assertTrue(js.contains("capitanoSerieSquadre"));
+        assertTrue(js.contains("cleanSheetPortiereSerieSquadre"));
         assertFalse(js.contains("puntiSquadraMax"));
-        assertTrue(js.contains("GENERATED_PARTIAL"));
+        assertTrue(js.contains("GENERATED_COMPLETE"));
+        assertFalse(js.contains("GENERATED_PARTIAL"));
     }
 }

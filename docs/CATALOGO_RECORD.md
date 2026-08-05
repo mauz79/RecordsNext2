@@ -97,3 +97,8 @@
 ## Output famiglia Modificatori 2.0
 
 `fcmRecordsNext_Modifiers.js` espone `window.fcmRecordsNextModifiers`. La prima versione riusa gli archivi normalizzati 1.0.2 per modificatore difesa e Capitano. Il Fattore Campo resta dichiarato ma non ancora implementato; lo stato complessivo e `GENERATED_PARTIAL`.
+
+
+## Aggiornamento Serie complete v2
+
+La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.

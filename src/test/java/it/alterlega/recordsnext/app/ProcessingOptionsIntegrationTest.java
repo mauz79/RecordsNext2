@@ -14,9 +14,7 @@ class ProcessingOptionsIntegrationTest {
     @Test
     void legacyConstructorBuildsEquivalentModularSelection() {
         ProcessingOptions options = new ProcessingOptions(true, false, true, false);
-
-        assertTrue(options.classic());
-        assertFalse(options.ru());
+        assertTrue(options.classic()); assertFalse(options.ru());
         assertTrue(options.familyEnabled(RecordFamily.CLASSICS));
         assertFalse(options.familyEnabled(RecordFamily.RU));
         assertFalse(options.culometroEnabled());
@@ -24,74 +22,34 @@ class ProcessingOptionsIntegrationTest {
 
     @Test
     void modularFactoryPreservesAllSelectedFamilies() {
-        ProcessingSelection selection = new ProcessingSelection(
-                Set.of(RecordFamily.CLASSICS, RecordFamily.SERIES),
-                Set.of(),
-                false,
-                true,
-                false
-        );
-
-        ProcessingOptions options = ProcessingOptions.modular(selection);
-
-        assertTrue(options.classic());
-        assertFalse(options.ru());
-        assertTrue(options.familyEnabled(RecordFamily.SERIES));
+        ProcessingOptions options = ProcessingOptions.modular(new ProcessingSelection(
+                Set.of(RecordFamily.CLASSICS, RecordFamily.THRESHOLDS_LUCK), Set.of(), false, true, false));
+        assertTrue(options.classic()); assertFalse(options.ru());
+        assertTrue(options.familyEnabled(RecordFamily.THRESHOLDS_LUCK));
     }
 
     @Test
-    void pipelineRejectsThresholdsLuckStillNotImplementedInsteadOfIgnoringThem() {
-        ProcessingOptions options = ProcessingOptions.modular(
-                new ProcessingSelection(
-                        Set.of(RecordFamily.THRESHOLDS_LUCK),
-                        Set.of(),
-                        false,
-                        false,
-                        false
-                )
-        );
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> RecordsNextPipeline.validateImplementedFamilies(options)
-        );
-    }
-
-    @Test
-    void pipelineAcceptsCurrentClassicRuSeriesAndModifiersBridge() {
-        ProcessingOptions options = ProcessingOptions.modular(
-                new ProcessingSelection(
-                        Set.of(
-                                RecordFamily.CLASSICS,
-                                RecordFamily.RU,
-                                RecordFamily.SERIES,
-                                RecordFamily.MODIFIERS
-                        ),
-                        Set.of(),
-                        false,
-                        true,
-                        false
-                )
-        );
-
+    void pipelineAcceptsAllFiveImplementedFamilies() {
+        ProcessingOptions options = ProcessingOptions.modular(new ProcessingSelection(
+                Set.of(RecordFamily.CLASSICS, RecordFamily.RU, RecordFamily.SERIES,
+                        RecordFamily.MODIFIERS, RecordFamily.THRESHOLDS_LUCK),
+                Set.of(), false, true, false));
         RecordsNextPipeline.validateImplementedFamilies(options);
     }
 
     @Test
     void pipelineRejectsCulometroUntilDedicatedExecutorExists() {
-        ProcessingOptions options = ProcessingOptions.modular(
-                new ProcessingSelection(
-                        Set.of(RecordFamily.THRESHOLDS_LUCK),
-                        Set.of("easter-egg.culometro"),
-                        true,
-                        false,
-                        false
-                )
-        );
+        ProcessingOptions options = ProcessingOptions.modular(new ProcessingSelection(
+                Set.of(RecordFamily.THRESHOLDS_LUCK), Set.of("easter-egg.culometro"), true, false, false));
+        assertThrows(IllegalArgumentException.class,
+                () -> RecordsNextPipeline.validateImplementedFamilies(options));
+    }
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> RecordsNextPipeline.validateImplementedFamilies(options)
-        );
+    @Test
+    void thresholdsFamilyDoesNotImplicitlyEnableCulometro() {
+        ProcessingOptions options = ProcessingOptions.modular(new ProcessingSelection(
+                Set.of(RecordFamily.THRESHOLDS_LUCK), Set.of(), false, true, false));
+        RecordsNextPipeline.validateImplementedFamilies(options);
+        assertFalse(options.culometroEnabled());
     }
 }

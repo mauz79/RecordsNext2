@@ -1001,3 +1001,8 @@ Restano da definire:
 ## Output Modificatori implementato
 
 `fcmRecordsNext_Modifiers.js` espone `window.fcmRecordsNextModifiers` e contiene le sezioni `modDifesaMax`, `modDifesaTotaleSquadre`, `capitanoVolteSquadre` e `capitanoTotaleSquadre`. Il Fattore Campo resta escluso finche non viene implementato il relativo calcolo dedicato.
+
+
+## Aggiornamento Serie complete v2
+
+La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.

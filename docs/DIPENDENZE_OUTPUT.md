@@ -38,3 +38,8 @@ Gli eventi soglia richiedono punteggi, soglie gol e risultato. Gli indicatori de
 ## Culometro
 
 Richiede selezione esplicita, configurazione dedicata, componenti, pesi e normalizzazione. Se non selezionato: `SKIPPED_NOT_SELECTED`. Questo non rende incompleta la famiglia.
+
+
+## Aggiornamento Serie complete v2
+
+La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.

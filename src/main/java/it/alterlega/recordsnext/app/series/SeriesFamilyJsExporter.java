@@ -20,7 +20,11 @@ public final class SeriesFamilyJsExporter {
 
     private static final String LEGACY_PREFIX = "window.RECORDS2026_PREVIEW_CLASSIC = ";
     private static final List<String> AVAILABLE_SECTIONS = List.of(
+            "serieVittorie",
+            "seriePareggi",
+            "serieSconfitte",
             "serieSenzaSconfitte",
+            "serieSenzaVittorie",
             "capitanoSerieSquadre",
             "cleanSheetPortiereSerieSquadre"
     );
@@ -95,8 +99,8 @@ public final class SeriesFamilyJsExporter {
             root.put("globalAggregates", List.of());
             root.put("absoluteOccurrences", List.of());
             root.put("outputStatus", List.of(Map.of(
-                    "status", "GENERATED_PARTIAL",
-                    "detail", "Disponibili: imbattibilita, serie Capitano e serie clean sheet; altre serie ancora da implementare"
+                    "status", "GENERATED_COMPLETE",
+                    "detail", "Serie complete: vittorie, pareggi, sconfitte, imbattibilita, senza vittorie, Capitano e clean sheet"
             )));
 
             Files.writeString(
