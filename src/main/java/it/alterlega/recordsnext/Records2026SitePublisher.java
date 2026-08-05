@@ -8,6 +8,7 @@ import it.alterlega.recordsnext.app.manifest.ManifestPublishingSupport;
 import it.alterlega.recordsnext.app.core.CoreJsExporter;
 import it.alterlega.recordsnext.app.core.LeagueMetadata;
 import it.alterlega.recordsnext.app.classics.ClassicsFamilyJsExporter;
+import it.alterlega.recordsnext.app.ru.RuFamilyJsExporter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +40,7 @@ public final class Records2026SitePublisher {
 
     private static final String CORE_FILE = "fcmRecordsNext_Core.js";
     private static final String CLASSICS_2_FILE = ClassicsFamilyJsExporter.FILE_NAME;
+    private static final String RU_2_FILE = RuFamilyJsExporter.FILE_NAME;
     private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
     private static final String RU_FILE = "records2026.recordstagionali.ru.js";
     private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -210,6 +212,7 @@ public final class Records2026SitePublisher {
             var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
             ruSeasons = ru.seasons();
             annualFiles = ru.annualFiles();
+            RuFamilyJsExporter.export(ruArchive, generatedDir.resolve(RU_2_FILE));
         }
 
         if (includeRecordsNextCore) {
@@ -289,6 +292,8 @@ public final class Records2026SitePublisher {
             }
             validatePrefix(byName.get(RU_FILE), "window.RECORDS2026_PREVIEW_RU");
             validatePrefix(byName.get(MANIFEST_FILE), "window.RECORDS2026_STORICO_RU_MANIFEST");
+            requireFile(byName, RU_2_FILE);
+            validatePrefix(byName.get(RU_2_FILE), "window.fcmRecordsNextRU");
             for (Path annual : annuals) validateContains(annual, "window.RECORDS2026_STORICO_RU");
         } else if (!annuals.isEmpty()) {
             throw new IOException("File RU annuali generati nonostante il modulo RU sia disattivato");
@@ -305,7 +310,7 @@ public final class Records2026SitePublisher {
             );
         }
         int expectedTotal = (includeClassic ? 2 : 0)
-                + (includeRu ? expectedAnnualFiles + 2 : 0)
+                + (includeRu ? expectedAnnualFiles + 3 : 0)
                 + (includeRecordsNextCore ? 1 : 0)
                 + (includeRecordsNextManifest ? 1 : 0);
         if (files.size() != expectedTotal) {
