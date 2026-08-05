@@ -1,0 +1,11 @@
+RecordsNext 2.0 - Execution planner v1
+
+Aggiunge soltanto nuove classi e test.
+Non sostituisce file esistenti.
+
+Dopo l'estrazione eseguire:
+  .\mvnw.cmd clean test
+
+Risultato atteso con i pacchetti precedenti applicati:
+  Tests run: 14
+  BUILD SUCCESS
