@@ -1,0 +1,25 @@
+﻿{
+  "schemaVersion": "2.0",
+  "canonicalCompetitionOrder": [
+    "serie-a",
+    "serie-b",
+    "serie-c",
+    "coppa-tra-le-coppe",
+    "europa-pipps",
+    "coppa-di-lega-serie-a",
+    "coppa-di-lega-serie-b",
+    "coppa-di-lega-serie-c",
+    "supercoppa-serie-a",
+    "supercoppa-serie-b",
+    "supercoppa-serie-c"
+  ],
+  "canonicalCompetitions": [],
+  "seasonCompetitions": [],
+  "associationStatuses": [
+    "MAPPED",
+    "UNMAPPED",
+    "AMBIGUOUS",
+    "MANUAL",
+    "EXCLUDED"
+  ]
+}

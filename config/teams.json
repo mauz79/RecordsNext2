@@ -1,0 +1,12 @@
+﻿{
+  "schemaVersion": "2.0",
+  "canonicalTeams": [],
+  "seasonTeams": [],
+  "associationStatuses": [
+    "MAPPED",
+    "UNMAPPED",
+    "AMBIGUOUS",
+    "MANUAL",
+    "EXCLUDED"
+  ]
+}

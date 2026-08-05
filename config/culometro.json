@@ -1,0 +1,8 @@
+﻿{
+  "schemaVersion": "2.0",
+  "enabled": false,
+  "minimumMatches": 10,
+  "normalization": "PER_MATCH",
+  "components": [],
+  "notes": "Easter egg opzionale. Compilare e abilitare solo su richiesta esplicita."
+}

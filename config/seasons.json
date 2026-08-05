@@ -1,0 +1,22 @@
+﻿{
+  "schemaVersion": "2.0",
+  "seasons": [
+    {
+      "seasonId": "2025_2026",
+      "startYear": 2025,
+      "endYear": 2026,
+      "seasonNumber": 21,
+      "status": "CURRENT",
+      "fcmFile": "E:\\FCM\\data\\AlterLega 2025_2026-21-2025.fcm",
+      "fcaFile": "E:\\FCM\\data\\ArchivioA2025SerieA.fca",
+      "site": {
+        "localRoot": "E:\\fantacalcio\\Lega2025",
+        "onlineRoot": "http://www.alterlega.altervista.org/lega2025",
+        "matchPageName": "ris.htm",
+        "dataAPath": "js\\DataA.js"
+      },
+      "hasMatchSheets": true,
+      "notes": ""
+    }
+  ]
+}

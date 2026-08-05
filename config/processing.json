@@ -1,0 +1,40 @@
+﻿{
+  "schemaVersion": "2.0",
+  "processing": {
+    "families": {
+      "classics": {
+        "enabled": true,
+        "children": "ALL"
+      },
+      "series": {
+        "enabled": true,
+        "children": "ALL"
+      },
+      "ru": {
+        "enabled": true,
+        "children": "ALL"
+      },
+      "modifiers": {
+        "enabled": true,
+        "children": {
+          "defence": true,
+          "captain": false,
+          "homeField": true
+        }
+      },
+      "thresholdsLuck": {
+        "enabled": true,
+        "children": "ALL"
+      }
+    },
+    "culometro": {
+      "enabled": false,
+      "configFile": "config\\culometro.json"
+    },
+    "output": {
+      "writeManifest": true,
+      "writeCore": true,
+      "publishToSite": false
+    }
+  }
+}
