@@ -23,7 +23,7 @@
         }
       },
       "thresholdsLuck": {
-        "enabled": false,
+        "enabled": true,
         "children": "ALL"
       }
     },

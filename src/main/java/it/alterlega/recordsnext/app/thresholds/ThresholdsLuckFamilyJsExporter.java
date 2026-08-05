@@ -50,30 +50,55 @@ public final class ThresholdsLuckFamilyJsExporter {
             matchRows += matches.size();
             for (Map<String,Object> match : matches) {
                 BigDecimal score = number(match.get("puntiFatti"));
+                BigDecimal scoreAgainst = number(match.get("puntiSubiti"));
                 int goalsFor = integer(match.get("golFatti"));
                 int goalsAgainst = integer(match.get("golSubiti"));
-                String result = string(match.get("esito"));
+                String result = string(match.get("esito")).trim().toUpperCase();
                 Band current = currentBand(bands, score);
                 BigDecimal nextMin = nextBandMin(bands, score);
                 BigDecimal distance = nextMin == null ? null : nextMin.subtract(score);
+                BigDecimal bandSurplus = current == null ? BigDecimal.ZERO : score.subtract(current.min());
 
                 if (current != null && score.compareTo(current.min()) == 0) {
                     addEvent(events, aggregates, match, "EXACT_THRESHOLD", "NEUTRAL", BigDecimal.ZERO,
-                            "Punteggio esattamente sul minimo della fascia gol");
+                            BigDecimal.ZERO, "Punteggio esattamente sul minimo della fascia gol");
                 }
-                if ("V".equals(result) && current != null && score.compareTo(current.min()) == 0
+                if (isWin(result) && current != null && score.compareTo(current.min()) == 0
                         && goalsFor == goalsAgainst + 1) {
                     addEvent(events, aggregates, match, "JUST_ENOUGH", "FAVOURABLE", BigDecimal.ZERO,
-                            "Vittoria con punteggio sul minimo della fascia decisiva");
+                            BigDecimal.ZERO, "Vittoria con punteggio sul minimo della fascia decisiva");
                 }
                 if (distance != null && distance.compareTo(new BigDecimal("0.5")) == 0) {
-                    if ("P".equals(result) && goalsFor == goalsAgainst) {
+                    if (isDraw(result) && goalsFor == goalsAgainst) {
                         addEvent(events, aggregates, match, "MISSED_WIN_HALF_POINT", "UNFAVOURABLE", distance,
-                                "Mezzo punto dalla fascia successiva che avrebbe prodotto la vittoria");
-                    } else if ("S".equals(result) && goalsFor + 1 == goalsAgainst) {
+                                bandSurplus, "Mezzo punto dalla fascia successiva che avrebbe prodotto la vittoria");
+                    } else if (isLoss(result) && goalsFor + 1 == goalsAgainst) {
                         addEvent(events, aggregates, match, "LOSS_BY_A_WHISKER", "UNFAVOURABLE", distance,
-                                "Mezzo punto dalla fascia successiva che avrebbe prodotto il pareggio");
+                                bandSurplus, "Mezzo punto dalla fascia successiva che avrebbe prodotto il pareggio");
                     }
+                }
+                if (isDraw(result) && goalsFor == goalsAgainst) {
+                    if (score.compareTo(scoreAgainst) < 0) {
+                        addEvent(events, aggregates, match, "MIRACLE_DRAW", "FAVOURABLE",
+                                distance, bandSurplus,
+                                "Pareggio ottenuto con punteggio inferiore all'avversaria nella stessa fascia gol");
+                    } else if (score.compareTo(scoreAgainst) > 0) {
+                        addEvent(events, aggregates, match, "TIGHT_DRAW", "UNFAVOURABLE",
+                                distance, bandSurplus,
+                                "Pareggio nonostante un punteggio superiore all'avversaria nella stessa fascia gol");
+                    }
+                }
+                if (isWin(result) && goalsFor == goalsAgainst + 1) {
+                    addEvent(events, aggregates, match, "ONE_GOAL_WIN", "FAVOURABLE",
+                            distance, bandSurplus, "Vittoria con un solo gol di margine");
+                } else if (isLoss(result) && goalsFor + 1 == goalsAgainst) {
+                    addEvent(events, aggregates, match, "ONE_GOAL_LOSS", "UNFAVOURABLE",
+                            distance, bandSurplus, "Sconfitta con un solo gol di margine");
+                }
+                if (current != null && bandSurplus.compareTo(BigDecimal.ZERO) > 0) {
+                    addEvent(events, aggregates, match, "UNUSED_BAND_POINTS", "NEUTRAL",
+                            distance, bandSurplus,
+                            "Punti oltre il minimo della fascia che non hanno prodotto un gol aggiuntivo");
                 }
             }
         }
@@ -95,7 +120,9 @@ public final class ThresholdsLuckFamilyJsExporter {
         metadata.put("teamMatchRowCount", matchRows);
         metadata.put("eventCount", events.size());
         metadata.put("implementedEventTypes", List.of(
-                "EXACT_THRESHOLD", "JUST_ENOUGH", "MISSED_WIN_HALF_POINT", "LOSS_BY_A_WHISKER"));
+                "EXACT_THRESHOLD", "JUST_ENOUGH", "MISSED_WIN_HALF_POINT", "LOSS_BY_A_WHISKER",
+                "MIRACLE_DRAW", "TIGHT_DRAW", "ONE_GOAL_WIN", "ONE_GOAL_LOSS",
+                "UNUSED_BAND_POINTS"));
         metadata.put("culometroGenerated", false);
 
         Map<String,Object> root = new LinkedHashMap<>();
@@ -107,8 +134,8 @@ public final class ThresholdsLuckFamilyJsExporter {
         root.put("globalAggregates", List.of());
         root.put("absoluteOccurrences", List.of());
         root.put("outputStatus", List.of(Map.of(
-                "status", "GENERATED_PARTIAL",
-                "detail", "Eventi oggettivi su fasce gol disponibili; regole beffa/miracolato/spreco ancora da catalogare. Culometro escluso."
+                "status", "GENERATED_COMPLETE",
+                "detail", "Indicatori oggettivi completi basati su esiti, fasce gol, margini e punti inutilizzati. Culometro escluso."
         )));
 
         Files.writeString(outputFile, GLOBAL_NAME + " = " + JsonWriter.write(root) + ";\n",
@@ -119,7 +146,7 @@ public final class ThresholdsLuckFamilyJsExporter {
 
     private static void addEvent(List<Object> events, Map<String,Aggregate> aggregates,
                                  Map<String,Object> match, String type, String direction,
-                                 BigDecimal distance, String detail) {
+                                 BigDecimal distance, BigDecimal bandSurplus, String detail) {
         Map<String,Object> event = new LinkedHashMap<>();
         event.put("eventId", "threshold:" + string(match.get("stagione")) + ":" + string(match.get("idIncontro"))
                 + ":" + string(match.get("idSquadra")) + ":" + type.toLowerCase());
@@ -142,11 +169,13 @@ public final class ThresholdsLuckFamilyJsExporter {
         event.put("goalsAgainst", match.get("golSubiti"));
         event.put("result", match.get("esito"));
         event.put("distanceToNextThreshold", distance);
+        event.put("unusedBandPoints", bandSurplus);
         event.put("detail", detail);
         events.add(event);
 
         String key = string(match.get("stagione")) + "|" + string(match.get("idSquadra"));
-        aggregates.computeIfAbsent(key, ignored -> new Aggregate(match)).add(direction, type);
+        aggregates.computeIfAbsent(key, ignored -> new Aggregate(match))
+                .add(direction, type, bandSurplus);
     }
 
     private static Band currentBand(List<Map<String,Object>> bands, BigDecimal score) {
@@ -190,6 +219,9 @@ public final class ThresholdsLuckFamilyJsExporter {
         return new BigDecimal(string(value).replace(',', '.'));
     }
     private static int integer(Object value) { return number(value).intValue(); }
+    private static boolean isWin(String result) { return "V".equals(result); }
+    private static boolean isDraw(String result) { return "P".equals(result) || "N".equals(result); }
+    private static boolean isLoss(String result) { return "S".equals(result); }
 
     public record ExportResult(int normalizedFileCount, int teamMatchRowCount, int eventCount,
                                int aggregateCount, Path outputFile) {}
@@ -198,17 +230,22 @@ public final class ThresholdsLuckFamilyJsExporter {
     private static final class Aggregate {
         private final Object seasonId, teamId, team;
         private int favourable, unfavourable, neutral;
+        private BigDecimal unusedBandPoints = BigDecimal.ZERO;
         private final Map<String,Integer> byType = new LinkedHashMap<>();
         Aggregate(Map<String,Object> match) { seasonId=match.get("stagione"); teamId=match.get("idSquadra"); team=match.get("squadra"); }
-        void add(String direction, String type) {
+        void add(String direction, String type, BigDecimal surplus) {
             switch (direction) { case "FAVOURABLE" -> favourable++; case "UNFAVOURABLE" -> unfavourable++; default -> neutral++; }
             byType.merge(type, 1, Integer::sum);
+            if ("UNUSED_BAND_POINTS".equals(type) && surplus != null) {
+                unusedBandPoints = unusedBandPoints.add(surplus);
+            }
         }
         Map<String,Object> toMap() {
             Map<String,Object> out = new LinkedHashMap<>();
             out.put("seasonId", seasonId); out.put("teamId", teamId); out.put("team", team);
             out.put("favourableEvents", favourable); out.put("unfavourableEvents", unfavourable);
             out.put("neutralEvents", neutral); out.put("luckBalance", favourable - unfavourable);
+            out.put("unusedBandPoints", unusedBandPoints);
             out.put("eventsByType", byType); return out;
         }
     }
