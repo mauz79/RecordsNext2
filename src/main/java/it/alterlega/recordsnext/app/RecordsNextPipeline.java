@@ -155,11 +155,6 @@ public final class RecordsNextPipeline {
                             + unsupported
             );
         }
-        if (options.culometroEnabled()) {
-            throw new IllegalArgumentException(
-                    "Il Culometro e configurabile ma non e ancora collegato alla pipeline 2.0"
-            );
-        }
     }
 
     private static String elapsed(long started) {

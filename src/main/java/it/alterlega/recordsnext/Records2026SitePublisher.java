@@ -12,6 +12,7 @@ import it.alterlega.recordsnext.app.ru.RuFamilyJsExporter;
 import it.alterlega.recordsnext.app.series.SeriesFamilyJsExporter;
 import it.alterlega.recordsnext.app.modifiers.ModifiersFamilyJsExporter;
 import it.alterlega.recordsnext.app.thresholds.ThresholdsLuckFamilyJsExporter;
+import it.alterlega.recordsnext.app.culometro.CulometroFamilyJsExporter;
 import it.alterlega.recordsnext.app.model.RecordFamily;
 
 import java.io.IOException;
@@ -48,6 +49,7 @@ public final class Records2026SitePublisher {
     private static final String SERIES_2_FILE = SeriesFamilyJsExporter.FILE_NAME;
     private static final String MODIFIERS_2_FILE = ModifiersFamilyJsExporter.FILE_NAME;
     private static final String THRESHOLDS_2_FILE = ThresholdsLuckFamilyJsExporter.FILE_NAME;
+    private static final String CULOMETRO_2_FILE = CulometroFamilyJsExporter.FILE_NAME;
     private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
     private static final String RU_FILE = "records2026.recordstagionali.ru.js";
     private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -193,6 +195,7 @@ public final class Records2026SitePublisher {
         boolean includeSeries = options != null && options.familyEnabled(RecordFamily.SERIES);
         boolean includeModifiers = options != null && options.familyEnabled(RecordFamily.MODIFIERS);
         boolean includeThresholds = options != null && options.familyEnabled(RecordFamily.THRESHOLDS_LUCK);
+        boolean includeCulometro = options != null && options.culometroEnabled();
         boolean includeRecordsNextManifest = options != null
                 && preflight != null
                 && manifestMetadata != null;
@@ -200,11 +203,11 @@ public final class Records2026SitePublisher {
                 && database != null
                 && leagueMetadata != null;
 
-        if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeThresholds && !includeRecordsNextManifest && !includeRecordsNextCore) {
+        if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeThresholds && !includeCulometro && !includeRecordsNextManifest && !includeRecordsNextCore) {
             throw new IOException("Nessun modulo selezionato per la generazione JS");
         }
         if (includeClassic || includeSeries || includeModifiers) requireDirectory(classicArchive, "Archivio classic");
-        if (includeThresholds) requireDirectory(reportsRoot, "Report normalizzati");
+        if (includeThresholds || includeCulometro) requireDirectory(reportsRoot, "Report normalizzati");
         if (includeRu) requireDirectory(ruArchive, "Archivio RU");
         Files.createDirectories(stagingRoot);
 
@@ -239,6 +242,15 @@ public final class Records2026SitePublisher {
             annualFiles = ru.annualFiles();
             RuFamilyJsExporter.export(ruArchive, generatedDir.resolve(RU_2_FILE));
         }
+        if (includeCulometro) {
+            Path projectRoot = reportsRoot.toAbsolutePath().normalize().getParent().getParent();
+            CulometroFamilyJsExporter.export(
+                    generatedDir.resolve(THRESHOLDS_2_FILE),
+                    generatedDir.resolve(RU_2_FILE),
+                    projectRoot.resolve("config/culometro.json"),
+                    generatedDir.resolve(CULOMETRO_2_FILE)
+            );
+        }
 
         if (includeRecordsNextCore) {
             try {
@@ -271,6 +283,7 @@ public final class Records2026SitePublisher {
                 includeSeries,
                 includeModifiers,
                 includeThresholds,
+                includeCulometro,
                 includeRecordsNextManifest,
                 includeRecordsNextCore
         );
@@ -291,6 +304,7 @@ public final class Records2026SitePublisher {
             boolean includeSeries,
             boolean includeModifiers,
             boolean includeThresholds,
+            boolean includeCulometro,
             boolean includeRecordsNextManifest,
             boolean includeRecordsNextCore) throws IOException {
 
@@ -325,6 +339,10 @@ public final class Records2026SitePublisher {
             requireFile(byName, THRESHOLDS_2_FILE);
             validatePrefix(byName.get(THRESHOLDS_2_FILE), "window.fcmRecordsNextThresholdsLuck");
         }
+        if (includeCulometro) {
+            requireFile(byName, CULOMETRO_2_FILE);
+            validatePrefix(byName.get(CULOMETRO_2_FILE), "window.fcmRecordsNextCulometro");
+        }
         List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
         if (includeRu) {
             requireFile(byName, RU_FILE);
@@ -356,6 +374,7 @@ public final class Records2026SitePublisher {
                 + (includeSeries ? 1 : 0)
                 + (includeModifiers ? 1 : 0)
                 + (includeThresholds ? 1 : 0)
+                + (includeCulometro ? 1 : 0)
                 + (includeRu ? expectedAnnualFiles + 3 : 0)
                 + (includeRecordsNextCore ? 1 : 0)
                 + (includeRecordsNextManifest ? 1 : 0);
