@@ -5,6 +5,8 @@ import it.alterlega.recordsnext.app.ProcessingOptions;
 import it.alterlega.recordsnext.app.manifest.ManifestJsWriter;
 import it.alterlega.recordsnext.app.manifest.ManifestMetadata;
 import it.alterlega.recordsnext.app.manifest.ManifestPublishingSupport;
+import it.alterlega.recordsnext.app.core.CoreJsExporter;
+import it.alterlega.recordsnext.app.core.LeagueMetadata;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +36,7 @@ import java.util.UUID;
  */
 public final class Records2026SitePublisher {
 
+    private static final String CORE_FILE = "fcmRecordsNext_Core.js";
     private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
     private static final String RU_FILE = "records2026.recordstagionali.ru.js";
     private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -95,6 +98,8 @@ public final class Records2026SitePublisher {
                 includeRu,
                 null,
                 null,
+                null,
+                null,
                 null
         );
     }
@@ -120,7 +125,38 @@ public final class Records2026SitePublisher {
                 includeRu,
                 options,
                 preflight,
-                manifestMetadata
+                manifestMetadata,
+                null,
+                null
+        );
+    }
+
+    public static PublishResult run(
+            Path classicArchive,
+            Path ruArchive,
+            Path stagingRoot,
+            Path siteJsDir,
+            boolean generateOnly,
+            boolean includeClassic,
+            boolean includeRu,
+            ProcessingOptions options,
+            PipelinePreflight.Result preflight,
+            ManifestMetadata manifestMetadata,
+            Path database,
+            LeagueMetadata leagueMetadata) throws IOException {
+        return runInternal(
+                classicArchive,
+                ruArchive,
+                stagingRoot,
+                siteJsDir,
+                generateOnly,
+                includeClassic,
+                includeRu,
+                options,
+                preflight,
+                manifestMetadata,
+                database,
+                leagueMetadata
         );
     }
 
@@ -134,13 +170,18 @@ public final class Records2026SitePublisher {
             boolean includeRu,
             ProcessingOptions options,
             PipelinePreflight.Result preflight,
-            ManifestMetadata manifestMetadata) throws IOException {
+            ManifestMetadata manifestMetadata,
+            Path database,
+            LeagueMetadata leagueMetadata) throws IOException {
 
         boolean includeRecordsNextManifest = options != null
                 && preflight != null
                 && manifestMetadata != null;
+        boolean includeRecordsNextCore = includeRecordsNextManifest
+                && database != null
+                && leagueMetadata != null;
 
-        if (!includeClassic && !includeRu && !includeRecordsNextManifest) {
+        if (!includeClassic && !includeRu && !includeRecordsNextManifest && !includeRecordsNextCore) {
             throw new IOException("Nessun modulo selezionato per la generazione JS");
         }
         if (includeClassic) requireDirectory(classicArchive, "Archivio classic");
@@ -167,6 +208,20 @@ public final class Records2026SitePublisher {
             annualFiles = ru.annualFiles();
         }
 
+        if (includeRecordsNextCore) {
+            try {
+                CoreJsExporter.export(
+                        database,
+                        generatedDir.resolve(CORE_FILE),
+                        leagueMetadata.leagueId(),
+                        leagueMetadata.leagueName()
+                );
+            } catch (Exception ex) {
+                if (ex instanceof IOException io) throw io;
+                throw new IOException("Generazione Core 2.0 fallita", ex);
+            }
+        }
+
         if (includeRecordsNextManifest) {
             ManifestPublishingSupport.write(
                     generatedDir,
@@ -181,7 +236,8 @@ public final class Records2026SitePublisher {
                 annualFiles,
                 includeClassic,
                 includeRu,
-                includeRecordsNextManifest
+                includeRecordsNextManifest,
+                includeRecordsNextCore
         );
         int published = 0;
         if (!generateOnly) {
@@ -197,7 +253,8 @@ public final class Records2026SitePublisher {
             int expectedAnnualFiles,
             boolean includeClassic,
             boolean includeRu,
-            boolean includeRecordsNextManifest) throws IOException {
+            boolean includeRecordsNextManifest,
+            boolean includeRecordsNextCore) throws IOException {
 
         List<Path> files;
         try (var stream = Files.list(generatedDir)) {
@@ -230,6 +287,10 @@ public final class Records2026SitePublisher {
         } else if (!annuals.isEmpty()) {
             throw new IOException("File RU annuali generati nonostante il modulo RU sia disattivato");
         }
+        if (includeRecordsNextCore) {
+            requireFile(byName, CORE_FILE);
+            validatePrefix(byName.get(CORE_FILE), "window.fcmRecordsNextCore");
+        }
         if (includeRecordsNextManifest) {
             requireFile(byName, ManifestJsWriter.FILE_NAME);
             validatePrefix(
@@ -239,6 +300,7 @@ public final class Records2026SitePublisher {
         }
         int expectedTotal = (includeClassic ? 1 : 0)
                 + (includeRu ? expectedAnnualFiles + 2 : 0)
+                + (includeRecordsNextCore ? 1 : 0)
                 + (includeRecordsNextManifest ? 1 : 0);
         if (files.size() != expectedTotal) {
             throw new IOException("Numero file JS inatteso: " + files.size()

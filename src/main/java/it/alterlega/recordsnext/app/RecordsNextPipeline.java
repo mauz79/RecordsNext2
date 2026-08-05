@@ -4,6 +4,8 @@ import it.alterlega.recordsnext.Records2026SitePublisher;
 import it.alterlega.recordsnext.RiserveUfficioArchiveBuilder;
 import it.alterlega.recordsnext.SeasonRecordsArchiveBuilder;
 import it.alterlega.recordsnext.app.manifest.ManifestMetadata;
+import it.alterlega.recordsnext.app.core.LeagueMetadata;
+import it.alterlega.recordsnext.app.core.LeagueMetadataLoader;
 import it.alterlega.recordsnext.app.model.RecordFamily;
 
 import java.nio.file.Path;
@@ -84,13 +86,16 @@ public final class RecordsNextPipeline {
                     82
             );
             long started = System.nanoTime();
+            LeagueMetadata leagueMetadata = LeagueMetadataLoader.load(
+                    c.projectRoot().resolve("config/league.json")
+            );
             ManifestMetadata manifestMetadata = new ManifestMetadata(
                     "RecordsNext by mauz79",
                     "2.0.0-dev",
                     "2.0",
                     OffsetDateTime.now(),
-                    "",
-                    "",
+                    leagueMetadata.leagueId(),
+                    leagueMetadata.currentSeasonId(),
                     c.seasons(),
                     List.of()
             );
@@ -104,7 +109,9 @@ public final class RecordsNextPipeline {
                     o.familyEnabled(RecordFamily.RU),
                     o,
                     preflight,
-                    manifestMetadata
+                    manifestMetadata,
+                    database,
+                    leagueMetadata
             );
             l.timing(
                     (o.publish()

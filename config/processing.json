@@ -7,7 +7,7 @@
         "children": "ALL"
       },
       "series": {
-        "enabled": true,
+        "enabled": false,
         "children": "ALL"
       },
       "ru": {
@@ -15,15 +15,15 @@
         "children": "ALL"
       },
       "modifiers": {
-        "enabled": true,
+        "enabled": false,
         "children": {
-          "defence": true,
+          "defence": false,
           "captain": false,
-          "homeField": true
+          "homeField": false
         }
       },
       "thresholdsLuck": {
-        "enabled": true,
+        "enabled": false,
         "children": "ALL"
       }
     },

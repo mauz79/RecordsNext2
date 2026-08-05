@@ -15,23 +15,43 @@ import java.util.Properties;
 public record PipelineConfig(Path projectRoot, Path reports, Path classicArchive, Path ruArchive,
                              Path staging, Path siteJs, List<String> seasons) {
     public static PipelineConfig load(Path projectRoot, Path file) throws IOException {
-        Properties p = new Properties();
+        Properties properties = new Properties();
         try (InputStream in = Files.newInputStream(file)) {
-            p.load(in);
+            properties.load(in);
         }
-        List<String> seasons = Arrays.stream(p.getProperty("seasons", "").split("\\s*,\\s*"))
-            .filter(s -> !s.isBlank()).toList();
+        return fromProperties(projectRoot, properties);
+    }
+
+    public static PipelineConfig defaults(Path projectRoot) {
+        return fromProperties(projectRoot, new Properties());
+    }
+
+    public static PipelineConfig fromProperties(Path projectRoot, Properties properties) {
+        List<String> seasons = Arrays.stream(
+                properties.getProperty("seasons", "").split("\\s*,\\s*")
+            )
+            .filter(value -> !value.isBlank())
+            .toList();
+
         Path normalizedRoot = projectRoot.toAbsolutePath().normalize();
-        return new PipelineConfig(normalizedRoot,
-            resolve(normalizedRoot, p.getProperty("reports", "data/reports")),
-            resolve(normalizedRoot, p.getProperty("classicArchive", "data/records-archive/stagioni")),
-            resolve(normalizedRoot, p.getProperty("ruArchive", "data/records-archive/riserveufficio")),
-            resolve(normalizedRoot, p.getProperty("staging", "data/site-export-staging")),
-            resolvePublishDirectory(normalizedRoot, p), seasons);
+
+        return new PipelineConfig(
+            normalizedRoot,
+            resolve(normalizedRoot, properties.getProperty("reports", "data/reports")),
+            resolve(normalizedRoot,
+                properties.getProperty("classicArchive", "data/records-archive/stagioni")),
+            resolve(normalizedRoot,
+                properties.getProperty("ruArchive", "data/records-archive/riserveufficio")),
+            resolve(normalizedRoot,
+                properties.getProperty("staging", "data/site-export-staging")),
+            resolvePublishDirectory(normalizedRoot, properties),
+            seasons
+        );
     }
 
     public static Path resolvePublishDirectory(Path projectRoot, Properties properties) {
         String mode = properties.getProperty("publish.destinationMode", "currentSeason").trim();
+
         if ("custom".equalsIgnoreCase(mode)) {
             String custom = properties.getProperty("publish.customDirectory", "").trim();
             if (!custom.isEmpty()) {
@@ -39,8 +59,11 @@ public record PipelineConfig(Path projectRoot, Path reports, Path classicArchive
             }
         }
 
-        Path database = resolve(projectRoot,
-            properties.getProperty("database", "data/database/recordsnext.db"));
+        Path database = resolve(
+            projectRoot,
+            properties.getProperty("database", "data/database/recordsnext.db")
+        );
+
         if (Files.isRegularFile(database)) {
             String sql = """
                 SELECT c.local_site_path
@@ -52,21 +75,32 @@ public record PipelineConfig(Path projectRoot, Path reports, Path classicArchive
                 ORDER BY s.sort_order DESC
                 LIMIT 1
                 """;
+
             try {
                 Class.forName("org.sqlite.JDBC");
-                try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + database);
-                     Statement statement = connection.createStatement();
-                     ResultSet result = statement.executeQuery(sql)) {
+
+                try (
+                    Connection connection =
+                        DriverManager.getConnection("jdbc:sqlite:" + database);
+                    Statement statement = connection.createStatement();
+                    ResultSet result = statement.executeQuery(sql)
+                ) {
                     if (result.next()) {
-                        return Path.of(result.getString(1)).resolve("js").toAbsolutePath().normalize();
+                        return Path.of(result.getString(1))
+                            .resolve("js")
+                            .toAbsolutePath()
+                            .normalize();
                     }
                 }
             } catch (Exception ignored) {
-                // Fallback to the legacy property below.
+                // Fallback alla proprieta legacy.
             }
         }
-        return resolve(projectRoot,
-            properties.getProperty("siteJs", "E:/fantacalcio/Lega2025/js"));
+
+        return resolve(
+            projectRoot,
+            properties.getProperty("siteJs", "E:/fantacalcio/Lega2025/js")
+        );
     }
 
     private static Path resolve(Path root, String value) {
