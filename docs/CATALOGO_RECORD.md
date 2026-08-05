@@ -8,7 +8,7 @@
 
 | ID provvisorio | Nome | Origine | Ambiti | Tabellino | Stato |
 |---|---|---|---|---|---|
-| classics.highest-match-score | Maggior punteggio in una partita | RecordsNext + ConfrontiStorici | Stagionale, assoluto | Singolo | DA_CATALOGARE |
+| classics.highest-match-score | Maggior punteggio in una partita | RecordsNext + ConfrontiStorici | Stagionale, assoluto | Singolo | VERIFICATO |
 | classics.lowest-match-score | Minor punteggio in una partita | ConfrontiStorici | Stagionale, assoluto | Singolo | DA_CATALOGARE |
 | classics.most-regulation-goals | Partita con piu gol regolamentari | ConfrontiStorici | Stagionale, assoluto | Singolo | DA_CATALOGARE |
 | classics.largest-regulation-margin | Maggior scarto regolamentare | ConfrontiStorici | Stagionale, assoluto | Singolo | DA_CATALOGARE |

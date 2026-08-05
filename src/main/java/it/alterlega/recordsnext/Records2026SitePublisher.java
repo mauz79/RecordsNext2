@@ -7,6 +7,7 @@ import it.alterlega.recordsnext.app.manifest.ManifestMetadata;
 import it.alterlega.recordsnext.app.manifest.ManifestPublishingSupport;
 import it.alterlega.recordsnext.app.core.CoreJsExporter;
 import it.alterlega.recordsnext.app.core.LeagueMetadata;
+import it.alterlega.recordsnext.app.classics.ClassicsFamilyJsExporter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,6 +38,7 @@ import java.util.UUID;
 public final class Records2026SitePublisher {
 
     private static final String CORE_FILE = "fcmRecordsNext_Core.js";
+    private static final String CLASSICS_2_FILE = ClassicsFamilyJsExporter.FILE_NAME;
     private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
     private static final String RU_FILE = "records2026.recordstagionali.ru.js";
     private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -201,6 +203,8 @@ public final class Records2026SitePublisher {
             var classic = Records2026ClassicJsExporter.export(
                     classicArchive, generatedDir.resolve(CLASSIC_FILE), List.of());
             classicEntries = classic.entryCount();
+            ClassicsFamilyJsExporter.export(
+                    classicArchive, generatedDir.resolve(CLASSICS_2_FILE));
         }
         if (includeRu) {
             var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
@@ -272,6 +276,8 @@ public final class Records2026SitePublisher {
         if (includeClassic) {
             requireFile(byName, CLASSIC_FILE);
             validatePrefix(byName.get(CLASSIC_FILE), "window.RECORDS2026_PREVIEW_CLASSIC");
+            requireFile(byName, CLASSICS_2_FILE);
+            validatePrefix(byName.get(CLASSICS_2_FILE), "window.fcmRecordsNextClassics");
         }
         List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
         if (includeRu) {
@@ -298,7 +304,7 @@ public final class Records2026SitePublisher {
                     "window.fcmRecordsNextManifest"
             );
         }
-        int expectedTotal = (includeClassic ? 1 : 0)
+        int expectedTotal = (includeClassic ? 2 : 0)
                 + (includeRu ? expectedAnnualFiles + 2 : 0)
                 + (includeRecordsNextCore ? 1 : 0)
                 + (includeRecordsNextManifest ? 1 : 0);

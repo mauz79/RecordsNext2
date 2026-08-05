@@ -882,6 +882,18 @@ Schema concettuale:
 
 Ogni famiglia può omettere sezioni non pertinenti, ma deve rispettare lo schema comune di metadata e stato.
 
+### Stato implementato Classici
+
+`fcmRecordsNext_Classics.js` è generato dalla pipeline e pubblica:
+
+- `schemaVersion: "2.0"`;
+- `familyId: "classics"`;
+- metadata con numero di stagioni e recordset;
+- `seasonAggregates` derivati dagli archivi Classici consolidati 1.0.2;
+- stato `GENERATED_COMPLETE`.
+
+Durante la migrazione resta generato anche il file legacy `records2026.recordstagionali.classic.js`.
+
 ## 34. Cartelle pubbliche
 
 Sul sito FCM:
