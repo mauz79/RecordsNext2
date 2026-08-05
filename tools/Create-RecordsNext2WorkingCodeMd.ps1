@@ -95,7 +95,7 @@ $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 [void]$Builder.AppendLine("")
 [void]$Builder.AppendLine("- Struttura iniziale del progetto.")
 [void]$Builder.AppendLine("- Documentazione architetturale iniziale.")
-[void]$Builder.AppendLine("- Generatore iniziale della bibbia.")
+[void]$Builder.AppendLine("- Generatore della bibbia aggiornato con documentazione e sorgenti reali.")
 [void]$Builder.AppendLine("")
 
 [void]$Builder.AppendLine("### Non ancora implementato")
@@ -114,6 +114,10 @@ Add-IndentedFileSection -Builder $Builder -Title "Architettura" -RelativePath "d
 Add-IndentedFileSection -Builder $Builder -Title "Catalogo record" -RelativePath "docs\CATALOGO_RECORD.md"
 Add-IndentedFileSection -Builder $Builder -Title "Dipendenze output" -RelativePath "docs\DIPENDENZE_OUTPUT.md"
 Add-IndentedFileSection -Builder $Builder -Title "Decisioni aperte" -RelativePath "docs\DECISIONI_APERTE.md"
+Add-IndentedFileSection -Builder $Builder -Title "Modello dati" -RelativePath "docs\MODELLO_DATI_RECORDSNEXT2.md"
+Add-IndentedFileSection -Builder $Builder -Title "Configurazione" -RelativePath "docs\CONFIGURAZIONE_RECORDSNEXT2.md"
+Add-IndentedFileSection -Builder $Builder -Title "Stato implementazione" -RelativePath "docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md"
+Add-IndentedFileSection -Builder $Builder -Title "Changelog" -RelativePath "CHANGELOG.md"
 
 $SourceExtensions = @(
     ".java",

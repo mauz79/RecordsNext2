@@ -1,11 +1,9 @@
-RecordsNext 2.0 - Execution planner v1
+RecordsNext 2.0 - integrazione manifest nello staging e nel publisher
 
-Aggiunge soltanto nuove classi e test.
-Non sostituisce file esistenti.
+Contenuto:
+- Records2026SitePublisher.java aggiornato
+- RecordsNextPipeline.java aggiornata
+- ManifestPublishingSupport.java nuovo
+- ManifestPublishingSupportTest.java nuovo
 
-Dopo l'estrazione eseguire:
-  .\mvnw.cmd clean test
-
-Risultato atteso con i pacchetti precedenti applicati:
-  Tests run: 14
-  BUILD SUCCESS
+Estrazione: direttamente nella root D:\DEV_APPS\RecordsNext2.0 con -Force.

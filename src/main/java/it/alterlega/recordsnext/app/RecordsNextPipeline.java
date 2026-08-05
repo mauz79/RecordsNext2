@@ -3,9 +3,11 @@ package it.alterlega.recordsnext.app;
 import it.alterlega.recordsnext.Records2026SitePublisher;
 import it.alterlega.recordsnext.RiserveUfficioArchiveBuilder;
 import it.alterlega.recordsnext.SeasonRecordsArchiveBuilder;
+import it.alterlega.recordsnext.app.manifest.ManifestMetadata;
 import it.alterlega.recordsnext.app.model.RecordFamily;
 
 import java.nio.file.Path;
+import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -82,6 +84,16 @@ public final class RecordsNextPipeline {
                     82
             );
             long started = System.nanoTime();
+            ManifestMetadata manifestMetadata = new ManifestMetadata(
+                    "RecordsNext by mauz79",
+                    "2.0.0-dev",
+                    "2.0",
+                    OffsetDateTime.now(),
+                    "",
+                    "",
+                    c.seasons(),
+                    List.of()
+            );
             var r = Records2026SitePublisher.run(
                     c.classicArchive(),
                     c.ruArchive(),
@@ -89,7 +101,10 @@ public final class RecordsNextPipeline {
                     c.siteJs(),
                     !o.publish(),
                     o.familyEnabled(RecordFamily.CLASSICS),
-                    o.familyEnabled(RecordFamily.RU)
+                    o.familyEnabled(RecordFamily.RU),
+                    o,
+                    preflight,
+                    manifestMetadata
             );
             l.timing(
                     (o.publish()

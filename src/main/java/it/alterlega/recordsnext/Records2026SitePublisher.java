@@ -1,5 +1,11 @@
 package it.alterlega.recordsnext;
 
+import it.alterlega.recordsnext.app.PipelinePreflight;
+import it.alterlega.recordsnext.app.ProcessingOptions;
+import it.alterlega.recordsnext.app.manifest.ManifestJsWriter;
+import it.alterlega.recordsnext.app.manifest.ManifestMetadata;
+import it.alterlega.recordsnext.app.manifest.ManifestPublishingSupport;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -79,8 +85,62 @@ public final class Records2026SitePublisher {
             boolean generateOnly,
             boolean includeClassic,
             boolean includeRu) throws IOException {
+        return runInternal(
+                classicArchive,
+                ruArchive,
+                stagingRoot,
+                siteJsDir,
+                generateOnly,
+                includeClassic,
+                includeRu,
+                null,
+                null,
+                null
+        );
+    }
 
-        if (!includeClassic && !includeRu) {
+    public static PublishResult run(
+            Path classicArchive,
+            Path ruArchive,
+            Path stagingRoot,
+            Path siteJsDir,
+            boolean generateOnly,
+            boolean includeClassic,
+            boolean includeRu,
+            ProcessingOptions options,
+            PipelinePreflight.Result preflight,
+            ManifestMetadata manifestMetadata) throws IOException {
+        return runInternal(
+                classicArchive,
+                ruArchive,
+                stagingRoot,
+                siteJsDir,
+                generateOnly,
+                includeClassic,
+                includeRu,
+                options,
+                preflight,
+                manifestMetadata
+        );
+    }
+
+    private static PublishResult runInternal(
+            Path classicArchive,
+            Path ruArchive,
+            Path stagingRoot,
+            Path siteJsDir,
+            boolean generateOnly,
+            boolean includeClassic,
+            boolean includeRu,
+            ProcessingOptions options,
+            PipelinePreflight.Result preflight,
+            ManifestMetadata manifestMetadata) throws IOException {
+
+        boolean includeRecordsNextManifest = options != null
+                && preflight != null
+                && manifestMetadata != null;
+
+        if (!includeClassic && !includeRu && !includeRecordsNextManifest) {
             throw new IOException("Nessun modulo selezionato per la generazione JS");
         }
         if (includeClassic) requireDirectory(classicArchive, "Archivio classic");
@@ -107,7 +167,22 @@ public final class Records2026SitePublisher {
             annualFiles = ru.annualFiles();
         }
 
-        ValidationResult validation = validateGenerated(generatedDir, annualFiles, includeClassic, includeRu);
+        if (includeRecordsNextManifest) {
+            ManifestPublishingSupport.write(
+                    generatedDir,
+                    options,
+                    preflight,
+                    manifestMetadata
+            );
+        }
+
+        ValidationResult validation = validateGenerated(
+                generatedDir,
+                annualFiles,
+                includeClassic,
+                includeRu,
+                includeRecordsNextManifest
+        );
         int published = 0;
         if (!generateOnly) {
             Files.createDirectories(siteJsDir);
@@ -117,8 +192,12 @@ public final class Records2026SitePublisher {
                 validation.files().size(), published, runDir);
     }
 
-    private static ValidationResult validateGenerated(Path generatedDir, int expectedAnnualFiles,
-            boolean includeClassic, boolean includeRu) throws IOException {
+    private static ValidationResult validateGenerated(
+            Path generatedDir,
+            int expectedAnnualFiles,
+            boolean includeClassic,
+            boolean includeRu,
+            boolean includeRecordsNextManifest) throws IOException {
 
         List<Path> files;
         try (var stream = Files.list(generatedDir)) {
@@ -151,7 +230,16 @@ public final class Records2026SitePublisher {
         } else if (!annuals.isEmpty()) {
             throw new IOException("File RU annuali generati nonostante il modulo RU sia disattivato");
         }
-        int expectedTotal = (includeClassic ? 1 : 0) + (includeRu ? expectedAnnualFiles + 2 : 0);
+        if (includeRecordsNextManifest) {
+            requireFile(byName, ManifestJsWriter.FILE_NAME);
+            validatePrefix(
+                    byName.get(ManifestJsWriter.FILE_NAME),
+                    "window.fcmRecordsNextManifest"
+            );
+        }
+        int expectedTotal = (includeClassic ? 1 : 0)
+                + (includeRu ? expectedAnnualFiles + 2 : 0)
+                + (includeRecordsNextManifest ? 1 : 0);
         if (files.size() != expectedTotal) {
             throw new IOException("Numero file JS inatteso: " + files.size()
                     + ", attesi " + expectedTotal);
