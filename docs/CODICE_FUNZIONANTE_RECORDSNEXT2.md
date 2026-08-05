@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-05 16:50:34 +02:00
+> Data generazione: 2026-08-05 17:01:47 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -203,7 +203,7 @@ File: docs\CATALOGO_RECORD.md
     
     | ID provvisorio | Nome | Origine | Ambiti | Tabellino | Stato |
     |---|---|---|---|---|---|
-    | classics.highest-match-score | Maggior punteggio in una partita | RecordsNext + ConfrontiStorici | Stagionale, assoluto | Singolo | DA_CATALOGARE |
+    | classics.highest-match-score | Maggior punteggio in una partita | RecordsNext + ConfrontiStorici | Stagionale, assoluto | Singolo | VERIFICATO |
     | classics.lowest-match-score | Minor punteggio in una partita | ConfrontiStorici | Stagionale, assoluto | Singolo | DA_CATALOGARE |
     | classics.most-regulation-goals | Partita con piu gol regolamentari | ConfrontiStorici | Stagionale, assoluto | Singolo | DA_CATALOGARE |
     | classics.largest-regulation-margin | Maggior scarto regolamentare | ConfrontiStorici | Stagionale, assoluto | Singolo | DA_CATALOGARE |
@@ -1243,6 +1243,18 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     
     Ogni famiglia può omettere sezioni non pertinenti, ma deve rispettare lo schema comune di metadata e stato.
     
+    ### Stato implementato Classici
+    
+    `fcmRecordsNext_Classics.js` è generato dalla pipeline e pubblica:
+    
+    - `schemaVersion: "2.0"`;
+    - `familyId: "classics"`;
+    - metadata con numero di stagioni e recordset;
+    - `seasonAggregates` derivati dagli archivi Classici consolidati 1.0.2;
+    - stato `GENERATED_COMPLETE`.
+    
+    Durante la migrazione resta generato anche il file legacy `records2026.recordstagionali.classic.js`.
+    
     ## 34. Cartelle pubbliche
     
     Sul sito FCM:
@@ -1590,6 +1602,98 @@ File: CHANGELOG.md
     - ultimo stato: 22 test superati, BUILD SUCCESS.
 
 ## File reali del progetto
+
+## src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporter.java
+
+File: src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporter.java
+
+    package it.alterlega.recordsnext.app.classics;
+    
+    import it.alterlega.recordsnext.Records2026ClassicJsExporter;
+    
+    import java.io.IOException;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.nio.file.StandardOpenOption;
+    import java.util.List;
+    
+    /**
+     * Genera l'output familiare nativo RecordsNext 2.0 per i record Classici.
+     * Riusa l'exporter consolidato 1.0.2 come sorgente di verita durante la
+     * migrazione, evitando di duplicare parser, proiezioni e regole pubbliche.
+     */
+    public final class ClassicsFamilyJsExporter {
+        public static final String FILE_NAME = "fcmRecordsNext_Classics.js";
+        public static final String GLOBAL_NAME = "window.fcmRecordsNextClassics";
+    
+        private static final String LEGACY_PREFIX = "window.RECORDS2026_PREVIEW_CLASSIC = ";
+    
+        private ClassicsFamilyJsExporter() {
+        }
+    
+        public static ExportResult export(Path archiveRoot, Path outputFile) throws IOException {
+            Path parent = outputFile.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+    
+            Path temporaryLegacy = Files.createTempFile(
+                    parent != null ? parent : outputFile.toAbsolutePath().getParent(),
+                    "recordsnext-classics-legacy-",
+                    ".js"
+            );
+    
+            try {
+                Records2026ClassicJsExporter.ExportResult legacy =
+                        Records2026ClassicJsExporter.export(archiveRoot, temporaryLegacy, List.of());
+    
+                String legacyJs = Files.readString(temporaryLegacy, StandardCharsets.UTF_8).trim();
+                if (!legacyJs.startsWith(LEGACY_PREFIX) || !legacyJs.endsWith(";")) {
+                    throw new IOException("Formato Classic legacy inatteso: " + temporaryLegacy);
+                }
+    
+                String entriesJson = legacyJs.substring(
+                        LEGACY_PREFIX.length(),
+                        legacyJs.length() - 1
+                ).trim();
+    
+                String javascript = GLOBAL_NAME + " = {"
+                        + "\"schemaVersion\":\"2.0\","
+                        + "\"familyId\":\"classics\","
+                        + "\"metadata\":{"
+                        + "\"source\":\"RecordsNext 1.0.2 normalized archive\","
+                        + "\"seasonCount\":" + legacy.seasonCount() + ","
+                        + "\"entryCount\":" + legacy.entryCount()
+                        + "},"
+                        + "\"events\":[],"
+                        + "\"seasonAggregates\":" + entriesJson + ","
+                        + "\"globalAggregates\":[],"
+                        + "\"absoluteOccurrences\":[],"
+                        + "\"outputStatus\":[{"
+                        + "\"status\":\"GENERATED_COMPLETE\","
+                        + "\"detail\":\"Migrazione compatibile dai recordset Classici consolidati\""
+                        + "}]"
+                        + "};\n";
+    
+                Files.writeString(
+                        outputFile,
+                        javascript,
+                        StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING,
+                        StandardOpenOption.WRITE
+                );
+    
+                return new ExportResult(legacy.seasonCount(), legacy.entryCount(), outputFile);
+            } finally {
+                Files.deleteIfExists(temporaryLegacy);
+            }
+        }
+    
+        public record ExportResult(int seasonCount, int entryCount, Path outputFile) {
+        }
+    }
 
 ## src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner.java
 
@@ -12628,6 +12732,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import it.alterlega.recordsnext.app.manifest.ManifestPublishingSupport;
     import it.alterlega.recordsnext.app.core.CoreJsExporter;
     import it.alterlega.recordsnext.app.core.LeagueMetadata;
+    import it.alterlega.recordsnext.app.classics.ClassicsFamilyJsExporter;
     
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
@@ -12658,6 +12763,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     public final class Records2026SitePublisher {
     
         private static final String CORE_FILE = "fcmRecordsNext_Core.js";
+        private static final String CLASSICS_2_FILE = ClassicsFamilyJsExporter.FILE_NAME;
         private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
         private static final String RU_FILE = "records2026.recordstagionali.ru.js";
         private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -12822,6 +12928,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 var classic = Records2026ClassicJsExporter.export(
                         classicArchive, generatedDir.resolve(CLASSIC_FILE), List.of());
                 classicEntries = classic.entryCount();
+                ClassicsFamilyJsExporter.export(
+                        classicArchive, generatedDir.resolve(CLASSICS_2_FILE));
             }
             if (includeRu) {
                 var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
@@ -12893,6 +13001,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             if (includeClassic) {
                 requireFile(byName, CLASSIC_FILE);
                 validatePrefix(byName.get(CLASSIC_FILE), "window.RECORDS2026_PREVIEW_CLASSIC");
+                requireFile(byName, CLASSICS_2_FILE);
+                validatePrefix(byName.get(CLASSICS_2_FILE), "window.fcmRecordsNextClassics");
             }
             List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
             if (includeRu) {
@@ -12919,7 +13029,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                         "window.fcmRecordsNextManifest"
                 );
             }
-            int expectedTotal = (includeClassic ? 1 : 0)
+            int expectedTotal = (includeClassic ? 2 : 0)
                     + (includeRu ? expectedAnnualFiles + 2 : 0)
                     + (includeRecordsNextCore ? 1 : 0)
                     + (includeRecordsNextManifest ? 1 : 0);
@@ -19331,6 +19441,53 @@ File: src\main\java\it\alterlega\recordsnext\SqliteAudit.java
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporterTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporterTest.java
+
+    package it.alterlega.recordsnext.app.classics;
+    
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+    
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+    
+    class ClassicsFamilyJsExporterTest {
+        @TempDir
+        Path temp;
+    
+        @Test
+        void writesNativeFamilyContractFromConsolidatedArchive() throws Exception {
+            Path archive = temp.resolve("archive");
+            Path season = archive.resolve("2025_2026");
+            Files.createDirectories(season);
+            Files.writeString(
+                    season.resolve("season_records_serie_a.json"),
+                    "{\"records\":{\"puntiSquadraMax\":[{"
+                            + "\"recordId\":\"classics.highest-match-score\","
+                            + "\"nome\":\"Maggior punteggio\","
+                            + "\"valore\":99.5,"
+                            + "\"squadra\":\"Test\"}]}}"
+            );
+    
+            Path output = temp.resolve(ClassicsFamilyJsExporter.FILE_NAME);
+            var result = ClassicsFamilyJsExporter.export(archive, output);
+            String js = Files.readString(output);
+    
+            assertEquals(1, result.seasonCount());
+            assertEquals(1, result.entryCount());
+            assertTrue(js.startsWith("window.fcmRecordsNextClassics = {"));
+            assertTrue(js.contains("\"familyId\":\"classics\""));
+            assertTrue(js.contains("\"seasonAggregates\":["));
+            assertTrue(js.contains("classics.highest-match-score"));
+            assertTrue(js.contains("GENERATED_COMPLETE"));
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTest.java
@@ -20419,6 +20576,7 @@ File: tools\Initialize-RecordsNext2Project.ps1
 
 ## Indice dei file inclusi
 
+- src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporter.java
 - src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner.java
 - src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
 - src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.java
@@ -20473,6 +20631,7 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\main\java\it\alterlega\recordsnext\SerieAQueryProbe.java
 - src\main\java\it\alterlega\recordsnext\SerieARoundProbe.java
 - src\main\java\it\alterlega\recordsnext\SqliteAudit.java
+- src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTest.java
 - src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoaderTest.java
