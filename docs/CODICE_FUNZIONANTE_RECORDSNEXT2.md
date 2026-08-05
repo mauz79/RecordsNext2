@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-05 18:08:47 +02:00
+> Data generazione: 2026-08-05 19:19:50 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -292,6 +292,11 @@ File: docs\CATALOGO_RECORD.md
     ## Output famiglia Modificatori 2.0
     
     `fcmRecordsNext_Modifiers.js` espone `window.fcmRecordsNextModifiers`. La prima versione riusa gli archivi normalizzati 1.0.2 per modificatore difesa e Capitano. Il Fattore Campo resta dichiarato ma non ancora implementato; lo stato complessivo e `GENERATED_PARTIAL`.
+    
+    
+    ## Aggiornamento Serie complete v2
+    
+    La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.
 
 ## Dipendenze output
 
@@ -337,6 +342,11 @@ File: docs\DIPENDENZE_OUTPUT.md
     ## Culometro
     
     Richiede selezione esplicita, configurazione dedicata, componenti, pesi e normalizzazione. Se non selezionato: `SKIPPED_NOT_SELECTED`. Questo non rende incompleta la famiglia.
+    
+    
+    ## Aggiornamento Serie complete v2
+    
+    La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.
 
 ## Decisioni aperte
 
@@ -1367,6 +1377,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     ## Output Modificatori implementato
     
     `fcmRecordsNext_Modifiers.js` espone `window.fcmRecordsNextModifiers` e contiene le sezioni `modDifesaMax`, `modDifesaTotaleSquadre`, `capitanoVolteSquadre` e `capitanoTotaleSquadre`. Il Fattore Campo resta escluso finche non viene implementato il relativo calcolo dedicato.
+    
+    
+    ## Aggiornamento Serie complete v2
+    
+    La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.
 
 ## Configurazione
 
@@ -3337,7 +3352,11 @@ File: src\main\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
                 "modDifesaMax",
                 "modDifesaTotaleSquadre",
                 "capitanoVolteSquadre",
-                "capitanoTotaleSquadre"
+                "capitanoTotaleSquadre",
+                "fattoreCampoDecisivo",
+                "fattoreCampoTotaleSquadre",
+                "fattoreCampoPuntiGuadagnatiSquadre",
+                "fattoreCampoPuntiPersiSquadre"
         );
     
         private ModifiersFamilyJsExporter() {
@@ -3410,8 +3429,8 @@ File: src\main\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
                 root.put("globalAggregates", List.of());
                 root.put("absoluteOccurrences", List.of());
                 root.put("outputStatus", List.of(Map.of(
-                        "status", "GENERATED_PARTIAL",
-                        "detail", "Disponibili: modificatore difesa e Capitano; Fattore Campo ancora da implementare"
+                        "status", "GENERATED_COMPLETE",
+                        "detail", "Modificatore difesa, Capitano e Fattore Campo disponibili"
                 )));
     
                 Files.writeString(
@@ -3891,7 +3910,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
     
     public final class RecordsNextPipeline {
         private static final Set<RecordFamily> IMPLEMENTED_FAMILIES = Set.copyOf(
-                EnumSet.of(RecordFamily.CLASSICS, RecordFamily.SERIES, RecordFamily.RU, RecordFamily.MODIFIERS)
+                EnumSet.of(RecordFamily.CLASSICS, RecordFamily.SERIES, RecordFamily.RU, RecordFamily.MODIFIERS, RecordFamily.THRESHOLDS_LUCK)
         );
     
         public interface Listener {
@@ -3985,7 +4004,8 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                         preflight,
                         manifestMetadata,
                         database,
-                        leagueMetadata
+                        leagueMetadata,
+                        c.reports()
                 );
                 l.timing(
                         (o.publish()
@@ -4658,7 +4678,11 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
     
         private static final String LEGACY_PREFIX = "window.RECORDS2026_PREVIEW_CLASSIC = ";
         private static final List<String> AVAILABLE_SECTIONS = List.of(
+                "serieVittorie",
+                "seriePareggi",
+                "serieSconfitte",
                 "serieSenzaSconfitte",
+                "serieSenzaVittorie",
                 "capitanoSerieSquadre",
                 "cleanSheetPortiereSerieSquadre"
         );
@@ -4733,8 +4757,8 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
                 root.put("globalAggregates", List.of());
                 root.put("absoluteOccurrences", List.of());
                 root.put("outputStatus", List.of(Map.of(
-                        "status", "GENERATED_PARTIAL",
-                        "detail", "Disponibili: imbattibilita, serie Capitano e serie clean sheet; altre serie ancora da implementare"
+                        "status", "GENERATED_COMPLETE",
+                        "detail", "Serie complete: vittorie, pareggi, sconfitte, imbattibilita, senza vittorie, Capitano e clean sheet"
                 )));
     
                 Files.writeString(
@@ -4822,6 +4846,254 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
                 throw new IllegalArgumentException("Tipo JSON non supportato: "+value.getClass());
             }
             private static String escape(String value){StringBuilder e=new StringBuilder(value.length()+16);for(int i=0;i<value.length();i++){char ch=value.charAt(i);switch(ch){case '\\'->e.append("\\\\");case '"'->e.append("\\\"");case '\b'->e.append("\\b");case '\f'->e.append("\\f");case '\n'->e.append("\\n");case '\r'->e.append("\\r");case '\t'->e.append("\\t");default->{if(ch<0x20)e.append(String.format("\\u%04x",(int)ch));else e.append(ch);}}}return e.toString();}
+        }
+    }
+
+## src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporter.java
+
+File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporter.java
+
+    package it.alterlega.recordsnext.app.thresholds;
+    
+    import java.io.IOException;
+    import java.math.BigDecimal;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.nio.file.StandardOpenOption;
+    import java.util.ArrayList;
+    import java.util.Comparator;
+    import java.util.LinkedHashMap;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.stream.Stream;
+    
+    /** Genera l'output 2.0 Soglie e Fortuna dai JSON normalizzati. */
+    public final class ThresholdsLuckFamilyJsExporter {
+        public static final String FILE_NAME = "fcmRecordsNext_ThresholdsLuck.js";
+        public static final String GLOBAL_NAME = "window.fcmRecordsNextThresholdsLuck";
+    
+        private ThresholdsLuckFamilyJsExporter() {
+        }
+    
+        public static ExportResult export(Path reportsRoot, Path outputFile) throws IOException {
+            if (!Files.isDirectory(reportsRoot)) {
+                throw new IOException("Cartella report normalizzati non trovata: " + reportsRoot);
+            }
+            Path parent = outputFile.toAbsolutePath().normalize().getParent();
+            if (parent == null) throw new IOException("Directory output Soglie non determinabile: " + outputFile);
+            Files.createDirectories(parent);
+    
+            List<Path> files;
+            try (Stream<Path> stream = Files.walk(reportsRoot)) {
+                files = stream.filter(Files::isRegularFile)
+                        .filter(path -> path.getFileName().toString().startsWith("season_normalized_"))
+                        .filter(path -> path.getFileName().toString().endsWith(".json"))
+                        .sorted()
+                        .toList();
+            }
+            if (files.isEmpty()) throw new IOException("Nessun report season_normalized_*.json in " + reportsRoot);
+    
+            List<Object> events = new ArrayList<>();
+            Map<String, Aggregate> aggregates = new LinkedHashMap<>();
+            int matchRows = 0;
+            for (Path file : files) {
+                Object parsed = new JsonParser(Files.readString(file, StandardCharsets.UTF_8), file).parse();
+                Map<String,Object> root = object(parsed, file, "radice");
+                List<Map<String,Object>> matches = rows(root.get("partiteSquadra"));
+                List<Map<String,Object>> bands = rows(root.get("fasceGolDettaglio"));
+                matchRows += matches.size();
+                for (Map<String,Object> match : matches) {
+                    BigDecimal score = number(match.get("puntiFatti"));
+                    int goalsFor = integer(match.get("golFatti"));
+                    int goalsAgainst = integer(match.get("golSubiti"));
+                    String result = string(match.get("esito"));
+                    Band current = currentBand(bands, score);
+                    BigDecimal nextMin = nextBandMin(bands, score);
+                    BigDecimal distance = nextMin == null ? null : nextMin.subtract(score);
+    
+                    if (current != null && score.compareTo(current.min()) == 0) {
+                        addEvent(events, aggregates, match, "EXACT_THRESHOLD", "NEUTRAL", BigDecimal.ZERO,
+                                "Punteggio esattamente sul minimo della fascia gol");
+                    }
+                    if ("V".equals(result) && current != null && score.compareTo(current.min()) == 0
+                            && goalsFor == goalsAgainst + 1) {
+                        addEvent(events, aggregates, match, "JUST_ENOUGH", "FAVOURABLE", BigDecimal.ZERO,
+                                "Vittoria con punteggio sul minimo della fascia decisiva");
+                    }
+                    if (distance != null && distance.compareTo(new BigDecimal("0.5")) == 0) {
+                        if ("P".equals(result) && goalsFor == goalsAgainst) {
+                            addEvent(events, aggregates, match, "MISSED_WIN_HALF_POINT", "UNFAVOURABLE", distance,
+                                    "Mezzo punto dalla fascia successiva che avrebbe prodotto la vittoria");
+                        } else if ("S".equals(result) && goalsFor + 1 == goalsAgainst) {
+                            addEvent(events, aggregates, match, "LOSS_BY_A_WHISKER", "UNFAVOURABLE", distance,
+                                    "Mezzo punto dalla fascia successiva che avrebbe prodotto il pareggio");
+                        }
+                    }
+                }
+            }
+    
+            events.sort(Comparator.comparing(value -> string(((Map<?,?>) value).get("seasonId")))
+                    .thenComparing(value -> string(((Map<?,?>) value).get("competitionId")))
+                    .thenComparing(value -> string(((Map<?,?>) value).get("matchId")))
+                    .thenComparing(value -> string(((Map<?,?>) value).get("teamId")))
+                    .thenComparing(value -> string(((Map<?,?>) value).get("eventType"))));
+    
+            List<Object> teamAggregates = new ArrayList<>();
+            for (Aggregate a : aggregates.values()) teamAggregates.add(a.toMap());
+            teamAggregates.sort(Comparator.comparing(value -> string(((Map<?,?>) value).get("seasonId")))
+                    .thenComparing(value -> string(((Map<?,?>) value).get("team"))));
+    
+            Map<String,Object> metadata = new LinkedHashMap<>();
+            metadata.put("source", "RecordsNext 1.0.2 normalized reports");
+            metadata.put("normalizedFileCount", files.size());
+            metadata.put("teamMatchRowCount", matchRows);
+            metadata.put("eventCount", events.size());
+            metadata.put("implementedEventTypes", List.of(
+                    "EXACT_THRESHOLD", "JUST_ENOUGH", "MISSED_WIN_HALF_POINT", "LOSS_BY_A_WHISKER"));
+            metadata.put("culometroGenerated", false);
+    
+            Map<String,Object> root = new LinkedHashMap<>();
+            root.put("schemaVersion", "2.0");
+            root.put("familyId", "thresholds-luck");
+            root.put("metadata", metadata);
+            root.put("events", events);
+            root.put("seasonAggregates", teamAggregates);
+            root.put("globalAggregates", List.of());
+            root.put("absoluteOccurrences", List.of());
+            root.put("outputStatus", List.of(Map.of(
+                    "status", "GENERATED_PARTIAL",
+                    "detail", "Eventi oggettivi su fasce gol disponibili; regole beffa/miracolato/spreco ancora da catalogare. Culometro escluso."
+            )));
+    
+            Files.writeString(outputFile, GLOBAL_NAME + " = " + JsonWriter.write(root) + ";\n",
+                    StandardCharsets.UTF_8, StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+            return new ExportResult(files.size(), matchRows, events.size(), teamAggregates.size(), outputFile);
+        }
+    
+        private static void addEvent(List<Object> events, Map<String,Aggregate> aggregates,
+                                     Map<String,Object> match, String type, String direction,
+                                     BigDecimal distance, String detail) {
+            Map<String,Object> event = new LinkedHashMap<>();
+            event.put("eventId", "threshold:" + string(match.get("stagione")) + ":" + string(match.get("idIncontro"))
+                    + ":" + string(match.get("idSquadra")) + ":" + type.toLowerCase());
+            event.put("eventType", type);
+            event.put("direction", direction);
+            event.put("seasonId", match.get("stagione"));
+            event.put("competitionId", match.get("competizioneStoricaId"));
+            event.put("competitionName", match.get("competizioneNome"));
+            event.put("matchId", match.get("idIncontro"));
+            event.put("round", match.get("giornata"));
+            event.put("serieARound", match.get("giornataDiA"));
+            event.put("scorecardUrl", match.get("urlTabellino"));
+            event.put("teamId", match.get("idSquadra"));
+            event.put("team", match.get("squadra"));
+            event.put("opponentId", match.get("idAvversaria"));
+            event.put("opponent", match.get("avversaria"));
+            event.put("scoreFor", match.get("puntiFatti"));
+            event.put("scoreAgainst", match.get("puntiSubiti"));
+            event.put("goalsFor", match.get("golFatti"));
+            event.put("goalsAgainst", match.get("golSubiti"));
+            event.put("result", match.get("esito"));
+            event.put("distanceToNextThreshold", distance);
+            event.put("detail", detail);
+            events.add(event);
+    
+            String key = string(match.get("stagione")) + "|" + string(match.get("idSquadra"));
+            aggregates.computeIfAbsent(key, ignored -> new Aggregate(match)).add(direction, type);
+        }
+    
+        private static Band currentBand(List<Map<String,Object>> bands, BigDecimal score) {
+            for (Map<String,Object> row : bands) {
+                BigDecimal min = number(row.get("min"));
+                BigDecimal max = number(row.get("max"));
+                if (score.compareTo(min) >= 0 && score.compareTo(max) <= 0) return new Band(min, max, integer(row.get("gol")));
+            }
+            return null;
+        }
+    
+        private static BigDecimal nextBandMin(List<Map<String,Object>> bands, BigDecimal score) {
+            BigDecimal next = null;
+            for (Map<String,Object> row : bands) {
+                BigDecimal min = number(row.get("min"));
+                if (min.compareTo(score) > 0 && (next == null || min.compareTo(next) < 0)) next = min;
+            }
+            return next;
+        }
+    
+        private static Map<String,Object> object(Object value, Path source, String label) throws IOException {
+            if (!(value instanceof Map<?,?> raw)) throw new IOException("Oggetto JSON '" + label + "' non valido: " + source);
+            Map<String,Object> out = new LinkedHashMap<>();
+            for (Map.Entry<?,?> e : raw.entrySet()) out.put(String.valueOf(e.getKey()), e.getValue());
+            return out;
+        }
+        private static List<Map<String,Object>> rows(Object value) {
+            List<Map<String,Object>> out = new ArrayList<>();
+            if (!(value instanceof List<?> list)) return out;
+            for (Object item : list) if (item instanceof Map<?,?> raw) {
+                Map<String,Object> map = new LinkedHashMap<>();
+                for (Map.Entry<?,?> e : raw.entrySet()) map.put(String.valueOf(e.getKey()), e.getValue());
+                out.add(map);
+            }
+            return out;
+        }
+        private static String string(Object value) { return value == null ? "" : String.valueOf(value); }
+        private static BigDecimal number(Object value) {
+            if (value == null || string(value).isBlank()) return BigDecimal.ZERO;
+            if (value instanceof BigDecimal b) return b;
+            return new BigDecimal(string(value).replace(',', '.'));
+        }
+        private static int integer(Object value) { return number(value).intValue(); }
+    
+        public record ExportResult(int normalizedFileCount, int teamMatchRowCount, int eventCount,
+                                   int aggregateCount, Path outputFile) {}
+        private record Band(BigDecimal min, BigDecimal max, int goals) {}
+    
+        private static final class Aggregate {
+            private final Object seasonId, teamId, team;
+            private int favourable, unfavourable, neutral;
+            private final Map<String,Integer> byType = new LinkedHashMap<>();
+            Aggregate(Map<String,Object> match) { seasonId=match.get("stagione"); teamId=match.get("idSquadra"); team=match.get("squadra"); }
+            void add(String direction, String type) {
+                switch (direction) { case "FAVOURABLE" -> favourable++; case "UNFAVOURABLE" -> unfavourable++; default -> neutral++; }
+                byType.merge(type, 1, Integer::sum);
+            }
+            Map<String,Object> toMap() {
+                Map<String,Object> out = new LinkedHashMap<>();
+                out.put("seasonId", seasonId); out.put("teamId", teamId); out.put("team", team);
+                out.put("favourableEvents", favourable); out.put("unfavourableEvents", unfavourable);
+                out.put("neutralEvents", neutral); out.put("luckBalance", favourable - unfavourable);
+                out.put("eventsByType", byType); return out;
+            }
+        }
+    
+        private static final class JsonParser {
+            private final String text; private final Path source; private int index;
+            JsonParser(String text, Path source){this.text=text;this.source=source;}
+            Object parse() throws IOException { skip(); Object v=value(); skip(); if(index!=text.length()) fail("Contenuto dopo JSON"); return v; }
+            private Object value() throws IOException { skip(); if(index>=text.length()) fail("Valore mancante"); return switch(text.charAt(index)){
+                case '{'->object(); case '['->array(); case '"'->string(); case 't'->literal("true",Boolean.TRUE);
+                case 'f'->literal("false",Boolean.FALSE); case 'n'->literal("null",null); default->number();}; }
+            private Map<String,Object> object() throws IOException { expect('{'); Map<String,Object> m=new LinkedHashMap<>(); skip(); if(peek('}')){index++;return m;}
+                while(true){String k=string();expect(':');m.put(k,value());skip();if(peek('}')){index++;return m;}expect(',');} }
+            private List<Object> array() throws IOException { expect('['); List<Object> a=new ArrayList<>(); skip(); if(peek(']')){index++;return a;}
+                while(true){a.add(value());skip();if(peek(']')){index++;return a;}expect(',');} }
+            private String string() throws IOException { expect('"'); StringBuilder b=new StringBuilder(); while(index<text.length()){char c=text.charAt(index++);if(c=='"')return b.toString();
+                if(c!='\\'){b.append(c);continue;} if(index>=text.length())fail("Escape incompleto");char e=text.charAt(index++);switch(e){case '"','\\','/'->b.append(e);case 'b'->b.append('\b');case 'f'->b.append('\f');case 'n'->b.append('\n');case 'r'->b.append('\r');case 't'->b.append('\t');case 'u'->b.append(unicode());default->fail("Escape non valido");}}fail("Stringa non terminata");return null; }
+            private char unicode() throws IOException { if(index+4>text.length())fail("Unicode incompleto");String h=text.substring(index,index+4);index+=4;try{return(char)Integer.parseInt(h,16);}catch(NumberFormatException ex){fail("Unicode non valido");return 0;} }
+            private Object literal(String s,Object v)throws IOException{if(!text.startsWith(s,index))fail("Token non valido");index+=s.length();return v;}
+            private BigDecimal number() throws IOException {int s=index;if(peek('-'))index++;while(index<text.length()&&Character.isDigit(text.charAt(index)))index++;if(peek('.')){index++;while(index<text.length()&&Character.isDigit(text.charAt(index)))index++;}if(peek('e')||peek('E')){index++;if(peek('+')||peek('-'))index++;while(index<text.length()&&Character.isDigit(text.charAt(index)))index++;}if(s==index)fail("Numero non valido");try{return new BigDecimal(text.substring(s,index));}catch(NumberFormatException ex){fail("Numero non valido");return null;}}
+            private void expect(char c)throws IOException{skip();if(index>=text.length()||text.charAt(index)!=c)fail("Atteso '"+c+"'");index++;}
+            private boolean peek(char c){return index<text.length()&&text.charAt(index)==c;} private void skip(){while(index<text.length()&&Character.isWhitespace(text.charAt(index)))index++;}
+            private void fail(String m)throws IOException{throw new IOException(m+" in "+source+" alla posizione "+index);}
+        }
+        private static final class JsonWriter {
+            static String write(Object v){StringBuilder b=new StringBuilder();append(b,v);return b.toString();}
+            private static void append(StringBuilder b,Object v){if(v==null){b.append("null");return;}if(v instanceof String s){b.append('"').append(escape(s)).append('"');return;}
+                if(v instanceof Boolean||v instanceof Number){b.append(v);return;}if(v instanceof Map<?,?> m){b.append('{');boolean f=true;for(Map.Entry<?,?>e:m.entrySet()){if(!f)b.append(',');f=false;b.append('"').append(escape(String.valueOf(e.getKey()))).append("\":");append(b,e.getValue());}b.append('}');return;}
+                if(v instanceof List<?> l){b.append('[');for(int i=0;i<l.size();i++){if(i>0)b.append(',');append(b,l.get(i));}b.append(']');return;}throw new IllegalArgumentException("Tipo JSON non supportato: "+v.getClass());}
+            private static String escape(String s){StringBuilder b=new StringBuilder();for(int i=0;i<s.length();i++){char c=s.charAt(i);switch(c){case '\\'->b.append("\\\\");case '"'->b.append("\\\"");case '\n'->b.append("\\n");case '\r'->b.append("\\r");case '\t'->b.append("\\t");default->{if(c<0x20)b.append(String.format("\\u%04x",(int)c));else b.append(c);}}}return b.toString();}
         }
     }
 
@@ -13232,6 +13504,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import it.alterlega.recordsnext.app.ru.RuFamilyJsExporter;
     import it.alterlega.recordsnext.app.series.SeriesFamilyJsExporter;
     import it.alterlega.recordsnext.app.modifiers.ModifiersFamilyJsExporter;
+    import it.alterlega.recordsnext.app.thresholds.ThresholdsLuckFamilyJsExporter;
     import it.alterlega.recordsnext.app.model.RecordFamily;
     
     import java.io.IOException;
@@ -13267,6 +13540,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
         private static final String RU_2_FILE = RuFamilyJsExporter.FILE_NAME;
         private static final String SERIES_2_FILE = SeriesFamilyJsExporter.FILE_NAME;
         private static final String MODIFIERS_2_FILE = ModifiersFamilyJsExporter.FILE_NAME;
+        private static final String THRESHOLDS_2_FILE = ThresholdsLuckFamilyJsExporter.FILE_NAME;
         private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
         private static final String RU_FILE = "records2026.recordstagionali.ru.js";
         private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -13330,6 +13604,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     null,
                     null,
                     null,
+                    null,
                     null
             );
         }
@@ -13357,6 +13632,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     preflight,
                     manifestMetadata,
                     null,
+                    null,
                     null
             );
         }
@@ -13373,7 +13649,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 PipelinePreflight.Result preflight,
                 ManifestMetadata manifestMetadata,
                 Path database,
-                LeagueMetadata leagueMetadata) throws IOException {
+                LeagueMetadata leagueMetadata,
+                Path reportsRoot) throws IOException {
             return runInternal(
                     classicArchive,
                     ruArchive,
@@ -13386,7 +13663,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     preflight,
                     manifestMetadata,
                     database,
-                    leagueMetadata
+                    leagueMetadata,
+                    reportsRoot
             );
         }
     
@@ -13402,10 +13680,12 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 PipelinePreflight.Result preflight,
                 ManifestMetadata manifestMetadata,
                 Path database,
-                LeagueMetadata leagueMetadata) throws IOException {
+                LeagueMetadata leagueMetadata,
+                Path reportsRoot) throws IOException {
     
             boolean includeSeries = options != null && options.familyEnabled(RecordFamily.SERIES);
             boolean includeModifiers = options != null && options.familyEnabled(RecordFamily.MODIFIERS);
+            boolean includeThresholds = options != null && options.familyEnabled(RecordFamily.THRESHOLDS_LUCK);
             boolean includeRecordsNextManifest = options != null
                     && preflight != null
                     && manifestMetadata != null;
@@ -13413,10 +13693,11 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     && database != null
                     && leagueMetadata != null;
     
-            if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeRecordsNextManifest && !includeRecordsNextCore) {
+            if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeThresholds && !includeRecordsNextManifest && !includeRecordsNextCore) {
                 throw new IOException("Nessun modulo selezionato per la generazione JS");
             }
             if (includeClassic || includeSeries || includeModifiers) requireDirectory(classicArchive, "Archivio classic");
+            if (includeThresholds) requireDirectory(reportsRoot, "Report normalizzati");
             if (includeRu) requireDirectory(ruArchive, "Archivio RU");
             Files.createDirectories(stagingRoot);
     
@@ -13441,6 +13722,9 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             }
             if (includeModifiers) {
                 ModifiersFamilyJsExporter.export(classicArchive, generatedDir.resolve(MODIFIERS_2_FILE));
+            }
+            if (includeThresholds) {
+                ThresholdsLuckFamilyJsExporter.export(reportsRoot, generatedDir.resolve(THRESHOLDS_2_FILE));
             }
             if (includeRu) {
                 var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
@@ -13479,6 +13763,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     includeRu,
                     includeSeries,
                     includeModifiers,
+                    includeThresholds,
                     includeRecordsNextManifest,
                     includeRecordsNextCore
             );
@@ -13498,6 +13783,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 boolean includeRu,
                 boolean includeSeries,
                 boolean includeModifiers,
+                boolean includeThresholds,
                 boolean includeRecordsNextManifest,
                 boolean includeRecordsNextCore) throws IOException {
     
@@ -13527,6 +13813,10 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             if (includeModifiers) {
                 requireFile(byName, MODIFIERS_2_FILE);
                 validatePrefix(byName.get(MODIFIERS_2_FILE), "window.fcmRecordsNextModifiers");
+            }
+            if (includeThresholds) {
+                requireFile(byName, THRESHOLDS_2_FILE);
+                validatePrefix(byName.get(THRESHOLDS_2_FILE), "window.fcmRecordsNextThresholdsLuck");
             }
             List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
             if (includeRu) {
@@ -13558,6 +13848,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             int expectedTotal = (includeClassic ? 2 : 0)
                     + (includeSeries ? 1 : 0)
                     + (includeModifiers ? 1 : 0)
+                    + (includeThresholds ? 1 : 0)
                     + (includeRu ? expectedAnnualFiles + 3 : 0)
                     + (includeRecordsNextCore ? 1 : 0)
                     + (includeRecordsNextManifest ? 1 : 0);
@@ -18141,7 +18432,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
      * Costruisce l'archivio season_records_*.json a partire dai JSON normalizzati
      * prodotti da RecordsNext.
      *
-     * Genera tutte le 18 sezioni del contratto pubblico Records2026 usando i
+     * Genera tutte le sezioni del contratto pubblico Records2026 usando i
      * dati normalizzati correnti, compresi i bonus capitano presenti in
      * modificatoriB2Dettaglio come tipo=capitano / campoOrigine=ModM2Pers.
      */
@@ -18166,7 +18457,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             System.out.println("Archivio     : " + archiveRoot);
             System.out.println("Stagioni     : " + result.seasons());
             System.out.println("Competizioni : " + result.competitions());
-            System.out.println("Sezioni      : 18/18");
+            System.out.println("Sezioni      : 22/22");
         }
     
         public static Result build(Path reportsRoot, Path archiveRoot, List<String> requestedSeasons) throws IOException {
@@ -18210,10 +18501,19 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             List<Map<String, Object>> events = rows(source.get("eventiSquadraDettaglio"));
             List<Map<String, Object>> modifiers = rows(source.get("modificatoriB2Dettaglio"));
             List<Map<String, Object>> cleanSheets = rows(source.get("cleanSheetB3Dettaglio"));
+            List<Map<String, Object>> goalBands = rows(source.get("fasceGolDettaglio"));
     
             Map<String, Object> records = new LinkedHashMap<>();
             records.put("puntiSquadraMax", pointsMax(matches));
             records.put("serieSenzaSconfitte", unbeatenSeries(matches));
+            records.put("serieVittorie", resultSeries(matches, "V", true,
+                    "serie_vittorie", "Vittorie consecutive"));
+            records.put("seriePareggi", resultSeries(matches, "N", true,
+                    "serie_pareggi", "Pareggi consecutivi"));
+            records.put("serieSconfitte", resultSeries(matches, "S", true,
+                    "serie_sconfitte", "Sconfitte consecutive"));
+            records.put("serieSenzaVittorie", resultSeries(matches, "V", false,
+                    "serie_senza_vittorie", "Partite consecutive senza vittorie"));
             records.put("espulsioniSquadre", expulsionsByTeam(expulsions));
             records.put("espulsioniGiocatori", expulsionsByPlayer(expulsions));
             records.put("ammonizioniSquadre", eventByTeam(events, "ammonizioniSquadre", "Maggiori ammonizioni"));
@@ -18230,12 +18530,16 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             records.put("cleanSheetPortiereTotaleSquadre", cleanSheetTotal(cleanSheets));
             records.put("cleanSheetPortiereSerieSquadre", cleanSheetSeries(matches, cleanSheets));
             records.put("capitanoSerieSquadre", captainSeries(matches, modifiers));
+            records.put("fattoreCampoDecisivo", homeFieldDecisive(matches, modifiers, goalBands));
+            records.put("fattoreCampoTotaleSquadre", homeFieldTotals(matches, modifiers));
+            records.put("fattoreCampoPuntiGuadagnatiSquadre", homeFieldStandingsImpact(matches, modifiers, goalBands, true));
+            records.put("fattoreCampoPuntiPersiSquadre", homeFieldStandingsImpact(matches, modifiers, goalBands, false));
     
             Map<String, Object> meta = new LinkedHashMap<>();
             meta.putAll(sourceMeta);
             meta.put("builder", "RecordsNext SeasonRecordsArchiveBuilder");
-            meta.put("sezioniGenerate", 18);
-            meta.put("sezioniAttese", 18);
+            meta.put("sezioniGenerate", 26);
+            meta.put("sezioniAttese", 26);
             meta.put("sezioniNonDisponibili", List.of());
     
             Map<String, Object> result = new LinkedHashMap<>();
@@ -18326,6 +18630,80 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     "vittorie", wins, "pareggi", draws);
             row.put("dettagli", details);
             records.add(row);
+        }
+    
+    
+        private static List<Object> resultSeries(List<Map<String, Object>> matches,
+                                                 String resultCode,
+                                                 boolean mustMatch,
+                                                 String recordId,
+                                                 String name) {
+            Map<String, List<Map<String, Object>>> byTeam = group(matches, "idSquadra");
+            List<Map<String, Object>> records = new ArrayList<>();
+    
+            for (List<Map<String, Object>> teamMatches : byTeam.values()) {
+                teamMatches.sort(Comparator
+                        .comparingDouble((Map<String, Object> row) -> number(row.get("ordineGiornata")))
+                        .thenComparing(row -> string(row.get("idIncontro"))));
+    
+                List<Map<String, Object>> current = new ArrayList<>();
+                for (Map<String, Object> match : teamMatches) {
+                    boolean matchesResult = resultCode.equals(string(match.get("esito")));
+                    boolean belongs = mustMatch ? matchesResult : !matchesResult;
+                    if (belongs) {
+                        current.add(match);
+                    } else {
+                        addResultSeries(records, current, recordId, name);
+                        current = new ArrayList<>();
+                    }
+                }
+                addResultSeries(records, current, recordId, name);
+            }
+    
+            records.sort(Comparator
+                    .comparingDouble((Map<String, Object> row) -> number(row.get("valore"))).reversed()
+                    .thenComparing(row -> string(row.get("squadra"))));
+            return new ArrayList<>(records.subList(0, Math.min(20, records.size())));
+        }
+    
+        private static void addResultSeries(List<Map<String, Object>> records,
+                                            List<Map<String, Object>> series,
+                                            String recordId,
+                                            String name) {
+            if (series.isEmpty()) return;
+    
+            Map<String, Object> first = series.get(0);
+            Map<String, Object> last = series.get(series.size() - 1);
+            List<Object> details = new ArrayList<>();
+            for (Map<String, Object> row : series) {
+                details.add(ordered(
+                        "idIncontro", row.get("idIncontro"),
+                        "giornata", row.get("giornata"),
+                        "giornataDiA", row.get("giornataDiA"),
+                        "urlTabellino", row.get("urlTabellino"),
+                        "avversaria", row.get("avversaria"),
+                        "risultato", row.get("risultato"),
+                        "punteggio", row.get("punteggio"),
+                        "esito", row.get("esito")
+                ));
+            }
+    
+            Map<String, Object> record = ordered(
+                    "recordId", recordId,
+                    "nome", name,
+                    "stagione", first.get("stagione"),
+                    "competizioneStoricaId", first.get("competizioneStoricaId"),
+                    "competizioneNome", first.get("competizioneNome"),
+                    "valore", series.size(),
+                    "idSquadra", first.get("idSquadra"),
+                    "squadra", first.get("squadra"),
+                    "daGiornata", first.get("giornata"),
+                    "aGiornata", last.get("giornata"),
+                    "daGiornataDiA", first.get("giornataDiA"),
+                    "aGiornataDiA", last.get("giornataDiA")
+            );
+            record.put("dettagli", details);
+            records.add(record);
         }
     
         private static List<Object> expulsionsByTeam(List<Map<String, Object>> rows) {
@@ -18450,6 +18828,187 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     .toList();
             return eventSeries(matches, captain, "capitanoSerieSquadre",
                     "Maggior serie bonus capitano");
+        }
+    
+    
+        private static List<Object> homeFieldDecisive(List<Map<String, Object>> matches,
+                                                       List<Map<String, Object>> modifiers,
+                                                       List<Map<String, Object>> goalBands) {
+            List<HomeFieldImpact> impacts = homeFieldImpacts(matches, modifiers, goalBands);
+            List<Object> out = new ArrayList<>();
+            for (HomeFieldImpact impact : impacts) {
+                if (impact.homePointsDelta() <= 0) continue;
+                Map<String, Object> home = impact.home();
+                Map<String, Object> away = impact.away();
+                out.add(ordered(
+                        "recordId", "fattoreCampoDecisivo",
+                        "nome", "Fattore Campo decisivo",
+                        "valore", cleanNumber(impact.homeBonus()),
+                        "puntiClassificaGuadagnati", impact.homePointsDelta(),
+                        "stagione", home.get("stagione"),
+                        "competizioneStoricaId", home.get("competizioneStoricaId"),
+                        "competizioneNome", home.get("competizioneNome"),
+                        "idSquadra", home.get("idSquadra"),
+                        "squadra", home.get("squadra"),
+                        "idAvversaria", away.get("idSquadra"),
+                        "avversaria", away.get("squadra"),
+                        "idIncontro", home.get("idIncontro"),
+                        "giornata", home.get("giornata"),
+                        "giornataDiA", home.get("giornataDiA"),
+                        "urlTabellino", home.get("urlTabellino"),
+                        "urlTabellinoLocale", home.get("urlTabellinoLocale"),
+                        "urlTabellinoOnline", home.get("urlTabellinoOnline"),
+                        "punteggioConFattoreCampo", home.get("punteggio"),
+                        "risultatoConFattoreCampo", home.get("risultato"),
+                        "puntiCasaSenzaFattoreCampo", cleanNumber(impact.homeScoreWithout()),
+                        "golCasaSenzaFattoreCampo", impact.homeGoalsWithout(),
+                        "risultatoSenzaFattoreCampo", impact.homeGoalsWithout() + "-" + impact.awayGoals()
+                ));
+            }
+            out.sort(Comparator
+                    .comparingDouble((Object value) -> number(((Map<?, ?>) value).get("puntiClassificaGuadagnati"))).reversed()
+                    .thenComparing(value -> string(((Map<?, ?>) value).get("stagione")))
+                    .thenComparing(value -> string(((Map<?, ?>) value).get("idIncontro"))));
+            return out;
+        }
+    
+        private static List<Object> homeFieldTotals(List<Map<String, Object>> matches,
+                                                     List<Map<String, Object>> modifiers) {
+            Map<String, Double> modifierTotals = modifierTotalsByMatchTeam(modifiers);
+            Map<String, List<Map<String, Object>>> groups = new LinkedHashMap<>();
+            for (Map<String, Object> match : matches) {
+                if (!"casa".equals(string(match.get("lato")))) continue;
+                groups.computeIfAbsent(string(match.get("idSquadra")), ignored -> new ArrayList<>()).add(match);
+            }
+            List<Map<String, Object>> out = new ArrayList<>();
+            for (List<Map<String, Object>> group : groups.values()) {
+                Map<String, Object> first = group.get(0);
+                double total = 0;
+                List<Object> details = new ArrayList<>();
+                for (Map<String, Object> match : group) {
+                    double bonus = homeBonus(match, modifierTotals);
+                    total += bonus;
+                    details.add(ordered(
+                            "idIncontro", match.get("idIncontro"),
+                            "giornataDiA", match.get("giornataDiA"),
+                            "avversaria", match.get("avversaria"),
+                            "valore", cleanNumber(bonus),
+                            "urlTabellino", match.get("urlTabellino")));
+                }
+                Map<String, Object> item = ordered(
+                        "recordId", "fattoreCampoTotaleSquadre",
+                        "nome", "Maggior totale Fattore Campo",
+                        "valore", cleanNumber(total),
+                        "presenzeCasa", group.size(),
+                        "idSquadra", first.get("idSquadra"),
+                        "squadra", first.get("squadra"));
+                item.put("dettagli", details);
+                out.add(item);
+            }
+            sortValueTeam(out);
+            return new ArrayList<>(out);
+        }
+    
+        private static List<Object> homeFieldStandingsImpact(List<Map<String, Object>> matches,
+                                                              List<Map<String, Object>> modifiers,
+                                                              List<Map<String, Object>> goalBands,
+                                                              boolean homeTeam) {
+            Map<String, List<HomeFieldImpact>> groups = new LinkedHashMap<>();
+            for (HomeFieldImpact impact : homeFieldImpacts(matches, modifiers, goalBands)) {
+                if (impact.homePointsDelta() <= 0) continue;
+                Map<String, Object> team = homeTeam ? impact.home() : impact.away();
+                groups.computeIfAbsent(string(team.get("idSquadra")), ignored -> new ArrayList<>()).add(impact);
+            }
+            List<Map<String, Object>> out = new ArrayList<>();
+            for (List<HomeFieldImpact> group : groups.values()) {
+                HomeFieldImpact firstImpact = group.get(0);
+                Map<String, Object> team = homeTeam ? firstImpact.home() : firstImpact.away();
+                int total = group.stream().mapToInt(HomeFieldImpact::homePointsDelta).sum();
+                List<Object> details = new ArrayList<>();
+                for (HomeFieldImpact impact : group) {
+                    Map<String, Object> home = impact.home();
+                    details.add(ordered(
+                            "idIncontro", home.get("idIncontro"),
+                            "giornataDiA", home.get("giornataDiA"),
+                            "squadraCasa", home.get("squadra"),
+                            "squadraFuori", impact.away().get("squadra"),
+                            "puntiClassifica", impact.homePointsDelta(),
+                            "urlTabellino", home.get("urlTabellino")));
+                }
+                Map<String, Object> item = ordered(
+                        "recordId", homeTeam ? "fattoreCampoPuntiGuadagnatiSquadre" : "fattoreCampoPuntiPersiSquadre",
+                        "nome", homeTeam ? "Punti classifica guadagnati col Fattore Campo" : "Punti classifica persi per il Fattore Campo avversario",
+                        "valore", total,
+                        "idSquadra", team.get("idSquadra"),
+                        "squadra", team.get("squadra"));
+                item.put("dettagli", details);
+                out.add(item);
+            }
+            sortValueTeam(out);
+            return new ArrayList<>(out);
+        }
+    
+        private static List<HomeFieldImpact> homeFieldImpacts(List<Map<String, Object>> matches,
+                                                               List<Map<String, Object>> modifiers,
+                                                               List<Map<String, Object>> goalBands) {
+            Map<String, List<Map<String, Object>>> byMatch = group(matches, "idIncontro");
+            Map<String, Double> modifierTotals = modifierTotalsByMatchTeam(modifiers);
+            List<Map<String, Object>> sortedBands = new ArrayList<>(goalBands);
+            sortedBands.sort(Comparator.comparingDouble(row -> number(row.get("min"))));
+            List<HomeFieldImpact> impacts = new ArrayList<>();
+            for (List<Map<String, Object>> pair : byMatch.values()) {
+                Map<String, Object> home = pair.stream().filter(row -> "casa".equals(string(row.get("lato")))).findFirst().orElse(null);
+                Map<String, Object> away = pair.stream().filter(row -> "fuori".equals(string(row.get("lato")))).findFirst().orElse(null);
+                if (home == null || away == null) continue;
+                double bonus = homeBonus(home, modifierTotals);
+                if (bonus <= 0) continue;
+                double scoreWithout = number(home.get("puntiFatti")) - bonus;
+                int goalsWithout = goalsForScore(scoreWithout, sortedBands);
+                int homeGoals = (int) number(home.get("golFatti"));
+                int awayGoals = (int) number(home.get("golSubiti"));
+                int actualPoints = standingsPoints(homeGoals, awayGoals);
+                int pointsWithout = standingsPoints(goalsWithout, awayGoals);
+                impacts.add(new HomeFieldImpact(home, away, bonus, scoreWithout, goalsWithout, awayGoals,
+                        Math.max(0, actualPoints - pointsWithout)));
+            }
+            return impacts;
+        }
+    
+        private static Map<String, Double> modifierTotalsByMatchTeam(List<Map<String, Object>> modifiers) {
+            Map<String, Double> totals = new LinkedHashMap<>();
+            for (Map<String, Object> modifier : modifiers) {
+                String key = string(modifier.get("idIncontro")) + "|" + string(modifier.get("idSquadra"));
+                totals.merge(key, number(modifier.get("valore")), Double::sum);
+            }
+            return totals;
+        }
+    
+        private static double homeBonus(Map<String, Object> match, Map<String, Double> modifierTotals) {
+            String key = string(match.get("idIncontro")) + "|" + string(match.get("idSquadra"));
+            double residual = number(match.get("puntiFatti")) - number(match.get("parzialeFatto"))
+                    - modifierTotals.getOrDefault(key, 0.0);
+            return Math.abs(residual) < 0.000001 ? 0.0 : residual;
+        }
+    
+        private static int goalsForScore(double score, List<Map<String, Object>> goalBands) {
+            int goals = 0;
+            for (Map<String, Object> band : goalBands) {
+                if (score + 0.000001 >= number(band.get("min"))) {
+                    goals = Math.max(goals, (int) number(band.get("gol")));
+                }
+            }
+            return goals;
+        }
+    
+        private static int standingsPoints(int goalsFor, int goalsAgainst) {
+            if (goalsFor > goalsAgainst) return 3;
+            if (goalsFor == goalsAgainst) return 1;
+            return 0;
+        }
+    
+        private record HomeFieldImpact(Map<String, Object> home, Map<String, Object> away,
+                                       double homeBonus, double homeScoreWithout,
+                                       int homeGoalsWithout, int awayGoals, int homePointsDelta) {
         }
     
         private static List<Object> cleanSheetCount(List<Map<String, Object>> clean) {
@@ -20502,14 +21061,18 @@ File: src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
         @TempDir Path temp;
     
         @Test
-        void exportsOnlyAvailableModifierSections() throws Exception {
+        void exportsCompleteModifierFamilyIncludingHomeField() throws Exception {
             Path season = temp.resolve("archive/2025_2026");
             Files.createDirectories(season);
             Files.writeString(season.resolve("season_records_serie_a.json"), """
                 {"records":{
                   "puntiSquadraMax":[{"recordId":"x","valore":99}],
                   "modDifesaMax":[{"recordId":"d","valore":6,"squadra":"A"}],
-                  "capitanoTotaleSquadre":[{"recordId":"c","valore":3,"squadra":"A"}]
+                  "capitanoTotaleSquadre":[{"recordId":"c","valore":3,"squadra":"A"}],
+                  "fattoreCampoDecisivo":[{"recordId":"fc","valore":1,"squadra":"A"}],
+                  "fattoreCampoTotaleSquadre":[{"recordId":"fct","valore":18,"squadra":"A"}],
+                  "fattoreCampoPuntiGuadagnatiSquadre":[{"recordId":"fcg","valore":3,"squadra":"A"}],
+                  "fattoreCampoPuntiPersiSquadre":[{"recordId":"fcp","valore":3,"squadra":"B"}]
                 }}
                 """, StandardCharsets.UTF_8);
     
@@ -20520,8 +21083,13 @@ File: src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
             assertTrue(js.startsWith("window.fcmRecordsNextModifiers = "));
             assertTrue(js.contains("modDifesaMax"));
             assertTrue(js.contains("capitanoTotaleSquadre"));
+            assertTrue(js.contains("fattoreCampoDecisivo"));
+            assertTrue(js.contains("fattoreCampoTotaleSquadre"));
+            assertTrue(js.contains("fattoreCampoPuntiGuadagnatiSquadre"));
+            assertTrue(js.contains("fattoreCampoPuntiPersiSquadre"));
             assertFalse(js.contains("puntiSquadraMax"));
-            assertTrue(js.contains("GENERATED_PARTIAL"));
+            assertTrue(js.contains("GENERATED_COMPLETE"));
+            assertFalse(js.contains("GENERATED_PARTIAL"));
         }
     }
 
@@ -20667,9 +21235,7 @@ File: src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTes
         @Test
         void legacyConstructorBuildsEquivalentModularSelection() {
             ProcessingOptions options = new ProcessingOptions(true, false, true, false);
-    
-            assertTrue(options.classic());
-            assertFalse(options.ru());
+            assertTrue(options.classic()); assertFalse(options.ru());
             assertTrue(options.familyEnabled(RecordFamily.CLASSICS));
             assertFalse(options.familyEnabled(RecordFamily.RU));
             assertFalse(options.culometroEnabled());
@@ -20677,75 +21243,35 @@ File: src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTes
     
         @Test
         void modularFactoryPreservesAllSelectedFamilies() {
-            ProcessingSelection selection = new ProcessingSelection(
-                    Set.of(RecordFamily.CLASSICS, RecordFamily.SERIES),
-                    Set.of(),
-                    false,
-                    true,
-                    false
-            );
-    
-            ProcessingOptions options = ProcessingOptions.modular(selection);
-    
-            assertTrue(options.classic());
-            assertFalse(options.ru());
-            assertTrue(options.familyEnabled(RecordFamily.SERIES));
+            ProcessingOptions options = ProcessingOptions.modular(new ProcessingSelection(
+                    Set.of(RecordFamily.CLASSICS, RecordFamily.THRESHOLDS_LUCK), Set.of(), false, true, false));
+            assertTrue(options.classic()); assertFalse(options.ru());
+            assertTrue(options.familyEnabled(RecordFamily.THRESHOLDS_LUCK));
         }
     
         @Test
-        void pipelineRejectsThresholdsLuckStillNotImplementedInsteadOfIgnoringThem() {
-            ProcessingOptions options = ProcessingOptions.modular(
-                    new ProcessingSelection(
-                            Set.of(RecordFamily.THRESHOLDS_LUCK),
-                            Set.of(),
-                            false,
-                            false,
-                            false
-                    )
-            );
-    
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> RecordsNextPipeline.validateImplementedFamilies(options)
-            );
-        }
-    
-        @Test
-        void pipelineAcceptsCurrentClassicRuSeriesAndModifiersBridge() {
-            ProcessingOptions options = ProcessingOptions.modular(
-                    new ProcessingSelection(
-                            Set.of(
-                                    RecordFamily.CLASSICS,
-                                    RecordFamily.RU,
-                                    RecordFamily.SERIES,
-                                    RecordFamily.MODIFIERS
-                            ),
-                            Set.of(),
-                            false,
-                            true,
-                            false
-                    )
-            );
-    
+        void pipelineAcceptsAllFiveImplementedFamilies() {
+            ProcessingOptions options = ProcessingOptions.modular(new ProcessingSelection(
+                    Set.of(RecordFamily.CLASSICS, RecordFamily.RU, RecordFamily.SERIES,
+                            RecordFamily.MODIFIERS, RecordFamily.THRESHOLDS_LUCK),
+                    Set.of(), false, true, false));
             RecordsNextPipeline.validateImplementedFamilies(options);
         }
     
         @Test
         void pipelineRejectsCulometroUntilDedicatedExecutorExists() {
-            ProcessingOptions options = ProcessingOptions.modular(
-                    new ProcessingSelection(
-                            Set.of(RecordFamily.THRESHOLDS_LUCK),
-                            Set.of("easter-egg.culometro"),
-                            true,
-                            false,
-                            false
-                    )
-            );
+            ProcessingOptions options = ProcessingOptions.modular(new ProcessingSelection(
+                    Set.of(RecordFamily.THRESHOLDS_LUCK), Set.of("easter-egg.culometro"), true, false, false));
+            assertThrows(IllegalArgumentException.class,
+                    () -> RecordsNextPipeline.validateImplementedFamilies(options));
+        }
     
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> RecordsNextPipeline.validateImplementedFamilies(options)
-            );
+        @Test
+        void thresholdsFamilyDoesNotImplicitlyEnableCulometro() {
+            ProcessingOptions options = ProcessingOptions.modular(new ProcessingSelection(
+                    Set.of(RecordFamily.THRESHOLDS_LUCK), Set.of(), false, true, false));
+            RecordsNextPipeline.validateImplementedFamilies(options);
+            assertFalse(options.culometroEnabled());
         }
     }
 
@@ -20792,6 +21318,72 @@ File: src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\series\SeriesCompleteIntegrationTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\series\SeriesCompleteIntegrationTest.java
+
+    package it.alterlega.recordsnext.app.series;
+    
+    import it.alterlega.recordsnext.SeasonRecordsArchiveBuilder;
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+    
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.List;
+    
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+    
+    class SeriesCompleteIntegrationTest {
+        @TempDir
+        Path temp;
+    
+        @Test
+        void exportsAllResultSeries() throws Exception {
+            Path reports = temp.resolve("reports");
+            Path season = reports.resolve("2025_2026");
+            Files.createDirectories(season);
+            Files.writeString(season.resolve("season_normalized_serie_a.json"), normalized(), StandardCharsets.UTF_8);
+    
+            Path archive = temp.resolve("archive");
+            SeasonRecordsArchiveBuilder.build(reports, archive, List.of("2025_2026"));
+    
+            Path output = temp.resolve(SeriesFamilyJsExporter.FILE_NAME);
+            SeriesFamilyJsExporter.export(archive, output);
+            String js = Files.readString(output, StandardCharsets.UTF_8);
+    
+            assertTrue(js.startsWith(SeriesFamilyJsExporter.GLOBAL_NAME));
+            assertTrue(js.contains("serieVittorie"));
+            assertTrue(js.contains("seriePareggi"));
+            assertTrue(js.contains("serieSconfitte"));
+            assertTrue(js.contains("serieSenzaVittorie"));
+            assertTrue(js.contains("GENERATED_COMPLETE"));
+        }
+    
+        private static String normalized() {
+            return """
+                {
+                  "meta": {
+                    "stagione": "2025_2026",
+                    "competizioneStoricaId": "serie_a",
+                    "competizioneNome": "Serie A"
+                  },
+                  "partiteSquadra": [
+                    {"stagione":"2025_2026","competizioneStoricaId":"serie_a","competizioneNome":"Serie A","idSquadra":"1","squadra":"Alpha","idIncontro":"1","ordineGiornata":1,"giornata":"1","giornataDiA":1,"urlTabellino":"ris.htm?Gio=1","avversaria":"Beta","esito":"V","risultato":"1-0","punteggio":"66-65","puntiFatti":66},
+                    {"stagione":"2025_2026","competizioneStoricaId":"serie_a","competizioneNome":"Serie A","idSquadra":"1","squadra":"Alpha","idIncontro":"2","ordineGiornata":2,"giornata":"2","giornataDiA":2,"urlTabellino":"ris.htm?Gio=2","avversaria":"Gamma","esito":"V","risultato":"2-0","punteggio":"72-60","puntiFatti":72},
+                    {"stagione":"2025_2026","competizioneStoricaId":"serie_a","competizioneNome":"Serie A","idSquadra":"1","squadra":"Alpha","idIncontro":"3","ordineGiornata":3,"giornata":"3","giornataDiA":3,"urlTabellino":"ris.htm?Gio=3","avversaria":"Delta","esito":"N","risultato":"1-1","punteggio":"66-66","puntiFatti":66},
+                    {"stagione":"2025_2026","competizioneStoricaId":"serie_a","competizioneNome":"Serie A","idSquadra":"1","squadra":"Alpha","idIncontro":"4","ordineGiornata":4,"giornata":"4","giornataDiA":4,"urlTabellino":"ris.htm?Gio=4","avversaria":"Epsilon","esito":"S","risultato":"0-1","punteggio":"65-66","puntiFatti":65}
+                  ],
+                  "espulsioniDettaglio": [],
+                  "eventiSquadraDettaglio": [],
+                  "modificatoriB2Dettaglio": [],
+                  "cleanSheetB3Dettaglio": []
+                }
+                """;
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
@@ -20812,14 +21404,19 @@ File: src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTe
         @TempDir Path temp;
     
         @Test
-        void exportsOnlyAvailableSeriesSections() throws Exception {
+        void exportsAvailableSeriesSectionsAsCompleteFamily() throws Exception {
             Path season = temp.resolve("archive/2025_2026");
             Files.createDirectories(season);
             Files.writeString(season.resolve("season_records_serie_a.json"), """
                 {"records":{
                   "puntiSquadraMax":[{"recordId":"x","valore":99}],
-                  "serieSenzaSconfitte":[{"recordId":"s","valore":10,"squadra":"A"}],
-                  "capitanoSerieSquadre":[{"recordId":"c","valore":3,"squadra":"A"}]
+                  "serieVittorie":[{"recordId":"v","valore":4,"squadra":"A"}],
+                  "seriePareggi":[{"recordId":"p","valore":2,"squadra":"A"}],
+                  "serieSconfitte":[{"recordId":"s","valore":3,"squadra":"A"}],
+                  "serieSenzaSconfitte":[{"recordId":"i","valore":10,"squadra":"A"}],
+                  "serieSenzaVittorie":[{"recordId":"n","valore":5,"squadra":"A"}],
+                  "capitanoSerieSquadre":[{"recordId":"c","valore":3,"squadra":"A"}],
+                  "cleanSheetPortiereSerieSquadre":[{"recordId":"g","valore":4,"squadra":"A"}]
                 }}
                 """, StandardCharsets.UTF_8);
     
@@ -20828,10 +21425,66 @@ File: src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTe
             String js = Files.readString(output, StandardCharsets.UTF_8);
     
             assertTrue(js.startsWith("window.fcmRecordsNextSeries = "));
+            assertTrue(js.contains("serieVittorie"));
+            assertTrue(js.contains("seriePareggi"));
+            assertTrue(js.contains("serieSconfitte"));
             assertTrue(js.contains("serieSenzaSconfitte"));
+            assertTrue(js.contains("serieSenzaVittorie"));
             assertTrue(js.contains("capitanoSerieSquadre"));
+            assertTrue(js.contains("cleanSheetPortiereSerieSquadre"));
             assertFalse(js.contains("puntiSquadraMax"));
-            assertTrue(js.contains("GENERATED_PARTIAL"));
+            assertTrue(js.contains("GENERATED_COMPLETE"));
+            assertFalse(js.contains("GENERATED_PARTIAL"));
+        }
+    }
+
+## src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporterTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporterTest.java
+
+    package it.alterlega.recordsnext.app.thresholds;
+    
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+    
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+    
+    class ThresholdsLuckFamilyJsExporterTest {
+        @TempDir Path temp;
+    
+        @Test
+        void exportsObjectiveThresholdEventsWithoutCulometro() throws Exception {
+            Path reports = temp.resolve("reports/2025_2026");
+            Files.createDirectories(reports);
+            Files.writeString(reports.resolve("season_normalized_serie_a.json"), """
+                {
+                  "partiteSquadra": [
+                    {"stagione":"2025_2026","competizioneStoricaId":"serie_a","competizioneNome":"Serie A",
+                     "idIncontro":"1","giornata":"1a","giornataDiA":1,"urlTabellino":"ris.htm?Gio=1",
+                     "idSquadra":"10","squadra":"Alpha","idAvversaria":"11","avversaria":"Beta",
+                     "puntiFatti":66,"puntiSubiti":65.5,"golFatti":1,"golSubiti":0,"esito":"V"},
+                    {"stagione":"2025_2026","competizioneStoricaId":"serie_a","competizioneNome":"Serie A",
+                     "idIncontro":"2","giornata":"2a","giornataDiA":2,"urlTabellino":"ris.htm?Gio=2",
+                     "idSquadra":"10","squadra":"Alpha","idAvversaria":"12","avversaria":"Gamma",
+                     "puntiFatti":65.5,"puntiSubiti":65.5,"golFatti":0,"golSubiti":0,"esito":"P"}
+                  ],
+                  "fasceGolDettaglio": [
+                    {"idCompetizioneFcm":1,"idFascia":"1","min":0,"max":65.5,"gol":0},
+                    {"idCompetizioneFcm":1,"idFascia":"2","min":66,"max":71.5,"gol":1},
+                    {"idCompetizioneFcm":1,"idFascia":"3","min":72,"max":77.5,"gol":2}
+                  ]
+                }
+                """);
+            Path output = temp.resolve("fcmRecordsNext_ThresholdsLuck.js");
+            ThresholdsLuckFamilyJsExporter.export(temp.resolve("reports"), output);
+            String js = Files.readString(output);
+            assertTrue(js.startsWith("window.fcmRecordsNextThresholdsLuck = "));
+            assertTrue(js.contains("JUST_ENOUGH"));
+            assertTrue(js.contains("MISSED_WIN_HALF_POINT"));
+            assertTrue(js.contains("\"culometroGenerated\":false"));
         }
     }
 
@@ -20960,7 +21613,7 @@ File: config\processing.json
             }
           },
           "thresholdsLuck": {
-            "enabled": false,
+            "enabled": true,
             "children": "ALL"
           }
         },
@@ -21270,6 +21923,7 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.java
 - src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
 - src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.java
+- src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporter.java
 - src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
 - src\main\java\it\alterlega\recordsnext\CanonicalSchemaProbe.java
 - src\main\java\it\alterlega\recordsnext\CanonicalViews.java
@@ -21309,7 +21963,9 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 - src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTest.java
 - src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\app\series\SeriesCompleteIntegrationTest.java
 - src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
 - config\competitions.json
 - config\culometro.json
