@@ -15,10 +15,10 @@
         "children": "ALL"
       },
       "modifiers": {
-        "enabled": false,
+        "enabled": true,
         "children": {
-          "defence": false,
-          "captain": false,
+          "defence": true,
+          "captain": true,
           "homeField": false
         }
       },

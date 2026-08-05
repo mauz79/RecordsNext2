@@ -61,10 +61,10 @@
 
 | ID provvisorio | Nome | Dipendenza | Stato |
 |---|---|---|---|
-| modifiers.defence-best-match | Miglior modificatore difesa in una gara | Difesa | DA_CATALOGARE |
-| modifiers.defence-total | Totale modificatore difesa | Difesa | DA_CATALOGARE |
-| modifiers.captain-uses | Utilizzi Capitano | Capitano | DA_CATALOGARE |
-| modifiers.captain-total | Totale modificatore Capitano | Capitano | DA_CATALOGARE |
+| modifiers.defence-best-match | Miglior modificatore difesa in una gara | Difesa | IMPLEMENTATO |
+| modifiers.defence-total | Totale modificatore difesa | Difesa | IMPLEMENTATO |
+| modifiers.captain-uses | Utilizzi Capitano | Capitano | IMPLEMENTATO |
+| modifiers.captain-total | Totale modificatore Capitano | Capitano | IMPLEMENTATO |
 | modifiers.home-field-deciding | Fattore Campo decisivo | Fattore Campo | DA_CATALOGARE |
 | modifiers.home-field-points-gained | Punti guadagnati col Fattore Campo | Fattore Campo | DA_CATALOGARE |
 | modifiers.home-field-points-lost | Punti persi fuori casa | Fattore Campo | DA_CATALOGARE |
@@ -92,3 +92,8 @@
 | ID | Regola | Stato |
 |---|---|---|
 | easter-egg.culometro | Solo su richiesta e con configurazione dedicata | DA_CATALOGARE |
+
+
+## Output famiglia Modificatori 2.0
+
+`fcmRecordsNext_Modifiers.js` espone `window.fcmRecordsNextModifiers`. La prima versione riusa gli archivi normalizzati 1.0.2 per modificatore difesa e Capitano. Il Fattore Campo resta dichiarato ma non ancora implementato; lo stato complessivo e `GENERATED_PARTIAL`.

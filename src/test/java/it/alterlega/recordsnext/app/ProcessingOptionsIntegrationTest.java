@@ -40,10 +40,10 @@ class ProcessingOptionsIntegrationTest {
     }
 
     @Test
-    void pipelineRejectsFamiliesStillNotImplementedInsteadOfIgnoringThem() {
+    void pipelineRejectsThresholdsLuckStillNotImplementedInsteadOfIgnoringThem() {
         ProcessingOptions options = ProcessingOptions.modular(
                 new ProcessingSelection(
-                        Set.of(RecordFamily.MODIFIERS),
+                        Set.of(RecordFamily.THRESHOLDS_LUCK),
                         Set.of(),
                         false,
                         false,
@@ -58,13 +58,14 @@ class ProcessingOptionsIntegrationTest {
     }
 
     @Test
-    void pipelineAcceptsCurrentClassicRuAndSeriesBridge() {
+    void pipelineAcceptsCurrentClassicRuSeriesAndModifiersBridge() {
         ProcessingOptions options = ProcessingOptions.modular(
                 new ProcessingSelection(
                         Set.of(
                                 RecordFamily.CLASSICS,
                                 RecordFamily.RU,
-                                RecordFamily.SERIES
+                                RecordFamily.SERIES,
+                                RecordFamily.MODIFIERS
                         ),
                         Set.of(),
                         false,

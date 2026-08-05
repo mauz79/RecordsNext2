@@ -996,3 +996,8 @@ Restano da definire:
 ## Output famiglia Serie implementato
 
 `fcmRecordsNext_Series.js` espone `window.fcmRecordsNextSeries`. La prima versione riusa gli archivi normalizzati 1.0.2 e pubblica le sezioni disponibili: imbattibilita, serie Capitano e serie clean sheet. Lo stato e `GENERATED_PARTIAL` finche non saranno aggiunte vittorie, pareggi, sconfitte e serie senza vittorie.
+
+
+## Output Modificatori implementato
+
+`fcmRecordsNext_Modifiers.js` espone `window.fcmRecordsNextModifiers` e contiene le sezioni `modDifesaMax`, `modDifesaTotaleSquadre`, `capitanoVolteSquadre` e `capitanoTotaleSquadre`. Il Fattore Campo resta escluso finche non viene implementato il relativo calcolo dedicato.
