@@ -2,224 +2,58 @@
   "schemaVersion": "2.0",
   "enabled": true,
   "minimumMatches": 20,
-  "normalization": {
-    "mode": "PER_MATCH",
-    "centerOnHistoricalMean": true,
-    "kScale": 4.15
-  },
-  "overlap": {
-    "strategy": "PRIMARY_PLUS_SECONDARY",
-    "secondaryWeight": 0.2,
-    "tagWeight": 0.0,
-    "maxSecondary": 1,
-    "maxTags": 2
-  },
-  "rarity": {
-    "enabled": true,
-    "profile": "NORMAL",
-    "maximumMultiplier": 5.25,
-    "minimumHistoricalOccurrences": 3
-  },
+  "normalization": { "mode": "PER_MATCH", "centerOnHistoricalMean": true, "kScale": 4.15 },
+  "overlap": { "strategy": "PRIMARY_PLUS_SECONDARY", "secondaryWeight": 0.2, "tagWeight": 0.0, "maxSecondary": 1, "maxTags": 2 },
+  "rarity": { "enabled": true, "profile": "NORMAL", "maximumMultiplier": 5.25, "minimumHistoricalOccurrences": 3 },
   "components": [
-    {
-      "componentId": "JUST_ENOUGH",
-      "enabled": true,
-      "weight": 1.15,
-      "allowedRange": {
-        "min": 0.5,
-        "max": 2.0
-      }
-    },
-    {
-      "componentId": "MISSED_WIN_HALF_POINT",
-      "enabled": true,
-      "weight": 1.35,
-      "allowedRange": {
-        "min": 0.75,
-        "max": 2.5
-      }
-    },
-    {
-      "componentId": "LOSS_BY_A_WHISKER",
-      "enabled": true,
-      "weight": 1.45,
-      "allowedRange": {
-        "min": 0.75,
-        "max": 2.5
-      }
-    },
-    {
-      "componentId": "MIRACLE_DRAW",
-      "enabled": true,
-      "weight": 1.1,
-      "allowedRange": {
-        "min": 0.5,
-        "max": 2.0
-      }
-    },
-    {
-      "componentId": "TIGHT_DRAW",
-      "enabled": true,
-      "weight": 1.1,
-      "allowedRange": {
-        "min": 0.5,
-        "max": 2.0
-      }
-    },
-    {
-      "componentId": "ONE_GOAL_WIN",
-      "enabled": true,
-      "weight": 0.7,
-      "allowedRange": {
-        "min": 0.5,
-        "max": 1.5
-      }
-    },
-    {
-      "componentId": "ONE_GOAL_LOSS",
-      "enabled": true,
-      "weight": 0.7,
-      "allowedRange": {
-        "min": 0.5,
-        "max": 1.5
-      }
-    },
-    {
-      "componentId": "RU_DECISIVE",
-      "enabled": true,
-      "weight": 1.4,
-      "allowedRange": {
-        "min": 0.75,
-        "max": 2.5
-      }
-    }
+    { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
+    { "componentId": "MISSED_WIN_HALF_POINT", "enabled": true, "weight": 1.35, "allowedRange": { "min": 0.75, "max": 2.5 } },
+    { "componentId": "ONE_GOAL_WIN", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
+    { "componentId": "RU_DECISIVE", "enabled": true, "weight": 1.4, "allowedRange": { "min": 0.75, "max": 2.5 } },
+    { "componentId": "ONE_GOAL_LOSS", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
+    { "componentId": "TIGHT_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
+    { "componentId": "LOSS_BY_A_WHISKER", "enabled": true, "weight": 1.45, "allowedRange": { "min": 0.75, "max": 2.5 } },
+    { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } }
   ],
   "labels": {
     "preset": "GOLIARDICO",
     "customized": false,
     "resetSource": "GOLIARDICO_DEFAULT",
     "bands": [
-      {
-        "min": 90,
-        "label": "Co' 'sso culo puoi andare a cazzi"
-      },
-      {
-        "min": 85,
-        "label": "Protetto dagli dei"
-      },
-      {
-        "min": 73,
-        "label": "Culone conclamato"
-      },
-      {
-        "min": 66,
-        "label": "Fortunello"
-      },
-      {
-        "min": 53.00001,
-        "label": "Non ti lamentare"
-      },
-      {
-        "min": 48,
-        "label": "Ne carne ne pesce"
-      },
-      {
-        "min": 35,
-        "label": "Doveva andare meglio"
-      },
-      {
-        "min": 28,
-        "label": "Sfigatello"
-      },
-      {
-        "min": 16,
-        "label": "Sfiga cieca"
-      },
-      {
-        "min": 11,
-        "label": "Raccoglitore di cetrioli"
-      },
-      {
-        "min": 0,
-        "label": "Vai a farti una vasca a Lourdes"
-      }
+      { "min": 90, "label": "Co' 'sso culo puoi andare a cazzi" },
+      { "min": 85, "label": "Protetto dagli dei" },
+      { "min": 73, "label": "Culone conclamato" },
+      { "min": 66, "label": "Fortunello" },
+      { "min": 53.00001, "label": "Non ti lamentare" },
+      { "min": 48, "label": "Ne carne ne pesce" },
+      { "min": 35, "label": "Doveva andare meglio" },
+      { "min": 28, "label": "Sfigatello" },
+      { "min": 16, "label": "Sfiga cieca" },
+      { "min": 11, "label": "Raccoglitore di cetrioli" },
+      { "min": 0, "label": "Vai a farti una vasca a Lourdes" }
     ],
     "presetDefaults": {
-      "GOLIARDICO_DEFAULT": [
-        {
-          "min": 90,
-          "label": "Co' 'sso culo puoi andare a cazzi"
-        },
-        {
-          "min": 85,
-          "label": "Protetto dagli dei"
-        },
-        {
-          "min": 73,
-          "label": "Culone conclamato"
-        },
-        {
-          "min": 66,
-          "label": "Fortunello"
-        },
-        {
-          "min": 53.00001,
-          "label": "Non ti lamentare"
-        },
-        {
-          "min": 48,
-          "label": "Ne carne ne pesce"
-        },
-        {
-          "min": 35,
-          "label": "Doveva andare meglio"
-        },
-        {
-          "min": 28,
-          "label": "Sfigatello"
-        },
-        {
-          "min": 16,
-          "label": "Sfiga cieca"
-        },
-        {
-          "min": 11,
-          "label": "Raccoglitore di cetrioli"
-        },
-        {
-          "min": 0,
-          "label": "Vai a farti una vasca a Lourdes"
-        }
-      ],
       "NEUTRAL_DEFAULT": [
-        {
-          "min": 90,
-          "label": "Fortuna eccezionale"
-        },
-        {
-          "min": 75,
-          "label": "Molto fortunato"
-        },
-        {
-          "min": 60,
-          "label": "Piuttosto fortunato"
-        },
-        {
-          "min": 45,
-          "label": "In equilibrio"
-        },
-        {
-          "min": 30,
-          "label": "Piuttosto sfortunato"
-        },
-        {
-          "min": 15,
-          "label": "Molto sfortunato"
-        },
-        {
-          "min": 0,
-          "label": "Sfortuna eccezionale"
-        }
+        { "min": 90, "label": "Fortuna eccezionale" },
+        { "min": 75, "label": "Molto fortunato" },
+        { "min": 60, "label": "Piuttosto fortunato" },
+        { "min": 45, "label": "In equilibrio" },
+        { "min": 30, "label": "Piuttosto sfortunato" },
+        { "min": 15, "label": "Molto sfortunato" },
+        { "min": 0, "label": "Sfortuna eccezionale" }
+      ],
+      "GOLIARDICO_DEFAULT": [
+        { "min": 90, "label": "Co' 'sso culo puoi andare a cazzi" },
+        { "min": 85, "label": "Protetto dagli dei" },
+        { "min": 73, "label": "Culone conclamato" },
+        { "min": 66, "label": "Fortunello" },
+        { "min": 53.00001, "label": "Non ti lamentare" },
+        { "min": 48, "label": "Ne carne ne pesce" },
+        { "min": 35, "label": "Doveva andare meglio" },
+        { "min": 28, "label": "Sfigatello" },
+        { "min": 16, "label": "Sfiga cieca" },
+        { "min": 11, "label": "Raccoglitore di cetrioli" },
+        { "min": 0, "label": "Vai a farti una vasca a Lourdes" }
       ]
     }
   }
