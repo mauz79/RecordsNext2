@@ -1148,6 +1148,12 @@ public final class SeasonNormalizedExporter {
                 CASE x.modifier_number
                     WHEN 1 THEN t.MODM1PERS
                     WHEN 2 THEN t.MODM2PERS
+                    WHEN 3 THEN t.MODM3PERS
+                    WHEN 4 THEN t.MODPORTIERE
+                    WHEN 5 THEN t.MODDIFESA
+                    WHEN 6 THEN t.MODCENTROCAMPO
+                    WHEN 7 THEN t.MODATTACCO
+                    WHEN 8 THEN t.MODMODULO
                 END AS modifier_value
 
             FROM %s t
@@ -1162,17 +1168,21 @@ public final class SeasonNormalizedExporter {
              AND tm.source_team_id = t.IDSQUADRA
 
             CROSS JOIN (
-                SELECT
-                    1 AS modifier_number,
-                    'modDifesa' AS modifier_type,
-                    'ModM1Pers' AS source_field
-
+                SELECT 1 AS modifier_number, 'modDifesa' AS modifier_type, 'MODM1PERS' AS source_field
                 UNION ALL
-
-                SELECT
-                    2 AS modifier_number,
-                    'capitano' AS modifier_type,
-                    'ModM2Pers' AS source_field
+                SELECT 2, 'capitano', 'MODM2PERS'
+                UNION ALL
+                SELECT 3, 'personalizzato3', 'MODM3PERS'
+                UNION ALL
+                SELECT 4, 'fcmPortiere', 'MODPORTIERE'
+                UNION ALL
+                SELECT 5, 'fcmDifesa', 'MODDIFESA'
+                UNION ALL
+                SELECT 6, 'fcmCentrocampo', 'MODCENTROCAMPO'
+                UNION ALL
+                SELECT 7, 'fcmAttacco', 'MODATTACCO'
+                UNION ALL
+                SELECT 8, 'fcmModulo', 'MODMODULO'
             ) x
 
             WHERE m.season_id = ?
@@ -1181,11 +1191,23 @@ public final class SeasonNormalizedExporter {
               AND CASE x.modifier_number
                     WHEN 1 THEN t.MODM1PERSESISTE
                     WHEN 2 THEN t.MODM2PERSESISTE
+                    WHEN 3 THEN t.MODM3PERSESISTE
+                    WHEN 4 THEN t.MODPORTIEREESISTE
+                    WHEN 5 THEN t.MODDIFESAESISTE
+                    WHEN 6 THEN t.MODCENTROCAMPOESISTE
+                    WHEN 7 THEN t.MODATTACCOESISTE
+                    WHEN 8 THEN t.MODMODULOESISTE
                   END <> 0
 
               AND CASE x.modifier_number
                     WHEN 1 THEN t.MODM1PERS
                     WHEN 2 THEN t.MODM2PERS
+                    WHEN 3 THEN t.MODM3PERS
+                    WHEN 4 THEN t.MODPORTIERE
+                    WHEN 5 THEN t.MODDIFESA
+                    WHEN 6 THEN t.MODCENTROCAMPO
+                    WHEN 7 THEN t.MODATTACCO
+                    WHEN 8 THEN t.MODMODULO
                   END <> 0
 
             ORDER BY

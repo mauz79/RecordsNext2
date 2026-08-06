@@ -1,6 +1,6 @@
 # Stato implementazione RecordsNext 2.0
 
-Aggiornamento: 5 agosto 2026.
+Aggiornamento: 6 agosto 2026.
 
 ## Base tecnica verificata
 
@@ -125,27 +125,71 @@ Il manifest viene:
 
 ## Test
 
-Ultimo stato verificato dall'utente:
+Ultimo stato verificato il 6 agosto 2026:
 
-- 22 test eseguiti;
+- 38 test eseguiti;
 - 0 failure;
 - 0 errori;
+- 0 test saltati;
 - BUILD SUCCESS.
+
+La verifica è stata eseguita anche sull’elaborazione reale delle stagioni configurate.
+
+## Famiglia Modificatori
+
+La famiglia Modificatori è implementata e verificata.
+
+La configurazione GUI permette di selezionare separatamente, per ciascun modificatore:
+
+- Massimo;
+- Totale;
+- Media;
+- Utilizzi.
+
+Modificatori personalizzati gestiti:
+
+- `MODM1PERS`, con nome configurabile;
+- `MODM2PERS`, con nome configurabile;
+- `MODM3PERS`, con nome configurabile.
+
+Modificatori standard FCM gestiti separatamente:
+
+- `MODPORTIERE`;
+- `MODDIFESA`;
+- `MODCENTROCAMPO`;
+- `MODATTACCO`;
+- `MODMODULO`.
+
+Il file `fcmRecordsNext_Modifiers.js` viene costruito direttamente dagli archivi `season_records_*.json`, senza dipendere dall’esportatore Classici legacy.
+
+I metadati distinguono:
+
+- `availableSections`: sezioni supportate dall’esportatore;
+- `generatedSections`: sezioni effettivamente prodotte in base alla configurazione e ai dati disponibili.
+
+È stata verificata nell’output reale la presenza di:
+
+- Massimo, Totale, Media e Utilizzi per `MODM1PERS`;
+- Massimo, Totale, Media e Utilizzi per `MODM2PERS`;
+- Massimo, Totale, Media e Utilizzi per `MODDIFESA`;
+- stagione `2006_2007` nei dati del Modificatore Difesa FCM;
+- nomi configurati corretti;
+- esclusione delle statistiche disattivate.
 
 ## Non ancora implementato
 
 Non sono ancora implementati come nuovi elaboratori nativi 2.0:
 
 - Serie;
-- Modificatori;
 - Soglie e Fortuna;
 - Culometro;
 - nuovo output Classici completo secondo lo schema 2.0;
 - nuovo output RU completo secondo lo schema 2.0;
 - fcmRecordsNext_Core.js;
-- GUI definitiva a cinque famiglie;
+- completamento e consolidamento della GUI 2.0;
 - viste HTML 2.0 definitive;
-- installer 2.0.
+- JS statici di rendering dei visualizzatori;
+- installer effettivo dei visualizzatori e dei profili CSS.
 
 Gli esportatori Classici e RU della 1.0.2 restano operativi come ponte.
 
@@ -160,3 +204,36 @@ Gli esportatori Classici e RU della 1.0.2 restano operativi come ponte.
 - Squadre e competizioni conservano identità stagionale e canonica.
 - Gli output devono essere viste dati complete, non top list tagliate.
 - Gli ZIP temporanei applicati, testati e committati vanno eliminati periodicamente da D:\DEV_APPS\downloads.
+
+
+## GUI e visualizzatori: stato al 6 agosto 2026
+
+La dashboard GUI e stata riorganizzata con tre aree principali:
+
+- Configurazione stagioni;
+- Famiglie record;
+- Soglie, Fortuna e Culometro.
+
+La GUI consente gia la configurazione granulare delle famiglie e del Culometro. L'avvio operativo deve includere UCanAccess nel classpath.
+
+Sono consolidate, ma non ancora implementate integralmente, le seguenti decisioni sui visualizzatori:
+
+- gli HTML non contengono dati;
+- gli HTML leggono esclusivamente i JS pubblici;
+- i JS statici di rendering saranno `fcmRecordsNextFunzioni_common.js` e `fcmRecordsNextFunzioni_viewer.js`;
+- tali file saranno installati nella cartella `js` della skin;
+- i nuovi nomi file usano underscore e non trattini;
+- i profili grafici iniziali saranno `mauzstrom`, `fantablue2` e `neutral`;
+- `mauzstrom` usera Trebuchet MS;
+- il profilo `neutral` sara moderno, autonomo e ispirato ai principi grafici di ReNewo;
+- la presenza degli HTML nella skin non implica la generazione dei relativi dati;
+- una pagina priva del proprio JS deve mostrare uno stato vuoto senza errori.
+
+Prossima fase:
+
+1. definire il contratto JavaScript pubblico definitivo;
+2. creare i due JS statici di rendering;
+3. creare l'indice e le pagine famiglia senza dati incorporati;
+4. creare e verificare i tre profili CSS;
+5. implementare l'installer nella GUI;
+6. aggiungere test automatici per struttura, riferimenti e assenza di dati negli HTML.

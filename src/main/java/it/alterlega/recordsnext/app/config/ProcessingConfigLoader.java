@@ -68,6 +68,11 @@ public final class ProcessingConfigLoader {
                     case "homeField" -> "modifiers.home-field-deciding";
                     default -> "modifiers." + entry.getKey();
                 };
+                case THRESHOLDS_LUCK -> switch (entry.getKey()) {
+                    case "favourable-events", "unfavourable-events", "balance" ->
+                            "luck." + entry.getKey();
+                    default -> "thresholds." + entry.getKey();
+                };
                 default -> family.id() + "." + entry.getKey();
             };
             out.add(id);

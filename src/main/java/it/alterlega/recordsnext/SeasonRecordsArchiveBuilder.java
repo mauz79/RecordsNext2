@@ -112,8 +112,37 @@ public final class SeasonRecordsArchiveBuilder {
         records.put("golRigoreSquadre", eventByTeam(events, "golRigoreSquadre", "Maggiori gol fatti su rigore"));
         records.put("modDifesaMax", modifierMax(modifiers));
         records.put("modDifesaTotaleSquadre", modifierTotal(modifiers));
+        records.put("capitanoMax", modifierMaxByType(modifiers, "capitano", "capitanoMax", "Miglior bonus Capitano in una gara"));
         records.put("capitanoVolteSquadre", captainCount(modifiers));
         records.put("capitanoTotaleSquadre", captainTotal(modifiers));
+        records.put("modPersonalizzato3Max", modifierMaxByType(modifiers, "personalizzato3", "modPersonalizzato3Max", "Miglior modificatore personalizzato 3"));
+        records.put("modPersonalizzato3TotaleSquadre", modifierTotalByType(modifiers, "personalizzato3", "modPersonalizzato3TotaleSquadre", "Maggior totale modificatore personalizzato 3"));
+        records.put("modPortiereFcmMax", modifierMaxByType(modifiers, "fcmPortiere", "modPortiereFcmMax", "Miglior Modificatore Portiere FCM"));
+        records.put("modPortiereFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmPortiere", "modPortiereFcmTotaleSquadre", "Maggior totale Modificatore Portiere FCM"));
+        records.put("modDifesaFcmMax", modifierMaxByType(modifiers, "fcmDifesa", "modDifesaFcmMax", "Miglior Modificatore Difesa FCM"));
+        records.put("modDifesaFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmDifesa", "modDifesaFcmTotaleSquadre", "Maggior totale Modificatore Difesa FCM"));
+        records.put("modCentrocampoFcmMax", modifierMaxByType(modifiers, "fcmCentrocampo", "modCentrocampoFcmMax", "Miglior Modificatore Centrocampo FCM"));
+        records.put("modCentrocampoFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmCentrocampo", "modCentrocampoFcmTotaleSquadre", "Maggior totale Modificatore Centrocampo FCM"));
+        records.put("modAttaccoFcmMax", modifierMaxByType(modifiers, "fcmAttacco", "modAttaccoFcmMax", "Miglior Modificatore Attacco FCM"));
+        records.put("modAttaccoFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmAttacco", "modAttaccoFcmTotaleSquadre", "Maggior totale Modificatore Attacco FCM"));
+        records.put("modModuloFcmMax", modifierMaxByType(modifiers, "fcmModulo", "modModuloFcmMax", "Miglior Modificatore Modulo FCM"));
+        records.put("modModuloFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmModulo", "modModuloFcmTotaleSquadre", "Maggior totale Modificatore Modulo FCM"));
+        records.put("modDifesaMediaSquadre", modifierAverageByType(modifiers, "modDifesa", "modDifesaMediaSquadre", "Miglior media Modificatore Difesa"));
+        records.put("modDifesaUtilizziSquadre", modifierUsesByType(modifiers, "modDifesa", "modDifesaUtilizziSquadre", "Maggior numero utilizzi Modificatore Difesa"));
+        records.put("capitanoMediaSquadre", modifierAverageByType(modifiers, "capitano", "capitanoMediaSquadre", "Miglior media Capitano"));
+        records.put("capitanoUtilizziSquadre", modifierUsesByType(modifiers, "capitano", "capitanoUtilizziSquadre", "Maggior numero utilizzi Capitano"));
+        records.put("modPersonalizzato3MediaSquadre", modifierAverageByType(modifiers, "personalizzato3", "modPersonalizzato3MediaSquadre", "Miglior media modificatore personalizzato 3"));
+        records.put("modPersonalizzato3UtilizziSquadre", modifierUsesByType(modifiers, "personalizzato3", "modPersonalizzato3UtilizziSquadre", "Maggior numero utilizzi modificatore personalizzato 3"));
+        records.put("modPortiereFcmMediaSquadre", modifierAverageByType(modifiers, "fcmPortiere", "modPortiereFcmMediaSquadre", "Miglior media Modificatore Portiere FCM"));
+        records.put("modPortiereFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmPortiere", "modPortiereFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Portiere FCM"));
+        records.put("modDifesaFcmMediaSquadre", modifierAverageByType(modifiers, "fcmDifesa", "modDifesaFcmMediaSquadre", "Miglior media Modificatore Difesa FCM"));
+        records.put("modDifesaFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmDifesa", "modDifesaFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Difesa FCM"));
+        records.put("modCentrocampoFcmMediaSquadre", modifierAverageByType(modifiers, "fcmCentrocampo", "modCentrocampoFcmMediaSquadre", "Miglior media Modificatore Centrocampo FCM"));
+        records.put("modCentrocampoFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmCentrocampo", "modCentrocampoFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Centrocampo FCM"));
+        records.put("modAttaccoFcmMediaSquadre", modifierAverageByType(modifiers, "fcmAttacco", "modAttaccoFcmMediaSquadre", "Miglior media Modificatore Attacco FCM"));
+        records.put("modAttaccoFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmAttacco", "modAttaccoFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Attacco FCM"));
+        records.put("modModuloFcmMediaSquadre", modifierAverageByType(modifiers, "fcmModulo", "modModuloFcmMediaSquadre", "Miglior media Modificatore Modulo FCM"));
+        records.put("modModuloFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmModulo", "modModuloFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Modulo FCM"));
         records.put("cleanSheetPortiereVolteSquadre", cleanSheetCount(cleanSheets));
         records.put("cleanSheetPortiereTotaleSquadre", cleanSheetTotal(cleanSheets));
         records.put("cleanSheetPortiereSerieSquadre", cleanSheetSeries(matches, cleanSheets));
@@ -363,6 +392,99 @@ public final class SeasonRecordsArchiveBuilder {
         List<Map<String, Object>> selected = modifiers.stream().filter(r -> "modDifesa".equals(string(r.get("tipo")))).toList();
         return aggregateSum(selected, "modDifesaTotaleSquadre", "Maggior totale modificatore difesa",
                 List.of("idIncontro", "giornataDiA", "avversaria", "valore"));
+    }
+
+    private static List<Object> modifierMaxByType(
+            List<Map<String, Object>> modifiers,
+            String type,
+            String recordId,
+            String label) {
+        List<Map<String, Object>> rows = modifiers.stream()
+                .filter(r -> type.equals(string(r.get("tipo"))))
+                .sorted(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("valore"))).reversed()
+                        .thenComparing(r -> string(r.get("squadra"))))
+                .limit(20)
+                .toList();
+        List<Object> out = new ArrayList<>();
+        for (Map<String, Object> r : rows) {
+            out.add(ordered(
+                    "recordId", recordId,
+                    "nome", label,
+                    "valore", r.get("valore"),
+                    "idSquadra", r.get("idSquadra"),
+                    "squadra", r.get("squadra"),
+                    "avversaria", r.get("avversaria"),
+                    "idIncontro", r.get("idIncontro"),
+                    "giornataDiA", r.get("giornataDiA"),
+                    "campoOrigine", r.get("campoOrigine")));
+        }
+        return out;
+    }
+
+    private static List<Object> modifierTotalByType(
+            List<Map<String, Object>> modifiers,
+            String type,
+            String recordId,
+            String label) {
+        List<Map<String, Object>> selected = modifiers.stream()
+                .filter(r -> type.equals(string(r.get("tipo"))))
+                .toList();
+        return aggregateSum(selected, recordId, label,
+                List.of("idIncontro", "giornataDiA", "avversaria", "valore", "campoOrigine"));
+    }
+
+    private static List<Object> modifierAverageByType(
+            List<Map<String, Object>> modifiers,
+            String type,
+            String recordId,
+            String label) {
+        List<Map<String, Object>> selected = modifiers.stream()
+                .filter(r -> type.equals(string(r.get("tipo"))))
+                .toList();
+        Map<String, List<Map<String, Object>>> groups = group(selected, "idSquadra");
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (List<Map<String, Object>> rows : groups.values()) {
+            if (rows.isEmpty()) continue;
+            Map<String, Object> first = rows.get(0);
+            double sum = rows.stream().mapToDouble(r -> number(r.get("valore"))).sum();
+            Map<String, Object> item = ordered(
+                    "recordId", recordId,
+                    "nome", label,
+                    "valore", cleanNumber(sum / rows.size()),
+                    "utilizzi", rows.size(),
+                    "idSquadra", first.get("idSquadra"),
+                    "squadra", first.get("squadra"));
+            item.put("dettagli", modifierDetails(rows));
+            out.add(item);
+        }
+        sortValueTeam(out);
+        return new ArrayList<>(out);
+    }
+
+    private static List<Object> modifierUsesByType(
+            List<Map<String, Object>> modifiers,
+            String type,
+            String recordId,
+            String label) {
+        List<Map<String, Object>> selected = modifiers.stream()
+                .filter(r -> type.equals(string(r.get("tipo"))))
+                .toList();
+        Map<String, List<Map<String, Object>>> groups = group(selected, "idSquadra");
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (List<Map<String, Object>> rows : groups.values()) {
+            if (rows.isEmpty()) continue;
+            Map<String, Object> first = rows.get(0);
+            Map<String, Object> item = ordered(
+                    "recordId", recordId,
+                    "nome", label,
+                    "valore", rows.size(),
+                    "idSquadra", first.get("idSquadra"),
+                    "squadra", first.get("squadra"));
+            item.put("dettagli", modifierDetails(rows));
+            out.add(item);
+        }
+        sortValueTeam(out);
+        return new ArrayList<>(out);
     }
 
     private static List<Object> captainCount(List<Map<String, Object>> modifiers) {

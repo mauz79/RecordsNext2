@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-05 20:39:28 +02:00
+> Data generazione: 2026-08-06 17:08:07 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -24,13 +24,40 @@
 - Link ai tabellini per i record riferiti a partite specifiche.
 - JS pubblici nella cartella js del sito.
 - Un solo HTML indice nella root del sito.
-- Viste HTML dimostrative nella cartella RecordsNext.
+- HTML statici senza dati incorporati: visualizzatori dei JS pubblici.
+- Viste HTML nella cartella RecordsNext e un solo indice nella root.
+- JS statici di rendering nella cartella js della skin: fcmRecordsNextFunzioni_common.js e fcmRecordsNextFunzioni_viewer.js.
+- Profili grafici iniziali: mauzstrom, fantablue2 e neutral.
+- Il profilo mauzstrom usa Trebuchet MS.
+- Nei nuovi nomi file RecordsNext si usa underscore, non trattino.
 
 ### Implementato e verificato
 
-- Struttura iniziale del progetto.
-- Documentazione architetturale iniziale.
-- Generatore della bibbia aggiornato con documentazione e sorgenti reali.
+- Base funzionante RecordsNext 1.0.2 importata nel progetto 2.0.
+- Accesso ai database FCM e FCA tramite UCanAccess.
+- Configurazione delle stagioni gestite e manuali.
+- Importazione, normalizzazione e consolidamento storico delle stagioni gestite.
+- Modello modulare con famiglie, figli, dipendenze, planner e preflight.
+- GUI RecordsNext 2.0 con configurazione granulare delle famiglie.
+- Configurazione gerarchica dei Modificatori per tipo e statistica.
+- Nomi configurabili per MODM1PERS, MODM2PERS e MODM3PERS.
+- Modificatori standard FCM distinti dai modificatori personalizzati.
+- Generazione diretta di fcmRecordsNext_Modifiers.js dagli archivi season_records.
+- Statistiche Massimo, Totale, Media e Utilizzi per i modificatori selezionati.
+- Esportazione verificata del MODDIFESA FCM della stagione 2006_2007.
+- Metadati availableSections e generatedSections distinti.
+- Test automatici: 38 eseguiti, 0 failure, 0 errori.
+- Verifica reale del JS Modificatori completata con tutte le sezioni selezionate presenti.
+
+### Non ancora implementato o da completare
+
+- Elaboratore nativo completo della famiglia Serie.
+- Elaboratore nativo completo della famiglia Soglie e Fortuna.
+- Culometro definitivo e relativo contratto dati pubblico.
+- Contratto JavaScript pubblico definitivo di tutte le famiglie.
+- Visualizzatori HTML 2.0 definitivi.
+- JS statici definitivi dei visualizzatori.
+- Installer definitivo dei visualizzatori e dei profili CSS.
 
 ### Non ancora implementato
 
@@ -38,7 +65,7 @@
 - Modello dati.
 - Elaboratori delle famiglie.
 - Esportatori JS.
-- GUI.
+- Consolidamento GUI 2.0.
 - Installer.
 - Viste HTML 2.0.
 
@@ -47,33 +74,33 @@
 File: README.md
 
     # RecordsNext 2.0
-    
+
     RecordsNext 2.0 e un nuovo progetto indipendente che genera viste dati modulari, complete e filtrabili, dalle quali ricavare record stagionali, assoluti, globali e personali.
-    
+
     ## Directory
-    
+
     `D:\DEV_APPS\RecordsNext2.0`
-    
+
     ## Repository di riferimento
-    
+
     - https://github.com/mauz79/RecordsNext
     - https://github.com/mauz79/ConfrontiStorici-3.x-Plus
     - https://github.com/mauz79/ConfrontiStorici34
-    
+
     I download manuali vanno salvati in `D:\DEV_APPS\downloads`.
-    
+
     ## Famiglie iniziali
-    
+
     1. Classici
     2. Serie
     3. Riserve d'Ufficio
     4. Modificatori
     5. Soglie e Fortuna
-    
+
     Il Culometro e un easter egg opzionale, generato soltanto su richiesta esplicita e con configurazione dedicata.
-    
+
     ## Output previsti
-    
+
     - `fcmRecordsNext_Core.js`
     - `fcmRecordsNext_Manifest.js`
     - `fcmRecordsNext_Classics.js`
@@ -82,11 +109,32 @@ File: README.md
     - `fcmRecordsNext_Modifiers.js`
     - `fcmRecordsNext_ThresholdsLuck.js`
     - `fcmRecordsNext_Culometro.js`
-    
-    Tutti i JS pubblici andranno nella cartella `js` del sito FCM. Nella root ci sara un solo `recordsnext.html`; viste e asset dimostrativi andranno nella cartella `RecordsNext`.
-    
+
+    Tutti i JS pubblici andranno nella cartella `js` del sito FCM. Nella root ci sara un solo `recordsnext.html`; le pagine visualizzatore e il relativo CSS andranno nella cartella `RecordsNext`.
+
+    ## Visualizzatori HTML
+
+    Gli HTML distribuiti con RecordsNext 2.0 non contengono dati incorporati. Sono visualizzatori statici e riutilizzabili dei file `fcmRecordsNext_*.js` prodotti dall'elaborazione.
+
+    Separazione ufficiale:
+
+    - HTML: struttura e contenitori;
+    - CSS: profilo grafico;
+    - `fcmRecordsNextFunzioni_common.js` e `fcmRecordsNextFunzioni_viewer.js`: funzioni di lettura e rendering;
+    - `fcmRecordsNext_*.js`: dati e metadati generati.
+
+    I due JS di visualizzazione vengono installati nella cartella `js` della skin, in modo che FCM li riporti nella cartella `js` del sito generato.
+
+    Profili grafici iniziali:
+
+    - `mauzstrom`, con font principale Trebuchet MS;
+    - `fantablue2`;
+    - `neutral`, moderno e autonomo, ispirato alla leggibilita della skin ReNewo senza dipendere dai suoi selettori.
+
+    Gli stessi HTML e gli stessi JS di rendering devono funzionare con tutti i profili. Cambia soltanto `RecordsNext\recordsnext.css`.
+
     ## Bibbia
-    
+
     La bibbia del progetto e `docs\CODICE_FUNZIONANTE_RECORDSNEXT2.md`. Deve distinguere decisioni consolidate, codice implementato e verificato, lavori in corso e questioni aperte.
 
 ## Architettura
@@ -94,13 +142,13 @@ File: README.md
 File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
     # Architettura RecordsNext 2.0
-    
+
     ## Scopo
-    
+
     RecordsNext 2.0 genera viste dati tematiche complete e filtrabili, non semplici classifiche finali.
-    
+
     ## Flusso
-    
+
     ```text
     FCM / FCA / configurazioni
                 |
@@ -119,88 +167,347 @@ File: docs\ARCHITETTURA_RECORDSNEXT2.md
                 v
     viste HTML filtrabili
     ```
-    
+
     ## Famiglie
-    
+
     ### Classici
-    
+
     Punteggi, medie, somme, risultati, gol, disciplinari, assist, autogol, rigori, clean sheet e aggregati per squadra, giocatore e portiere. Le sequenze appartengono a Serie.
-    
+
     Output: `fcmRecordsNext_Classics.js`
-    
+
     ### Serie
-    
+
     Serie positive e negative, vittorie, pareggi e sconfitte consecutive, clean sheet consecutivi e serie dipendenti da eventi o modificatori.
-    
+
     Output: `fcmRecordsNext_Series.js`
-    
+
     ### Riserve d'Ufficio
-    
+
     PU, DU, CU, AU, partite con e contro uffici, uffici decisivi, bilanci, medie e distribuzioni.
-    
+
     Output: `fcmRecordsNext_RU.js`
-    
+
     ### Modificatori
-    
+
     Difesa, Capitano, altri modificatori selezionati e Fattore Campo.
-    
+
     Output: `fcmRecordsNext_Modifiers.js`
-    
+
     ### Soglie e Fortuna
-    
+
     Vittorie chirurgiche, sconfitte beffa, pareggi miracolati e stretti, mezzo punto, soglie precise, spreco punti e indicatori di fortuna/sfortuna.
-    
+
     Output: `fcmRecordsNext_ThresholdsLuck.js`
-    
+
     ## Culometro
-    
+
     Easter egg opzionale: non viene generato automaticamente; richiede selezione e configurazione dedicate.
-    
+
     Output: `fcmRecordsNext_Culometro.js`
-    
+
     ## Dipendenze
-    
+
     Ogni figlio dichiara dipendenze obbligatorie e opzionali. Una dipendenza mancante blocca solo il figlio interessato.
-    
+
     Esempio: senza Capitano non vengono generati i figli Capitano e le relative serie, ma le altre serie continuano.
-    
+
     ## Ambiti temporali
-    
+
     - stagionale: valore per squadra e stagione;
     - globale: aggregato su tutte le stagioni dell'identita canonica;
     - assoluto: migliore o peggiore occorrenza fra tutte le stagioni;
     - storico continuo: sequenza che puo attraversare piu stagioni.
-    
+
     Non tutti i record supportano tutti gli ambiti.
-    
+
     ## Identita canoniche
-    
+
     Squadre e competizioni conservano identita e nome stagionale, identita e nome canonico, stagione e stato dell'associazione.
-    
+
     ## Filtri minimi
-    
+
     Famiglia, figlio, squadra stagionale e canonica, stagione, competizione stagionale e canonica, casa/trasferta/neutro, squadre attuali/tutte e ambito temporale.
-    
+
     ## Tabellini
-    
+
     Ogni record riferito a una partita specifica conserva identificativo, link locale e online, stagione, competizione, giornata, squadre, risultato e data.
-    
+
     ## Fuori perimetro iniziale
-    
+
     Palmares, albo d'oro, promozioni, retrocessioni, bilancio prossimo turno, confronti diretti e altre funzioni non-record.
+
+
+    ## Architettura dei visualizzatori HTML
+
+    ### Regola vincolante
+
+    Gli HTML a corredo di RecordsNext 2.0 non devono contenere dati incorporati, record precalcolati, nomi di squadre o classifiche scritte nel markup.
+
+    Devono essere visualizzatori statici dei JavaScript generati dal programma. Questa separazione consente di:
+
+    - distribuire gli HTML insieme al plugin;
+    - installarli nella skin una sola volta;
+    - aggiornare i dati senza riscrivere le pagine;
+    - cambiare grafica senza rigenerare i dati;
+    - offrire una base utile a chi vuole costruire visualizzatori propri.
+
+    ### Strati
+
+    ```text
+    HTML statici
+        |
+        v
+    fcmRecordsNextFunzioni_common.js
+    fcmRecordsNextFunzioni_viewer.js
+        |
+        v
+    fcmRecordsNext_Manifest.js
+    fcmRecordsNext_Core.js
+    fcmRecordsNext_*.js
+    ```
+
+    Responsabilita:
+
+    - HTML: struttura semantica, aree filtri, navigazione e contenitori risultati;
+    - CSS: resa grafica del profilo scelto;
+    - JS funzioni: controllo disponibilita, lettura dati, filtri, ordinamenti e rendering;
+    - JS dati: dati completi, metadati, stato degli output e link ai tabellini.
+
+    ### File statici installabili nella skin
+
+    ```text
+    recordsnext.html
+    RecordsNext\classici.html
+    RecordsNext\serie.html
+    RecordsNext\riserve_ufficio.html
+    RecordsNext\modificatori.html
+    RecordsNext\soglie_fortuna.html
+    RecordsNext\culometro.html
+    RecordsNext\recordsnext.css
+    js\fcmRecordsNextFunzioni_common.js
+    js\fcmRecordsNextFunzioni_viewer.js
+    ```
+
+    Nei nomi dei nuovi file RecordsNext si usa l'underscore, non il trattino.
+
+    ### File dati generati
+
+    I file `fcmRecordsNext_*.js` vengono prodotti dalla pipeline e pubblicati nella cartella `js` del sito. Non fanno parte del pacchetto statico della skin.
+
+    ### Profili grafici
+
+    I profili iniziali sono:
+
+    - `mauzstrom`: Trebuchet MS come font principale;
+    - `fantablue2`;
+    - `neutral`: stile moderno autonomo ispirato ai principi grafici di ReNewo.
+
+    La GUI installa sempre gli stessi HTML e JS di rendering. Il profilo scelto determina soltanto il file copiato come `RecordsNext\recordsnext.css`.
+
+    ### Dati mancanti
+
+    La presenza di una pagina HTML non implica la presenza del relativo output dati. In assenza del JS richiesto, la pagina deve mostrare uno stato vuoto leggibile e non produrre errori JavaScript.
+
+    ### Soglie, Fortuna e Culometro
+
+    Soglie e Fortuna resta una famiglia dati autonoma. Nella GUI viene raggruppata con il Culometro perche il Culometro dipende da questi indicatori e puo dipendere anche da componenti delle Riserve d'Ufficio.
+
+    Il Culometro resta opzionale e viene generato soltanto quando selezionato esplicitamente. Anche `culometro.html` resta un visualizzatore statico senza dati incorporati.
+
+## Architettura visualizzatori HTML
+
+File: docs\ARCHITETTURA_VISUALIZZATORI_HTML.md
+
+    # Architettura visualizzatori HTML RecordsNext 2.0
+
+    ## Scopo
+
+    I visualizzatori RecordsNext offrono pagine gia utili per un sito FCM semplice e una base tecnica per personalizzazioni autonome.
+
+    ## Vincolo principale
+
+    Nessun HTML distribuito con RecordsNext contiene dati della lega. Tutti i dati provengono dai file `fcmRecordsNext_*.js` generati dalla pipeline.
+
+    ## Struttura prevista
+
+    ```text
+    recordsnext.html
+    RecordsNext\classici.html
+    RecordsNext\serie.html
+    RecordsNext\riserve_ufficio.html
+    RecordsNext\modificatori.html
+    RecordsNext\soglie_fortuna.html
+    RecordsNext\culometro.html
+    RecordsNext\recordsnext.css
+    js\fcmRecordsNextFunzioni_common.js
+    js\fcmRecordsNextFunzioni_viewer.js
+    ```
+
+    ## Responsabilita
+
+    ### HTML
+
+    Definisce titolo, navigazione, filtri, contenitori e stati vuoti. Non contiene dataset o risultati.
+
+    ### CSS
+
+    Definisce esclusivamente la resa grafica. Gli HTML usano classi stabili con prefisso `rn_`.
+
+    ### `fcmRecordsNextFunzioni_common.js`
+
+    Gestisce funzioni condivise: rilevamento output disponibili, formattazione, accesso sicuro alle variabili globali, escape, link e stati errore.
+
+    ### `fcmRecordsNextFunzioni_viewer.js`
+
+    Gestisce filtri, ordinamenti, selezione delle viste e rendering di tabelle o schede.
+
+    ### JS dati
+
+    Sono prodotti dall'elaborazione, pubblicati nella cartella `js` del sito e non distribuiti come file statici della skin.
+
+    ## Profili grafici
+
+    - `mauzstrom`: Trebuchet MS, adattamento alla relativa skin;
+    - `fantablue2`: adattamento alla skin Fantablue2;
+    - `neutral`: stile moderno autonomo.
+
+    Gli HTML non cambiano fra un profilo e l'altro.
+
+    ## Assenza di dati
+
+    Ogni pagina deve poter essere presente anche quando il relativo output non e stato generato. In quel caso mostra un messaggio leggibile e non genera eccezioni.
+
+    ## Culometro
+
+    `culometro.html` e sempre un visualizzatore statico. Il relativo JS dati esiste solo quando il Culometro e stato richiesto ed elaborato.
+
+## Installazione visualizzatori HTML
+
+File: docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md
+
+    # Installazione visualizzatori HTML RecordsNext 2.0
+
+    ## Destinatari
+
+    Questa guida e destinata all'utente che vuole installare le pagine RecordsNext in una skin FCM.
+
+    ## Procedura prevista nella GUI
+
+    1. Aprire la sezione di installazione dei visualizzatori.
+    2. Selezionare la cartella principale della skin FCM.
+    3. Scegliere il profilo `mauzstrom`, `fantablue2` oppure `neutral`.
+    4. Verificare le destinazioni proposte.
+    5. Avviare `Installa visualizzatori RecordsNext nella skin`.
+
+    ## File copiati
+
+    ```text
+    recordsnext.html
+    RecordsNext\*.html
+    RecordsNext\recordsnext.css
+    js\fcmRecordsNextFunzioni_common.js
+    js\fcmRecordsNextFunzioni_viewer.js
+    ```
+
+    I file dati `fcmRecordsNext_*.js` non vengono copiati dall'installer: sono generati dall'elaborazione.
+
+    ## Aggiornamento del sito
+
+    Dopo l'installazione nella skin, FCM riporta gli asset statici nel sito generato. RecordsNext aggiorna invece i JS dati nella cartella `js` del sito.
+
+    ## Famiglie non generate
+
+    Le pagine possono essere presenti anche quando una famiglia non e stata elaborata. Il visualizzatore mostra uno stato vuoto e il collegamento puo essere disabilitato dall'indice tramite il manifest.
+
+    ## Aggiornamento dei visualizzatori
+
+    Una nuova versione puo sostituire HTML, JS statici e CSS senza toccare i JS dati. Prima della sovrascrittura l'installer dovra creare un backup mirato dei file RecordsNext esistenti.
+
+## Personalizzazione visualizzatori HTML
+
+File: docs\PERSONALIZZAZIONE_VISUALIZZATORI_HTML.md
+
+    # Personalizzazione visualizzatori HTML RecordsNext 2.0
+
+    ## Principio
+
+    La personalizzazione deve mantenere separati dati e presentazione. Non copiare dataset dentro HTML o CSS.
+
+    ## Classi CSS
+
+    Le nuove pagine useranno classi con prefisso `rn_`, per esempio:
+
+    ```text
+    rn_page
+    rn_shell
+    rn_header
+    rn_navigation
+    rn_toolbar
+    rn_filter
+    rn_panel
+    rn_table
+    rn_row_even
+    rn_row_odd
+    rn_empty_state
+    rn_error_state
+    ```
+
+    ## Profili
+
+    Ogni profilo fornisce un proprio `recordsnext.css` ma usa gli stessi selettori `rn_`.
+
+    Struttura sorgente:
+
+    ```text
+    templates\skins\mauzstrom\recordsnext.css
+    templates\skins\fantablue2\recordsnext.css
+    templates\skins\neutral\recordsnext.css
+    ```
+
+    Il profilo `mauzstrom` usa Trebuchet MS come font principale.
+
+    ## JavaScript
+
+    Non modificare i file dati generati per cambiare la grafica. Le personalizzazioni funzionali vanno nei file:
+
+    ```text
+    fcmRecordsNextFunzioni_common.js
+    fcmRecordsNextFunzioni_viewer.js
+    ```
+
+    Una pagina personalizzata deve:
+
+    - verificare la disponibilita del manifest;
+    - verificare la disponibilita del dataset richiesto;
+    - gestire schema non compatibile e dati mancanti;
+    - applicare filtri nel browser;
+    - mantenere i link ai tabellini;
+    - evitare dipendenze dalla posizione assoluta del sito.
+
+    ## Divieto di dati incorporati
+
+    Non sono ammessi:
+
+    - array di record scritti nell'HTML;
+    - JSON inline con dati della lega;
+    - classifiche statiche generate nel markup;
+    - nomi di squadre o stagioni inseriti come contenuto permanente della pagina.
+
+    Sono ammessi soltanto testi generici dell'interfaccia e configurazioni di visualizzazione non legate a una lega specifica.
 
 ## Catalogo record
 
 File: docs\CATALOGO_RECORD.md
 
     # Catalogo record RecordsNext 2.0
-    
+
     ## Stati
-    
+
     `DA_CATALOGARE`, `DEFINITO`, `IN_SVILUPPO`, `IMPLEMENTATO`, `VERIFICATO`, `SOSPESO`.
-    
+
     ## Classici
-    
+
     | ID provvisorio | Nome | Origine | Ambiti | Tabellino | Stato |
     |---|---|---|---|---|---|
     | classics.highest-match-score | Maggior punteggio in una partita | RecordsNext + ConfrontiStorici | Stagionale, assoluto | Singolo | VERIFICATO |
@@ -224,9 +531,9 @@ File: docs\CATALOGO_RECORD.md
     | classics.penalties-missed | Rigori sbagliati | RecordsNext | Stagionale, assoluto, globale | No | DA_CATALOGARE |
     | classics.penalties-saved | Rigori parati | RecordsNext | Stagionale, assoluto, globale | No | DA_CATALOGARE |
     | classics.clean-sheets | Clean sheet | RecordsNext | Stagionale, assoluto, globale | No | DA_CATALOGARE |
-    
+
     ## Serie
-    
+
     | ID provvisorio | Nome | Dipendenze | Stato |
     |---|---|---|---|
     | series.unbeaten | Serie positiva | Risultati ordinati | IMPLEMENTATO |
@@ -236,9 +543,9 @@ File: docs\CATALOGO_RECORD.md
     | series.losses | Sconfitte consecutive | Risultati ordinati | DA_CATALOGARE |
     | series.clean-sheets | Clean sheet consecutivi | Clean sheet elaborati | IMPLEMENTATO |
     | series.captain-bonus | Bonus Capitano consecutivo | Modificatore Capitano | IMPLEMENTATO |
-    
+
     ## Riserve d'Ufficio
-    
+
     | ID provvisorio | Nome | Stato |
     |---|---|---|
     | ru.max-in-match | Maggior numero di RU in una partita | DA_CATALOGARE |
@@ -251,9 +558,9 @@ File: docs\CATALOGO_RECORD.md
     | ru.average-points | Media punti con RU | DA_CATALOGARE |
     | ru.average-points-against | Media punti contro RU | DA_CATALOGARE |
     | ru.role-distribution | Distribuzione PU, DU, CU e AU | DA_CATALOGARE |
-    
+
     ## Modificatori
-    
+
     | ID provvisorio | Nome | Dipendenza | Stato |
     |---|---|---|---|
     | modifiers.defence-best-match | Miglior modificatore difesa in una gara | Difesa | IMPLEMENTATO |
@@ -264,9 +571,9 @@ File: docs\CATALOGO_RECORD.md
     | modifiers.home-field-points-gained | Punti guadagnati col Fattore Campo | Fattore Campo | DA_CATALOGARE |
     | modifiers.home-field-points-lost | Punti persi fuori casa | Fattore Campo | DA_CATALOGARE |
     | modifiers.home-field-balance | Saldo Fattore Campo | Fattore Campo | DA_CATALOGARE |
-    
+
     ## Soglie e Fortuna
-    
+
     | ID provvisorio | Nome | Stato |
     |---|---|---|
     | thresholds.surgical-win | Vittoria chirurgica | DA_CATALOGARE |
@@ -281,21 +588,21 @@ File: docs\CATALOGO_RECORD.md
     | luck.favourable-events | Eventi favorevoli | DA_CATALOGARE |
     | luck.unfavourable-events | Eventi sfavorevoli | DA_CATALOGARE |
     | luck.balance | Saldo fortuna-sfortuna | DA_CATALOGARE |
-    
+
     ## Culometro
-    
+
     | ID | Regola | Stato |
     |---|---|---|
     | easter-egg.culometro | Solo su richiesta e con configurazione dedicata | DA_CATALOGARE |
-    
-    
+
+
     ## Output famiglia Modificatori 2.0
-    
+
     `fcmRecordsNext_Modifiers.js` espone `window.fcmRecordsNextModifiers`. La prima versione riusa gli archivi normalizzati 1.0.2 per modificatore difesa e Capitano. Il Fattore Campo resta dichiarato ma non ancora implementato; lo stato complessivo e `GENERATED_PARTIAL`.
-    
-    
+
+
     ## Aggiornamento Serie complete v2
-    
+
     La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.
 
 ## Dipendenze output
@@ -303,49 +610,49 @@ File: docs\CATALOGO_RECORD.md
 File: docs\DIPENDENZE_OUTPUT.md
 
     # Dipendenze output RecordsNext 2.0
-    
+
     ## Principio
-    
+
     Una dipendenza mancante blocca soltanto il figlio interessato ed e dichiarata nel manifest.
-    
+
     ## Stati
-    
+
     - `GENERATED_COMPLETE`
     - `GENERATED_PARTIAL`
     - `SKIPPED_REQUIRED_DEPENDENCY`
     - `SKIPPED_NOT_SELECTED`
     - `SKIPPED_NO_DATA`
-    
+
     ## Capitano
-    
+
     Senza Capitano:
-    
+
     ```text
     modifiers.captain-total -> SKIPPED_NOT_SELECTED
     series.captain-bonus    -> SKIPPED_REQUIRED_DEPENDENCY
     ```
-    
+
     Le altre serie continuano.
-    
+
     ## Fattore Campo
-    
+
     Richiede punteggi, risultato, bonus casa e configurazione delle soglie gol.
-    
+
     ## RU decisive
-    
+
     Richiedono RU identificate, formazione, punteggio e simulazione senza RU. I semplici conteggi possono essere prodotti senza simulazione.
-    
+
     ## Soglie e Fortuna
-    
+
     Gli eventi soglia richiedono punteggi, soglie gol e risultato. Gli indicatori derivati richiedono gli eventi selezionati.
-    
+
     ## Culometro
-    
+
     Richiede selezione esplicita, configurazione dedicata, componenti, pesi e normalizzazione. Se non selezionato: `SKIPPED_NOT_SELECTED`. Questo non rende incompleta la famiglia.
-    
-    
+
+
     ## Aggiornamento Serie complete v2
-    
+
     La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.
 
 ## Decisioni aperte
@@ -353,7 +660,7 @@ File: docs\DIPENDENZE_OUTPUT.md
 File: docs\DECISIONI_APERTE.md
 
     # Decisioni aperte RecordsNext 2.0
-    
+
     - catalogo definitivo dei figli;
     - ID pubblici definitivi;
     - struttura esatta dei JS;
@@ -375,13 +682,13 @@ File: docs\DECISIONI_APERTE.md
 File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     # Modello dati RecordsNext 2.0
-    
+
     ## 1. Scopo
-    
+
     Questo documento definisce il modello dati comune di RecordsNext 2.0.
-    
+
     Il modello deve sostenere:
-    
+
     - cinque famiglie elaborabili;
     - record stagionali, assoluti, globali e personali;
     - serie cronologiche;
@@ -393,17 +700,17 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - generazione modulare dei file JavaScript;
     - GUI futura;
     - stagioni gestite e stagioni manuali.
-    
+
     Il modello comune deve essere indipendente dalla singola famiglia di record.
-    
+
     ## 2. Principi generali
-    
+
     ### 2.1 Dati completi, non classifiche finali
-    
+
     Gli output non devono contenere soltanto top 10 o classifiche già tagliate.
-    
+
     Devono contenere dati sufficientemente completi da permettere alle viste HTML di ricavare:
-    
+
     - record generali;
     - record personali;
     - classifiche complete;
@@ -414,33 +721,33 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - filtri per ambito;
     - confronti fra squadre;
     - dettagli partita.
-    
+
     I limiti di visualizzazione appartengono alla vista, non al dataset.
-    
+
     ### 2.2 Identità stagionale e identità canonica
-    
+
     Ogni squadra e competizione deve conservare due livelli di identità:
-    
+
     - identità originale della stagione;
     - identità canonica storica.
-    
+
     Questo permette di mantenere i nomi realmente usati nella stagione e, nello stesso tempo, aggregare correttamente tutta la storia della stessa entità.
-    
+
     ### 2.3 Dipendenze locali
-    
+
     Ogni figlio dichiara le proprie dipendenze.
-    
+
     Se una dipendenza manca:
-    
+
     - non viene bloccata automaticamente la famiglia;
     - viene saltato soltanto il figlio interessato;
     - il manifest registra il motivo;
     - non vengono generati dati apparentemente completi ma incompleti.
-    
+
     ### 2.4 Provenienza dei dati
-    
+
     Ogni dato derivato deve poter dichiarare:
-    
+
     - fonte;
     - stagione;
     - file origine;
@@ -448,11 +755,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - metodo di calcolo;
     - eventuale fallback;
     - eventuale simulazione.
-    
+
     ## 3. Entità principali
-    
+
     Il modello comune iniziale comprende:
-    
+
     1. configurazione lega;
     2. stagione;
     3. sito della stagione;
@@ -479,11 +786,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     24. dipendenza;
     25. stato output;
     26. manifest.
-    
+
     ## 4. Configurazione della lega
-    
+
     Struttura concettuale:
-    
+
         {
           "leagueId": "alterlega",
           "leagueName": "AlterLega",
@@ -492,9 +799,9 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "defaultTimeZone": "Europe/Rome",
           "dataVersion": "2.0"
         }
-    
+
     Campi minimi:
-    
+
     | Campo | Significato |
     |---|---|
     | leagueId | Identificativo stabile della lega |
@@ -503,11 +810,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     | defaultLocale | Formato locale |
     | defaultTimeZone | Fuso orario |
     | dataVersion | Versione dello schema |
-    
+
     ## 5. Stagione
-    
+
     Struttura concettuale:
-    
+
         {
           "seasonId": "2025_2026",
           "startYear": 2025,
@@ -520,32 +827,32 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "siteOnlineConfigured": true,
           "hasMatchSheets": true
         }
-    
+
     Stati ammessi:
-    
+
     - MANAGED;
     - MANUAL;
     - ARCHIVED;
     - CURRENT;
     - DISABLED.
-    
+
     Regole:
-    
+
     - una stagione MANAGED può essere elaborata da FCM/FCA;
     - una stagione MANUAL resta nello storico ma non viene elaborata da FCM;
     - una stagione MANUAL può avere classifiche o albo d'oro manuali;
     - una stagione MANUAL può non avere tabellini;
     - l'ultimo FCM disponibile rappresenta la stagione attuale del sito, anche quando cronologicamente non è l'anno corrente reale.
-    
+
     ## 6. Sito della stagione
-    
+
     Ogni stagione può avere:
-    
+
     - sito locale;
     - sito online.
-    
+
     Struttura concettuale:
-    
+
         {
           "seasonId": "2025_2026",
           "localSiteRoot": "E:\\fantacalcio\\Lega2025",
@@ -554,9 +861,9 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "matchPageName": "ris.htm",
           "dataAPath": "js\\DataA.js"
         }
-    
+
     Campi minimi:
-    
+
     | Campo | Significato |
     |---|---|
     | localSiteRoot | Root del sito locale |
@@ -564,20 +871,20 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     | matchPageType | HTM, PHP o altro formato configurato |
     | matchPageName | Nome effettivo della pagina tabellino |
     | dataAPath | Percorso relativo di DataA.js |
-    
+
     Regole:
-    
+
     - la cartella `js` è interna alla root del sito;
     - il formato `.htm` o `.php` non deve essere dedotto genericamente;
     - il formato deve derivare dalla configurazione della stagione;
     - il link online e il link locale devono essere costruiti separatamente;
     - non bisogna concatenare la root della stagione corrente con quella storica;
     - gli eventuali DataA.js storici possono essere copiati e normalizzati nel progetto.
-    
+
     ## 7. Squadra stagionale
-    
+
     Struttura concettuale:
-    
+
         {
           "seasonTeamId": "2025_2026:team:7",
           "seasonId": "2025_2026",
@@ -588,9 +895,9 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "associationStatus": "MAPPED",
           "isCurrent": true
         }
-    
+
     Campi minimi:
-    
+
     | Campo | Significato |
     |---|---|
     | seasonTeamId | ID univoco nella stagione |
@@ -601,19 +908,19 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     | canonicalTeamId | Identità storica |
     | associationStatus | Stato associazione |
     | isCurrent | Squadra presente nell'ultimo FCM |
-    
+
     Stati associazione:
-    
+
     - MAPPED;
     - UNMAPPED;
     - AMBIGUOUS;
     - MANUAL;
     - EXCLUDED.
-    
+
     ## 8. Squadra canonica
-    
+
     Struttura concettuale:
-    
+
         {
           "canonicalTeamId": "river-pino",
           "canonicalName": "River Pino",
@@ -624,20 +931,20 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
             "River Pino"
           ]
         }
-    
+
     Regole:
-    
+
     - il canonicalTeamId deve essere stabile;
     - il nome canonico è distinto dal nome storico;
     - l'associazione parte dalla squadra attuale;
     - le squadre delle stagioni precedenti vengono collegate alla squadra attuale;
     - gli aggregati globali usano il canonicalTeamId;
     - le viste stagionali possono mostrare il seasonName.
-    
+
     ## 9. Competizione stagionale
-    
+
     Struttura concettuale:
-    
+
         {
           "seasonCompetitionId": "2025_2026:competition:1",
           "seasonId": "2025_2026",
@@ -648,28 +955,28 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "competitionType": "LEAGUE",
           "includedByDefault": true
         }
-    
+
     Tipi preliminari:
-    
+
     - LEAGUE;
     - CUP;
     - SUPERCUP;
     - PLAYOFF;
     - PLAYOUT;
     - OTHER.
-    
+
     Regole:
-    
+
     - non tutte le stagioni hanno le stesse competizioni;
     - una competizione assente non deve essere inventata;
     - Play Off e Play Out restano fuori dai gruppi principali;
     - competizioni presenti in una sola stagione sono ammesse;
     - i gruppi predefiniti devono rispettare l'ordine canonico già stabilito nel progetto storico.
-    
+
     ## 10. Competizione canonica
-    
+
     Struttura concettuale:
-    
+
         {
           "canonicalCompetitionId": "europa-pipps",
           "canonicalName": "Europa Pipps",
@@ -679,17 +986,17 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           ],
           "active": true
         }
-    
+
     Regole:
-    
+
     - competizioni con nomi diversi possono condividere la stessa identità canonica;
     - il nome originale della stagione deve essere conservato;
     - gli aggregati storici per competizione usano il canonicalCompetitionId.
-    
+
     ## 11. Giornata
-    
+
     Struttura concettuale:
-    
+
         {
           "roundId": "2025_2026:serie-a:18",
           "seasonId": "2025_2026",
@@ -699,19 +1006,19 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "matchDate": "2026-01-11",
           "dateSource": "DataA.js"
         }
-    
+
     Regole:
-    
+
     - la data va letta da DataA.js quando disponibile;
     - devono essere distinti numero giornata reale e numero giornata della competizione, se differenti;
     - la data deve essere normalizzata in formato ISO.
-    
+
     ## 12. Partita normalizzata
-    
+
     La partita è l'entità centrale del modello.
-    
+
     Struttura concettuale:
-    
+
         {
           "matchId": "2025_2026:competition:1:round:18:match:4",
           "seasonId": "2025_2026",
@@ -735,9 +1042,9 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "localMatchUrl": "file:///E:/fantacalcio/Lega2025/ris.htm?Gio=18",
           "onlineMatchUrl": "http://www.alterlega.altervista.org/lega2025/ris.htm?Gio=18"
         }
-    
+
     Campi principali:
-    
+
     | Gruppo | Campi |
     |---|---|
     | Identità | matchId, seasonId, competitionId, roundId |
@@ -750,22 +1057,22 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     | Campo | isNeutral |
     | Data | matchDate |
     | Tabellini | localMatchUrl, onlineMatchUrl |
-    
+
     Esiti ammessi:
-    
+
     - HOME_WIN;
     - DRAW;
     - AWAY_WIN;
     - NOT_PLAYED;
     - CANCELLED;
     - UNKNOWN.
-    
+
     ## 13. Partecipazione squadra alla partita
-    
+
     Per semplificare aggregati e record personali, ogni partita produce due righe squadra-partita.
-    
+
     Struttura concettuale:
-    
+
         {
           "matchTeamId": "2025_2026:competition:1:round:18:match:4:team:7",
           "matchId": "2025_2026:competition:1:round:18:match:4",
@@ -781,9 +1088,9 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "standingsPoints": 0,
           "result": "LOSS"
         }
-    
+
     Vantaggi:
-    
+
     - aggregazioni più semplici;
     - filtri per squadra;
     - record personali;
@@ -791,42 +1098,42 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - serie;
     - casa e trasferta;
     - statistiche fatte e subite.
-    
+
     ## 14. Link ai tabellini
-    
+
     Ogni record riferito a una partita specifica deve conservare almeno:
-    
+
     - matchId;
     - localMatchUrl;
     - onlineMatchUrl.
-    
+
     Tipi di collegamento:
-    
+
     - SINGLE_MATCH;
     - MATCH_RANGE;
     - MULTIPLE_MATCHES;
     - NOT_APPLICABLE.
-    
+
     Esempi:
-    
+
     - maggior punteggio: SINGLE_MATCH;
     - partita con più gol regolamentari: SINGLE_MATCH;
     - serie positiva: MATCH_RANGE o MULTIPLE_MATCHES;
     - totale punti stagionale: NOT_APPLICABLE;
     - sequenza storica: MULTIPLE_MATCHES.
-    
+
     Per le serie devono essere conservati:
-    
+
     - startMatchId;
     - endMatchId;
     - matchIds;
     - startMatchUrl;
     - endMatchUrl.
-    
+
     ## 15. Giocatore
-    
+
     Struttura concettuale:
-    
+
         {
           "playerId": "player:12345",
           "sourcePlayerId": "12345",
@@ -834,21 +1141,21 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "role": "D",
           "active": true
         }
-    
+
     Ruoli preliminari:
-    
+
     - P;
     - D;
     - C;
     - A;
     - UNKNOWN.
-    
+
     L'identità storica del giocatore sarà approfondita solo se necessaria per aggregati pluristagionali affidabili.
-    
+
     ## 16. Presenza giocatore
-    
+
     Struttura concettuale:
-    
+
         {
           "appearanceId": "match:xyz:team:7:player:12345",
           "matchId": "match:xyz",
@@ -860,19 +1167,19 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "fantasyVote": 7.0,
           "played": true
         }
-    
+
     Tipi presenza:
-    
+
     - STARTER;
     - SUBSTITUTE;
     - BENCH;
     - OFFICE_PLAYER;
     - NOT_USED.
-    
+
     ## 17. Evento giocatore
-    
+
     Struttura concettuale:
-    
+
         {
           "playerEventId": "event:match:xyz:player:12345:yellow-card:1",
           "matchId": "match:xyz",
@@ -881,9 +1188,9 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "eventType": "YELLOW_CARD",
           "value": 1
         }
-    
+
     Tipi preliminari:
-    
+
     - GOAL;
     - ASSIST;
     - OWN_GOAL;
@@ -897,11 +1204,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - CAPTAIN_BONUS;
     - DEFENCE_MODIFIER_COMPONENT;
     - OTHER.
-    
+
     ## 18. Modificatore
-    
+
     Struttura concettuale:
-    
+
         {
           "modifierEventId": "modifier:match:xyz:team:7:defence",
           "matchId": "match:xyz",
@@ -912,22 +1219,22 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "enabled": true,
           "source": "FCM"
         }
-    
+
     Tipi iniziali:
-    
+
     - DEFENCE;
     - CAPTAIN;
     - HOME_FIELD;
     - CUSTOM.
-    
+
     Ogni modificatore può essere elaborato o escluso indipendentemente.
-    
+
     ## 19. Fattore Campo
-    
+
     Il Fattore Campo appartiene alla famiglia Modificatori.
-    
+
     Struttura concettuale:
-    
+
         {
           "homeFieldEventId": "homefield:match:xyz",
           "matchId": "match:xyz",
@@ -941,11 +1248,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "standingsPointsDeltaHome": 2,
           "standingsPointsDeltaAway": -1
         }
-    
+
     ## 20. Riserva d'Ufficio
-    
+
     Struttura concettuale:
-    
+
         {
           "officePlayerEventId": "office:match:xyz:team:7:role:A:1",
           "matchId": "match:xyz",
@@ -956,22 +1263,22 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "scoreImpact": 1.5,
           "decisive": false
         }
-    
+
     Tipi:
-    
+
     - PU;
     - DU;
     - CU;
     - AU.
-    
+
     Le elaborazioni decisive richiedono una simulazione dedicata.
-    
+
     I semplici conteggi non dipendono dalla simulazione.
-    
+
     ## 21. Evento soglia
-    
+
     Struttura concettuale:
-    
+
         {
           "thresholdEventId": "threshold:match:xyz:team:7:surgical-win",
           "matchId": "match:xyz",
@@ -980,9 +1287,9 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "distanceToThreshold": 0.5,
           "resultImpact": "FAVOURABLE"
         }
-    
+
     Tipi iniziali:
-    
+
     - SURGICAL_WIN;
     - MOCKING_LOSS;
     - MIRACULOUS_DRAW;
@@ -992,11 +1299,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - EXACT_THRESHOLD;
     - JUST_ENOUGH;
     - WASTED_POINTS.
-    
+
     ## 22. Evento fortuna-sfortuna
-    
+
     Struttura concettuale:
-    
+
         {
           "luckEventId": "luck:match:xyz:team:7:1",
           "matchId": "match:xyz",
@@ -1007,19 +1314,19 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "weight": 1.0,
           "normalizedValue": 0.125
         }
-    
+
     Direzioni:
-    
+
     - FAVOURABLE;
     - UNFAVOURABLE;
     - NEUTRAL.
-    
+
     ## 23. Culometro
-    
+
     Il Culometro non fa parte dell'elaborazione ordinaria automatica.
-    
+
     Struttura concettuale della configurazione:
-    
+
         {
           "enabled": true,
           "minimumMatches": 10,
@@ -1037,20 +1344,20 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
             }
           ]
         }
-    
+
     Regole:
-    
+
     - viene generato solo su richiesta esplicita;
     - richiede configurazione dedicata;
     - i pesi devono essere dichiarati;
     - le componenti mancanti devono essere segnalate;
     - la mancata generazione non rende incompleta Soglie e Fortuna;
     - l'output dedicato è separato.
-    
+
     ## 24. Serie
-    
+
     Struttura concettuale:
-    
+
         {
           "seriesId": "series:unbeaten:river-pino:2024_2025:1",
           "seriesType": "UNBEATEN",
@@ -1067,19 +1374,19 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           ],
           "crossesSeasonBoundary": false
         }
-    
+
     Ambiti:
-    
+
     - SEASON;
     - ABSOLUTE;
     - HISTORICAL_CONTINUOUS.
-    
+
     Ogni tipo di serie deve dichiarare se può attraversare il confine stagionale.
-    
+
     ## 25. Aggregato stagionale
-    
+
     Struttura concettuale:
-    
+
         {
           "aggregateId": "aggregate:2025_2026:river-pino:serie-a:total-points",
           "metricId": "classics.total-points",
@@ -1093,20 +1400,20 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "average": 72.6528,
           "percentage": null
         }
-    
+
     Ogni aggregato deve conservare, quando applicabili:
-    
+
     - numero partite;
     - totale;
     - media;
     - percentuale;
     - minimo;
     - massimo.
-    
+
     ## 26. Aggregato globale
-    
+
     Struttura concettuale:
-    
+
         {
           "aggregateId": "global:river-pino:all:total-points",
           "metricId": "classics.total-points",
@@ -1117,15 +1424,15 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "total": 51428.5,
           "average": 72.2310
         }
-    
+
     Il globale somma o media tutte le stagioni della stessa identità canonica.
-    
+
     Non va confuso con l'assoluto.
-    
+
     ## 27. Occorrenza assoluta
-    
+
     Struttura concettuale:
-    
+
         {
           "absoluteId": "absolute:classics.total-points:river-pino",
           "metricId": "classics.total-points",
@@ -1136,15 +1443,15 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "matches": 38,
           "average": 70.5263
         }
-    
+
     L'assoluto individua la migliore o peggiore occorrenza fra stagioni.
-    
+
     Non è la somma della carriera.
-    
+
     ## 28. Ex aequo
-    
+
     Regola preliminare:
-    
+
     - i dati conservano tutte le occorrenze;
     - la vista decide quante posizioni mostrare;
     - gli ex aequo non devono essere eliminati durante l'esportazione;
@@ -1155,13 +1462,13 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
       3. media;
       4. data;
       5. nome visualizzato.
-    
+
     La regola definitiva resta da catalogare figlio per figlio.
-    
+
     ## 29. Dipendenza
-    
+
     Struttura concettuale:
-    
+
         {
           "childId": "series.captain-bonus",
           "required": [
@@ -1171,9 +1478,9 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "optional": [],
           "missingBehaviour": "SKIP_CHILD"
         }
-    
+
     Tipi di dipendenza:
-    
+
     - DATA;
     - MODULE;
     - CONFIGURATION;
@@ -1181,20 +1488,20 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - SIMULATION;
     - SITE;
     - MAPPING.
-    
+
     ## 30. Stato output
-    
+
     Stati ammessi:
-    
+
     - GENERATED_COMPLETE;
     - GENERATED_PARTIAL;
     - SKIPPED_REQUIRED_DEPENDENCY;
     - SKIPPED_NOT_SELECTED;
     - SKIPPED_NO_DATA;
     - FAILED.
-    
+
     Struttura concettuale:
-    
+
         {
           "childId": "series.captain-bonus",
           "status": "SKIPPED_REQUIRED_DEPENDENCY",
@@ -1203,11 +1510,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           ],
           "message": "Modificatore Capitano non elaborato."
         }
-    
+
     ## 31. Manifest generale
-    
+
     Struttura concettuale:
-    
+
         {
           "program": "RecordsNext by mauz79",
           "programVersion": "2.0.0-dev",
@@ -1223,13 +1530,13 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "generatedFiles": [],
           "culometroGenerated": false
         }
-    
+
     Il manifest deve descrivere ciò che è stato realmente elaborato.
-    
+
     ## 32. Output JavaScript
-    
+
     Output preliminari:
-    
+
     - `fcmRecordsNext_Core.js`
     - `fcmRecordsNext_Manifest.js`
     - `fcmRecordsNext_Classics.js`
@@ -1238,13 +1545,13 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - `fcmRecordsNext_Modifiers.js`
     - `fcmRecordsNext_ThresholdsLuck.js`
     - `fcmRecordsNext_Culometro.js`
-    
+
     Il Culometro viene scritto solo se richiesto.
-    
+
     ## 33. Struttura comune di una famiglia
-    
+
     Schema concettuale:
-    
+
         window.fcmRecordsNextClassics = {
             schemaVersion: "2.0",
             familyId: "classics",
@@ -1255,52 +1562,52 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
             absoluteOccurrences: [],
             outputStatus: []
         };
-    
+
     Ogni famiglia può omettere sezioni non pertinenti, ma deve rispettare lo schema comune di metadata e stato.
-    
+
     ### Stato implementato Classici
-    
+
     `fcmRecordsNext_Classics.js` è generato dalla pipeline e pubblica:
-    
+
     - `schemaVersion: "2.0"`;
     - `familyId: "classics"`;
     - metadata con numero di stagioni e recordset;
     - `seasonAggregates` derivati dagli archivi Classici consolidati 1.0.2;
     - stato `GENERATED_COMPLETE`.
-    
+
     Durante la migrazione resta generato anche il file legacy `records2026.recordstagionali.classic.js`.
-    
+
     ## 34. Cartelle pubbliche
-    
+
     Sul sito FCM:
-    
+
     - tutti i JS pubblici vanno nella cartella `js`;
     - nella root va un solo HTML indice;
     - viste e asset vanno nella cartella `RecordsNext`;
     - i file intermedi non devono essere pubblicati.
-    
+
     ## 35. Dati intermedi
-    
+
     I dati intermedi possono risiedere nel progetto:
-    
+
         D:\DEV_APPS\RecordsNext2.0\work
-    
+
     Possibili sottocartelle future:
-    
+
     - `work\normalized`
     - `work\seasons`
     - `work\cache`
     - `work\exports`
     - `work\diagnostics`
-    
+
     Questi file non sono necessariamente pubblici.
-    
+
     ## 36. Validazione
-    
+
     Ogni entità deve poter essere validata.
-    
+
     Controlli minimi:
-    
+
     - ID obbligatori non nulli;
     - stagione esistente;
     - squadra stagionale esistente;
@@ -1312,11 +1619,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - data valida;
     - dipendenze note;
     - stato output ammesso.
-    
+
     ## 37. Test minimi del modello
-    
+
     Il modello deve essere testato almeno su:
-    
+
     1. stagione corrente gestita;
     2. stagione storica gestita;
     3. stagione manuale;
@@ -1332,11 +1639,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     13. Culometro richiesto con configurazione;
     14. record personale di una squadra non prima in classifica;
     15. ex aequo.
-    
+
     ## 38. Decisioni consolidate
-    
+
     Sono consolidate:
-    
+
     - progetto separato RecordsNext2.0;
     - cinque famiglie;
     - output modulari;
@@ -1350,11 +1657,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - JS pubblici nella cartella `js`;
     - un solo HTML indice nella root;
     - viste in cartella `RecordsNext`.
-    
+
     ## 39. Decisioni ancora aperte
-    
+
     Restano da definire:
-    
+
     - struttura fisica definitiva dei file di configurazione;
     - tecnologia del motore 2.0;
     - formato finale degli ID;
@@ -1367,34 +1674,64 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - formato finale della configurazione Culometro;
     - struttura definitiva della GUI;
     - strategia di migrazione o confronto con RecordsNext 1.0.2.
-    
-    
+
+
     ## Output famiglia Serie implementato
-    
+
     `fcmRecordsNext_Series.js` espone `window.fcmRecordsNextSeries`. La prima versione riusa gli archivi normalizzati 1.0.2 e pubblica le sezioni disponibili: imbattibilita, serie Capitano e serie clean sheet. Lo stato e `GENERATED_PARTIAL` finche non saranno aggiunte vittorie, pareggi, sconfitte e serie senza vittorie.
-    
-    
+
+
     ## Output Modificatori implementato
-    
+
     `fcmRecordsNext_Modifiers.js` espone `window.fcmRecordsNextModifiers` e contiene le sezioni `modDifesaMax`, `modDifesaTotaleSquadre`, `capitanoVolteSquadre` e `capitanoTotaleSquadre`. Il Fattore Campo resta escluso finche non viene implementato il relativo calcolo dedicato.
-    
-    
+
+
     ## Aggiornamento Serie complete v2
-    
+
     La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.
+
+
+    ## Contratto dati dei visualizzatori
+
+    Gli HTML non sono parte del modello dati e non devono contenere copie serializzate dei dataset.
+
+    Il contratto pubblico verso i visualizzatori e costituito dai JavaScript generati:
+
+    - `fcmRecordsNext_Manifest.js`: disponibilita, versioni, file prodotti e stato degli output;
+    - `fcmRecordsNext_Core.js`: metadati e strutture comuni;
+    - file della singola famiglia: viste dati complete e filtrabili;
+    - `fcmRecordsNext_Culometro.js`: presente soltanto quando la generazione opzionale e richiesta ed eseguibile.
+
+    I file di funzioni statiche:
+
+    - `fcmRecordsNextFunzioni_common.js`;
+    - `fcmRecordsNextFunzioni_viewer.js`;
+
+    non contengono dati della lega. Espongono esclusivamente funzioni di accesso, validazione, filtro, ordinamento, formattazione e rendering.
+
+    Ogni dataset pubblico deve dichiarare almeno:
+
+    - versione dello schema;
+    - famiglia;
+    - data e stato della generazione;
+    - stagioni incluse;
+    - disponibilita delle viste;
+    - dati completi necessari ai filtri;
+    - eventuali dipendenze mancanti;
+    - link ai tabellini quando la riga rappresenta una partita.
 
 ## Configurazione
 
 File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
 
     # Configurazione RecordsNext 2.0
-    
+
     ## Scopo
-    
+
     Questi file costituiscono la prima configurazione concreta del progetto.
-    
+
     ## File
-    
+
     - `config/league.json`: identità generale della lega.
     - `config/seasons.json`: stagioni gestite, manuali e correnti.
     - `config/teams.json`: squadre canoniche e squadre stagionali.
@@ -1402,9 +1739,38 @@ File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
     - `config/processing.json`: famiglie e figli richiesti.
     - `config/culometro.json`: configurazione separata dell'easter egg.
     - `config/manifest.example.json`: forma preliminare del manifest prodotto.
-    
+
+    ## Configurazione granulare dei Modificatori
+
+    La sezione Modificatori di `config/processing.json` conserva separatamente le selezioni per ogni campo disponibile.
+
+    Per ogni modificatore sono configurabili:
+
+    - `max`;
+    - `total`;
+    - `average`;
+    - `uses`.
+
+    I modificatori personalizzati sono:
+
+    - `modm1pers`;
+    - `modm2pers`;
+    - `modm3pers`.
+
+    I relativi nomi visualizzati sono configurabili nella GUI e vengono salvati nella configurazione.
+
+    I modificatori standard FCM sono:
+
+    - `modportiere`;
+    - `moddifesa`;
+    - `modcentrocampo`;
+    - `modattacco`;
+    - `modmodulo`.
+
+    I nomi dei modificatori standard FCM restano espliciti e non devono essere confusi con quelli personalizzati.
+
     ## Regole consolidate
-    
+
     - Il file FCM e il file FCA sono configurati per stagione.
     - La cartella `js` non viene configurata separatamente: è interna alla root del sito.
     - Ogni stagione può avere sito locale e online.
@@ -1417,11 +1783,11 @@ File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
     - Il Culometro richiede configurazione esplicita.
     - Le competizioni canoniche rispettano l'ordine stabilito.
     - Play Off e Play Out non appartengono all'ordine principale.
-    
+
     ## Nota importante
-    
+
     I valori presenti sono iniziali o di esempio. Prima dell'elaborazione reale sarà necessario importare e verificare:
-    
+
     - tutte le stagioni;
     - i percorsi FCM/FCA;
     - le root locali e online;
@@ -1429,20 +1795,58 @@ File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
     - i mapping delle squadre;
     - i mapping delle competizioni.
 
+
+    ## Installazione dei visualizzatori nella skin
+
+    La configurazione dell'installer deve prevedere:
+
+    - cartella della skin FCM;
+    - profilo grafico da installare;
+    - conferma della struttura di destinazione;
+    - sovrascrittura controllata dei soli file RecordsNext.
+
+    Profili iniziali ammessi:
+
+    - `mauzstrom`;
+    - `fantablue2`;
+    - `neutral`.
+
+    Struttura dei profili nel progetto:
+
+    ```text
+    templates\skins\mauzstrom\recordsnext.css
+    templates\skins\fantablue2\recordsnext.css
+    templates\skins\neutral\recordsnext.css
+    ```
+
+    Il profilo `mauzstrom` usa Trebuchet MS come font principale.
+
+    La procedura `Installa visualizzatori RecordsNext nella skin` deve copiare:
+
+    ```text
+    recordsnext.html                         -> root della skin
+    RecordsNext\*.html                     -> RecordsNext della skin
+    RecordsNext\recordsnext.css            -> RecordsNext della skin
+    js\fcmRecordsNextFunzioni_common.js    -> js della skin
+    js\fcmRecordsNextFunzioni_viewer.js    -> js della skin
+    ```
+
+    Non deve copiare i file dati `fcmRecordsNext_*.js`, che vengono generati dalla pipeline.
+
 ## Stato implementazione
 
 File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
     # Stato implementazione RecordsNext 2.0
-    
-    Aggiornamento: 5 agosto 2026.
-    
+
+    Aggiornamento: 6 agosto 2026.
+
     ## Base tecnica verificata
-    
+
     RecordsNext 2.0 nasce dal codice funzionante di RecordsNext 1.0.2.
-    
+
     Sono stati importati e mantenuti:
-    
+
     - progetto Maven e Maven Wrapper;
     - Java 21;
     - accesso FCM/FCA tramite UCanAccess;
@@ -1457,13 +1861,13 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     - esportatori Classici e Riserve d'Ufficio esistenti;
     - staging, validazione, pubblicazione e rollback;
     - GUI esistente come base da evolvere.
-    
+
     UCanAccess 2.0.9.5 resta candidato obbligatorio nei benchmark comparativi.
-    
+
     ## Modello modulare implementato
-    
+
     Sono state introdotte le strutture Java per:
-    
+
     - cinque famiglie elaborabili;
     - figli di famiglia;
     - dipendenze obbligatorie e opzionali;
@@ -1471,72 +1875,72 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     - selezione modulare;
     - catalogo iniziale;
     - valutazione delle dipendenze.
-    
+
     Famiglie:
-    
+
     1. Classici;
     2. Serie;
     3. Riserve d'Ufficio;
     4. Modificatori;
     5. Soglie e Fortuna.
-    
+
     Il Culometro resta un easter egg opzionale, non selezionato automaticamente.
-    
+
     ## Compatibilità con la pipeline 1.0.2
-    
+
     ProcessingOptions e RecordsNextPipeline sono stati estesi mantenendo la compatibilità con il costruttore legacy basato su:
-    
+
     - Classici;
     - Riserve d'Ufficio;
     - generazione JavaScript;
     - pubblicazione.
-    
+
     La pipeline usa internamente la selezione modulare.
-    
+
     Le famiglie non ancora dotate di elaboratore non vengono ignorate silenziosamente.
-    
+
     ## Planner e preflight
-    
+
     Sono implementati:
-    
+
     - inventario delle capacità disponibili;
     - piano di esecuzione;
     - valutazione preventiva delle dipendenze;
     - conteggio di figli completi, parziali e saltati;
     - preflight eseguibile prima della produzione degli archivi e degli output.
-    
+
     La mancanza di una dipendenza blocca soltanto il figlio interessato.
-    
+
     Esempio consolidato:
-    
+
     - Capitano disattivato;
     - output del Capitano saltati;
     - serie dipendenti dal Capitano saltate;
     - tutte le altre serie e famiglie continuano.
-    
+
     ## Configurazione modulare
-    
+
     La configurazione processing.json viene letta dal codice Java.
-    
+
     Sono supportati:
-    
+
     - selezione delle cinque famiglie;
     - selezione dei figli dei Modificatori;
     - Capitano disattivabile;
     - Culometro abilitabile solo esplicitamente;
     - generazione JavaScript;
     - pubblicazione.
-    
+
     Il percorso legacy della GUI resta disponibile durante la migrazione.
-    
+
     ## Manifest 2.0
-    
+
     E' implementato il writer di:
-    
+
     fcmRecordsNext_Manifest.js
-    
+
     Il manifest contiene almeno:
-    
+
     - versione programma e schema;
     - lega;
     - stagione corrente;
@@ -1549,43 +1953,87 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     - file prodotti;
     - stato Culometro;
     - riepilogo preflight.
-    
+
     Il manifest viene:
-    
+
     - generato nella staging;
     - validato;
     - incluso nel conteggio dei file;
     - pubblicato insieme agli altri JavaScript;
     - protetto dal rollback transazionale esistente.
-    
+
     ## Test
-    
-    Ultimo stato verificato dall'utente:
-    
-    - 22 test eseguiti;
+
+    Ultimo stato verificato il 6 agosto 2026:
+
+    - 38 test eseguiti;
     - 0 failure;
     - 0 errori;
+    - 0 test saltati;
     - BUILD SUCCESS.
-    
+
+    La verifica è stata eseguita anche sull’elaborazione reale delle stagioni configurate.
+
+    ## Famiglia Modificatori
+
+    La famiglia Modificatori è implementata e verificata.
+
+    La configurazione GUI permette di selezionare separatamente, per ciascun modificatore:
+
+    - Massimo;
+    - Totale;
+    - Media;
+    - Utilizzi.
+
+    Modificatori personalizzati gestiti:
+
+    - `MODM1PERS`, con nome configurabile;
+    - `MODM2PERS`, con nome configurabile;
+    - `MODM3PERS`, con nome configurabile.
+
+    Modificatori standard FCM gestiti separatamente:
+
+    - `MODPORTIERE`;
+    - `MODDIFESA`;
+    - `MODCENTROCAMPO`;
+    - `MODATTACCO`;
+    - `MODMODULO`.
+
+    Il file `fcmRecordsNext_Modifiers.js` viene costruito direttamente dagli archivi `season_records_*.json`, senza dipendere dall’esportatore Classici legacy.
+
+    I metadati distinguono:
+
+    - `availableSections`: sezioni supportate dall’esportatore;
+    - `generatedSections`: sezioni effettivamente prodotte in base alla configurazione e ai dati disponibili.
+
+    È stata verificata nell’output reale la presenza di:
+
+    - Massimo, Totale, Media e Utilizzi per `MODM1PERS`;
+    - Massimo, Totale, Media e Utilizzi per `MODM2PERS`;
+    - Massimo, Totale, Media e Utilizzi per `MODDIFESA`;
+    - stagione `2006_2007` nei dati del Modificatore Difesa FCM;
+    - nomi configurati corretti;
+    - esclusione delle statistiche disattivate.
+
     ## Non ancora implementato
-    
+
     Non sono ancora implementati come nuovi elaboratori nativi 2.0:
-    
+
     - Serie;
-    - Modificatori;
     - Soglie e Fortuna;
     - Culometro;
     - nuovo output Classici completo secondo lo schema 2.0;
     - nuovo output RU completo secondo lo schema 2.0;
     - fcmRecordsNext_Core.js;
-    - GUI definitiva a cinque famiglie;
+    - completamento e consolidamento della GUI 2.0;
     - viste HTML 2.0 definitive;
-    - installer 2.0.
-    
+    - JS statici di rendering dei visualizzatori;
+    - installer effettivo dei visualizzatori e dei profili CSS.
+
     Gli esportatori Classici e RU della 1.0.2 restano operativi come ponte.
-    
+
     ## Regole da non perdere
-    
+
     - Non riscrivere accesso FCM/FCA, mapping, normalizzazione e consolidamento senza una necessità verificata.
     - Basarsi sul codice reale di RecordsNext 1.0.2.
     - Tutti i JavaScript pubblici vanno nella cartella js del sito FCM.
@@ -1596,40 +2044,103 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     - Gli output devono essere viste dati complete, non top list tagliate.
     - Gli ZIP temporanei applicati, testati e committati vanno eliminati periodicamente da D:\DEV_APPS\downloads.
 
+
+    ## GUI e visualizzatori: stato al 6 agosto 2026
+
+    La dashboard GUI e stata riorganizzata con tre aree principali:
+
+    - Configurazione stagioni;
+    - Famiglie record;
+    - Soglie, Fortuna e Culometro.
+
+    La GUI consente gia la configurazione granulare delle famiglie e del Culometro. L'avvio operativo deve includere UCanAccess nel classpath.
+
+    Sono consolidate, ma non ancora implementate integralmente, le seguenti decisioni sui visualizzatori:
+
+    - gli HTML non contengono dati;
+    - gli HTML leggono esclusivamente i JS pubblici;
+    - i JS statici di rendering saranno `fcmRecordsNextFunzioni_common.js` e `fcmRecordsNextFunzioni_viewer.js`;
+    - tali file saranno installati nella cartella `js` della skin;
+    - i nuovi nomi file usano underscore e non trattini;
+    - i profili grafici iniziali saranno `mauzstrom`, `fantablue2` e `neutral`;
+    - `mauzstrom` usera Trebuchet MS;
+    - il profilo `neutral` sara moderno, autonomo e ispirato ai principi grafici di ReNewo;
+    - la presenza degli HTML nella skin non implica la generazione dei relativi dati;
+    - una pagina priva del proprio JS deve mostrare uno stato vuoto senza errori.
+
+    Prossima fase:
+
+    1. definire il contratto JavaScript pubblico definitivo;
+    2. creare i due JS statici di rendering;
+    3. creare l'indice e le pagine famiglia senza dati incorporati;
+    4. creare e verificare i tre profili CSS;
+    5. implementare l'installer nella GUI;
+    6. aggiungere test automatici per struttura, riferimenti e assenza di dati negli HTML.
+
 ## Changelog
 
 File: CHANGELOG.md
 
     # Changelog
-    
+
     ## 2.0.0-dev
-    
+
     ### Fondazione
-    
+
     - creato progetto separato RecordsNext2.0;
     - importata la base funzionante RecordsNext 1.0.2;
     - confermato accesso FCM/FCA tramite UCanAccess;
     - mantenuti SQLite, mapping canonici, normalizzazione, consolidamento e pubblicazione.
-    
+
     ### Architettura modulare
-    
+
     - definite cinque famiglie elaborabili;
     - introdotti figli, dipendenze e stati degli output;
     - introdotta selezione modulare;
     - mantenuta compatibilita temporanea con Classici e RU legacy;
     - introdotti planner e preflight;
     - collegato config\processing.json alla pipeline.
-    
+
     ### Manifest
-    
+
     - introdotto fcmRecordsNext_Manifest.js;
     - integrata generazione nella staging;
     - integrata validazione;
     - integrata pubblicazione con rollback.
-    
+
+    ### Modificatori
+
+    - introdotta la configurazione gerarchica per modificatore e tipo di statistica;
+    - aggiunti Massimo, Totale, Media e Utilizzi;
+    - distinti i modificatori personalizzati dai modificatori standard FCM;
+    - aggiunti i nomi configurabili per `MODM1PERS`, `MODM2PERS` e `MODM3PERS`;
+    - aggiunta la lettura dei campi standard `MODPORTIERE`, `MODDIFESA`, `MODCENTROCAMPO`, `MODATTACCO` e `MODMODULO`;
+    - collegata la famiglia Modificatori direttamente agli archivi `season_records_*.json`;
+    - aggiunti i metadati distinti `availableSections` e `generatedSections`;
+    - verificata l’esportazione del Modificatore Difesa FCM nella stagione 2006_2007;
+    - verificata l’esclusione delle statistiche disattivate.
+
     ### Verifica
-    
-    - ultimo stato: 22 test superati, BUILD SUCCESS.
+
+    - 38 test eseguiti;
+    - 0 failure;
+    - 0 errori;
+    - BUILD SUCCESS;
+    - output JavaScript reale controllato con tutte le sezioni selezionate presenti.
+
+
+    ### GUI e visualizzatori
+
+    - evoluta la dashboard GUI e la configurazione granulare delle famiglie;
+    - raggruppati Soglie, Fortuna e Culometro nella stessa area della GUI;
+    - consolidata la regola che gli HTML non contengono dati incorporati;
+    - definiti i JS statici `fcmRecordsNextFunzioni_common.js` e `fcmRecordsNextFunzioni_viewer.js`;
+    - stabilita l'installazione dei JS statici nella cartella `js` della skin;
+    - adottato l'underscore per i nuovi nomi file;
+    - definiti i profili grafici `mauzstrom`, `fantablue2` e `neutral`;
+    - stabilito Trebuchet MS come font principale del profilo `mauzstrom`;
+    - progettato il profilo `neutral` moderno ispirato ai principi grafici di ReNewo;
+    - aggiunta la documentazione di architettura, installazione e personalizzazione dei visualizzatori.
 
 ## File reali del progetto
 
@@ -1638,16 +2149,16 @@ File: CHANGELOG.md
 File: src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporter.java
 
     package it.alterlega.recordsnext.app.classics;
-    
+
     import it.alterlega.recordsnext.Records2026ClassicJsExporter;
-    
+
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.nio.file.StandardOpenOption;
     import java.util.List;
-    
+
     /**
      * Genera l'output familiare nativo RecordsNext 2.0 per i record Classici.
      * Riusa l'exporter consolidato 1.0.2 come sorgente di verita durante la
@@ -1656,38 +2167,38 @@ File: src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExport
     public final class ClassicsFamilyJsExporter {
         public static final String FILE_NAME = "fcmRecordsNext_Classics.js";
         public static final String GLOBAL_NAME = "window.fcmRecordsNextClassics";
-    
+
         private static final String LEGACY_PREFIX = "window.RECORDS2026_PREVIEW_CLASSIC = ";
-    
+
         private ClassicsFamilyJsExporter() {
         }
-    
+
         public static ExportResult export(Path archiveRoot, Path outputFile) throws IOException {
             Path parent = outputFile.getParent();
             if (parent != null) {
                 Files.createDirectories(parent);
             }
-    
+
             Path temporaryLegacy = Files.createTempFile(
                     parent != null ? parent : outputFile.toAbsolutePath().getParent(),
                     "recordsnext-classics-legacy-",
                     ".js"
             );
-    
+
             try {
                 Records2026ClassicJsExporter.ExportResult legacy =
                         Records2026ClassicJsExporter.export(archiveRoot, temporaryLegacy, List.of());
-    
+
                 String legacyJs = Files.readString(temporaryLegacy, StandardCharsets.UTF_8).trim();
                 if (!legacyJs.startsWith(LEGACY_PREFIX) || !legacyJs.endsWith(";")) {
                     throw new IOException("Formato Classic legacy inatteso: " + temporaryLegacy);
                 }
-    
+
                 String entriesJson = legacyJs.substring(
                         LEGACY_PREFIX.length(),
                         legacyJs.length() - 1
                 ).trim();
-    
+
                 String javascript = GLOBAL_NAME + " = {"
                         + "\"schemaVersion\":\"2.0\","
                         + "\"familyId\":\"classics\","
@@ -1705,7 +2216,7 @@ File: src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExport
                         + "\"detail\":\"Migrazione compatibile dai recordset Classici consolidati\""
                         + "}]"
                         + "};\n";
-    
+
                 Files.writeString(
                         outputFile,
                         javascript,
@@ -1714,13 +2225,13 @@ File: src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExport
                         StandardOpenOption.TRUNCATE_EXISTING,
                         StandardOpenOption.WRITE
                 );
-    
+
                 return new ExportResult(legacy.seasonCount(), legacy.entryCount(), outputFile);
             } finally {
                 Files.deleteIfExists(temporaryLegacy);
             }
         }
-    
+
         public record ExportResult(int seasonCount, int entryCount, Path outputFile) {
         }
     }
@@ -1730,18 +2241,18 @@ File: src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExport
 File: src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner.java
 
     package it.alterlega.recordsnext.app.config;
-    
+
     import it.alterlega.recordsnext.app.PipelineConfig;
     import it.alterlega.recordsnext.app.ProcessingMode;
     import it.alterlega.recordsnext.app.RecordsNextPipeline;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
-    
+
     public final class ConfiguredPipelineRunner {
         private ConfiguredPipelineRunner() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length < 1 || args.length > 3) {
                 System.err.println(
@@ -1750,39 +2261,39 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner
                 );
                 System.exit(2);
             }
-    
+
             Path processingConfig = Path.of(args[0]).toAbsolutePath().normalize();
-    
+
             if (!Files.isRegularFile(processingConfig)) {
                 throw new IllegalArgumentException(
                     "File di configurazione elaborazione non trovato: " + processingConfig
                 );
             }
-    
+
             Path inferredRoot = processingConfig.getParent() == null
                 ? null
                 : processingConfig.getParent().getParent();
-    
+
             Path projectRoot = args.length == 3
                 ? Path.of(args[2]).toAbsolutePath().normalize()
                 : inferredRoot;
-    
+
             if (projectRoot == null) {
                 throw new IllegalArgumentException(
                     "Impossibile ricavare la root progetto da: " + processingConfig
                 );
             }
-    
+
             Path propertiesFile = projectRoot
                 .resolve("config")
                 .resolve("recordsnext-gui.properties");
-    
+
             PipelineConfig pipelineConfig = Files.isRegularFile(propertiesFile)
                 ? PipelineConfig.load(projectRoot, propertiesFile)
                 : PipelineConfig.defaults(projectRoot);
-    
+
             RecordsNextPipeline pipeline = new RecordsNextPipeline();
-    
+
             ProcessingMode mode;
             if (args.length >= 2 && !args[1].isBlank()) {
                 mode = ProcessingMode.valueOf(args[1].trim().toUpperCase());
@@ -1791,7 +2302,7 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner
                     ? ProcessingMode.CONSOLIDATED
                     : ProcessingMode.FULL;
             }
-    
+
             System.out.println("RecordsNext 2.0 - esecuzione configurata");
             System.out.println("Project root : " + projectRoot);
             System.out.println("Processing   : " + processingConfig);
@@ -1803,14 +2314,14 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner
             );
             System.out.println("Mode         : " + mode);
             System.out.println();
-    
+
             RecordsNextPipeline.Result result = run(
                 pipelineConfig,
                 processingConfig,
                 mode,
                 new ConsoleListener()
             );
-    
+
             System.out.println();
             System.out.println("Elaborazione completata.");
             System.out.println("Classic entries : " + result.classicEntries());
@@ -1818,7 +2329,7 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner
             System.out.println("File validi     : " + result.files());
             System.out.println("File pubblicati : " + result.published());
         }
-    
+
         public static RecordsNextPipeline.Result run(
             PipelineConfig pipelineConfig,
             Path processingConfig,
@@ -1832,15 +2343,15 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner
                 listener
             );
         }
-    
+
         private static final class ConsoleListener
             implements RecordsNextPipeline.Listener {
-    
+
             @Override
             public void phase(String text, int percent) {
                 System.out.println("[" + percent + "%] " + text);
             }
-    
+
             @Override
             public void timing(String text) {
                 System.out.println("TEMPO " + text);
@@ -1853,20 +2364,20 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner
 File: src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
 
     package it.alterlega.recordsnext.app.config;
-    
+
     import java.util.ArrayList;
     import java.util.LinkedHashMap;
     import java.util.List;
     import java.util.Map;
-    
+
     final class MiniJson {
         private final String text;
         private int pos;
-    
+
         private MiniJson(String text) {
             this.text = text != null && text.startsWith("\uFEFF") ? text.substring(1) : text;
         }
-    
+
         static Object parse(String text) {
             MiniJson parser = new MiniJson(text);
             Object value = parser.readValue();
@@ -1876,7 +2387,7 @@ File: src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
             }
             return value;
         }
-    
+
         private Object readValue() {
             skipWhitespace();
             if (pos >= text.length()) throw error("Valore JSON mancante");
@@ -1890,7 +2401,7 @@ File: src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
                 default -> readNumber();
             };
         }
-    
+
         private Map<String, Object> readObject() {
             expect('{');
             Map<String, Object> result = new LinkedHashMap<>();
@@ -1907,7 +2418,7 @@ File: src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
                 expect(',');
             }
         }
-    
+
         private List<Object> readArray() {
             expect('[');
             List<Object> result = new ArrayList<>();
@@ -1920,7 +2431,7 @@ File: src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
                 expect(',');
             }
         }
-    
+
         private String readString() {
             expect('"');
             StringBuilder out = new StringBuilder();
@@ -1947,7 +2458,7 @@ File: src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
             }
             throw error("Stringa JSON non chiusa");
         }
-    
+
         private Object readNumber() {
             int start = pos;
             while (pos < text.length() && "-+0123456789.eE".indexOf(text.charAt(pos)) >= 0) pos++;
@@ -1960,17 +2471,17 @@ File: src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
                 throw error("Numero JSON non valido: " + raw);
             }
         }
-    
+
         private Object readLiteral(String literal, Object value) {
             if (!text.startsWith(literal, pos)) throw error("Valore JSON non valido");
             pos += literal.length();
             return value;
         }
-    
+
         private void skipWhitespace() {
             while (pos < text.length() && Character.isWhitespace(text.charAt(pos))) pos++;
         }
-    
+
         private void expect(char expected) {
             skipWhitespace();
             if (pos >= text.length() || text.charAt(pos) != expected) {
@@ -1978,11 +2489,11 @@ File: src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
             }
             pos++;
         }
-    
+
         private boolean peek(char c) {
             return pos < text.length() && text.charAt(pos) == c;
         }
-    
+
         private IllegalArgumentException error(String message) {
             return new IllegalArgumentException(message + " alla posizione " + pos);
         }
@@ -1993,12 +2504,12 @@ File: src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
 File: src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.java
 
     package it.alterlega.recordsnext.app.config;
-    
+
     import it.alterlega.recordsnext.app.ProcessingOptions;
     import it.alterlega.recordsnext.app.model.CoreRecordCatalog;
     import it.alterlega.recordsnext.app.model.ProcessingSelection;
     import it.alterlega.recordsnext.app.model.RecordFamily;
-    
+
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
@@ -2007,10 +2518,10 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.j
     import java.util.LinkedHashSet;
     import java.util.Map;
     import java.util.Set;
-    
+
     public final class ProcessingConfigLoader {
         private ProcessingConfigLoader() {}
-    
+
         public static ProcessingOptions load(Path file) throws IOException {
             Object parsed = MiniJson.parse(Files.readString(file, StandardCharsets.UTF_8));
             Map<String, Object> root = object(parsed, "root");
@@ -2018,12 +2529,12 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.j
             if (!"2.0".equals(schema)) {
                 throw new IllegalArgumentException("Versione schema processing non supportata: " + schema);
             }
-    
+
             Map<String, Object> processing = object(root.get("processing"), "processing");
             Map<String, Object> familiesNode = object(processing.get("families"), "processing.families");
             EnumSet<RecordFamily> families = EnumSet.noneOf(RecordFamily.class);
             Set<String> children = new LinkedHashSet<>();
-    
+
             for (RecordFamily family : RecordFamily.values()) {
                 Object raw = familiesNode.get(family.id());
                 if (raw == null) continue;
@@ -2032,24 +2543,24 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.j
                 families.add(family);
                 collectChildren(family, familyNode.get("children"), children);
             }
-    
+
             Map<String, Object> culometroNode = object(processing.get("culometro"), "processing.culometro");
             boolean culometro = bool(culometroNode.get("enabled"), false);
             if (culometro) {
                 families.add(RecordFamily.THRESHOLDS_LUCK);
                 children.add(CoreRecordCatalog.CULOMETRO_ID);
             }
-    
+
             Map<String, Object> output = object(processing.get("output"), "processing.output");
             boolean generateJs = bool(output.get("writeManifest"), true) || bool(output.get("writeCore"), true);
             boolean publish = bool(output.get("publishToSite"), false);
-    
+
             ProcessingSelection selection = new ProcessingSelection(
                     Set.copyOf(families), Set.copyOf(children), culometro, generateJs, publish
             );
             return ProcessingOptions.modular(selection);
         }
-    
+
         private static void collectChildren(RecordFamily family, Object node, Set<String> out) {
             if (node == null || "ALL".equalsIgnoreCase(String.valueOf(node))) return;
             Map<String, Object> children = object(node, "children of " + family.id());
@@ -2062,26 +2573,307 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.j
                         case "homeField" -> "modifiers.home-field-deciding";
                         default -> "modifiers." + entry.getKey();
                     };
+                    case THRESHOLDS_LUCK -> switch (entry.getKey()) {
+                        case "favourable-events", "unfavourable-events", "balance" ->
+                                "luck." + entry.getKey();
+                        default -> "thresholds." + entry.getKey();
+                    };
                     default -> family.id() + "." + entry.getKey();
                 };
                 out.add(id);
             }
         }
-    
+
         @SuppressWarnings("unchecked")
         private static Map<String, Object> object(Object value, String name) {
             if (value instanceof Map<?, ?> map) return (Map<String, Object>) map;
             throw new IllegalArgumentException("Oggetto JSON mancante o non valido: " + name);
         }
-    
+
         private static boolean bool(Object value, boolean defaultValue) {
             return value == null ? defaultValue : Boolean.TRUE.equals(value);
         }
-    
+
         private static String string(Object value, String name) {
             if (value instanceof String s && !s.isBlank()) return s;
             throw new IllegalArgumentException("Stringa JSON mancante o non valida: " + name);
         }
+    }
+
+## src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriter.java
+
+File: src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriter.java
+
+    package it.alterlega.recordsnext.app.config;
+
+    import java.io.IOException;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.LinkedHashMap;
+    import java.util.Map;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public final class ProcessingConfigWriter {
+        public record State(
+                boolean classics,
+                boolean series,
+                boolean ru,
+                boolean modifiers,
+                boolean thresholdsLuck,
+                boolean culometro,
+                boolean publishToSite,
+                Map<String, Boolean> children,
+                Map<String, String> modifierNames
+        ) {
+            public State {
+                children = Map.copyOf(children == null ? Map.of() : children);
+                modifierNames = Map.copyOf(modifierNames == null ? defaultModifierNames() : modifierNames);
+            }
+
+            public State(
+                    boolean classics,
+                    boolean series,
+                    boolean ru,
+                    boolean modifiers,
+                    boolean thresholdsLuck,
+                    boolean culometro,
+                    boolean publishToSite
+            ) {
+                this(classics, series, ru, modifiers, thresholdsLuck, culometro,
+                        publishToSite, Map.of(), defaultModifierNames());
+            }
+
+            public boolean childEnabled(String id) {
+                return children.getOrDefault(id, true);
+            }
+
+            public String modifierName(String sourceField) {
+                return modifierNames.getOrDefault(sourceField, "");
+            }
+        }
+
+        private ProcessingConfigWriter() {}
+
+        public static Map<String, String> defaultModifierNames() {
+            Map<String, String> names = new LinkedHashMap<>();
+            names.put("MODM1PERS", "Modificatore Difesa");
+            names.put("MODM2PERS", "Capitano");
+            names.put("MODM3PERS", "");
+            return names;
+        }
+
+        public static State load(Path file) throws IOException {
+            String json = Files.readString(file, StandardCharsets.UTF_8).replace("\uFEFF", "");
+            Map<String, Boolean> children = new LinkedHashMap<>();
+            readChildren(json, "classics", CLASSICS, children);
+            readChildren(json, "series", SERIES, children);
+            readChildren(json, "ru", RU, children);
+            readChildren(json, "modifiers", MODIFIERS, children);
+            readChildren(json, "thresholdsLuck", THRESHOLDS, children);
+
+            return new State(
+                    enabled(json, "classics"),
+                    enabled(json, "series"),
+                    enabled(json, "ru"),
+                    enabled(json, "modifiers"),
+                    enabled(json, "thresholdsLuck"),
+                    blockBoolean(json, "culometro", "enabled"),
+                    blockBoolean(json, "output", "publishToSite"),
+                    children,
+                    readModifierNames(json)
+            );
+        }
+
+        public static void save(Path file, State state) throws IOException {
+            Files.createDirectories(file.toAbsolutePath().normalize().getParent());
+            String json = """
+                    {
+                      "schemaVersion": "2.0",
+                      "processing": {
+                        "families": {
+                          "classics": {
+                            "enabled": %s,
+                            "children": %s
+                          },
+                          "series": {
+                            "enabled": %s,
+                            "children": %s
+                          },
+                          "ru": {
+                            "enabled": %s,
+                            "children": %s
+                          },
+                          "modifiers": {
+                            "enabled": %s,
+                            "children": %s
+                          },
+                          "thresholdsLuck": {
+                            "enabled": %s,
+                            "children": %s
+                          }
+                        },
+                        "modifierNames": {
+                          "MODM1PERS": "%s",
+                          "MODM2PERS": "%s",
+                          "MODM3PERS": "%s"
+                        },
+                        "culometro": {
+                          "enabled": %s,
+                          "configFile": "config\\\\culometro.json"
+                        },
+                        "output": {
+                          "writeManifest": true,
+                          "writeCore": true,
+                          "publishToSite": %s
+                        }
+                      }
+                    }
+                    """.formatted(
+                    state.classics(), childrenJson(state, CLASSICS),
+                    state.series(), childrenJson(state, SERIES),
+                    state.ru(), childrenJson(state, RU),
+                    state.modifiers(), childrenJson(state, MODIFIERS),
+                    state.thresholdsLuck(), childrenJson(state, THRESHOLDS),
+                    jsonEscape(state.modifierName("MODM1PERS")),
+                    jsonEscape(state.modifierName("MODM2PERS")),
+                    jsonEscape(state.modifierName("MODM3PERS")),
+                    state.culometro(), state.publishToSite()
+            );
+            Files.writeString(file, json, StandardCharsets.UTF_8);
+        }
+
+        private static Map<String, String> readModifierNames(String json) {
+            Map<String, String> result = new LinkedHashMap<>(defaultModifierNames());
+            int start = json.indexOf("\"modifierNames\"");
+            if (start < 0) return result;
+            int blockStart = json.indexOf('{', start);
+            int blockEnd = blockStart < 0 ? -1 : findMatchingBrace(json, blockStart);
+            if (blockStart < 0 || blockEnd < 0) return result;
+            String section = json.substring(blockStart, blockEnd + 1);
+            for (String field : new String[] {"MODM1PERS", "MODM2PERS", "MODM3PERS"}) {
+                Pattern pattern = Pattern.compile("\\\"" + Pattern.quote(field)
+                        + "\\\"\\s*:\\s*\\\"((?:\\\\.|[^\\\"])*)\\\"");
+                Matcher matcher = pattern.matcher(section);
+                if (matcher.find()) result.put(field, jsonUnescape(matcher.group(1)));
+            }
+            return result;
+        }
+
+        private static String jsonEscape(String value) {
+            if (value == null) return "";
+            return value.replace("\\", "\\\\").replace("\"", "\\\"")
+                    .replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
+        }
+
+        private static String jsonUnescape(String value) {
+            return value.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t")
+                    .replace("\\\"", "\"").replace("\\\\", "\\");
+        }
+
+        private static String childrenJson(State state, String[] ids) {
+            StringBuilder out = new StringBuilder("{\n");
+            for (int i = 0; i < ids.length; i++) {
+                String id = ids[i];
+                String key = id.substring(id.indexOf('.') + 1);
+                out.append("                          \"").append(key).append("\": ")
+                        .append(state.childEnabled(id));
+                if (i + 1 < ids.length) out.append(',');
+                out.append('\n');
+            }
+            out.append("                        }");
+            return out.toString();
+        }
+
+        private static void readChildren(String json, String family, String[] ids, Map<String, Boolean> out) {
+            int familyStart = json.indexOf('"' + family + '"');
+            if (familyStart < 0) return;
+            int childrenStart = json.indexOf("\"children\"", familyStart);
+            if (childrenStart < 0) return;
+            int colon = json.indexOf(':', childrenStart);
+            if (colon < 0) return;
+            String tail = json.substring(colon + 1).stripLeading();
+            if (tail.startsWith("\"ALL\"")) {
+                for (String id : ids) out.put(id, true);
+                return;
+            }
+            int blockStart = json.indexOf('{', colon);
+            int blockEnd = blockStart < 0 ? -1 : findMatchingBrace(json, blockStart);
+            if (blockStart < 0 || blockEnd < 0) return;
+            String section = json.substring(blockStart, blockEnd + 1);
+            for (String id : ids) {
+                String key = id.substring(id.indexOf('.') + 1);
+                out.put(id, section.matches("(?s).*\\\"" + Pattern.quote(key)
+                        + "\\\"\\s*:\\s*true.*"));
+            }
+        }
+
+        private static int findMatchingBrace(String value, int start) {
+            int depth = 0;
+            for (int i = start; i < value.length(); i++) {
+                char ch = value.charAt(i);
+                if (ch == '{') depth++;
+                if (ch == '}' && --depth == 0) return i;
+            }
+            return -1;
+        }
+
+        private static boolean enabled(String json, String block) {
+            return blockBoolean(json, block, "enabled");
+        }
+
+        private static boolean blockBoolean(String json, String block, String key) {
+            int start = json.indexOf('"' + block + '"');
+            if (start < 0) return false;
+            int end = json.indexOf('}', start);
+            if (end < 0) end = json.length();
+            String section = json.substring(start, end);
+            return section.matches("(?s).*\\\"" + key + "\\\"\\s*:\\s*true.*");
+        }
+
+        public static final String[] CLASSICS = {
+                "classics.highest-match-score", "classics.lowest-match-score",
+                "classics.most-regulation-goals", "classics.largest-regulation-margin",
+                "classics.average-points", "classics.total-points", "classics.standings-points",
+                "classics.wins", "classics.draws", "classics.losses", "classics.goals-for",
+                "classics.goals-against", "classics.yellow-cards-team", "classics.red-cards-team",
+                "classics.red-cards-player", "classics.assists-team", "classics.own-goals-team",
+                "classics.penalties-scored", "classics.penalties-missed",
+                "classics.penalties-saved", "classics.clean-sheets"
+        };
+
+        public static final String[] SERIES = {
+                "series.unbeaten", "series.winless", "series.wins", "series.draws",
+                "series.losses", "series.clean-sheets", "series.captain-bonus"
+        };
+
+        public static final String[] RU = {
+                "ru.max-in-match", "ru.matches-with", "ru.matches-against", "ru.deciding",
+                "ru.deciding-against", "ru.balance", "ru.balance-against",
+                "ru.average-points", "ru.average-points-against", "ru.role-distribution"
+        };
+
+        public static final String[] MODIFIERS = {
+                "modifiers.modm1pers.max", "modifiers.modm1pers.total", "modifiers.modm1pers.average", "modifiers.modm1pers.uses",
+                "modifiers.modm2pers.max", "modifiers.modm2pers.total", "modifiers.modm2pers.average", "modifiers.modm2pers.uses",
+                "modifiers.modm3pers.max", "modifiers.modm3pers.total", "modifiers.modm3pers.average", "modifiers.modm3pers.uses",
+                "modifiers.modportiere.max", "modifiers.modportiere.total", "modifiers.modportiere.average", "modifiers.modportiere.uses",
+                "modifiers.moddifesa.max", "modifiers.moddifesa.total", "modifiers.moddifesa.average", "modifiers.moddifesa.uses",
+                "modifiers.modcentrocampo.max", "modifiers.modcentrocampo.total", "modifiers.modcentrocampo.average", "modifiers.modcentrocampo.uses",
+                "modifiers.modattacco.max", "modifiers.modattacco.total", "modifiers.modattacco.average", "modifiers.modattacco.uses",
+                "modifiers.modmodulo.max", "modifiers.modmodulo.total", "modifiers.modmodulo.average", "modifiers.modmodulo.uses",
+                "modifiers.home-field-deciding", "modifiers.home-field-points-gained", "modifiers.home-field-points-lost", "modifiers.home-field-balance"
+        };
+
+        public static final String[] THRESHOLDS = {
+                "thresholds.surgical-win", "thresholds.mocking-loss",
+                "thresholds.miraculous-draw", "thresholds.narrow-draw",
+                "thresholds.missed-win-half-point", "thresholds.loss-by-a-whisker",
+                "thresholds.exact-threshold", "thresholds.just-enough",
+                "thresholds.wasted-points", "luck.favourable-events",
+                "luck.unfavourable-events", "luck.balance"
+        };
     }
 
 ## src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
@@ -2089,7 +2881,7 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.j
 File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
 
     package it.alterlega.recordsnext.app.core;
-    
+
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
@@ -2103,17 +2895,17 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
     import java.util.LinkedHashMap;
     import java.util.List;
     import java.util.Map;
-    
+
     public final class CoreJsExporter {
         private CoreJsExporter() {
         }
-    
+
         public static ExportResult export(
                 Path database,
                 Path outputFile,
                 String leagueId,
                 String leagueName) throws Exception {
-    
+
             Path db = database.toAbsolutePath().normalize();
             Path out = outputFile.toAbsolutePath().normalize();
             if (!Files.isRegularFile(db)) {
@@ -2125,13 +2917,13 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
             if (leagueName == null || leagueName.isBlank()) {
                 throw new IllegalArgumentException("leagueName obbligatorio");
             }
-    
+
             Class.forName("org.sqlite.JDBC");
             CoreData data;
             try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db)) {
                 data = read(c, leagueId.trim(), leagueName.trim());
             }
-    
+
             Path parent = out.getParent();
             if (parent != null) {
                 Files.createDirectories(parent);
@@ -2146,7 +2938,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                 out
             );
         }
-    
+
         private static CoreData read(Connection c, String leagueId, String leagueName)
                 throws Exception {
             List<Map<String, Object>> seasons = readRows(c, """
@@ -2165,7 +2957,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                   ON sc.season_id = s.season_id
                 ORDER BY COALESCE(s.sort_order, 999999), s.season_id
                 """);
-    
+
             List<Map<String, Object>> canonicalTeams = readRows(c, """
                 SELECT
                     team_identity_id AS canonical_team_id,
@@ -2175,7 +2967,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                 FROM rn_team_identity
                 ORDER BY canonical_name COLLATE NOCASE, team_identity_id
                 """);
-    
+
             List<Map<String, Object>> seasonTeams = readRows(c, """
                 SELECT
                     team_season_id,
@@ -2194,7 +2986,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                 FROM rn_configured_team
                 ORDER BY season_id, canonical_name COLLATE NOCASE, source_name COLLATE NOCASE
                 """);
-    
+
             List<Map<String, Object>> canonicalCompetitions = readRows(c, """
                 SELECT
                     competition_identity_id AS canonical_competition_id,
@@ -2204,7 +2996,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                 FROM rn_competition_identity
                 ORDER BY canonical_name COLLATE NOCASE, competition_identity_id
                 """);
-    
+
             List<Map<String, Object>> seasonCompetitions = readRows(c, """
                 SELECT
                     competition_season_id,
@@ -2221,7 +3013,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                 FROM rn_configured_competition
                 ORDER BY season_id, canonical_name COLLATE NOCASE, source_name COLLATE NOCASE
                 """);
-    
+
             return new CoreData(
                 "2.0",
                 Instant.now().toString(),
@@ -2234,7 +3026,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                 seasonCompetitions
             );
         }
-    
+
         private static List<Map<String, Object>> readRows(Connection c, String sql)
                 throws Exception {
             List<Map<String, Object>> rows = new ArrayList<>();
@@ -2252,11 +3044,11 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
             }
             return rows;
         }
-    
+
         static String toJavascript(CoreData data) {
             return "window.fcmRecordsNextCore = " + toJson(data) + ";\n";
         }
-    
+
         private static String toJson(Object value) {
             if (value == null) return "null";
             if (value instanceof String s) return quote(s);
@@ -2295,7 +3087,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
             }
             throw new IllegalArgumentException("Tipo JSON non supportato: " + value.getClass());
         }
-    
+
         private static String quote(String value) {
             StringBuilder b = new StringBuilder("\"");
             for (int i = 0; i < value.length(); i++) {
@@ -2314,7 +3106,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
             }
             return b.append('"').toString();
         }
-    
+
         private static String toCamelCase(String value) {
             StringBuilder b = new StringBuilder();
             boolean upper = false;
@@ -2330,7 +3122,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
             }
             return b.toString();
         }
-    
+
         public record ExportResult(
             int seasons,
             int canonicalTeams,
@@ -2339,7 +3131,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
             int seasonCompetitions,
             Path outputFile
         ) {}
-    
+
         record CoreData(
             String schemaVersion,
             String generatedAt,
@@ -2358,7 +3150,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
 File: src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadata.java
 
     package it.alterlega.recordsnext.app.core;
-    
+
     public record LeagueMetadata(
             String leagueId,
             String leagueName,
@@ -2369,7 +3161,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadata.java
             leagueName = require(leagueName, "leagueName");
             currentSeasonId = require(currentSeasonId, "currentSeasonId");
         }
-    
+
         private static String require(String value, String field) {
             if (value == null || value.isBlank()) {
                 throw new IllegalArgumentException(field + " obbligatorio");
@@ -2383,18 +3175,18 @@ File: src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadata.java
 File: src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoader.java
 
     package it.alterlega.recordsnext.app.core;
-    
+
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.util.regex.Matcher;
     import java.util.regex.Pattern;
-    
+
     public final class LeagueMetadataLoader {
         private LeagueMetadataLoader() {
         }
-    
+
         public static LeagueMetadata load(Path configFile) throws IOException {
             Path file = configFile.toAbsolutePath().normalize();
             if (!Files.isRegularFile(file)) {
@@ -2407,7 +3199,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoader.java
                     readString(json, "currentSeasonId")
             );
         }
-    
+
         private static String readString(String json, String key) throws IOException {
             Pattern pattern = Pattern.compile(
                     "\"" + Pattern.quote(key) + "\"\\s*:\\s*\"([^\"]*)\""
@@ -2425,11 +3217,11 @@ File: src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoader.java
 File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfig.java
 
     package it.alterlega.recordsnext.app.culometro;
-    
+
     import java.math.BigDecimal;
     import java.util.List;
     import java.util.Map;
-    
+
     public record CulometroConfig(
             boolean enabled,
             int minimumMatches,
@@ -2457,7 +3249,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfig.java
                 return reset;
             }
         }
-    
+
         public List<LabelBand> labels() {
             return labelConfiguration.bands();
         }
@@ -2468,7 +3260,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfig.java
 File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader.java
 
     package it.alterlega.recordsnext.app.culometro;
-    
+
     import java.io.IOException;
     import java.math.BigDecimal;
     import java.nio.charset.StandardCharsets;
@@ -2478,10 +3270,10 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
     import java.util.LinkedHashMap;
     import java.util.List;
     import java.util.Map;
-    
+
     public final class CulometroConfigLoader {
         private CulometroConfigLoader() {}
-    
+
         public static CulometroConfig load(Path file) throws IOException {
             if (!Files.isRegularFile(file)) throw new IOException("Configurazione Culometro non trovata: " + file);
             Object parsed = new Json(Files.readString(file, StandardCharsets.UTF_8)).parse();
@@ -2496,7 +3288,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
             Map<String,Object> rarity = object(root.get("rarity"), "rarity");
             BigDecimal maximumRarity = decimal(rarity.get("maximumMultiplier"), "5.25");
             int minimumOccurrences = integer(rarity.get("minimumHistoricalOccurrences"), 3);
-    
+
             Map<String,CulometroConfig.Component> components = new LinkedHashMap<>();
             Object rawComponents = root.get("components");
             if (rawComponents instanceof List<?> list) {
@@ -2512,19 +3304,19 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
                     ));
                 }
             }
-    
+
             Map<String,Object> labelsNode = object(root.get("labels"), "labels");
             String preset = string(labelsNode.get("preset"));
             boolean customized = bool(labelsNode.get("customized"), false);
             String resetSource = string(labelsNode.get("resetSource"));
             List<CulometroConfig.LabelBand> labels = readBands(labelsNode.get("bands"), "labels.bands");
-    
+
             Map<String,List<CulometroConfig.LabelBand>> presetDefaults = new LinkedHashMap<>();
             Map<String,Object> defaultsNode = object(labelsNode.get("presetDefaults"), "labels.presetDefaults");
             for (Map.Entry<String,Object> entry : defaultsNode.entrySet()) {
                 presetDefaults.put(entry.getKey(), List.copyOf(readBands(entry.getValue(), "preset " + entry.getKey())));
             }
-    
+
             CulometroConfig.LabelConfiguration labelConfiguration = new CulometroConfig.LabelConfiguration(
                     preset, customized, resetSource, List.copyOf(labels), Map.copyOf(presetDefaults));
             CulometroConfig config = new CulometroConfig(enabled, minimumMatches, kScale, secondaryWeight,
@@ -2532,7 +3324,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
             validate(config);
             return config;
         }
-    
+
         private static List<CulometroConfig.LabelBand> readBands(Object raw, String name) {
             List<CulometroConfig.LabelBand> labels = new ArrayList<>();
             if (!(raw instanceof List<?> list)) throw new IllegalArgumentException("Array JSON mancante: " + name);
@@ -2542,7 +3334,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
             }
             return labels;
         }
-    
+
         public static void validate(CulometroConfig c) {
             if (c.minimumMatches() < 10 || c.minimumMatches() > 40) throw new IllegalArgumentException("minimumMatches deve essere tra 10 e 40");
             range(c.kScale(), "kScale", "3.00", "6.00");
@@ -2571,7 +3363,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
                 throw new IllegalArgumentException("Etichette diverse dal preset di reset: impostare customized=true");
             }
         }
-    
+
         private static void validateBands(List<CulometroConfig.LabelBand> bands, String name) {
             if (bands.isEmpty()) throw new IllegalArgumentException("Definire almeno una fascia per " + name);
             BigDecimal previous = new BigDecimal("101");
@@ -2583,7 +3375,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
             }
             if (bands.get(bands.size()-1).min().compareTo(BigDecimal.ZERO) != 0) throw new IllegalArgumentException("L'ultima fascia deve partire da 0 per " + name);
         }
-    
+
         private static void range(BigDecimal value, String name, String min, String max) {
             if (value.compareTo(new BigDecimal(min)) < 0 || value.compareTo(new BigDecimal(max)) > 0) throw new IllegalArgumentException(name + " fuori range");
         }
@@ -2592,7 +3384,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
         private static boolean bool(Object v, boolean d){ return v==null?d:Boolean.TRUE.equals(v); }
         private static int integer(Object v, int d){ if(v==null)return d; return new BigDecimal(String.valueOf(v)).intValue(); }
         private static BigDecimal decimal(Object v, String d){ return new BigDecimal(v==null?d:String.valueOf(v)); }
-    
+
         private static final class Json {
             private final String text; private int i;
             Json(String text){this.text=text.charAt(0)=='\uFEFF'?text.substring(1):text;}
@@ -2610,12 +3402,85 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
         }
     }
 
+## src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigWriter.java
+
+File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigWriter.java
+
+    package it.alterlega.recordsnext.app.culometro;
+
+    import java.io.IOException;
+    import java.math.BigDecimal;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.List;
+    import java.util.Map;
+
+    public final class CulometroConfigWriter {
+        private CulometroConfigWriter() {}
+
+        public static void save(Path file, CulometroConfig c) throws IOException {
+            CulometroConfigLoader.validate(c);
+            StringBuilder out = new StringBuilder();
+            out.append("{\n  \"schemaVersion\": \"2.0\",\n");
+            out.append("  \"enabled\": ").append(c.enabled()).append(",\n");
+            out.append("  \"minimumMatches\": ").append(c.minimumMatches()).append(",\n");
+            out.append("  \"normalization\": { \"mode\": \"PER_MATCH\", \"centerOnHistoricalMean\": true, \"kScale\": ")
+                    .append(number(c.kScale())).append(" },\n");
+            out.append("  \"overlap\": { \"strategy\": \"PRIMARY_PLUS_SECONDARY\", \"secondaryWeight\": ")
+                    .append(number(c.secondaryWeight())).append(", \"tagWeight\": 0.0, \"maxSecondary\": 1, \"maxTags\": 2 },\n");
+            out.append("  \"rarity\": { \"enabled\": true, \"profile\": \"NORMAL\", \"maximumMultiplier\": ")
+                    .append(number(c.maximumRarityMultiplier())).append(", \"minimumHistoricalOccurrences\": ")
+                    .append(c.minimumHistoricalOccurrences()).append(" },\n");
+            out.append("  \"components\": [\n");
+            int i = 0;
+            for (Map.Entry<String, CulometroConfig.Component> e : c.components().entrySet()) {
+                CulometroConfig.Component v = e.getValue();
+                if (i++ > 0) out.append(",\n");
+                out.append("    { \"componentId\": \"").append(escape(e.getKey())).append("\", \"enabled\": ")
+                        .append(v.enabled()).append(", \"weight\": ").append(number(v.weight()))
+                        .append(", \"allowedRange\": { \"min\": ").append(number(v.min()))
+                        .append(", \"max\": ").append(number(v.max())).append(" } }");
+            }
+            out.append("\n  ],\n  \"labels\": {\n");
+            var lc = c.labelConfiguration();
+            out.append("    \"preset\": \"").append(escape(lc.preset())).append("\",\n");
+            out.append("    \"customized\": ").append(lc.customized()).append(",\n");
+            out.append("    \"resetSource\": \"").append(escape(lc.resetSource())).append("\",\n");
+            out.append("    \"bands\": "); appendBands(out, lc.bands(), 4); out.append(",\n");
+            out.append("    \"presetDefaults\": {\n");
+            int p = 0;
+            for (Map.Entry<String, List<CulometroConfig.LabelBand>> e : lc.presetDefaults().entrySet()) {
+                if (p++ > 0) out.append(",\n");
+                out.append("      \"").append(escape(e.getKey())).append("\": "); appendBands(out, e.getValue(), 6);
+            }
+            out.append("\n    }\n  }\n}\n");
+            Files.createDirectories(file.toAbsolutePath().normalize().getParent());
+            Files.writeString(file, out.toString(), StandardCharsets.UTF_8);
+        }
+
+        private static void appendBands(StringBuilder out, List<CulometroConfig.LabelBand> bands, int indent) {
+            out.append("[\n");
+            String pad = " ".repeat(indent + 2);
+            for (int i = 0; i < bands.size(); i++) {
+                var b = bands.get(i);
+                if (i > 0) out.append(",\n");
+                out.append(pad).append("{ \"min\": ").append(number(b.min())).append(", \"label\": \"")
+                        .append(escape(b.label())).append("\" }");
+            }
+            out.append("\n").append(" ".repeat(indent)).append("]");
+        }
+
+        private static String number(BigDecimal value) { return value.stripTrailingZeros().toPlainString(); }
+        private static String escape(String value) { return value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n"); }
+    }
+
 ## src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExporter.java
 
 File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExporter.java
 
     package it.alterlega.recordsnext.app.culometro;
-    
+
     import java.io.IOException;
     import java.math.BigDecimal;
     import java.math.RoundingMode;
@@ -2631,25 +3496,25 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
     import java.util.List;
     import java.util.Map;
     import java.util.Set;
-    
+
     public final class CulometroFamilyJsExporter {
         public static final String FILE_NAME = "fcmRecordsNext_Culometro.js";
         public static final String GLOBAL_NAME = "window.fcmRecordsNextCulometro";
         private static final String THRESHOLDS_PREFIX = "window.fcmRecordsNextThresholdsLuck = ";
         private static final String RU_PREFIX = "window.fcmRecordsNextRU = ";
-    
+
         private CulometroFamilyJsExporter() {}
-    
+
         public static ExportResult export(Path thresholdsJs, Path ruJs, Path configFile, Path outputFile) throws IOException {
             CulometroConfig config = CulometroConfigLoader.load(configFile);
             if (!config.enabled()) throw new IOException("Culometro richiesto ma config.enabled=false: " + configFile);
-    
+
             Map<String,Object> thresholds = parseAssignment(thresholdsJs, THRESHOLDS_PREFIX);
             List<Map<String,Object>> thresholdEvents = rows(thresholds.get("events"));
             List<Map<String,Object>> ruEvents = Files.isRegularFile(ruJs)
                     ? findRuEvents(parseAssignment(ruJs, RU_PREFIX))
                     : List.of();
-    
+
             List<Event> candidates = new ArrayList<>();
             for (Map<String,Object> event : thresholdEvents) {
                 String type = text(event.get("eventType"));
@@ -2669,7 +3534,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                 Event ru = Event.fromRu(event, component.weight());
                 if (ru != null) candidates.add(ru);
             }
-    
+
             Set<String> performances = new LinkedHashSet<>();
             Map<String,Integer> occurrences = new HashMap<>();
             for (Event event : candidates) {
@@ -2677,10 +3542,10 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                 occurrences.merge(event.type(), 1, Integer::sum);
             }
             int denominator = Math.max(1, performances.size());
-    
+
             Map<String,List<Event>> grouped = new LinkedHashMap<>();
             for (Event event : candidates) grouped.computeIfAbsent(event.performanceKey(), ignored -> new ArrayList<>()).add(event);
-    
+
             List<Map<String,Object>> scoredEvents = new ArrayList<>();
             Map<String,TeamAggregate> teamAggregates = new LinkedHashMap<>();
             for (List<Event> group : grouped.values()) {
@@ -2704,12 +3569,12 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                     teamAggregates.computeIfAbsent(event.teamKey(), ignored -> new TeamAggregate(event)).add(contribution, level);
                 }
             }
-    
+
             double rawMean = teamAggregates.values().stream().mapToDouble(TeamAggregate::perMatch).average().orElse(0.0);
             List<Map<String,Object>> ranking = new ArrayList<>();
             for (TeamAggregate aggregate : teamAggregates.values()) ranking.add(aggregate.finish(rawMean, config));
             ranking.sort(Comparator.comparingDouble(value -> -number(value.get("index")).doubleValue()));
-    
+
             Map<String,Object> root = new LinkedHashMap<>();
             root.put("schemaVersion", "2.0");
             root.put("familyId", "culometro");
@@ -2736,7 +3601,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
             root.put("events", scoredEvents);
             root.put("ranking", ranking);
             root.put("outputStatus", List.of(Map.of("status", "GENERATED_COMPLETE", "detail", "Culometro configurabile con pesi vincolati, rarita, affidabilita, etichette editabili e RU prudenziale")));
-    
+
             Path parent = outputFile.toAbsolutePath().normalize().getParent();
             if (parent == null) throw new IOException("Directory output Culometro non determinabile");
             Files.createDirectories(parent);
@@ -2744,7 +3609,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             return new ExportResult(scoredEvents.size(), ranking.size(), outputFile);
         }
-    
+
         private static BigDecimal rarityMultiplier(int occurrences, int denominator, CulometroConfig config) {
             int safeOccurrences = Math.max(occurrences, config.minimumHistoricalOccurrences());
             double frequency = (double) safeOccurrences / denominator;
@@ -2752,14 +3617,14 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
             value = Math.max(1.0, Math.min(config.maximumRarityMultiplier().doubleValue(), value));
             return BigDecimal.valueOf(value).setScale(6, RoundingMode.HALF_UP);
         }
-    
+
         private static Map<String,Object> parseAssignment(Path file, String prefix) throws IOException {
             String js = Files.readString(file, StandardCharsets.UTF_8).trim();
             if (!js.startsWith(prefix) || !js.endsWith(";")) throw new IOException("Formato JS inatteso: " + file);
             Object parsed = new Json(js.substring(prefix.length(), js.length()-1).trim()).parse();
             return object(parsed);
         }
-    
+
         private static List<Map<String,Object>> findRuEvents(Object root) {
             List<Map<String,Object>> out = new ArrayList<>();
             walk(root, out);
@@ -2772,12 +3637,12 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                 for (Object child : map.values()) walk(child, out);
             } else if (value instanceof List<?> list) for (Object child : list) walk(child, out);
         }
-    
+
         @SuppressWarnings("unchecked") private static Map<String,Object> object(Object v){ if(v instanceof Map<?,?> m)return (Map<String,Object>)m; throw new IllegalArgumentException("Oggetto JSON atteso"); }
         private static List<Map<String,Object>> rows(Object v){ List<Map<String,Object>> out=new ArrayList<>(); if(v instanceof List<?> l)for(Object x:l)if(x instanceof Map<?,?>)out.add(object(x)); return out; }
         private static String text(Object v){ return v==null?"":String.valueOf(v); }
         private static BigDecimal number(Object v){ if(v==null||text(v).isBlank())return BigDecimal.ZERO; return v instanceof BigDecimal b?b:new BigDecimal(text(v).replace(',','.')); }
-    
+
         private record Event(String type,int direction,BigDecimal weight,String seasonId,String competitionId,String matchId,String teamId,String team,String opponent,String url,String detail) {
             static Event fromThreshold(Map<String,Object> m,String type,int direction,BigDecimal weight){return new Event(type,direction,weight,text(m.get("seasonId")),text(m.get("competitionId")),text(m.get("matchId")),text(m.get("teamId")),text(m.get("team")),text(m.get("opponent")),text(m.get("scorecardUrl")),text(m.get("detail")));}
             static Event fromRu(Map<String,Object> m,BigDecimal weight){
@@ -2790,7 +3655,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
             String teamKey(){return seasonId+"|"+teamId;}
             Map<String,Object> toMap(){Map<String,Object>m=new LinkedHashMap<>();m.put("eventType",type);m.put("direction",direction>0?"FAVOURABLE":"UNFAVOURABLE");m.put("seasonId",seasonId);m.put("competitionId",competitionId);m.put("matchId",matchId);m.put("teamId",teamId);m.put("team",team);m.put("opponent",opponent);m.put("scorecardUrl",url);m.put("detail",detail);m.put("componentWeight",weight);return m;}
         }
-    
+
         private static final class TeamAggregate {
             final String seasonId,teamId,team; BigDecimal total=BigDecimal.ZERO; int matches,primary,secondary;
             TeamAggregate(Event e){seasonId=e.seasonId();teamId=e.teamId();team=e.team();}
@@ -2799,9 +3664,9 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
             Map<String,Object> finish(double mean,CulometroConfig c){double centered=perMatch()-mean;double raw=50.0+50.0*Math.tanh(centered/c.kScale().doubleValue());double reliability=Math.min(1.0,(double)matches/c.minimumMatches());double index=50.0+(raw-50.0)*reliability;index=Math.max(0,Math.min(100,index));Map<String,Object>m=new LinkedHashMap<>();m.put("seasonId",seasonId);m.put("teamId",teamId);m.put("team",team);m.put("matches",matches);m.put("primaryEvents",primary);m.put("secondaryEvents",secondary);m.put("totalContribution",total.setScale(6,RoundingMode.HALF_UP));m.put("perMatch",BigDecimal.valueOf(perMatch()).setScale(6,RoundingMode.HALF_UP));m.put("reliability",BigDecimal.valueOf(reliability).setScale(6,RoundingMode.HALF_UP));m.put("index",BigDecimal.valueOf(index).setScale(2,RoundingMode.HALF_UP));m.put("label",label(index,c.labels()));return m;}
             private static String label(double index,List<CulometroConfig.LabelBand> bands){for(CulometroConfig.LabelBand b:bands)if(index>=b.min().doubleValue())return b.label();return bands.get(bands.size()-1).label();}
         }
-    
+
         public record ExportResult(int eventCount,int teamCount,Path outputFile){}
-    
+
         private static final class Json {
             private final String t;private int i;Json(String s){t=s.charAt(0)=='\uFEFF'?s.substring(1):s;}Object parse(){skip();Object v=val();skip();if(i!=t.length())fail();return v;}private Object val(){skip();if(i>=t.length())fail();return switch(t.charAt(i)){case '{'->obj();case '['->arr();case '"'->str();case 't'->lit("true",true);case 'f'->lit("false",false);case 'n'->lit("null",null);default->num();};}private Map<String,Object>obj(){expect('{');Map<String,Object>m=new LinkedHashMap<>();skip();if(peek('}')){i++;return m;}while(true){String k=str();expect(':');m.put(k,val());skip();if(peek('}')){i++;return m;}expect(',');}}private List<Object>arr(){expect('[');List<Object>l=new ArrayList<>();skip();if(peek(']')){i++;return l;}while(true){l.add(val());skip();if(peek(']')){i++;return l;}expect(',');}}private String str(){expect('"');StringBuilder b=new StringBuilder();while(i<t.length()){char c=t.charAt(i++);if(c=='"')return b.toString();if(c=='\\'){char e=t.charAt(i++);if(e=='u'){b.append((char)Integer.parseInt(t.substring(i,i+4),16));i+=4;}else b.append(switch(e){case '"'->'"';case '\\'->'\\';case '/'->'/';case 'b'->'\b';case 'f'->'\f';case 'n'->'\n';case 'r'->'\r';case 't'->'\t';default->throw new IllegalArgumentException();});}else b.append(c);}fail();return "";}private Object num(){int s=i;while(i<t.length()&&"-+0123456789.eE".indexOf(t.charAt(i))>=0)i++;return new BigDecimal(t.substring(s,i));}private Object lit(String s,Object v){if(!t.startsWith(s,i))fail();i+=s.length();return v;}private void skip(){while(i<t.length()&&Character.isWhitespace(t.charAt(i)))i++;}private boolean peek(char c){skip();return i<t.length()&&t.charAt(i)==c;}private void expect(char c){skip();if(i>=t.length()||t.charAt(i)!=c)fail();i++;}private void fail(){throw new IllegalArgumentException("JSON non valido a "+i);}static String write(Object v){StringBuilder b=new StringBuilder();w(v,b);return b.toString();}private static void w(Object v,StringBuilder b){if(v==null){b.append("null");return;}if(v instanceof String s){b.append('"');for(char c:s.toCharArray()){switch(c){case '"'->b.append("\\\"");case '\\'->b.append("\\\\");case '\n'->b.append("\\n");case '\r'->b.append("\\r");case '\t'->b.append("\\t");default->b.append(c);}}b.append('"');return;}if(v instanceof Number||v instanceof Boolean){b.append(v);return;}if(v instanceof CulometroConfig.LabelBand band){w(Map.of("min",band.min(),"label",band.label()),b);return;}if(v instanceof CulometroConfig.LabelConfiguration labels){Map<String,Object>m=new LinkedHashMap<>();m.put("preset",labels.preset());m.put("customized",labels.customized());m.put("resetSource",labels.resetSource());m.put("bands",labels.bands());m.put("presetDefaults",labels.presetDefaults());w(m,b);return;}if(v instanceof Map<?,?>m){b.append('{');boolean first=true;for(var e:m.entrySet()){if(!first)b.append(',');first=false;w(String.valueOf(e.getKey()),b);b.append(':');w(e.getValue(),b);}b.append('}');return;}if(v instanceof Iterable<?>it){b.append('[');boolean first=true;for(Object x:it){if(!first)b.append(',');first=false;w(x,b);}b.append(']');return;}w(String.valueOf(v),b);}}
     }
@@ -2811,12 +3676,12 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
 File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
 
     package it.alterlega.recordsnext.app.manifest;
-    
+
     import it.alterlega.recordsnext.app.PipelinePreflight;
     import it.alterlega.recordsnext.app.ProcessingOptions;
     import it.alterlega.recordsnext.app.model.ExecutionPlanItem;
     import it.alterlega.recordsnext.app.model.RecordFamily;
-    
+
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
@@ -2825,13 +3690,13 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
     import java.util.Comparator;
     import java.util.List;
     import java.util.Objects;
-    
+
     public final class ManifestJsWriter {
         public static final String FILE_NAME = "fcmRecordsNext_Manifest.js";
-    
+
         private ManifestJsWriter() {
         }
-    
+
         public static Path write(
                 Path outputDirectory,
                 ProcessingOptions options,
@@ -2842,13 +3707,13 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
             Objects.requireNonNull(options, "options");
             Objects.requireNonNull(preflight, "preflight");
             Objects.requireNonNull(metadata, "metadata");
-    
+
             Files.createDirectories(outputDirectory);
             Path outputFile = outputDirectory.resolve(FILE_NAME);
             Files.writeString(outputFile, render(options, preflight, metadata), StandardCharsets.UTF_8);
             return outputFile;
         }
-    
+
         public static String render(
                 ProcessingOptions options,
                 PipelinePreflight.Result preflight,
@@ -2857,32 +3722,32 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
             Objects.requireNonNull(options, "options");
             Objects.requireNonNull(preflight, "preflight");
             Objects.requireNonNull(metadata, "metadata");
-    
+
             List<String> requestedFamilies = options.selection().enabledFamilies().stream()
                     .sorted(Comparator.comparing(RecordFamily::id))
                     .map(RecordFamily::id)
                     .toList();
-    
+
             List<String> generatedFamilies = preflight.plan().executableItems().stream()
                     .map(item -> item.child().family())
                     .distinct()
                     .sorted(Comparator.comparing(RecordFamily::id))
                     .map(RecordFamily::id)
                     .toList();
-    
+
             List<ExecutionPlanItem> selected = preflight.plan().selectedItems().stream()
                     .sorted(Comparator.comparing(item -> item.child().id()))
                     .toList();
-    
+
             List<String> generatedChildren = selected.stream()
                     .filter(ExecutionPlanItem::executable)
                     .map(item -> item.child().id())
                     .toList();
-    
+
             List<ExecutionPlanItem> skippedChildren = selected.stream()
                     .filter(item -> !item.executable())
                     .toList();
-    
+
             StringBuilder out = new StringBuilder();
             out.append("window.fcmRecordsNextManifest = {\n");
             property(out, 1, "program", metadata.program(), true);
@@ -2910,7 +3775,7 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
             out.append("};\n");
             return out.toString();
         }
-    
+
         private static void skippedArray(
                 StringBuilder out,
                 int indent,
@@ -2937,26 +3802,26 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
             if (comma) out.append(",");
             out.append("\n");
         }
-    
+
         private static List<String> sorted(Iterable<String> values) {
             List<String> result = new ArrayList<>();
             for (String value : values) result.add(value);
             result.sort(String::compareTo);
             return result;
         }
-    
+
         private static void property(StringBuilder out, int indent, String name, String value, boolean comma) {
             pad(out, indent).append(name).append(": \"").append(escape(value)).append("\"");
             if (comma) out.append(",");
             out.append("\n");
         }
-    
+
         private static void numberProperty(StringBuilder out, int indent, String name, int value, boolean comma) {
             pad(out, indent).append(name).append(": ").append(value);
             if (comma) out.append(",");
             out.append("\n");
         }
-    
+
         private static void stringArray(
                 StringBuilder out,
                 int indent,
@@ -2973,11 +3838,11 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
             if (comma) out.append(",");
             out.append("\n");
         }
-    
+
         private static StringBuilder pad(StringBuilder out, int indent) {
             return out.append("  ".repeat(Math.max(0, indent)));
         }
-    
+
         private static String escape(String value) {
             String safe = value == null ? "" : value;
             return safe
@@ -2993,11 +3858,11 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
 File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestMetadata.java
 
     package it.alterlega.recordsnext.app.manifest;
-    
+
     import java.time.OffsetDateTime;
     import java.util.List;
     import java.util.Objects;
-    
+
     public record ManifestMetadata(
             String program,
             String programVersion,
@@ -3018,7 +3883,7 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestMetadata.java
             processedSeasons = List.copyOf(Objects.requireNonNullElse(processedSeasons, List.of()));
             generatedFiles = List.copyOf(Objects.requireNonNullElse(generatedFiles, List.of()));
         }
-    
+
         public static ManifestMetadata minimal(String programVersion) {
             return new ManifestMetadata(
                     "RecordsNext by mauz79",
@@ -3031,7 +3896,7 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestMetadata.java
                     List.of()
             );
         }
-    
+
         private static String required(String value, String field) {
             Objects.requireNonNull(value, field);
             String normalized = value.trim();
@@ -3040,7 +3905,7 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestMetadata.java
             }
             return normalized;
         }
-    
+
         private static String optional(String value) {
             return value == null ? "" : value.trim();
         }
@@ -3051,10 +3916,10 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestMetadata.java
 File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupport.java
 
     package it.alterlega.recordsnext.app.manifest;
-    
+
     import it.alterlega.recordsnext.app.PipelinePreflight;
     import it.alterlega.recordsnext.app.ProcessingOptions;
-    
+
     import java.io.IOException;
     import java.nio.file.Files;
     import java.nio.file.Path;
@@ -3062,11 +3927,11 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
     import java.util.Comparator;
     import java.util.List;
     import java.util.Objects;
-    
+
     public final class ManifestPublishingSupport {
         private ManifestPublishingSupport() {
         }
-    
+
         public static Path write(
                 Path generatedDirectory,
                 ProcessingOptions options,
@@ -3077,7 +3942,7 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
             Objects.requireNonNull(options, "options");
             Objects.requireNonNull(preflight, "preflight");
             Objects.requireNonNull(metadata, "metadata");
-    
+
             List<String> generatedFiles = new ArrayList<>();
             if (Files.isDirectory(generatedDirectory)) {
                 try (var stream = Files.list(generatedDirectory)) {
@@ -3089,7 +3954,7 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
             }
             generatedFiles.add(ManifestJsWriter.FILE_NAME);
             generatedFiles = generatedFiles.stream().distinct().sorted().toList();
-    
+
             ManifestMetadata effectiveMetadata = new ManifestMetadata(
                     metadata.program(),
                     metadata.programVersion(),
@@ -3100,7 +3965,7 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
                     metadata.processedSeasons(),
                     generatedFiles
             );
-    
+
             return ManifestJsWriter.write(
                     generatedDirectory,
                     options,
@@ -3115,19 +3980,19 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
 File: src\main\java\it\alterlega\recordsnext\app\model\CoreRecordCatalog.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.List;
     import java.util.Set;
-    
+
     /**
      * Primo catalogo minimo usato per validare il modello modulare.
      */
     public final class CoreRecordCatalog {
         public static final String CULOMETRO_ID = "easter-egg.culometro";
-    
+
         private CoreRecordCatalog() {
         }
-    
+
         public static List<RecordChild> children() {
             return List.of(
                     new RecordChild(
@@ -3199,11 +4064,11 @@ File: src\main\java\it\alterlega\recordsnext\app\model\CoreRecordCatalog.java
 File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluation.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.LinkedHashSet;
     import java.util.Objects;
     import java.util.Set;
-    
+
     /**
      * Esito della valutazione delle dipendenze di un figlio.
      */
@@ -3221,7 +4086,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluation.java
                     Objects.requireNonNullElse(missingOptional, Set.of())
             ));
         }
-    
+
         public boolean canGenerate() {
             return status == OutputStatus.GENERATED_COMPLETE
                     || status == OutputStatus.GENERATED_PARTIAL;
@@ -3233,18 +4098,18 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluation.java
 File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluator.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.LinkedHashSet;
     import java.util.Objects;
     import java.util.Set;
-    
+
     /**
      * Valuta le dipendenze senza bloccare l'intera famiglia.
      */
     public final class DependencyEvaluator {
         private DependencyEvaluator() {
         }
-    
+
         public static DependencyEvaluation evaluate(
                 RecordChild child,
                 ProcessingSelection selection,
@@ -3255,7 +4120,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluator.java
             Set<String> available = Set.copyOf(
                     Objects.requireNonNullElse(availableDependencies, Set.of())
             );
-    
+
             if (!selection.isChildSelected(child)) {
                 return new DependencyEvaluation(
                         OutputStatus.SKIPPED_NOT_SELECTED,
@@ -3263,10 +4128,10 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluator.java
                         Set.of()
                 );
             }
-    
+
             Set<String> missingRequired = new LinkedHashSet<>();
             Set<String> missingOptional = new LinkedHashSet<>();
-    
+
             for (RecordDependency dependency : child.dependencies()) {
                 if (available.contains(dependency.id())) {
                     continue;
@@ -3277,7 +4142,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluator.java
                     missingOptional.add(dependency.id());
                 }
             }
-    
+
             if (!missingRequired.isEmpty()) {
                 return new DependencyEvaluation(
                         OutputStatus.SKIPPED_REQUIRED_DEPENDENCY,
@@ -3285,7 +4150,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluator.java
                         missingOptional
                 );
             }
-    
+
             if (!missingOptional.isEmpty()) {
                 return new DependencyEvaluation(
                         OutputStatus.GENERATED_PARTIAL,
@@ -3293,7 +4158,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluator.java
                         missingOptional
                 );
             }
-    
+
             return new DependencyEvaluation(
                     OutputStatus.GENERATED_COMPLETE,
                     Set.of(),
@@ -3307,10 +4172,10 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluator.java
 File: src\main\java\it\alterlega\recordsnext\app\model\DependencyInventory.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.LinkedHashSet;
     import java.util.Set;
-    
+
     /**
      * Inventario iniziale delle dipendenze disponibili nel flusso RecordsNext 1.0.2.
      * Non esegue controlli sul database: rappresenta solo capacita dichiarate.
@@ -3318,7 +4183,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyInventory.java
     public final class DependencyInventory {
         private DependencyInventory() {
         }
-    
+
         public static Set<String> legacyCapabilities(
                 boolean captainEnabled,
                 boolean homeFieldEnabled,
@@ -3331,7 +4196,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyInventory.java
             dependencies.add("data.ordered-matches");
             dependencies.add("configuration.goal-bands");
             dependencies.add("ru.events");
-    
+
             if (captainEnabled) {
                 dependencies.add("modifier.captain");
             }
@@ -3344,7 +4209,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyInventory.java
             if (culometroConfigured) {
                 dependencies.add("configuration.culometro");
             }
-    
+
             return Set.copyOf(dependencies);
         }
     }
@@ -3354,7 +4219,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyInventory.java
 File: src\main\java\it\alterlega\recordsnext\app\model\DependencyType.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     /**
      * Tipi di dipendenza dichiarabili da un figlio elaborabile.
      */
@@ -3373,12 +4238,12 @@ File: src\main\java\it\alterlega\recordsnext\app\model\DependencyType.java
 File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlan.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.List;
     import java.util.Map;
     import java.util.Objects;
     import java.util.stream.Collectors;
-    
+
     /**
      * Piano completo delle elaborazioni richieste.
      */
@@ -3386,19 +4251,19 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlan.java
         public ExecutionPlan {
             items = List.copyOf(Objects.requireNonNullElse(items, List.of()));
         }
-    
+
         public List<ExecutionPlanItem> selectedItems() {
             return items.stream().filter(ExecutionPlanItem::selected).toList();
         }
-    
+
         public List<ExecutionPlanItem> executableItems() {
             return items.stream().filter(ExecutionPlanItem::executable).toList();
         }
-    
+
         public List<ExecutionPlanItem> skippedItems() {
             return items.stream().filter(item -> !item.executable()).toList();
         }
-    
+
         public Map<RecordFamily, List<ExecutionPlanItem>> byFamily() {
             return items.stream().collect(Collectors.groupingBy(
                     item -> item.child().family(),
@@ -3406,7 +4271,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlan.java
                     Collectors.toList()
             ));
         }
-    
+
         public boolean hasFailures() {
             return items.stream().anyMatch(item -> item.status() == OutputStatus.FAILED);
         }
@@ -3417,10 +4282,10 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlan.java
 File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlanItem.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.Objects;
     import java.util.Set;
-    
+
     /**
      * Riga del piano di elaborazione di un singolo figlio.
      */
@@ -3436,11 +4301,11 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlanItem.java
             missingRequired = Set.copyOf(Objects.requireNonNullElse(missingRequired, Set.of()));
             missingOptional = Set.copyOf(Objects.requireNonNullElse(missingOptional, Set.of()));
         }
-    
+
         public boolean selected() {
             return status != OutputStatus.SKIPPED_NOT_SELECTED;
         }
-    
+
         public boolean executable() {
             return status == OutputStatus.GENERATED_COMPLETE
                     || status == OutputStatus.GENERATED_PARTIAL;
@@ -3452,25 +4317,25 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlanItem.java
 File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlanner.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.List;
     import java.util.Objects;
     import java.util.Set;
-    
+
     /**
      * Costruisce il piano senza eseguire alcun elaboratore.
      */
     public final class ExecutionPlanner {
         private ExecutionPlanner() {
         }
-    
+
         public static ExecutionPlan plan(
                 ProcessingSelection selection,
                 Set<String> availableDependencies
         ) {
             return plan(CoreRecordCatalog.children(), selection, availableDependencies);
         }
-    
+
         public static ExecutionPlan plan(
                 List<RecordChild> catalog,
                 ProcessingSelection selection,
@@ -3478,7 +4343,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlanner.java
         ) {
             Objects.requireNonNull(catalog, "catalog");
             Objects.requireNonNull(selection, "selection");
-    
+
             List<ExecutionPlanItem> items = catalog.stream()
                     .map(child -> toItem(
                             child,
@@ -3489,10 +4354,10 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlanner.java
                             )
                     ))
                     .toList();
-    
+
             return new ExecutionPlan(items);
         }
-    
+
         private static ExecutionPlanItem toItem(
                 RecordChild child,
                 DependencyEvaluation evaluation
@@ -3511,7 +4376,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ExecutionPlanner.java
 File: src\main\java\it\alterlega\recordsnext\app\model\OutputStatus.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     /**
      * Stato finale di un figlio o di un output.
      */
@@ -3529,12 +4394,12 @@ File: src\main\java\it\alterlega\recordsnext\app\model\OutputStatus.java
 File: src\main\java\it\alterlega\recordsnext\app\model\ProcessingSelection.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.LinkedHashSet;
     import java.util.Objects;
     import java.util.Set;
     import java.util.stream.Collectors;
-    
+
     /**
      * Selezione modulare richiesta dall'utente.
      */
@@ -3553,18 +4418,18 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ProcessingSelection.java
             enabledChildren = selectedChildren.stream()
                     .map(ProcessingSelection::normalizeChildId)
                     .collect(Collectors.toUnmodifiableSet());
-    
+
             if (publish && !generateJs) {
                 throw new IllegalArgumentException(
                         "Publishing requires JavaScript generation"
                 );
             }
         }
-    
+
         public boolean isFamilyEnabled(RecordFamily family) {
             return enabledFamilies.contains(Objects.requireNonNull(family, "family"));
         }
-    
+
         public boolean isChildSelected(RecordChild child) {
             Objects.requireNonNull(child, "child");
             if (!isFamilyEnabled(child.family())) {
@@ -3575,13 +4440,13 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ProcessingSelection.java
             }
             return enabledChildren.isEmpty() || enabledChildren.contains(child.id());
         }
-    
+
         public OutputStatus selectionStatus(RecordChild child) {
             return isChildSelected(child)
                     ? OutputStatus.GENERATED_COMPLETE
                     : OutputStatus.SKIPPED_NOT_SELECTED;
         }
-    
+
         private static String normalizeChildId(String value) {
             Objects.requireNonNull(value, "enabled child id");
             String normalized = value.trim();
@@ -3597,11 +4462,11 @@ File: src\main\java\it\alterlega\recordsnext\app\model\ProcessingSelection.java
 File: src\main\java\it\alterlega\recordsnext\app\model\RecordChild.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.LinkedHashSet;
     import java.util.Objects;
     import java.util.Set;
-    
+
     /**
      * Definizione di un singolo figlio elaborabile.
      */
@@ -3620,19 +4485,19 @@ File: src\main\java\it\alterlega\recordsnext\app\model\RecordChild.java
                     Objects.requireNonNullElse(dependencies, Set.of())
             ));
         }
-    
+
         public Set<RecordDependency> requiredDependencies() {
             return dependencies.stream()
                     .filter(RecordDependency::required)
                     .collect(java.util.stream.Collectors.toUnmodifiableSet());
         }
-    
+
         public Set<RecordDependency> optionalDependencies() {
             return dependencies.stream()
                     .filter(dependency -> !dependency.required())
                     .collect(java.util.stream.Collectors.toUnmodifiableSet());
         }
-    
+
         private static String normalize(String value, String field) {
             Objects.requireNonNull(value, field);
             String normalized = value.trim();
@@ -3648,9 +4513,9 @@ File: src\main\java\it\alterlega\recordsnext\app\model\RecordChild.java
 File: src\main\java\it\alterlega\recordsnext\app\model\RecordDependency.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import java.util.Objects;
-    
+
     /**
      * Dipendenza dichiarata da un figlio.
      */
@@ -3663,15 +4528,15 @@ File: src\main\java\it\alterlega\recordsnext\app\model\RecordDependency.java
             id = normalizeId(id);
             type = Objects.requireNonNull(type, "type");
         }
-    
+
         public static RecordDependency required(String id, DependencyType type) {
             return new RecordDependency(id, type, true);
         }
-    
+
         public static RecordDependency optional(String id, DependencyType type) {
             return new RecordDependency(id, type, false);
         }
-    
+
         private static String normalizeId(String value) {
             Objects.requireNonNull(value, "id");
             String normalized = value.trim();
@@ -3687,7 +4552,7 @@ File: src\main\java\it\alterlega\recordsnext\app\model\RecordDependency.java
 File: src\main\java\it\alterlega\recordsnext\app\model\RecordFamily.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     /**
      * Famiglie elaborabili di RecordsNext 2.0.
      */
@@ -3697,13 +4562,13 @@ File: src\main\java\it\alterlega\recordsnext\app\model\RecordFamily.java
         RU("ru"),
         MODIFIERS("modifiers"),
         THRESHOLDS_LUCK("thresholdsLuck");
-    
+
         private final String id;
-    
+
         RecordFamily(String id) {
             this.id = id;
         }
-    
+
         public String id() {
             return id;
         }
@@ -3714,9 +4579,9 @@ File: src\main\java\it\alterlega\recordsnext\app\model\RecordFamily.java
 File: src\main\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExporter.java
 
     package it.alterlega.recordsnext.app.modifiers;
-    
-    import it.alterlega.recordsnext.Records2026ClassicJsExporter;
-    
+
+    import it.alterlega.recordsnext.app.config.ProcessingConfigWriter;
+
     import java.io.IOException;
     import java.math.BigDecimal;
     import java.nio.charset.StandardCharsets;
@@ -3724,115 +4589,238 @@ File: src\main\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
     import java.nio.file.Path;
     import java.nio.file.StandardOpenOption;
     import java.util.ArrayList;
+    import java.util.Comparator;
     import java.util.LinkedHashMap;
+    import java.util.LinkedHashSet;
     import java.util.List;
     import java.util.Map;
-    
-    /** Genera l'output familiare RecordsNext 2.0 dedicato alle modificatori. */
+    import java.util.Set;
+    import java.util.stream.Stream;
+
+    /** Genera l'output familiare RecordsNext 2.0 dedicato ai modificatori. */
     public final class ModifiersFamilyJsExporter {
         public static final String FILE_NAME = "fcmRecordsNext_Modifiers.js";
         public static final String GLOBAL_NAME = "window.fcmRecordsNextModifiers";
-    
-        private static final String LEGACY_PREFIX = "window.RECORDS2026_PREVIEW_CLASSIC = ";
-        private static final List<String> AVAILABLE_SECTIONS = List.of(
-                "modDifesaMax",
-                "modDifesaTotaleSquadre",
-                "capitanoVolteSquadre",
-                "capitanoTotaleSquadre",
-                "fattoreCampoDecisivo",
-                "fattoreCampoTotaleSquadre",
-                "fattoreCampoPuntiGuadagnatiSquadre",
-                "fattoreCampoPuntiPersiSquadre"
+
+        private static final String RECORD_PREFIX = "season_records_";
+        private static final String RECORD_SUFFIX = ".json";
+
+        private static final Map<String, String> SECTION_BY_SELECTION = Map.ofEntries(
+                Map.entry("modifiers.modm1pers.max", "modDifesaMax"),
+                Map.entry("modifiers.modm1pers.total", "modDifesaTotaleSquadre"),
+                Map.entry("modifiers.modm1pers.average", "modDifesaMediaSquadre"),
+                Map.entry("modifiers.modm1pers.uses", "modDifesaUtilizziSquadre"),
+                Map.entry("modifiers.modm2pers.max", "capitanoMax"),
+                Map.entry("modifiers.modm2pers.total", "capitanoTotaleSquadre"),
+                Map.entry("modifiers.modm2pers.average", "capitanoMediaSquadre"),
+                Map.entry("modifiers.modm2pers.uses", "capitanoUtilizziSquadre"),
+                Map.entry("modifiers.modm3pers.max", "modPersonalizzato3Max"),
+                Map.entry("modifiers.modm3pers.total", "modPersonalizzato3TotaleSquadre"),
+                Map.entry("modifiers.modm3pers.average", "modPersonalizzato3MediaSquadre"),
+                Map.entry("modifiers.modm3pers.uses", "modPersonalizzato3UtilizziSquadre"),
+                Map.entry("modifiers.modportiere.max", "modPortiereFcmMax"),
+                Map.entry("modifiers.modportiere.total", "modPortiereFcmTotaleSquadre"),
+                Map.entry("modifiers.modportiere.average", "modPortiereFcmMediaSquadre"),
+                Map.entry("modifiers.modportiere.uses", "modPortiereFcmUtilizziSquadre"),
+                Map.entry("modifiers.moddifesa.max", "modDifesaFcmMax"),
+                Map.entry("modifiers.moddifesa.total", "modDifesaFcmTotaleSquadre"),
+                Map.entry("modifiers.moddifesa.average", "modDifesaFcmMediaSquadre"),
+                Map.entry("modifiers.moddifesa.uses", "modDifesaFcmUtilizziSquadre"),
+                Map.entry("modifiers.modcentrocampo.max", "modCentrocampoFcmMax"),
+                Map.entry("modifiers.modcentrocampo.total", "modCentrocampoFcmTotaleSquadre"),
+                Map.entry("modifiers.modcentrocampo.average", "modCentrocampoFcmMediaSquadre"),
+                Map.entry("modifiers.modcentrocampo.uses", "modCentrocampoFcmUtilizziSquadre"),
+                Map.entry("modifiers.modattacco.max", "modAttaccoFcmMax"),
+                Map.entry("modifiers.modattacco.total", "modAttaccoFcmTotaleSquadre"),
+                Map.entry("modifiers.modattacco.average", "modAttaccoFcmMediaSquadre"),
+                Map.entry("modifiers.modattacco.uses", "modAttaccoFcmUtilizziSquadre"),
+                Map.entry("modifiers.modmodulo.max", "modModuloFcmMax"),
+                Map.entry("modifiers.modmodulo.total", "modModuloFcmTotaleSquadre"),
+                Map.entry("modifiers.modmodulo.average", "modModuloFcmMediaSquadre"),
+                Map.entry("modifiers.modmodulo.uses", "modModuloFcmUtilizziSquadre"),
+                Map.entry("modifiers.home-field-deciding", "fattoreCampoDecisivo"),
+                Map.entry("modifiers.home-field-points-gained", "fattoreCampoPuntiGuadagnatiSquadre"),
+                Map.entry("modifiers.home-field-points-lost", "fattoreCampoPuntiPersiSquadre"),
+                Map.entry("modifiers.home-field-balance", "fattoreCampoTotaleSquadre")
         );
-    
+
         private ModifiersFamilyJsExporter() {
         }
-    
+
         public static ExportResult export(Path archiveRoot, Path outputFile) throws IOException {
+            Path processingFile = Path.of("").toAbsolutePath().normalize().resolve("config/processing.json");
+            ProcessingConfigWriter.State config = Files.isRegularFile(processingFile)
+                    ? ProcessingConfigWriter.load(processingFile)
+                    : new ProcessingConfigWriter.State(true, true, true, true, true, false, false);
+            return export(archiveRoot, outputFile, config.modifierNames(), config.children());
+        }
+
+        public static ExportResult export(Path archiveRoot, Path outputFile,
+                                          Map<String, String> configuredNames) throws IOException {
+            return export(archiveRoot, outputFile, configuredNames, Map.of());
+        }
+
+        public static ExportResult export(Path archiveRoot, Path outputFile,
+                                          Map<String, String> configuredNames,
+                                          Map<String, Boolean> selections) throws IOException {
+            if (!Files.isDirectory(archiveRoot)) {
+                throw new IOException("Archivio stagioni non trovato: " + archiveRoot);
+            }
+
             Path parent = outputFile.toAbsolutePath().normalize().getParent();
-            if (parent == null) throw new IOException("Directory output Modificatori non determinabile: " + outputFile);
+            if (parent == null) {
+                throw new IOException("Directory output Modificatori non determinabile: " + outputFile);
+            }
             Files.createDirectories(parent);
-    
-            Path temporaryLegacy = Files.createTempFile(parent, "recordsnext-modifiers-legacy-", ".js");
-            try {
-                Records2026ClassicJsExporter.ExportResult legacy =
-                        Records2026ClassicJsExporter.export(archiveRoot, temporaryLegacy, List.of());
-                String legacyJs = Files.readString(temporaryLegacy, StandardCharsets.UTF_8).trim();
-                if (!legacyJs.startsWith(LEGACY_PREFIX) || !legacyJs.endsWith(";")) {
-                    throw new IOException("Formato Classic legacy inatteso: " + temporaryLegacy);
-                }
-    
-                String payload = legacyJs.substring(LEGACY_PREFIX.length(), legacyJs.length() - 1).trim();
-                Object parsed = new JsonParser(payload, temporaryLegacy).parse();
-                if (!(parsed instanceof List<?> entries)) {
-                    throw new IOException("Payload Classic legacy non e un array: " + temporaryLegacy);
-                }
-    
-                List<Object> filteredEntries = new ArrayList<>();
-                int sectionCount = 0;
-                for (Object value : entries) {
-                    if (!(value instanceof Map<?, ?> rawEntry)) continue;
-                    Map<String, Object> entry = stringMap(rawEntry);
-                    Object dataValue = entry.get("data");
-                    if (!(dataValue instanceof Map<?, ?> rawData)) continue;
-                    Map<String, Object> data = stringMap(rawData);
-                    Object recordsValue = data.get("records");
-                    if (!(recordsValue instanceof Map<?, ?> rawRecords)) continue;
+
+            List<Object> filteredEntries = new ArrayList<>();
+            Set<String> generatedSections = new LinkedHashSet<>();
+            Set<String> seasonsWithSelectedRecords = new LinkedHashSet<>();
+            int sectionCount = 0;
+
+            for (Path seasonDirectory : listSeasonDirectories(archiveRoot)) {
+                String season = seasonDirectory.getFileName().toString();
+                for (Path recordFile : listRecordFiles(seasonDirectory)) {
+                    Object parsed = new JsonParser(
+                            Files.readString(recordFile, StandardCharsets.UTF_8),
+                            recordFile
+                    ).parse();
+                    if (!(parsed instanceof Map<?, ?> rawRoot)) {
+                        throw new IOException("Radice JSON non valida: " + recordFile);
+                    }
+                    Map<String, Object> root = stringMap(rawRoot);
+                    Object recordsValue = root.get("records");
+                    if (!(recordsValue instanceof Map<?, ?> rawRecords)) {
+                        continue;
+                    }
                     Map<String, Object> records = stringMap(rawRecords);
-    
+
                     Map<String, Object> selected = new LinkedHashMap<>();
-                    for (String section : AVAILABLE_SECTIONS) {
+                    for (Map.Entry<String, String> sectionEntry : SECTION_BY_SELECTION.entrySet()) {
+                        if (!selections.isEmpty()
+                                && !selections.getOrDefault(sectionEntry.getKey(), true)) {
+                            continue;
+                        }
+                        String section = sectionEntry.getValue();
                         Object rows = records.get(section);
                         if (rows instanceof List<?> list && !list.isEmpty()) {
-                            selected.put(section, rows);
+                            selected.put(section, list);
+                            generatedSections.add(section);
                             sectionCount++;
                         }
                     }
-                    if (selected.isEmpty()) continue;
-    
+
+                    if (selected.isEmpty()) {
+                        continue;
+                    }
+
+                    String fileName = recordFile.getFileName().toString();
+                    String competitionId = fileName.substring(
+                            RECORD_PREFIX.length(),
+                            fileName.length() - RECORD_SUFFIX.length()
+                    );
+
                     Map<String, Object> filteredData = new LinkedHashMap<>();
                     filteredData.put("records", selected);
+
                     Map<String, Object> filteredEntry = new LinkedHashMap<>();
-                    filteredEntry.put("stagione", entry.get("stagione"));
-                    filteredEntry.put("id", entry.get("id"));
-                    filteredEntry.put("file", entry.get("file"));
+                    filteredEntry.put("stagione", season);
+                    filteredEntry.put("id", competitionId);
+                    filteredEntry.put("file", fileName);
                     filteredEntry.put("data", filteredData);
                     filteredEntries.add(filteredEntry);
+                    seasonsWithSelectedRecords.add(season);
                 }
-    
-                Map<String, Object> root = new LinkedHashMap<>();
-                root.put("schemaVersion", "2.0");
-                root.put("familyId", "modifiers");
-                Map<String, Object> metadata = new LinkedHashMap<>();
-                metadata.put("source", "RecordsNext 1.0.2 normalized archive");
-                metadata.put("seasonCount", legacy.seasonCount());
-                metadata.put("entryCount", filteredEntries.size());
-                metadata.put("sectionCount", sectionCount);
-                metadata.put("availableSections", AVAILABLE_SECTIONS);
-                root.put("metadata", metadata);
-                root.put("events", List.of());
-                root.put("seasonAggregates", filteredEntries);
-                root.put("globalAggregates", List.of());
-                root.put("absoluteOccurrences", List.of());
-                root.put("outputStatus", List.of(Map.of(
-                        "status", "GENERATED_COMPLETE",
-                        "detail", "Modificatore difesa, Capitano e Fattore Campo disponibili"
-                )));
-    
-                Files.writeString(
-                        outputFile,
-                        GLOBAL_NAME + " = " + JsonWriter.write(root) + ";\n",
-                        StandardCharsets.UTF_8,
-                        StandardOpenOption.CREATE,
-                        StandardOpenOption.TRUNCATE_EXISTING,
-                        StandardOpenOption.WRITE
-                );
-                return new ExportResult(legacy.seasonCount(), filteredEntries.size(), sectionCount, outputFile);
-            } finally {
-                Files.deleteIfExists(temporaryLegacy);
+            }
+
+            Map<String, Object> root = new LinkedHashMap<>();
+            root.put("schemaVersion", "2.0");
+            root.put("familyId", "modifiers");
+
+            Map<String, Object> metadata = new LinkedHashMap<>();
+            metadata.put("source", "RecordsNext 1.0.2 records archive");
+            metadata.put("seasonCount", seasonsWithSelectedRecords.size());
+            metadata.put("entryCount", filteredEntries.size());
+            metadata.put("sectionCount", sectionCount);
+            metadata.put("availableSections", new ArrayList<>(SECTION_BY_SELECTION.values()));
+            metadata.put("generatedSections", new ArrayList<>(generatedSections));
+            metadata.put("modifierCatalog", modifierCatalog(configuredNames));
+            root.put("metadata", metadata);
+            root.put("events", List.of());
+            root.put("seasonAggregates", filteredEntries);
+            root.put("globalAggregates", List.of());
+            root.put("absoluteOccurrences", List.of());
+            root.put("outputStatus", List.of(Map.of(
+                    "status", "GENERATED_COMPLETE",
+                    "detail", "Modificatori personalizzati, standard FCM e Fattore Campo disponibili"
+            )));
+
+            Files.writeString(
+                    outputFile,
+                    GLOBAL_NAME + " = " + JsonWriter.write(root) + ";\n",
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING,
+                    StandardOpenOption.WRITE
+            );
+
+            return new ExportResult(
+                    seasonsWithSelectedRecords.size(),
+                    filteredEntries.size(),
+                    sectionCount,
+                    outputFile
+            );
+        }
+
+        private static List<Path> listSeasonDirectories(Path archiveRoot) throws IOException {
+            try (Stream<Path> stream = Files.list(archiveRoot)) {
+                return stream
+                        .filter(Files::isDirectory)
+                        .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                        .toList();
             }
         }
-    
+
+        private static List<Path> listRecordFiles(Path seasonDirectory) throws IOException {
+            try (Stream<Path> stream = Files.list(seasonDirectory)) {
+                return stream
+                        .filter(Files::isRegularFile)
+                        .filter(path -> {
+                            String name = path.getFileName().toString();
+                            return name.startsWith(RECORD_PREFIX) && name.endsWith(RECORD_SUFFIX);
+                        })
+                        .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                        .toList();
+            }
+        }
+
+        private static List<Object> modifierCatalog(Map<String, String> configuredNames) {
+            Map<String, String> names = new LinkedHashMap<>(ProcessingConfigWriter.defaultModifierNames());
+            if (configuredNames != null) {
+                names.putAll(configuredNames);
+            }
+            return List.of(
+                    catalogItem("MODM1PERS", "CUSTOM", "Modificatore Difesa", names.get("MODM1PERS")),
+                    catalogItem("MODM2PERS", "CUSTOM", "Capitano", names.get("MODM2PERS")),
+                    catalogItem("MODM3PERS", "CUSTOM", "Modificatore personalizzato 3", names.get("MODM3PERS")),
+                    catalogItem("MODPORTIERE", "FCM_STANDARD", "Modificatore Portiere FCM", "Modificatore Portiere FCM"),
+                    catalogItem("MODDIFESA", "FCM_STANDARD", "Modificatore Difesa FCM", "Modificatore Difesa FCM"),
+                    catalogItem("MODCENTROCAMPO", "FCM_STANDARD", "Modificatore Centrocampo FCM", "Modificatore Centrocampo FCM"),
+                    catalogItem("MODATTACCO", "FCM_STANDARD", "Modificatore Attacco FCM", "Modificatore Attacco FCM"),
+                    catalogItem("MODMODULO", "FCM_STANDARD", "Modificatore Modulo FCM", "Modificatore Modulo FCM")
+            );
+        }
+
+        private static Map<String, Object> catalogItem(String sourceField, String category,
+                                                       String defaultName, String configuredName) {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("sourceField", sourceField);
+            item.put("category", category);
+            item.put("defaultName", defaultName);
+            item.put("configuredName", configuredName == null ? "" : configuredName);
+            return item;
+        }
+
         private static Map<String, Object> stringMap(Map<?, ?> raw) {
             Map<String, Object> result = new LinkedHashMap<>();
             for (Map.Entry<?, ?> entry : raw.entrySet()) {
@@ -3840,70 +4828,271 @@ File: src\main\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
             }
             return result;
         }
-    
+
         public record ExportResult(int seasonCount, int entryCount, int sectionCount, Path outputFile) {
         }
-    
+
         private static final class JsonParser {
             private final String text;
             private final Path source;
             private int index;
-            JsonParser(String text, Path source) { this.text = text; this.source = source; }
+
+            JsonParser(String text, Path source) {
+                this.text = text;
+                this.source = source;
+            }
+
             Object parse() throws IOException {
-                skipWhitespace(); Object value = parseValue(); skipWhitespace();
-                if (index != text.length()) fail("Contenuto dopo la fine del JSON");
+                skipWhitespace();
+                Object value = parseValue();
+                skipWhitespace();
+                if (index != text.length()) {
+                    fail("Contenuto dopo la fine del JSON");
+                }
                 return value;
             }
+
             private Object parseValue() throws IOException {
-                skipWhitespace(); if (index >= text.length()) fail("Valore mancante");
+                skipWhitespace();
+                if (index >= text.length()) {
+                    fail("Valore mancante");
+                }
                 return switch (text.charAt(index)) {
-                    case '{' -> parseObject(); case '[' -> parseArray(); case '"' -> parseString();
-                    case 't' -> parseLiteral("true", Boolean.TRUE); case 'f' -> parseLiteral("false", Boolean.FALSE);
-                    case 'n' -> parseLiteral("null", null); default -> parseNumber();
+                    case '{' -> parseObject();
+                    case '[' -> parseArray();
+                    case '"' -> parseString();
+                    case 't' -> parseLiteral("true", Boolean.TRUE);
+                    case 'f' -> parseLiteral("false", Boolean.FALSE);
+                    case 'n' -> parseLiteral("null", null);
+                    default -> parseNumber();
                 };
             }
-            private Map<String,Object> parseObject() throws IOException {
-                expect('{'); Map<String,Object> result=new LinkedHashMap<>(); skipWhitespace();
-                if (peek('}')) { index++; return result; }
-                while (true) { String key=parseString(); expect(':'); result.put(key,parseValue()); skipWhitespace();
-                    if (peek('}')) { index++; return result; } expect(','); }
+
+            private Map<String, Object> parseObject() throws IOException {
+                expect('{');
+                Map<String, Object> result = new LinkedHashMap<>();
+                skipWhitespace();
+                if (peek('}')) {
+                    index++;
+                    return result;
+                }
+                while (true) {
+                    String key = parseString();
+                    expect(':');
+                    result.put(key, parseValue());
+                    skipWhitespace();
+                    if (peek('}')) {
+                        index++;
+                        return result;
+                    }
+                    expect(',');
+                }
             }
+
             private List<Object> parseArray() throws IOException {
-                expect('['); List<Object> result=new ArrayList<>(); skipWhitespace();
-                if (peek(']')) { index++; return result; }
-                while (true) { result.add(parseValue()); skipWhitespace(); if (peek(']')) { index++; return result; } expect(','); }
+                expect('[');
+                List<Object> result = new ArrayList<>();
+                skipWhitespace();
+                if (peek(']')) {
+                    index++;
+                    return result;
+                }
+                while (true) {
+                    result.add(parseValue());
+                    skipWhitespace();
+                    if (peek(']')) {
+                        index++;
+                        return result;
+                    }
+                    expect(',');
+                }
             }
+
             private String parseString() throws IOException {
-                expect('"'); StringBuilder result=new StringBuilder();
-                while (index<text.length()) { char ch=text.charAt(index++); if (ch=='"') return result.toString();
-                    if (ch!='\\') { result.append(ch); continue; } if (index>=text.length()) fail("Escape incompleto");
-                    char esc=text.charAt(index++); switch(esc) { case '"','\\','/' -> result.append(esc); case 'b'->result.append('\b');
-                        case 'f'->result.append('\f'); case 'n'->result.append('\n'); case 'r'->result.append('\r'); case 't'->result.append('\t');
-                        case 'u'->result.append(parseUnicode()); default->fail("Escape non valido"); } }
-                fail("Stringa non terminata"); return null;
+                expect('"');
+                StringBuilder result = new StringBuilder();
+                while (index < text.length()) {
+                    char ch = text.charAt(index++);
+                    if (ch == '"') {
+                        return result.toString();
+                    }
+                    if (ch != '\\') {
+                        result.append(ch);
+                        continue;
+                    }
+                    if (index >= text.length()) {
+                        fail("Escape incompleto");
+                    }
+                    char escaped = text.charAt(index++);
+                    switch (escaped) {
+                        case '"', '\\', '/' -> result.append(escaped);
+                        case 'b' -> result.append('\b');
+                        case 'f' -> result.append('\f');
+                        case 'n' -> result.append('\n');
+                        case 'r' -> result.append('\r');
+                        case 't' -> result.append('\t');
+                        case 'u' -> result.append(parseUnicode());
+                        default -> fail("Escape non valido");
+                    }
+                }
+                fail("Stringa non terminata");
+                return null;
             }
-            private char parseUnicode() throws IOException { if(index+4>text.length()) fail("Unicode incompleto"); String h=text.substring(index,index+4); index+=4;
-                try{return(char)Integer.parseInt(h,16);}catch(NumberFormatException ex){fail("Unicode non valido");return 0;} }
-            private Object parseLiteral(String literal,Object value)throws IOException{if(!text.startsWith(literal,index))fail("Token non valido");index+=literal.length();return value;}
-            private BigDecimal parseNumber() throws IOException { int start=index; if(peek('-'))index++; while(index<text.length()&&Character.isDigit(text.charAt(index)))index++;
-                if(peek('.')){index++;while(index<text.length()&&Character.isDigit(text.charAt(index)))index++;} if(peek('e')||peek('E')){index++;if(peek('+')||peek('-'))index++;while(index<text.length()&&Character.isDigit(text.charAt(index)))index++;}
-                if(start==index)fail("Numero non valido"); try{return new BigDecimal(text.substring(start,index));}catch(NumberFormatException ex){fail("Numero non valido");return null;} }
-            private void expect(char expected)throws IOException{skipWhitespace();if(index>=text.length()||text.charAt(index)!=expected)fail("Atteso '"+expected+"'");index++;}
-            private boolean peek(char value){return index<text.length()&&text.charAt(index)==value;}
-            private void skipWhitespace(){while(index<text.length()&&Character.isWhitespace(text.charAt(index)))index++;}
-            private void fail(String message)throws IOException{throw new IOException(message+" in "+source+" alla posizione "+index);}
+
+            private char parseUnicode() throws IOException {
+                if (index + 4 > text.length()) {
+                    fail("Unicode incompleto");
+                }
+                String hexadecimal = text.substring(index, index + 4);
+                index += 4;
+                try {
+                    return (char) Integer.parseInt(hexadecimal, 16);
+                } catch (NumberFormatException ex) {
+                    fail("Unicode non valido");
+                    return 0;
+                }
+            }
+
+            private Object parseLiteral(String literal, Object value) throws IOException {
+                if (!text.startsWith(literal, index)) {
+                    fail("Token non valido");
+                }
+                index += literal.length();
+                return value;
+            }
+
+            private BigDecimal parseNumber() throws IOException {
+                int start = index;
+                if (peek('-')) {
+                    index++;
+                }
+                while (index < text.length() && Character.isDigit(text.charAt(index))) {
+                    index++;
+                }
+                if (peek('.')) {
+                    index++;
+                    while (index < text.length() && Character.isDigit(text.charAt(index))) {
+                        index++;
+                    }
+                }
+                if (peek('e') || peek('E')) {
+                    index++;
+                    if (peek('+') || peek('-')) {
+                        index++;
+                    }
+                    while (index < text.length() && Character.isDigit(text.charAt(index))) {
+                        index++;
+                    }
+                }
+                if (start == index) {
+                    fail("Numero non valido");
+                }
+                try {
+                    return new BigDecimal(text.substring(start, index));
+                } catch (NumberFormatException ex) {
+                    fail("Numero non valido");
+                    return null;
+                }
+            }
+
+            private void expect(char expected) throws IOException {
+                skipWhitespace();
+                if (index >= text.length() || text.charAt(index) != expected) {
+                    fail("Atteso '" + expected + "'");
+                }
+                index++;
+            }
+
+            private boolean peek(char value) {
+                return index < text.length() && text.charAt(index) == value;
+            }
+
+            private void skipWhitespace() {
+                while (index < text.length() && Character.isWhitespace(text.charAt(index))) {
+                    index++;
+                }
+            }
+
+            private void fail(String message) throws IOException {
+                throw new IOException(message + " in " + source + " alla posizione " + index);
+            }
         }
-    
+
         private static final class JsonWriter {
-            static String write(Object value){StringBuilder out=new StringBuilder();append(out,value);return out.toString();}
-            private static void append(StringBuilder out,Object value){
-                if(value==null){out.append("null");return;} if(value instanceof String s){out.append('"').append(escape(s)).append('"');return;}
-                if(value instanceof Boolean||value instanceof BigDecimal||value instanceof Number){out.append(value);return;}
-                if(value instanceof Map<?,?> map){out.append('{');boolean first=true;for(Map.Entry<?,?> e:map.entrySet()){if(!first)out.append(',');first=false;out.append('"').append(escape(String.valueOf(e.getKey()))).append("\":");append(out,e.getValue());}out.append('}');return;}
-                if(value instanceof List<?> list){out.append('[');for(int i=0;i<list.size();i++){if(i>0)out.append(',');append(out,list.get(i));}out.append(']');return;}
-                throw new IllegalArgumentException("Tipo JSON non supportato: "+value.getClass());
+            static String write(Object value) {
+                StringBuilder output = new StringBuilder();
+                append(output, value);
+                return output.toString();
             }
-            private static String escape(String value){StringBuilder e=new StringBuilder(value.length()+16);for(int i=0;i<value.length();i++){char ch=value.charAt(i);switch(ch){case '\\'->e.append("\\\\");case '"'->e.append("\\\"");case '\b'->e.append("\\b");case '\f'->e.append("\\f");case '\n'->e.append("\\n");case '\r'->e.append("\\r");case '\t'->e.append("\\t");default->{if(ch<0x20)e.append(String.format("\\u%04x",(int)ch));else e.append(ch);}}}return e.toString();}
+
+            private static void append(StringBuilder output, Object value) {
+                if (value == null) {
+                    output.append("null");
+                    return;
+                }
+                if (value instanceof String text) {
+                    output.append('"').append(escape(text)).append('"');
+                    return;
+                }
+                if (value instanceof Boolean || value instanceof BigDecimal || value instanceof Number) {
+                    output.append(value);
+                    return;
+                }
+                if (value instanceof Map<?, ?> map) {
+                    output.append('{');
+                    boolean first = true;
+                    for (Map.Entry<?, ?> entry : map.entrySet()) {
+                        if (!first) {
+                            output.append(',');
+                        }
+                        first = false;
+                        output.append('"')
+                                .append(escape(String.valueOf(entry.getKey())))
+                                .append("\":");
+                        append(output, entry.getValue());
+                    }
+                    output.append('}');
+                    return;
+                }
+                if (value instanceof Iterable<?> iterable) {
+                    output.append('[');
+                    boolean first = true;
+                    for (Object item : iterable) {
+                        if (!first) {
+                            output.append(',');
+                        }
+                        first = false;
+                        append(output, item);
+                    }
+                    output.append(']');
+                    return;
+                }
+                throw new IllegalArgumentException("Tipo JSON non supportato: " + value.getClass());
+            }
+
+            private static String escape(String value) {
+                StringBuilder escaped = new StringBuilder(value.length() + 16);
+                for (int index = 0; index < value.length(); index++) {
+                    char ch = value.charAt(index);
+                    switch (ch) {
+                        case '\\' -> escaped.append("\\\\");
+                        case '"' -> escaped.append("\\\"");
+                        case '\b' -> escaped.append("\\b");
+                        case '\f' -> escaped.append("\\f");
+                        case '\n' -> escaped.append("\\n");
+                        case '\r' -> escaped.append("\\r");
+                        case '\t' -> escaped.append("\\t");
+                        default -> {
+                            if (ch < 0x20) {
+                                escaped.append(String.format("\\u%04x", (int) ch));
+                            } else {
+                                escaped.append(ch);
+                            }
+                        }
+                    }
+                }
+                return escaped.toString();
+            }
         }
     }
 
@@ -3912,7 +5101,7 @@ File: src\main\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
 File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
 
     package it.alterlega.recordsnext.app;
-    
+
     import java.io.IOException;
     import java.io.InputStream;
     import java.nio.file.Files;
@@ -3924,7 +5113,7 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
     import java.util.Arrays;
     import java.util.List;
     import java.util.Properties;
-    
+
     public record PipelineConfig(Path projectRoot, Path reports, Path classicArchive, Path ruArchive,
                                  Path staging, Path siteJs, List<String> seasons) {
         public static PipelineConfig load(Path projectRoot, Path file) throws IOException {
@@ -3934,20 +5123,20 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
             }
             return fromProperties(projectRoot, properties);
         }
-    
+
         public static PipelineConfig defaults(Path projectRoot) {
             return fromProperties(projectRoot, new Properties());
         }
-    
+
         public static PipelineConfig fromProperties(Path projectRoot, Properties properties) {
             List<String> seasons = Arrays.stream(
                     properties.getProperty("seasons", "").split("\\s*,\\s*")
                 )
                 .filter(value -> !value.isBlank())
                 .toList();
-    
+
             Path normalizedRoot = projectRoot.toAbsolutePath().normalize();
-    
+
             return new PipelineConfig(
                 normalizedRoot,
                 resolve(normalizedRoot, properties.getProperty("reports", "data/reports")),
@@ -3961,22 +5150,22 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
                 seasons
             );
         }
-    
+
         public static Path resolvePublishDirectory(Path projectRoot, Properties properties) {
             String mode = properties.getProperty("publish.destinationMode", "currentSeason").trim();
-    
+
             if ("custom".equalsIgnoreCase(mode)) {
                 String custom = properties.getProperty("publish.customDirectory", "").trim();
                 if (!custom.isEmpty()) {
                     return resolve(projectRoot, custom);
                 }
             }
-    
+
             Path database = resolve(
                 projectRoot,
                 properties.getProperty("database", "data/database/recordsnext.db")
             );
-    
+
             if (Files.isRegularFile(database)) {
                 String sql = """
                     SELECT c.local_site_path
@@ -3988,10 +5177,10 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
                     ORDER BY s.sort_order DESC
                     LIMIT 1
                     """;
-    
+
                 try {
                     Class.forName("org.sqlite.JDBC");
-    
+
                     try (
                         Connection connection =
                             DriverManager.getConnection("jdbc:sqlite:" + database);
@@ -4009,13 +5198,13 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
                     // Fallback alla proprieta legacy.
                 }
             }
-    
+
             return resolve(
                 projectRoot,
                 properties.getProperty("siteJs", "E:/fantacalcio/Lega2025/js")
             );
         }
-    
+
         private static Path resolve(Path root, String value) {
             Path path = Path.of(value);
             return (path.isAbsolute() ? path : root.resolve(path)).normalize();
@@ -4027,42 +5216,42 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
 File: src\main\java\it\alterlega\recordsnext\app\PipelinePreflight.java
 
     package it.alterlega.recordsnext.app;
-    
+
     import it.alterlega.recordsnext.app.model.DependencyInventory;
     import it.alterlega.recordsnext.app.model.ExecutionPlan;
     import it.alterlega.recordsnext.app.model.ExecutionPlanItem;
     import it.alterlega.recordsnext.app.model.ExecutionPlanner;
     import it.alterlega.recordsnext.app.model.OutputStatus;
-    
+
     import java.util.List;
     import java.util.Objects;
     import java.util.Set;
-    
+
     /**
      * Costruisce e riassume il piano prima dell'esecuzione della pipeline.
      */
     public final class PipelinePreflight {
         private PipelinePreflight() {
         }
-    
+
         public static Result evaluate(ProcessingOptions options) {
             Objects.requireNonNull(options, "options");
-    
+
             Set<String> availableDependencies = DependencyInventory.legacyCapabilities(
                     false,
                     false,
                     options.familyEnabled(it.alterlega.recordsnext.app.model.RecordFamily.RU),
                     options.culometroEnabled()
             );
-    
+
             ExecutionPlan plan = ExecutionPlanner.plan(
                     options.selection(),
                     availableDependencies
             );
-    
+
             return new Result(plan, availableDependencies);
         }
-    
+
         public record Result(
                 ExecutionPlan plan,
                 Set<String> availableDependencies
@@ -4073,37 +5262,37 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelinePreflight.java
                         Objects.requireNonNullElse(availableDependencies, Set.of())
                 );
             }
-    
+
             public int selectedCount() {
                 return plan.selectedItems().size();
             }
-    
+
             public int executableCount() {
                 return plan.executableItems().size();
             }
-    
+
             public int completeCount() {
                 return count(OutputStatus.GENERATED_COMPLETE);
             }
-    
+
             public int partialCount() {
                 return count(OutputStatus.GENERATED_PARTIAL);
             }
-    
+
             public int skippedDependencyCount() {
                 return count(OutputStatus.SKIPPED_REQUIRED_DEPENDENCY);
             }
-    
+
             public List<ExecutionPlanItem> relevantItems() {
                 return plan.selectedItems();
             }
-    
+
             public List<String> messages() {
                 return relevantItems().stream()
                         .map(PipelinePreflight.Result::message)
                         .toList();
             }
-    
+
             public String summary() {
                 return "Preflight: selezionati=" + selectedCount()
                         + ", eseguibili=" + executableCount()
@@ -4111,19 +5300,19 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelinePreflight.java
                         + ", parziali=" + partialCount()
                         + ", saltati per dipendenze=" + skippedDependencyCount();
             }
-    
+
             private int count(OutputStatus status) {
                 return (int) plan.items().stream()
                         .filter(item -> item.status() == status)
                         .count();
             }
-    
+
             private static String message(ExecutionPlanItem item) {
                 StringBuilder value = new StringBuilder()
                         .append(item.child().id())
                         .append(" -> ")
                         .append(item.status());
-    
+
                 if (!item.missingRequired().isEmpty()) {
                     value.append("; richieste mancanti=")
                             .append(item.missingRequired());
@@ -4142,7 +5331,7 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelinePreflight.java
 File: src\main\java\it\alterlega\recordsnext\app\ProcessingMode.java
 
     package it.alterlega.recordsnext.app;
-    
+
     public enum ProcessingMode {
         FULL,
         CONSOLIDATED
@@ -4153,15 +5342,15 @@ File: src\main\java\it\alterlega\recordsnext\app\ProcessingMode.java
 File: src\main\java\it\alterlega\recordsnext\app\ProcessingOptions.java
 
     package it.alterlega.recordsnext.app;
-    
+
     import it.alterlega.recordsnext.app.model.ProcessingSelection;
     import it.alterlega.recordsnext.app.model.RecordChild;
     import it.alterlega.recordsnext.app.model.RecordFamily;
-    
+
     import java.util.EnumSet;
     import java.util.Objects;
     import java.util.Set;
-    
+
     /**
      * Opzioni di elaborazione compatibili con RecordsNext 1.0.2 e con il modello
      * modulare di RecordsNext 2.0.
@@ -4190,10 +5379,10 @@ File: src\main\java\it\alterlega\recordsnext\app\ProcessingOptions.java
                     legacySelection(classic, ru, generateJs, publish)
             );
         }
-    
+
         public ProcessingOptions {
             selection = Objects.requireNonNull(selection, "selection");
-    
+
             if (!classic && !ru && selection.enabledFamilies().isEmpty()) {
                 throw new IllegalArgumentException("Selezionare almeno un'elaborazione");
             }
@@ -4223,7 +5412,7 @@ File: src\main\java\it\alterlega\recordsnext\app\ProcessingOptions.java
                 );
             }
         }
-    
+
         /**
          * Crea opzioni 2.0 partendo dalla selezione modulare.
          */
@@ -4237,19 +5426,19 @@ File: src\main\java\it\alterlega\recordsnext\app\ProcessingOptions.java
                     selection
             );
         }
-    
+
         public boolean familyEnabled(RecordFamily family) {
             return selection.isFamilyEnabled(family);
         }
-    
+
         public boolean childSelected(RecordChild child) {
             return selection.isChildSelected(child);
         }
-    
+
         public boolean culometroEnabled() {
             return selection.culometroEnabled();
         }
-    
+
         private static ProcessingSelection legacySelection(
                 boolean classic,
                 boolean ru,
@@ -4278,7 +5467,7 @@ File: src\main\java\it\alterlega\recordsnext\app\ProcessingOptions.java
 File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
 
     package it.alterlega.recordsnext.app;
-    
+
     import it.alterlega.recordsnext.Records2026SitePublisher;
     import it.alterlega.recordsnext.RiserveUfficioArchiveBuilder;
     import it.alterlega.recordsnext.SeasonRecordsArchiveBuilder;
@@ -4286,26 +5475,26 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
     import it.alterlega.recordsnext.app.core.LeagueMetadata;
     import it.alterlega.recordsnext.app.core.LeagueMetadataLoader;
     import it.alterlega.recordsnext.app.model.RecordFamily;
-    
+
     import java.nio.file.Path;
     import java.time.OffsetDateTime;
     import java.util.EnumSet;
     import java.util.List;
     import java.util.Locale;
     import java.util.Set;
-    
+
     public final class RecordsNextPipeline {
         private static final Set<RecordFamily> IMPLEMENTED_FAMILIES = Set.copyOf(
                 EnumSet.of(RecordFamily.CLASSICS, RecordFamily.SERIES, RecordFamily.RU, RecordFamily.MODIFIERS, RecordFamily.THRESHOLDS_LUCK)
         );
-    
+
         public interface Listener {
             void phase(String text, int percent);
             default void timing(String text) { phase("TEMPO " + text, -1); }
         }
-    
+
         public record Result(int classicEntries, int ruSeasons, int files, int published) {}
-    
+
         public Result run(
                 PipelineConfig c,
                 ProcessingOptions o,
@@ -4317,20 +5506,20 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
             for (String message : preflight.messages()) {
                 l.phase("PREFLIGHT " + message, -1);
             }
-    
+
             validateImplementedFamilies(o);
-    
+
             long totalStarted = System.nanoTime();
             Path database = c.projectRoot().resolve("data/database/recordsnext.db").normalize();
             RecordsNextPreparationService preparation = new RecordsNextPreparationService(
                     c.projectRoot(),
                     database
             );
-    
+
             long preparationStarted = System.nanoTime();
             List<String> changedSeasons = preparation.prepare(mode, c.seasons(), l);
             l.timing("preparazione complessiva: " + elapsed(preparationStarted));
-    
+
             if (o.familyEnabled(RecordFamily.CLASSICS)) {
                 l.phase("Generazione record classici", 55);
                 long started = System.nanoTime();
@@ -4341,7 +5530,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                 );
                 l.timing("record classici: " + elapsed(started));
             }
-    
+
             if (o.familyEnabled(RecordFamily.RU)) {
                 l.phase("Generazione riserve d'ufficio", 68);
                 long started = System.nanoTime();
@@ -4352,7 +5541,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                 );
                 l.timing("riserve d'ufficio: " + elapsed(started));
             }
-    
+
             Result result;
             if (!o.generateJs()) {
                 l.phase("Archivi elaborati; generazione JavaScript non richiesta", 96);
@@ -4406,17 +5595,17 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                         r.publishedFiles()
                 );
             }
-    
+
             preparation.saveConsolidation(c.seasons());
             l.timing("totale elaborazione: " + elapsed(totalStarted));
             l.phase("Elaborazione completata e consolidamento aggiornato", 100);
             return result;
         }
-    
+
         public PipelinePreflight.Result preflight(ProcessingOptions options) {
             return PipelinePreflight.evaluate(options);
         }
-    
+
         public boolean hasConsolidation(PipelineConfig c) {
             Path database = c.projectRoot().resolve("data/database/recordsnext.db").normalize();
             return new RecordsNextPreparationService(
@@ -4424,7 +5613,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                     database
             ).hasConsolidation();
         }
-    
+
         static void validateImplementedFamilies(ProcessingOptions options) {
             Set<RecordFamily> unsupported = EnumSet.copyOf(options.selection().enabledFamilies());
             unsupported.removeAll(IMPLEMENTED_FAMILIES);
@@ -4435,7 +5624,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                 );
             }
         }
-    
+
         private static String elapsed(long started) {
             double seconds = (System.nanoTime() - started) / 1_000_000_000.0;
             return String.format(Locale.ROOT, "%.3f s", seconds);
@@ -4447,12 +5636,12 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
 File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.java
 
     package it.alterlega.recordsnext.app;
-    
+
     import it.alterlega.recordsnext.CanonicalViews;
     import it.alterlega.recordsnext.ConfigurationSchema;
     import it.alterlega.recordsnext.RawSqliteImporter;
     import it.alterlega.recordsnext.SeasonNormalizedBatchExporter;
-    
+
     import java.io.InputStream;
     import java.io.OutputStream;
     import java.nio.charset.StandardCharsets;
@@ -4467,25 +5656,25 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
     import java.util.Comparator;
     import java.util.List;
     import java.util.Properties;
-    
+
     final class RecordsNextPreparationService {
         record SeasonSource(String id, String type, String fcm, String fca,
                             String localSite, String onlineSite) {}
-    
+
         private final Path root;
         private final Path database;
         private static final String NORMALIZER_CACHE_VERSION = "season-normalized-v21";
-    
+
         private final Path stateFile;
         private final Path normalizationCacheFile;
-    
+
         RecordsNextPreparationService(Path root, Path database) {
             this.root = root.toAbsolutePath().normalize();
             this.database = database.toAbsolutePath().normalize();
             this.stateFile = this.root.resolve("data/consolidation/recordsnext-consolidation.properties");
             this.normalizationCacheFile = this.root.resolve("data/consolidation/normalization-cache.properties");
         }
-    
+
         List<String> prepare(ProcessingMode mode, List<String> selected,
                              RecordsNextPipeline.Listener listener) throws Exception {
             List<SeasonSource> seasons = loadConfigured(selected);
@@ -4500,7 +5689,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                 throw new IllegalStateException("Non esistono stagioni gestite da importare.");
             }
             SeasonSource current = managed.get(managed.size() - 1);
-    
+
             List<SeasonSource> toImport;
             if (mode == ProcessingMode.CONSOLIDATED) {
                 validateConsolidation(seasons, current.id());
@@ -4510,7 +5699,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                 toImport = managed;
                 listener.phase("Importazione completa delle stagioni gestite", 5);
             }
-    
+
             int index = 0;
             boolean imported = false;
             for (SeasonSource season : toImport) {
@@ -4535,7 +5724,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                     listener.phase(season.id() + " — FCA invariato", Math.min(29, percent + 2));
                 }
             }
-    
+
             if (imported) {
                 listener.phase("Aggiornamento configurazione e identità storiche", 30);
                 long started = System.nanoTime();
@@ -4544,14 +5733,14 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             } else {
                 listener.phase("Sorgenti già importate; configurazione conservata", 30);
             }
-    
+
             validateMappings(managed, current.id());
-    
+
             listener.phase("Rigenerazione viste canoniche", 34);
             long canonicalStarted = System.nanoTime();
             CanonicalViews.main(new String[]{database.toString()});
             listener.timing("viste canoniche: " + elapsed(canonicalStarted));
-    
+
             List<String> normalize = mode == ProcessingMode.CONSOLIDATED
                 ? List.of(current.id())
                 : managed.stream().map(SeasonSource::id).toList();
@@ -4586,8 +5775,8 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             }
             return normalize;
         }
-    
-    
+
+
         private Properties loadNormalizationCache() throws Exception {
             Properties cache = new Properties();
             if (Files.isRegularFile(normalizationCacheFile)) {
@@ -4597,14 +5786,14 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             }
             return cache;
         }
-    
+
         private void saveNormalizationCache(Properties cache) throws Exception {
             Files.createDirectories(normalizationCacheFile.getParent());
             try (OutputStream out = Files.newOutputStream(normalizationCacheFile)) {
                 cache.store(out, "RecordsNext normalized season cache");
             }
         }
-    
+
         private String normalizationSignature(SeasonSource season) throws Exception {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             updateDigest(digest, NORMALIZER_CACHE_VERSION);
@@ -4617,7 +5806,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             updateDigest(digest, mappingStamp(season.id()));
             return toHex(digest.digest());
         }
-    
+
         private static void updateFileDigest(MessageDigest digest, String value) throws Exception {
             updateDigest(digest, value == null ? "" : value);
             if (value == null || value.isBlank()) return;
@@ -4626,12 +5815,12 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             updateDigest(digest, Long.toString(Files.size(file)));
             updateDigest(digest, Files.getLastModifiedTime(file).toInstant().toString());
         }
-    
+
         private static void updateDigest(MessageDigest digest, String value) {
             digest.update((value == null ? "" : value).getBytes(StandardCharsets.UTF_8));
             digest.update((byte) 0);
         }
-    
+
         private boolean canBootstrapNormalizationCache(SeasonSource season) throws Exception {
             if (!Files.isRegularFile(stateFile) || !normalizationOutputsComplete(season.id())) {
                 return false;
@@ -4651,14 +5840,14 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             }
             return true;
         }
-    
+
         private boolean normalizationCacheValid(String season, String signature, Properties cache) throws Exception {
             if (!signature.equals(cache.getProperty("season." + season + ".signature", ""))) {
                 return false;
             }
             return normalizationOutputsComplete(season);
         }
-    
+
         private boolean normalizationOutputsComplete(String season) throws Exception {
             Path outputDir = root.resolve("data/reports").resolve(season);
             if (!Files.isDirectory(outputDir)) return false;
@@ -4672,7 +5861,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             }
             return actual >= expectedCompetitionCount(season) && actual > 0;
         }
-    
+
         private long expectedCompetitionCount(String season) throws Exception {
             String sql = """
                 SELECT COUNT(DISTINCT competition_name)
@@ -4687,7 +5876,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                 }
             }
         }
-    
+
         void saveConsolidation(List<String> selected) throws Exception {
             List<SeasonSource> seasons = loadConfigured(selected);
             Properties p = snapshot(seasons);
@@ -4696,11 +5885,11 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                 p.store(out, "RecordsNext consolidation state");
             }
         }
-    
+
         boolean hasConsolidation() {
             return Files.isRegularFile(stateFile);
         }
-    
+
         private void validateConsolidation(List<SeasonSource> seasons, String currentId) throws Exception {
             if (!Files.isRegularFile(stateFile)) {
                 throw new IllegalStateException("Nessun consolidamento disponibile. Eseguire prima un'elaborazione completa.");
@@ -4724,12 +5913,12 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                 }
             }
         }
-    
+
         private static IllegalStateException invalid(String reason) {
             return new IllegalStateException("Il consolidamento non è più valido: " + reason
                 + ". Eseguire una nuova elaborazione completa.");
         }
-    
+
         private Properties snapshot(List<SeasonSource> seasons) throws Exception {
             Properties p = new Properties();
             p.setProperty("seasons", String.join(",", seasons.stream().map(SeasonSource::id).sorted().toList()));
@@ -4744,7 +5933,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             }
             return p;
         }
-    
+
         private static void fileSnapshot(Properties p, String key, String value) throws Exception {
             p.setProperty(key, value == null ? "" : value);
             if (value != null && !value.isBlank() && Files.isRegularFile(Path.of(value))) {
@@ -4756,7 +5945,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                 p.setProperty(key + ".mtime", "");
             }
         }
-    
+
         private String mappingStamp(String seasonId) throws Exception {
             // The consolidation signature must describe mapping decisions, not timestamps.
             // Only entities belonging to the latest FCM import of the season are relevant.
@@ -4800,7 +5989,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                          COALESCE(s.source_division_id,-1), COALESCE(s.source_team_number,-1),
                          m.mapping_status, COALESCE(m.team_identity_id,0)
                 """;
-    
+
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + database)) {
                 updateMappingDigest(c, competitionSql, seasonId, "C", digest);
@@ -4808,7 +5997,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             }
             return toHex(digest.digest());
         }
-    
+
         private static void updateMappingDigest(Connection connection, String sql,
                                                 String seasonId, String prefix,
                                                 MessageDigest digest) throws Exception {
@@ -4829,7 +6018,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                 }
             }
         }
-    
+
         private static String toHex(byte[] bytes) {
             StringBuilder result = new StringBuilder(bytes.length * 2);
             for (byte value : bytes) {
@@ -4838,8 +6027,8 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             }
             return result.toString();
         }
-    
-    
+
+
         private boolean sourceNeedsImport(String seasonId, String sourceType, String configuredPath) throws Exception {
             Path file = Path.of(configuredPath).toAbsolutePath().normalize();
             String sql = """
@@ -4893,7 +6082,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             }
             return result;
         }
-    
+
         private void validateMappings(List<SeasonSource> managed, String currentId) throws Exception {
             String sql = """
                 SELECT
@@ -4923,7 +6112,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
                 }
             }
         }
-    
+
         private static void validateManagedSource(SeasonSource s) {
             if (s.fcm().isBlank() || !Files.isRegularFile(Path.of(s.fcm()))) {
                 throw new IllegalStateException(s.id() + ": file FCM non trovato: " + s.fcm());
@@ -4936,7 +6125,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
             double seconds = (System.nanoTime() - started) / 1_000_000_000.0;
             return String.format(java.util.Locale.ROOT, "%.3f s", seconds);
         }
-    
+
     }
 
 ## src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
@@ -4944,49 +6133,49 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPreparationService.j
 File: src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
 
     package it.alterlega.recordsnext.app.ru;
-    
+
     import it.alterlega.recordsnext.Records2026RuJsExporter;
-    
+
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.nio.file.StandardOpenOption;
-    
+
     /** Genera l'output familiare nativo RecordsNext 2.0 per le Riserve d'Ufficio. */
     public final class RuFamilyJsExporter {
         public static final String FILE_NAME = "fcmRecordsNext_RU.js";
         public static final String GLOBAL_NAME = "window.fcmRecordsNextRU";
-    
+
         private static final String LEGACY_FILE = "records2026.recordstagionali.ru.js";
         private static final String LEGACY_PREFIX = "window.RECORDS2026_PREVIEW_RU = ";
-    
+
         private RuFamilyJsExporter() {
         }
-    
+
         public static ExportResult export(Path archiveRoot, Path outputFile) throws IOException {
             Path parent = outputFile.toAbsolutePath().normalize().getParent();
             if (parent == null) {
                 throw new IOException("Directory output RU non determinabile: " + outputFile);
             }
             Files.createDirectories(parent);
-    
+
             Path temporaryDir = Files.createTempDirectory(parent, "recordsnext-ru-legacy-");
             try {
                 Records2026RuJsExporter.ExportResult legacy =
                         Records2026RuJsExporter.export(archiveRoot, temporaryDir);
-    
+
                 Path legacyCompact = temporaryDir.resolve(LEGACY_FILE);
                 String legacyJs = Files.readString(legacyCompact, StandardCharsets.UTF_8).trim();
                 if (!legacyJs.startsWith(LEGACY_PREFIX) || !legacyJs.endsWith(";")) {
                     throw new IOException("Formato RU legacy inatteso: " + legacyCompact);
                 }
-    
+
                 String seasonsJson = legacyJs.substring(
                         LEGACY_PREFIX.length(),
                         legacyJs.length() - 1
                 ).trim();
-    
+
                 String javascript = GLOBAL_NAME + " = {"
                         + "\"schemaVersion\":\"2.0\","
                         + "\"familyId\":\"office-reserves\","
@@ -5004,7 +6193,7 @@ File: src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
                         + "\"detail\":\"Migrazione compatibile dai dataset RU consolidati\""
                         + "}]"
                         + "};\n";
-    
+
                 Files.writeString(
                         outputFile,
                         javascript,
@@ -5013,13 +6202,13 @@ File: src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
                         StandardOpenOption.TRUNCATE_EXISTING,
                         StandardOpenOption.WRITE
                 );
-    
+
                 return new ExportResult(legacy.seasons(), legacy.annualFiles(), outputFile);
             } finally {
                 deleteTree(temporaryDir);
             }
         }
-    
+
         private static void deleteTree(Path root) throws IOException {
             if (!Files.exists(root)) return;
             try (var stream = Files.walk(root)) {
@@ -5028,7 +6217,7 @@ File: src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
                 }
             }
         }
-    
+
         public record ExportResult(int seasonCount, int annualFileCount, Path outputFile) {
         }
     }
@@ -5038,9 +6227,9 @@ File: src\main\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporter.java
 File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.java
 
     package it.alterlega.recordsnext.app.series;
-    
+
     import it.alterlega.recordsnext.Records2026ClassicJsExporter;
-    
+
     import java.io.IOException;
     import java.math.BigDecimal;
     import java.nio.charset.StandardCharsets;
@@ -5051,12 +6240,12 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
     import java.util.LinkedHashMap;
     import java.util.List;
     import java.util.Map;
-    
+
     /** Genera l'output familiare RecordsNext 2.0 dedicato alle serie cronologiche. */
     public final class SeriesFamilyJsExporter {
         public static final String FILE_NAME = "fcmRecordsNext_Series.js";
         public static final String GLOBAL_NAME = "window.fcmRecordsNextSeries";
-    
+
         private static final String LEGACY_PREFIX = "window.RECORDS2026_PREVIEW_CLASSIC = ";
         private static final List<String> AVAILABLE_SECTIONS = List.of(
                 "serieVittorie",
@@ -5067,15 +6256,15 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
                 "capitanoSerieSquadre",
                 "cleanSheetPortiereSerieSquadre"
         );
-    
+
         private SeriesFamilyJsExporter() {
         }
-    
+
         public static ExportResult export(Path archiveRoot, Path outputFile) throws IOException {
             Path parent = outputFile.toAbsolutePath().normalize().getParent();
             if (parent == null) throw new IOException("Directory output Serie non determinabile: " + outputFile);
             Files.createDirectories(parent);
-    
+
             Path temporaryLegacy = Files.createTempFile(parent, "recordsnext-series-legacy-", ".js");
             try {
                 Records2026ClassicJsExporter.ExportResult legacy =
@@ -5084,13 +6273,13 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
                 if (!legacyJs.startsWith(LEGACY_PREFIX) || !legacyJs.endsWith(";")) {
                     throw new IOException("Formato Classic legacy inatteso: " + temporaryLegacy);
                 }
-    
+
                 String payload = legacyJs.substring(LEGACY_PREFIX.length(), legacyJs.length() - 1).trim();
                 Object parsed = new JsonParser(payload, temporaryLegacy).parse();
                 if (!(parsed instanceof List<?> entries)) {
                     throw new IOException("Payload Classic legacy non e un array: " + temporaryLegacy);
                 }
-    
+
                 List<Object> filteredEntries = new ArrayList<>();
                 int sectionCount = 0;
                 for (Object value : entries) {
@@ -5102,7 +6291,7 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
                     Object recordsValue = data.get("records");
                     if (!(recordsValue instanceof Map<?, ?> rawRecords)) continue;
                     Map<String, Object> records = stringMap(rawRecords);
-    
+
                     Map<String, Object> selected = new LinkedHashMap<>();
                     for (String section : AVAILABLE_SECTIONS) {
                         Object rows = records.get(section);
@@ -5112,7 +6301,7 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
                         }
                     }
                     if (selected.isEmpty()) continue;
-    
+
                     Map<String, Object> filteredData = new LinkedHashMap<>();
                     filteredData.put("records", selected);
                     Map<String, Object> filteredEntry = new LinkedHashMap<>();
@@ -5122,7 +6311,7 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
                     filteredEntry.put("data", filteredData);
                     filteredEntries.add(filteredEntry);
                 }
-    
+
                 Map<String, Object> root = new LinkedHashMap<>();
                 root.put("schemaVersion", "2.0");
                 root.put("familyId", "series");
@@ -5141,7 +6330,7 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
                         "status", "GENERATED_COMPLETE",
                         "detail", "Serie complete: vittorie, pareggi, sconfitte, imbattibilita, senza vittorie, Capitano e clean sheet"
                 )));
-    
+
                 Files.writeString(
                         outputFile,
                         GLOBAL_NAME + " = " + JsonWriter.write(root) + ";\n",
@@ -5155,7 +6344,7 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
                 Files.deleteIfExists(temporaryLegacy);
             }
         }
-    
+
         private static Map<String, Object> stringMap(Map<?, ?> raw) {
             Map<String, Object> result = new LinkedHashMap<>();
             for (Map.Entry<?, ?> entry : raw.entrySet()) {
@@ -5163,10 +6352,10 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
             }
             return result;
         }
-    
+
         public record ExportResult(int seasonCount, int entryCount, int sectionCount, Path outputFile) {
         }
-    
+
         private static final class JsonParser {
             private final String text;
             private final Path source;
@@ -5216,7 +6405,7 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
             private void skipWhitespace(){while(index<text.length()&&Character.isWhitespace(text.charAt(index)))index++;}
             private void fail(String message)throws IOException{throw new IOException(message+" in "+source+" alla posizione "+index);}
         }
-    
+
         private static final class JsonWriter {
             static String write(Object value){StringBuilder out=new StringBuilder();append(out,value);return out.toString();}
             private static void append(StringBuilder out,Object value){
@@ -5235,7 +6424,7 @@ File: src\main\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporter.j
 File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporter.java
 
     package it.alterlega.recordsnext.app.thresholds;
-    
+
     import java.io.IOException;
     import java.math.BigDecimal;
     import java.nio.charset.StandardCharsets;
@@ -5248,15 +6437,15 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
     import java.util.List;
     import java.util.Map;
     import java.util.stream.Stream;
-    
+
     /** Genera l'output 2.0 Soglie e Fortuna dai JSON normalizzati. */
     public final class ThresholdsLuckFamilyJsExporter {
         public static final String FILE_NAME = "fcmRecordsNext_ThresholdsLuck.js";
         public static final String GLOBAL_NAME = "window.fcmRecordsNextThresholdsLuck";
-    
+
         private ThresholdsLuckFamilyJsExporter() {
         }
-    
+
         public static ExportResult export(Path reportsRoot, Path outputFile) throws IOException {
             if (!Files.isDirectory(reportsRoot)) {
                 throw new IOException("Cartella report normalizzati non trovata: " + reportsRoot);
@@ -5264,7 +6453,7 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
             Path parent = outputFile.toAbsolutePath().normalize().getParent();
             if (parent == null) throw new IOException("Directory output Soglie non determinabile: " + outputFile);
             Files.createDirectories(parent);
-    
+
             List<Path> files;
             try (Stream<Path> stream = Files.walk(reportsRoot)) {
                 files = stream.filter(Files::isRegularFile)
@@ -5274,7 +6463,7 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
                         .toList();
             }
             if (files.isEmpty()) throw new IOException("Nessun report season_normalized_*.json in " + reportsRoot);
-    
+
             List<Object> events = new ArrayList<>();
             Map<String, Aggregate> aggregates = new LinkedHashMap<>();
             int matchRows = 0;
@@ -5294,7 +6483,7 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
                     BigDecimal nextMin = nextBandMin(bands, score);
                     BigDecimal distance = nextMin == null ? null : nextMin.subtract(score);
                     BigDecimal bandSurplus = current == null ? BigDecimal.ZERO : score.subtract(current.min());
-    
+
                     if (current != null && score.compareTo(current.min()) == 0) {
                         addEvent(events, aggregates, match, "EXACT_THRESHOLD", "NEUTRAL", BigDecimal.ZERO,
                                 BigDecimal.ZERO, "Punteggio esattamente sul minimo della fascia gol");
@@ -5338,18 +6527,18 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
                     }
                 }
             }
-    
+
             events.sort(Comparator.comparing(value -> string(((Map<?,?>) value).get("seasonId")))
                     .thenComparing(value -> string(((Map<?,?>) value).get("competitionId")))
                     .thenComparing(value -> string(((Map<?,?>) value).get("matchId")))
                     .thenComparing(value -> string(((Map<?,?>) value).get("teamId")))
                     .thenComparing(value -> string(((Map<?,?>) value).get("eventType"))));
-    
+
             List<Object> teamAggregates = new ArrayList<>();
             for (Aggregate a : aggregates.values()) teamAggregates.add(a.toMap());
             teamAggregates.sort(Comparator.comparing(value -> string(((Map<?,?>) value).get("seasonId")))
                     .thenComparing(value -> string(((Map<?,?>) value).get("team"))));
-    
+
             Map<String,Object> metadata = new LinkedHashMap<>();
             metadata.put("source", "RecordsNext 1.0.2 normalized reports");
             metadata.put("normalizedFileCount", files.size());
@@ -5360,7 +6549,7 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
                     "MIRACLE_DRAW", "TIGHT_DRAW", "ONE_GOAL_WIN", "ONE_GOAL_LOSS",
                     "UNUSED_BAND_POINTS"));
             metadata.put("culometroGenerated", false);
-    
+
             Map<String,Object> root = new LinkedHashMap<>();
             root.put("schemaVersion", "2.0");
             root.put("familyId", "thresholds-luck");
@@ -5373,13 +6562,13 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
                     "status", "GENERATED_COMPLETE",
                     "detail", "Indicatori oggettivi completi basati su esiti, fasce gol, margini e punti inutilizzati. Culometro escluso."
             )));
-    
+
             Files.writeString(outputFile, GLOBAL_NAME + " = " + JsonWriter.write(root) + ";\n",
                     StandardCharsets.UTF_8, StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             return new ExportResult(files.size(), matchRows, events.size(), teamAggregates.size(), outputFile);
         }
-    
+
         private static void addEvent(List<Object> events, Map<String,Aggregate> aggregates,
                                      Map<String,Object> match, String type, String direction,
                                      BigDecimal distance, BigDecimal bandSurplus, String detail) {
@@ -5408,12 +6597,12 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
             event.put("unusedBandPoints", bandSurplus);
             event.put("detail", detail);
             events.add(event);
-    
+
             String key = string(match.get("stagione")) + "|" + string(match.get("idSquadra"));
             aggregates.computeIfAbsent(key, ignored -> new Aggregate(match))
                     .add(direction, type, bandSurplus);
         }
-    
+
         private static Band currentBand(List<Map<String,Object>> bands, BigDecimal score) {
             for (Map<String,Object> row : bands) {
                 BigDecimal min = number(row.get("min"));
@@ -5422,7 +6611,7 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
             }
             return null;
         }
-    
+
         private static BigDecimal nextBandMin(List<Map<String,Object>> bands, BigDecimal score) {
             BigDecimal next = null;
             for (Map<String,Object> row : bands) {
@@ -5431,7 +6620,7 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
             }
             return next;
         }
-    
+
         private static Map<String,Object> object(Object value, Path source, String label) throws IOException {
             if (!(value instanceof Map<?,?> raw)) throw new IOException("Oggetto JSON '" + label + "' non valido: " + source);
             Map<String,Object> out = new LinkedHashMap<>();
@@ -5458,11 +6647,11 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
         private static boolean isWin(String result) { return "V".equals(result); }
         private static boolean isDraw(String result) { return "P".equals(result) || "N".equals(result); }
         private static boolean isLoss(String result) { return "S".equals(result); }
-    
+
         public record ExportResult(int normalizedFileCount, int teamMatchRowCount, int eventCount,
                                    int aggregateCount, Path outputFile) {}
         private record Band(BigDecimal min, BigDecimal max, int goals) {}
-    
+
         private static final class Aggregate {
             private final Object seasonId, teamId, team;
             private int favourable, unfavourable, neutral;
@@ -5485,7 +6674,7 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
                 out.put("eventsByType", byType); return out;
             }
         }
-    
+
         private static final class JsonParser {
             private final String text; private final Path source; private int index;
             JsonParser(String text, Path source){this.text=text;this.source=source;}
@@ -5520,7 +6709,7 @@ File: src\main\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
 File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.security.MessageDigest;
@@ -5534,7 +6723,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
     import java.util.Locale;
     import java.util.regex.Matcher;
     import java.util.regex.Pattern;
-    
+
     /**
      * Risolve i file DataA-AAAA.js senza dipendere da ConfrontiStorici.
      *
@@ -5543,32 +6732,32 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
      * gia validato. Questa classe registra la provenienza per stagione.</p>
      */
     public final class CalendarSourceManager {
-    
+
         private static final String EXTERNAL_DIRECTORY_KEY = "dataa_external_directory";
         private static final Pattern SEASON_PATTERN =
             Pattern.compile("^(\\d{4})_(\\d{4})$");
-    
+
         private CalendarSourceManager() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length < 2) {
                 usage();
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
             if (!Files.isRegularFile(database)) {
                 throw new IllegalArgumentException("Database SQLite non trovato: " + database);
             }
-    
+
             String command = args[1].trim().toLowerCase(Locale.ROOT);
             Class.forName("org.sqlite.JDBC");
-    
+
             try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + database)) {
                 configure(connection);
                 installSchema(connection);
-    
+
                 switch (command) {
                     case "set-directory" -> setDirectory(connection, args);
                     case "clear-directory" -> clearDirectory(connection, args);
@@ -5583,7 +6772,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                 }
             }
         }
-    
+
         static void installSchema(Connection connection) throws Exception {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
@@ -5593,7 +6782,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_calendar_source (
                         season_id TEXT PRIMARY KEY,
@@ -5608,14 +6797,14 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                     """);
             }
         }
-    
+
         private static void setDirectory(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 3, "<db> set-directory <cartella-DataA>");
             Path directory = Path.of(args[2]).toAbsolutePath().normalize();
             if (!Files.isDirectory(directory)) {
                 throw new IllegalArgumentException("Cartella DataA non trovata: " + directory);
             }
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 INSERT INTO rn_global_configuration(config_key, config_value, updated_at)
                 VALUES (?, ?, CURRENT_TIMESTAMP)
@@ -5627,10 +6816,10 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                 statement.setString(2, directory.toString());
                 statement.executeUpdate();
             }
-    
+
             System.out.println("Cartella DataA esterna configurata: " + directory);
         }
-    
+
         private static void clearDirectory(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 2, "<db> clear-directory");
             try (PreparedStatement statement = connection.prepareStatement(
@@ -5640,57 +6829,57 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
             }
             System.out.println("Cartella DataA esterna rimossa. Verra usato il fallback distribuito.");
         }
-    
+
         private static void resolveCommand(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 4, "<db> resolve <stagione> <project-root>");
             ResolvedSource source = resolve(connection, args[2], Path.of(args[3]));
             printSource(source);
         }
-    
+
         private static void importCommand(
                 Connection connection,
                 Path database,
                 String[] args) throws Exception {
-    
+
             requireArgCount(args, 4, "<db> import <stagione> <project-root>");
             String season = requireSeason(connection, args[2]);
             ResolvedSource source = resolve(connection, season, Path.of(args[3]));
-    
+
             ConfrontiStoriciCalendarImporter.main(new String[] {
                 database.toString(), "set-directory", source.directory().toString()
             });
             ConfrontiStoriciCalendarImporter.main(new String[] {
                 database.toString(), "import", season
             });
-    
+
             recordSource(connection, season, source);
             printSource(source);
         }
-    
+
         private static void validateCommand(
                 Connection connection,
                 Path database,
                 String[] args) throws Exception {
-    
+
             requireArgCount(args, 4, "<db> validate <stagione> <project-root>");
             String season = requireSeason(connection, args[2]);
             ResolvedSource source = resolve(connection, season, Path.of(args[3]));
-    
+
             ConfrontiStoriciCalendarImporter.main(new String[] {
                 database.toString(), "set-directory", source.directory().toString()
             });
             ConfrontiStoriciCalendarImporter.main(new String[] {
                 database.toString(), "validate", season
             });
-    
+
             verifyRecordedSource(connection, season, source);
             printSource(source);
         }
-    
+
         private static void showCommand(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 3, "<db> show <stagione>");
             String season = requireSeason(connection, args[2]);
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT source_type, source_directory, source_file,
                        source_sha256, imported_at
@@ -5712,16 +6901,16 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                 }
             }
         }
-    
+
         private static ResolvedSource resolve(
                 Connection connection,
                 String seasonValue,
                 Path projectRootValue) throws Exception {
-    
+
             String season = requireSeason(connection, seasonValue);
             int startYear = startYear(season);
             String fileName = "DataA-" + startYear + ".js";
-    
+
             Path external = readExternalDirectory(connection);
             if (external != null) {
                 Path candidate = external.resolve(fileName).toAbsolutePath().normalize();
@@ -5731,7 +6920,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                     );
                 }
             }
-    
+
             Path projectRoot = projectRootValue.toAbsolutePath().normalize();
             Path bundledDirectory = projectRoot.resolve("data").resolve("calendars");
             Path bundled = bundledDirectory.resolve(fileName).normalize();
@@ -5740,7 +6929,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                     "BUNDLED", bundledDirectory, bundled, sha256(bundled)
                 );
             }
-    
+
             StringBuilder message = new StringBuilder("DataA non trovato per ")
                 .append(season).append(". Atteso: ").append(fileName);
             if (external != null) {
@@ -5749,7 +6938,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
             message.append(" oppure in ").append(bundledDirectory);
             throw new IllegalArgumentException(message.toString());
         }
-    
+
         private static Path readExternalDirectory(Connection connection) throws Exception {
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT config_value
@@ -5767,12 +6956,12 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                 }
             }
         }
-    
+
         private static void recordSource(
                 Connection connection,
                 String season,
                 ResolvedSource source) throws Exception {
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 INSERT INTO rn_calendar_source (
                     season_id, source_type, source_directory,
@@ -5794,12 +6983,12 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                 statement.executeUpdate();
             }
         }
-    
+
         private static void verifyRecordedSource(
                 Connection connection,
                 String season,
                 ResolvedSource source) throws Exception {
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT source_type, source_file, source_sha256
                 FROM rn_calendar_source
@@ -5823,7 +7012,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
                 }
             }
         }
-    
+
         private static String requireSeason(Connection connection, String value) throws Exception {
             String season = value.trim();
             Matcher matcher = SEASON_PATTERN.matcher(season);
@@ -5837,7 +7026,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
             if (end != start + 1) {
                 throw new IllegalArgumentException("Stagione non consecutiva: " + season);
             }
-    
+
             try (PreparedStatement statement = connection.prepareStatement(
                     "SELECT COUNT(*) FROM rn_season WHERE season_id = ?")) {
                 statement.setString(1, season);
@@ -5850,38 +7039,38 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
             }
             return season;
         }
-    
+
         private static int startYear(String season) {
             return Integer.parseInt(season.substring(0, 4));
         }
-    
+
         private static String sha256(Path file) throws Exception {
             byte[] bytes = Files.readAllBytes(file);
             return HexFormat.of().formatHex(
                 MessageDigest.getInstance("SHA-256").digest(bytes)
             );
         }
-    
+
         private static void printSource(ResolvedSource source) {
             System.out.println("Origine  : " + source.type());
             System.out.println("Cartella : " + source.directory());
             System.out.println("File     : " + source.file());
             System.out.println("SHA-256  : " + source.sha256());
         }
-    
+
         private static void configure(Connection connection) throws Exception {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("PRAGMA foreign_keys = ON");
                 statement.execute("PRAGMA busy_timeout = 10000");
             }
         }
-    
+
         private static void requireArgCount(String[] args, int expected, String usage) {
             if (args.length != expected) {
                 throw new IllegalArgumentException("Uso: " + usage);
             }
         }
-    
+
         private static void usage() {
             System.err.println("Comandi:");
             System.err.println("  <db> set-directory <cartella-DataA>");
@@ -5891,7 +7080,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
             System.err.println("  <db> validate <stagione> <project-root>");
             System.err.println("  <db> show <stagione>");
         }
-    
+
         private record ResolvedSource(
             String type,
             Path directory,
@@ -5906,7 +7095,7 @@ File: src\main\java\it\alterlega\recordsnext\CalendarSourceManager.java
 File: src\main\java\it\alterlega\recordsnext\CanonicalSchemaProbe.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Path;
     import java.sql.Connection;
     import java.sql.DriverManager;
@@ -5914,9 +7103,9 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalSchemaProbe.java
     import java.sql.ResultSetMetaData;
     import java.sql.Statement;
     import java.util.List;
-    
+
     public final class CanonicalSchemaProbe {
-    
+
         private static final List<String> TABLES = List.of(
             "raw_2025_2026_fcm_competizione",
             "raw_2025_2026_fcm_girone",
@@ -5929,45 +7118,45 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalSchemaProbe.java
             "raw_2025_2026_fca_giocain",
             "raw_2025_2026_fca_punteggio"
         );
-    
+
         private CanonicalSchemaProbe() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 1) {
                 System.err.println("Uso: CanonicalSchemaProbe <recordsnext.db>");
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             try (Connection connection = DriverManager.getConnection(
                     "jdbc:sqlite:" + database)) {
-    
+
                 for (String table : TABLES) {
                     printTable(connection, table);
                 }
             }
         }
-    
+
         private static void printTable(
                 Connection connection,
                 String table) throws Exception {
-    
+
             System.out.println();
             System.out.println("==================================================");
             System.out.println(table);
             System.out.println("==================================================");
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet columns = statement.executeQuery(
                      "PRAGMA table_info(\"" + table.replace("\"", "\"\"") + "\")"
                  )) {
-    
+
                 System.out.println("COLONNE:");
-    
+
                 while (columns.next()) {
                     System.out.printf(
                         "%3d  %-35s %s%n",
@@ -5977,27 +7166,27 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalSchemaProbe.java
                     );
                 }
             }
-    
+
             String sql = "SELECT * FROM \""
                 + table.replace("\"", "\"\"")
                 + "\" LIMIT 1";
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet row = statement.executeQuery(sql)) {
-    
+
                 if (!row.next()) {
                     System.out.println("TABELLA VUOTA");
                     return;
                 }
-    
+
                 ResultSetMetaData metadata = row.getMetaData();
-    
+
                 System.out.println();
                 System.out.println("PRIMA RIGA:");
-    
+
                 for (int index = 1; index <= metadata.getColumnCount(); index++) {
                     Object value = row.getObject(index);
-    
+
                     System.out.printf(
                         "%-35s = %s%n",
                         metadata.getColumnName(index),
@@ -6013,7 +7202,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalSchemaProbe.java
 File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Path;
     import java.sql.Connection;
     import java.sql.DriverManager;
@@ -6023,12 +7212,12 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
     import java.util.ArrayList;
     import java.util.List;
     import java.util.Locale;
-    
+
     public final class CanonicalViews {
-    
+
         private CanonicalViews() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 1) {
                 System.err.println(
@@ -6036,18 +7225,18 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 );
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0])
                 .toAbsolutePath()
                 .normalize();
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             try (Connection connection = DriverManager.getConnection(
                     "jdbc:sqlite:" + database)) {
-    
+
                 connection.setAutoCommit(false);
-    
+
                 try {
                     createViews(connection);
                     connection.commit();
@@ -6058,27 +7247,27 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 }
             }
         }
-    
+
         private static void createViews(Connection connection)
                 throws Exception {
-    
+
             dropCanonicalViews(connection);
             createConfiguredEntityViews(connection);
-    
+
             List<String> seasonEventViews =
                 createSeasonEventViews(connection);
-    
+
             createUnionViews(
                 connection,
                 seasonEventViews
             );
         }
-    
+
         private static void dropCanonicalViews(
                 Connection connection) throws Exception {
-    
+
             List<String> generatedViews = new ArrayList<>();
-    
+
             try (
                 Statement statement = connection.createStatement();
                 ResultSet result = statement.executeQuery("""
@@ -6098,48 +7287,48 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                     );
                 }
             }
-    
+
             try (Statement statement = connection.createStatement()) {
                 statement.execute(
                     "DROP VIEW IF EXISTS rn_playoff_result"
                 );
-    
+
                 statement.execute(
                     "DROP VIEW IF EXISTS rn_team_match"
                 );
-    
+
                 statement.execute(
                     "DROP VIEW IF EXISTS rn_team_event"
                 );
-    
+
                 statement.execute(
                     "DROP VIEW IF EXISTS rn_match"
                 );
-    
+
                 statement.execute(
                     "DROP VIEW IF EXISTS rn_event"
                 );
-    
+
                 for (String viewName : generatedViews) {
                     statement.execute(
                         "DROP VIEW IF EXISTS "
                             + quoteIdentifier(viewName)
                     );
                 }
-    
+
                 statement.execute(
                     "DROP VIEW IF EXISTS rn_configured_team"
                 );
-    
+
                 statement.execute(
                     "DROP VIEW IF EXISTS rn_configured_competition"
                 );
             }
         }
-    
+
         private static void createConfiguredEntityViews(
                 Connection connection) throws Exception {
-    
+
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
                     CREATE VIEW rn_configured_competition AS
@@ -6163,7 +7352,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                       ON ci.competition_identity_id =
                          cm.competition_identity_id
                     """);
-    
+
                 statement.execute("""
                     CREATE VIEW rn_configured_team AS
                     SELECT
@@ -6190,32 +7379,32 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                     """);
             }
         }
-    
+
         private static List<String> createSeasonEventViews(
                 Connection connection) throws Exception {
-    
+
             List<FcmSource> sources = readFcmSources(connection);
             List<String> generatedViews = new ArrayList<>();
-    
+
             for (FcmSource source : sources) {
                 String incontroTable = rawTable(
                     connection,
                     source.importId(),
                     "INCONTRO"
                 );
-    
+
                 String gironeTable = rawTable(
                     connection,
                     source.importId(),
                     "GIRONE"
                 );
-    
+
                 String giornataTable = rawTable(
                     connection,
                     source.importId(),
                     "GIORNATA"
                 );
-    
+
                 String viewName =
                     "rn_event_"
                         + normalizeIdentifier(
@@ -6223,7 +7412,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                         )
                         + "_"
                         + source.importId();
-    
+
                 createSeasonEventView(
                     connection,
                     source,
@@ -6232,24 +7421,24 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                     gironeTable,
                     giornataTable
                 );
-    
+
                 generatedViews.add(viewName);
             }
-    
+
             if (generatedViews.isEmpty()) {
                 throw new IllegalStateException(
                     "Nessuna sorgente FCM configurata."
                 );
             }
-    
+
             return generatedViews;
         }
-    
+
         private static List<FcmSource> readFcmSources(
                 Connection connection) throws Exception {
-    
+
             List<FcmSource> sources = new ArrayList<>();
-    
+
             String sql = """
                 SELECT
                     source_file_id,
@@ -6265,7 +7454,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                   )
                 ORDER BY season_id, import_id
                 """;
-    
+
             try (
                 Statement statement = connection.createStatement();
                 ResultSet result = statement.executeQuery(sql)
@@ -6280,10 +7469,10 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                     );
                 }
             }
-    
+
             return sources;
         }
-    
+
         private static void createSeasonEventView(
                 Connection connection,
                 FcmSource source,
@@ -6291,7 +7480,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 String incontroTable,
                 String gironeTable,
                 String giornataTable) throws Exception {
-    
+
             String sql = """
                 CREATE VIEW %s AS
                 WITH rounds AS (
@@ -6320,23 +7509,23 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 SELECT
                     '%s' AS season_id,
                     %d AS source_file_id,
-    
+
                     cc.competition_identity_id,
                     cc.canonical_name AS competition_name,
                     cc.source_competition_id,
-    
+
                     g.ID AS source_group_id,
                     g.NOME AS source_group_name,
-    
+
                     i.ID AS source_event_id,
-    
+
                     r.competition_round,
                     i.GIORNATADIA AS serie_a_round,
                     i.IDGIORNATA AS source_round_id,
                     gio."DESC" AS round_description,
-    
+
                     i.IDTIPO AS source_match_type_id,
-    
+
                     i.IDCASA AS home_source_team_id,
                     home.team_identity_id
                         AS home_team_identity_id,
@@ -6344,7 +7533,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                         home.canonical_name,
                         home.source_name
                     ) AS home_team_name,
-    
+
                     i.IDFUORI AS away_source_team_id,
                     away.team_identity_id
                         AS away_team_identity_id,
@@ -6355,57 +7544,57 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                             away.source_name
                         )
                     END AS away_team_name,
-    
+
                     i.PARZCASA AS home_partial_score,
                     i.PARZFUORI AS away_partial_score,
-    
+
                     i.TOTCASA AS home_total_score,
                     i.TOTFUORI AS away_total_score,
-    
+
                     i.GOLCASA AS home_goals,
                     i.GOLFUORI AS away_goals,
-    
+
                     i.GIOCATO AS played,
-    
+
                     CASE
                         WHEN i.IDFUORI <> 0
                             THEN 'HEAD_TO_HEAD'
-    
+
                         WHEN i.TOTCASA <> 0
                           OR i.PARZCASA <> 0
                             THEN 'SCORE_ONLY'
-    
+
                         ELSE 'REST'
                     END AS event_type
-    
+
                 FROM %s i
-    
+
                 JOIN %s g
                   ON g.ID = i.IDGIRONE
-    
+
                 JOIN rn_configured_competition cc
                   ON cc.source_file_id = %d
                  AND cc.source_competition_id =
                      g.IDCOMPETIZIONE
                  AND cc.mapping_status = 'ASSOCIATA'
-    
+
                 JOIN rn_configured_team home
                   ON home.source_file_id = %d
                  AND home.source_team_id = i.IDCASA
                  AND home.mapping_status = 'ASSOCIATA'
-    
+
                 LEFT JOIN rn_configured_team away
                   ON away.source_file_id = %d
                  AND away.source_team_id = i.IDFUORI
                  AND away.mapping_status = 'ASSOCIATA'
-    
+
                 LEFT JOIN %s gio
                   ON gio.ID = i.IDGIORNATA
-    
+
                 JOIN rounds r
                   ON r.source_group_id = g.ID
                  AND r.source_round_id = i.IDGIORNATA
-    
+
                 WHERE i.GIOCATO <> 0
                   AND i.IDCASA <> 0
                   AND (
@@ -6426,35 +7615,35 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                     source.sourceFileId(),
                     quoteIdentifier(giornataTable)
                 );
-    
+
             try (Statement statement = connection.createStatement()) {
                 statement.execute(sql);
             }
         }
-    
+
         private static void createUnionViews(
                 Connection connection,
                 List<String> seasonEventViews) throws Exception {
-    
+
             StringBuilder eventUnion = new StringBuilder();
-    
+
             for (String viewName : seasonEventViews) {
                 if (!eventUnion.isEmpty()) {
                     eventUnion.append("\nUNION ALL\n");
                 }
-    
+
                 eventUnion.append(
                     "SELECT * FROM "
                         + quoteIdentifier(viewName)
                 );
             }
-    
+
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
                     CREATE VIEW rn_event AS
                     %s
                     """.formatted(eventUnion));
-    
+
                 statement.execute("""
                     CREATE VIEW rn_match AS
                     SELECT
@@ -6465,262 +7654,262 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                         source_competition_id,
                         source_group_id,
                         source_group_name,
-    
+
                         source_event_id,
                         source_event_id AS source_match_id,
-    
+
                         competition_round,
                         serie_a_round,
                         source_round_id,
                         round_description,
                         source_match_type_id,
-    
+
                         home_source_team_id,
                         home_team_identity_id,
                         home_team_name,
-    
+
                         away_source_team_id,
                         away_team_identity_id,
                         away_team_name,
-    
+
                         home_partial_score,
                         away_partial_score,
                         home_total_score,
                         away_total_score,
                         home_goals,
                         away_goals,
-    
+
                         played
                     FROM rn_event
                     WHERE event_type = 'HEAD_TO_HEAD'
                     """);
-    
+
                 statement.execute("""
                     CREATE VIEW rn_team_event AS
-    
+
                     SELECT
                         season_id,
                         source_file_id,
-    
+
                         competition_identity_id,
                         competition_name,
                         source_competition_id,
-    
+
                         source_group_id,
                         source_group_name,
-    
+
                         source_event_id,
-    
+
                         competition_round,
                         serie_a_round,
                         source_round_id,
                         round_description,
                         source_match_type_id,
-    
+
                         event_type,
-    
+
                         home_source_team_id
                             AS source_team_id,
-    
+
                         home_team_identity_id
                             AS team_identity_id,
-    
+
                         home_team_name
                             AS team_name,
-    
+
                         CASE
                             WHEN event_type = 'HEAD_TO_HEAD'
                             THEN away_source_team_id
                             ELSE NULL
                         END AS opponent_source_team_id,
-    
+
                         CASE
                             WHEN event_type = 'HEAD_TO_HEAD'
                             THEN away_team_identity_id
                             ELSE NULL
                         END AS opponent_team_identity_id,
-    
+
                         CASE
                             WHEN event_type = 'HEAD_TO_HEAD'
                             THEN away_team_name
                             ELSE NULL
                         END AS opponent_name,
-    
+
                         CASE
                             WHEN event_type = 'HEAD_TO_HEAD'
                             THEN 'HOME'
                             ELSE 'NEUTRAL'
                         END AS venue,
-    
+
                         home_goals AS goals_for,
-    
+
                         CASE
                             WHEN event_type = 'HEAD_TO_HEAD'
                             THEN away_goals
                             ELSE NULL
                         END AS goals_against,
-    
+
                         home_partial_score AS partial_score_for,
-    
+
                         CASE
                             WHEN event_type = 'HEAD_TO_HEAD'
                             THEN away_partial_score
                             ELSE NULL
                         END AS partial_score_against,
-    
+
                         home_total_score AS score_for,
-    
+
                         CASE
                             WHEN event_type = 'HEAD_TO_HEAD'
                             THEN away_total_score
                             ELSE NULL
                         END AS score_against,
-    
+
                         CASE
                             WHEN event_type <> 'HEAD_TO_HEAD'
                                 THEN NULL
-    
+
                             WHEN home_goals > away_goals
                                 THEN 'W'
-    
+
                             WHEN home_goals = away_goals
                                 THEN 'D'
-    
+
                             ELSE 'L'
                         END AS result
-    
+
                     FROM rn_event
-    
+
                     UNION ALL
-    
+
                     SELECT
                         season_id,
                         source_file_id,
-    
+
                         competition_identity_id,
                         competition_name,
                         source_competition_id,
-    
+
                         source_group_id,
                         source_group_name,
-    
+
                         source_event_id,
-    
+
                         competition_round,
                         serie_a_round,
                         source_round_id,
                         round_description,
                         source_match_type_id,
-    
+
                         event_type,
-    
+
                         away_source_team_id
                             AS source_team_id,
-    
+
                         away_team_identity_id
                             AS team_identity_id,
-    
+
                         away_team_name
                             AS team_name,
-    
+
                         home_source_team_id
                             AS opponent_source_team_id,
-    
+
                         home_team_identity_id
                             AS opponent_team_identity_id,
-    
+
                         home_team_name
                             AS opponent_name,
-    
+
                         'AWAY' AS venue,
-    
+
                         away_goals AS goals_for,
                         home_goals AS goals_against,
-    
+
                         away_partial_score AS partial_score_for,
                         home_partial_score AS partial_score_against,
-    
+
                         away_total_score AS score_for,
                         home_total_score AS score_against,
-    
+
                         CASE
                             WHEN away_goals > home_goals
                                 THEN 'W'
-    
+
                             WHEN away_goals = home_goals
                                 THEN 'D'
-    
+
                             ELSE 'L'
                         END AS result
-    
+
                     FROM rn_event
                     WHERE event_type = 'HEAD_TO_HEAD'
                     """);
-    
+
                 statement.execute("""
                     CREATE VIEW rn_team_match AS
                     SELECT
                         season_id,
                         source_file_id,
-    
+
                         competition_identity_id,
                         competition_name,
                         source_competition_id,
-    
+
                         source_group_id,
                         source_group_name,
-    
+
                         source_event_id,
                         source_event_id AS source_match_id,
-    
+
                         competition_round,
                         serie_a_round,
                         source_round_id,
                         round_description,
                         source_match_type_id,
-    
+
                         source_team_id,
                         team_identity_id,
                         team_name,
-    
+
                         opponent_source_team_id,
                         opponent_team_identity_id,
                         opponent_name,
-    
+
                         venue,
-    
+
                         goals_for,
                         goals_against,
-    
+
                         partial_score_for,
                         partial_score_against,
-    
+
                         score_for,
                         score_against,
-    
+
                         result
                     FROM rn_team_event
                     WHERE event_type = 'HEAD_TO_HEAD'
                     """);
-    
+
                 statement.execute("""
                     CREATE VIEW rn_playoff_result AS
                     SELECT
                         current.season_id,
                         current.source_file_id,
-    
+
                         current.competition_identity_id,
                         current.competition_name,
                         current.source_competition_id,
-    
+
                         current.source_group_id,
                         current.source_group_name,
-    
+
                         current.source_round_id,
                         current.round_description,
                         current.serie_a_round,
                         current.competition_round,
-    
+
                         current.source_event_id,
                         current.home_source_team_id
                             AS source_team_id,
@@ -6728,7 +7917,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                             AS team_identity_id,
                         current.home_team_name
                             AS team_name,
-    
+
                         opponent.source_event_id
                             AS opponent_source_event_id,
                         opponent.home_source_team_id
@@ -6737,26 +7926,26 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                             AS opponent_team_identity_id,
                         opponent.home_team_name
                             AS opponent_name,
-    
+
                         current.home_total_score
                             AS score_for,
                         opponent.home_total_score
                             AS score_against,
-    
+
                         CASE
                             WHEN current.home_total_score >
                                  opponent.home_total_score
                                 THEN 'W'
-    
+
                             WHEN current.home_total_score <
                                  opponent.home_total_score
                                 THEN 'L'
-    
+
                             ELSE 'D'
                         END AS result
-    
+
                     FROM rn_event current
-    
+
                     JOIN rn_event opponent
                       ON opponent.season_id =
                          current.season_id
@@ -6771,35 +7960,35 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                      AND opponent.source_event_id <>
                          current.source_event_id
                      AND opponent.event_type = 'SCORE_ONLY'
-    
+
                     WHERE current.event_type = 'SCORE_ONLY'
                       AND UPPER(current.competition_name) =
                           'PLAY OFF - PLAY OUT'
                     """);
             }
         }
-    
+
         private static String rawTable(
                 Connection connection,
                 long importId,
                 String sourceTableName) throws Exception {
-    
+
             String sql = """
                 SELECT raw_table_name
                 FROM rn_table_catalog
                 WHERE import_id = ?
                   AND UPPER(source_table_name) = ?
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setLong(1, importId);
                 statement.setString(
                     2,
                     sourceTableName.toUpperCase(Locale.ROOT)
                 );
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
                         throw new IllegalStateException(
@@ -6809,21 +7998,21 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                                 + importId
                         );
                     }
-    
+
                     return result.getString("raw_table_name");
                 }
             }
         }
-    
+
         private static void printAudit(
                 Connection connection) throws Exception {
-    
+
             System.out.println(
                 "Viste canoniche create"
             );
-    
+
             System.out.println();
-    
+
             printCount(
                 connection,
                 "Stagioni",
@@ -6832,7 +8021,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 FROM rn_event
                 """
             );
-    
+
             printCount(
                 connection,
                 "Competizioni con eventi",
@@ -6843,7 +8032,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 FROM rn_event
                 """
             );
-    
+
             printCount(
                 connection,
                 "Eventi totali",
@@ -6852,7 +8041,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 FROM rn_event
                 """
             );
-    
+
             printCount(
                 connection,
                 "Scontri diretti",
@@ -6862,7 +8051,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 WHERE event_type = 'HEAD_TO_HEAD'
                 """
             );
-    
+
             printCount(
                 connection,
                 "Riposi",
@@ -6872,7 +8061,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 WHERE event_type = 'REST'
                 """
             );
-    
+
             printCount(
                 connection,
                 "Punteggi puri",
@@ -6882,7 +8071,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 WHERE event_type = 'SCORE_ONLY'
                 """
             );
-    
+
             printCount(
                 connection,
                 "Partecipazioni",
@@ -6891,7 +8080,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 FROM rn_team_event
                 """
             );
-    
+
             printCount(
                 connection,
                 "Righe squadra match",
@@ -6900,7 +8089,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 FROM rn_team_match
                 """
             );
-    
+
             printCount(
                 connection,
                 "Righe play off/out",
@@ -6909,10 +8098,10 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 FROM rn_playoff_result
                 """
             );
-    
+
             System.out.println();
             System.out.println("=== ESITI SCONTRI DIRETTI ===");
-    
+
             printCount(
                 connection,
                 "Vittorie",
@@ -6922,7 +8111,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 WHERE result = 'W'
                 """
             );
-    
+
             printCount(
                 connection,
                 "Pareggi",
@@ -6932,7 +8121,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 WHERE result = 'D'
                 """
             );
-    
+
             printCount(
                 connection,
                 "Sconfitte",
@@ -6942,10 +8131,10 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 WHERE result = 'L'
                 """
             );
-    
+
             System.out.println();
             System.out.println("=== ESITI PLAY OFF / PLAY OUT ===");
-    
+
             printCount(
                 connection,
                 "Vinti",
@@ -6955,7 +8144,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 WHERE result = 'W'
                 """
             );
-    
+
             printCount(
                 connection,
                 "Persi",
@@ -6965,7 +8154,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 WHERE result = 'L'
                 """
             );
-    
+
             printCount(
                 connection,
                 "Pari",
@@ -6975,10 +8164,10 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 WHERE result = 'D'
                 """
             );
-    
+
             System.out.println();
             System.out.println("=== EVENTI PER TIPO ===");
-    
+
             try (
                 Statement statement = connection.createStatement();
                 ResultSet result = statement.executeQuery("""
@@ -7000,18 +8189,18 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 }
             }
         }
-    
+
         private static void printCount(
                 Connection connection,
                 String label,
                 String sql) throws Exception {
-    
+
             try (
                 Statement statement = connection.createStatement();
                 ResultSet result = statement.executeQuery(sql)
             ) {
                 result.next();
-    
+
                 System.out.printf(
                     Locale.ROOT,
                     "%-24s: %d%n",
@@ -7020,33 +8209,33 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
                 );
             }
         }
-    
+
         private static String normalizeIdentifier(String value) {
             String normalized = value
                 .trim()
                 .toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9]+", "_")
                 .replaceAll("^_+|_+$", "");
-    
+
             if (normalized.isBlank()) {
                 throw new IllegalArgumentException(
                     "Identificatore non valido: " + value
                 );
             }
-    
+
             return normalized;
         }
-    
+
         private static String quoteIdentifier(String value) {
             return "\""
                 + value.replace("\"", "\"\"")
                 + "\"";
         }
-    
+
         private static String escapeSqlLiteral(String value) {
             return value.replace("'", "''");
         }
-    
+
         private record FcmSource(
             long sourceFileId,
             long importId,
@@ -7060,7 +8249,7 @@ File: src\main\java\it\alterlega\recordsnext\CanonicalViews.java
 File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Path;
     import java.sql.Connection;
     import java.sql.DriverManager;
@@ -7071,12 +8260,12 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
     import java.util.ArrayList;
     import java.util.List;
     import java.util.Locale;
-    
+
     public final class ConfigurationSchema {
-    
+
         private ConfigurationSchema() {
         }
-    
+
         /**
          * Crea lo schema RecordsNext vuoto per una nuova installazione.
          * Non richiede ancora una stagione-ancora e non importa dati.
@@ -7087,7 +8276,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
             if (parent != null) {
                 java.nio.file.Files.createDirectories(parent);
             }
-    
+
             Class.forName("org.sqlite.JDBC");
             try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + normalized)) {
                 connection.setAutoCommit(false);
@@ -7101,7 +8290,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 }
             }
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 2) {
                 System.err.println(
@@ -7109,23 +8298,23 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 );
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
             String anchorSeason = args[1].trim();
-    
+
             if (anchorSeason.isBlank()) {
                 throw new IllegalArgumentException(
                     "La stagione-ancora non può essere vuota."
                 );
             }
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             try (Connection connection = DriverManager.getConnection(
                     "jdbc:sqlite:" + database)) {
-    
+
                 connection.setAutoCommit(false);
-    
+
                 try {
                     configureConnection(connection);
                     createSchema(connection);
@@ -7134,9 +8323,9 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                     importSeasonEntities(connection);
                     createAnchorIdentities(connection, anchorSeason);
                     initializeHistoricalMappings(connection, anchorSeason);
-    
+
                     connection.commit();
-    
+
                     printSummary(connection, anchorSeason);
                 } catch (Exception exception) {
                     connection.rollback();
@@ -7144,21 +8333,21 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 }
             }
         }
-    
+
         private static void configureConnection(Connection connection)
                 throws Exception {
-    
+
             try (Statement statement = connection.createStatement()) {
                 statement.execute("PRAGMA foreign_keys = ON");
                 statement.execute("PRAGMA busy_timeout = 10000");
             }
         }
-    
+
         private static void createSchema(Connection connection)
                 throws Exception {
-    
+
             try (Statement statement = connection.createStatement()) {
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_season (
                         season_id TEXT PRIMARY KEY,
@@ -7170,14 +8359,14 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                         updated_at TEXT NOT NULL
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE UNIQUE INDEX IF NOT EXISTS
                         ux_rn_season_anchor
                     ON rn_season(is_anchor)
                     WHERE is_anchor = 1
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_source_file (
                         source_file_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -7195,13 +8384,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                             REFERENCES rn_season(season_id)
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE INDEX IF NOT EXISTS
                         ix_rn_source_file_season_type
                     ON rn_source_file(season_id, source_type)
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_competition_season (
                         competition_season_id INTEGER
@@ -7222,13 +8411,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                             REFERENCES rn_source_file(source_file_id)
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE INDEX IF NOT EXISTS
                         ix_rn_competition_season
                     ON rn_competition_season(season_id)
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_team_season (
                         team_season_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -7250,13 +8439,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                             REFERENCES rn_source_file(source_file_id)
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE INDEX IF NOT EXISTS
                         ix_rn_team_season
                     ON rn_team_season(season_id)
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_competition_identity (
                         competition_identity_id INTEGER
@@ -7273,7 +8462,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                             )
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_team_identity (
                         team_identity_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -7287,7 +8476,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                             REFERENCES rn_team_season(team_season_id)
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_competition_mapping (
                         competition_season_id INTEGER PRIMARY KEY,
@@ -7325,7 +8514,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                             )
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_team_mapping (
                         team_season_id INTEGER PRIMARY KEY,
@@ -7361,12 +8550,12 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                     """);
             }
         }
-    
+
         private static void importSeasonsAndSources(
                 Connection connection) throws Exception {
-    
+
             String now = Instant.now().toString();
-    
+
             String seasonSql = """
                 INSERT INTO rn_season (
                     season_id,
@@ -7388,15 +8577,15 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 ON CONFLICT(season_id) DO UPDATE SET
                     updated_at = excluded.updated_at
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(seasonSql)) {
-    
+
                 statement.setString(1, now);
                 statement.setString(2, now);
                 statement.executeUpdate();
             }
-    
+
             String sourceSql = """
                 INSERT INTO rn_source_file (
                     import_id,
@@ -7438,24 +8627,24 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                     source_sha256 = excluded.source_sha256,
                     imported_at = excluded.imported_at
                 """;
-    
+
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(sourceSql);
             }
         }
-    
+
         private static void setAnchorSeason(
                 Connection connection,
                 String anchorSeason) throws Exception {
-    
+
             try (PreparedStatement check = connection.prepareStatement(
                     "SELECT COUNT(*) FROM rn_season WHERE season_id = ?")) {
-    
+
                 check.setString(1, anchorSeason);
-    
+
                 try (ResultSet result = check.executeQuery()) {
                     result.next();
-    
+
                     if (result.getInt(1) != 1) {
                         throw new IllegalArgumentException(
                             "Stagione-ancora non trovata: " + anchorSeason
@@ -7463,13 +8652,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                     }
                 }
             }
-    
+
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(
                     "UPDATE rn_season SET is_anchor = 0"
                 );
             }
-    
+
             try (PreparedStatement statement = connection.prepareStatement(
                     """
                     UPDATE rn_season
@@ -7477,37 +8666,37 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                         updated_at = ?
                     WHERE season_id = ?
                     """)) {
-    
+
                 statement.setString(1, Instant.now().toString());
                 statement.setString(2, anchorSeason);
                 statement.executeUpdate();
             }
         }
-    
+
         private static void importSeasonEntities(
                 Connection connection) throws Exception {
-    
+
             List<FcmSource> sources = readFcmSources(connection);
-    
+
             for (FcmSource source : sources) {
                 String competitionTable = findRawTable(
                     connection,
                     source.importId(),
                     "COMPETIZIONE"
                 );
-    
+
                 String teamTable = findRawTable(
                     connection,
                     source.importId(),
                     "FANTASQUADRA"
                 );
-    
+
                 importCompetitions(
                     connection,
                     source,
                     competitionTable
                 );
-    
+
                 importTeams(
                     connection,
                     source,
@@ -7515,12 +8704,12 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 );
             }
         }
-    
+
         private static List<FcmSource> readFcmSources(
                 Connection connection) throws Exception {
-    
+
             List<FcmSource> sources = new ArrayList<>();
-    
+
             String sql = """
                 SELECT
                     source_file_id,
@@ -7536,10 +8725,10 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                   )
                 ORDER BY season_id, import_id
                 """;
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery(sql)) {
-    
+
                 while (result.next()) {
                     sources.add(
                         new FcmSource(
@@ -7550,31 +8739,31 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                     );
                 }
             }
-    
+
             return sources;
         }
-    
+
         private static String findRawTable(
                 Connection connection,
                 long importId,
                 String sourceTableName) throws Exception {
-    
+
             String sql = """
                 SELECT raw_table_name
                 FROM rn_table_catalog
                 WHERE import_id = ?
                   AND UPPER(source_table_name) = ?
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setLong(1, importId);
                 statement.setString(
                     2,
                     sourceTableName.toUpperCase(Locale.ROOT)
                 );
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
                         throw new IllegalStateException(
@@ -7584,17 +8773,17 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                                 + sourceTableName
                         );
                     }
-    
+
                     return result.getString("raw_table_name");
                 }
             }
         }
-    
+
         private static void importCompetitions(
                 Connection connection,
                 FcmSource source,
                 String rawTable) throws Exception {
-    
+
             String sql = """
                 INSERT INTO rn_competition_season (
                     season_id,
@@ -7622,22 +8811,22 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                     source_name = excluded.source_name,
                     normalized_name = excluded.normalized_name
                 """.formatted(quoteIdentifier(rawTable));
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, source.seasonId());
                 statement.setLong(2, source.sourceFileId());
                 statement.setString(3, Instant.now().toString());
                 statement.executeUpdate();
             }
         }
-    
+
         private static void importTeams(
                 Connection connection,
                 FcmSource source,
                 String rawTable) throws Exception {
-    
+
             String sql = """
                 INSERT INTO rn_team_season (
                     season_id,
@@ -7671,23 +8860,23 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                     source_division_id = excluded.source_division_id,
                     source_team_number = excluded.source_team_number
                 """.formatted(quoteIdentifier(rawTable));
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, source.seasonId());
                 statement.setLong(2, source.sourceFileId());
                 statement.setString(3, Instant.now().toString());
                 statement.executeUpdate();
             }
         }
-    
+
         private static void createAnchorIdentities(
                 Connection connection,
                 String anchorSeason) throws Exception {
-    
+
             String now = Instant.now().toString();
-    
+
             String competitionIdentitySql = """
                 INSERT INTO rn_competition_identity (
                     anchor_season_id,
@@ -7706,15 +8895,15 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 DO UPDATE SET
                     canonical_name = excluded.canonical_name
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(competitionIdentitySql)) {
-    
+
                 statement.setString(1, now);
                 statement.setString(2, anchorSeason);
                 statement.executeUpdate();
             }
-    
+
             String teamIdentitySql = """
                 INSERT INTO rn_team_identity (
                     anchor_season_id,
@@ -7733,15 +8922,15 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 DO UPDATE SET
                     canonical_name = excluded.canonical_name
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(teamIdentitySql)) {
-    
+
                 statement.setString(1, now);
                 statement.setString(2, anchorSeason);
                 statement.executeUpdate();
             }
-    
+
             String anchorCompetitionMappingSql = """
                 INSERT INTO rn_competition_mapping (
                     competition_season_id,
@@ -7772,17 +8961,17 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                     notes = NULL,
                     updated_at = excluded.updated_at
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(
                          anchorCompetitionMappingSql
                      )) {
-    
+
                 statement.setString(1, now);
                 statement.setString(2, anchorSeason);
                 statement.executeUpdate();
             }
-    
+
             String anchorTeamMappingSql = """
                 INSERT INTO rn_team_mapping (
                     team_season_id,
@@ -7812,22 +9001,22 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                     notes = NULL,
                     updated_at = excluded.updated_at
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(anchorTeamMappingSql)) {
-    
+
                 statement.setString(1, now);
                 statement.setString(2, anchorSeason);
                 statement.executeUpdate();
             }
         }
-    
+
         private static void initializeHistoricalMappings(
                 Connection connection,
                 String anchorSeason) throws Exception {
-    
+
             String now = Instant.now().toString();
-    
+
             String competitionSql = """
                 INSERT INTO rn_competition_mapping (
                     competition_season_id,
@@ -7848,15 +9037,15 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 WHERE season_id <> ?
                 ON CONFLICT(competition_season_id) DO NOTHING
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(competitionSql)) {
-    
+
                 statement.setString(1, now);
                 statement.setString(2, anchorSeason);
                 statement.executeUpdate();
             }
-    
+
             String teamSql = """
                 INSERT INTO rn_team_mapping (
                     team_season_id,
@@ -7877,63 +9066,63 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 WHERE season_id <> ?
                 ON CONFLICT(team_season_id) DO NOTHING
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(teamSql)) {
-    
+
                 statement.setString(1, now);
                 statement.setString(2, anchorSeason);
                 statement.executeUpdate();
             }
         }
-    
+
         private static void printSummary(
                 Connection connection,
                 String anchorSeason) throws Exception {
-    
+
             System.out.println();
             System.out.println("Configurazione multistagione installata");
             System.out.println("Database       : "
                 + connection.getMetaData().getURL());
             System.out.println("Stagione ancora: " + anchorSeason);
             System.out.println();
-    
+
             printCount(
                 connection,
                 "Stagioni",
                 "SELECT COUNT(*) FROM rn_season"
             );
-    
+
             printCount(
                 connection,
                 "Sorgenti",
                 "SELECT COUNT(*) FROM rn_source_file"
             );
-    
+
             printCount(
                 connection,
                 "Competizioni locali",
                 "SELECT COUNT(*) FROM rn_competition_season"
             );
-    
+
             printCount(
                 connection,
                 "Squadre locali",
                 "SELECT COUNT(*) FROM rn_team_season"
             );
-    
+
             printCount(
                 connection,
                 "Identità competizioni",
                 "SELECT COUNT(*) FROM rn_competition_identity"
             );
-    
+
             printCount(
                 connection,
                 "Identità squadre",
                 "SELECT COUNT(*) FROM rn_team_identity"
             );
-    
+
             printCount(
                 connection,
                 "Competizioni da configurare",
@@ -7943,7 +9132,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 WHERE mapping_status = 'DA_CONFIGURARE'
                 """
             );
-    
+
             printCount(
                 connection,
                 "Squadre da configurare",
@@ -7954,17 +9143,17 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 """
             );
         }
-    
+
         private static void printCount(
                 Connection connection,
                 String label,
                 String sql) throws Exception {
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery(sql)) {
-    
+
                 result.next();
-    
+
                 System.out.printf(
                     Locale.ROOT,
                     "%-28s: %d%n",
@@ -7973,13 +9162,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
                 );
             }
         }
-    
+
         private static String quoteIdentifier(String value) {
             return "\""
                 + value.replace("\"", "\"\"")
                 + "\"";
         }
-    
+
         private record FcmSource(
             long sourceFileId,
             long importId,
@@ -7993,7 +9182,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
 File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.io.IOException;
     import java.nio.charset.Charset;
     import java.nio.charset.CodingErrorAction;
@@ -8020,13 +9209,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
     import java.util.TreeMap;
     import java.util.regex.Matcher;
     import java.util.regex.Pattern;
-    
+
     /**
      * Importa le date delle giornate dai DataA-AAAA.js della configurazione
      * di ConfrontiStorici. Non apre file FCM/FCA e non modifica gli export.
      */
     public final class ConfrontiStoriciCalendarImporter {
-    
+
         private static final String CONFIG_KEY = "confrontistorici_data_directory";
         private static final Pattern SEASON_PATTERN = Pattern.compile("^(\\d{4})_(\\d{4})$");
         private static final Pattern DATE_LINE_PATTERN = Pattern.compile(
@@ -8036,24 +9225,24 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
             .dateFormatter();
         private static final DateTimeFormatter DATA_A_DATE_TIME_FORMAT = new DateTimeFormatterBuilderSafe()
             .dateTimeFormatter();
-    
+
         private ConfrontiStoriciCalendarImporter() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length < 2) {
                 usage();
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
             String command = args[1].trim().toLowerCase(Locale.ROOT);
-    
+
             Class.forName("org.sqlite.JDBC");
             try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + database)) {
                 configure(connection);
                 installSchema(connection);
-    
+
                 switch (command) {
                     case "set-directory" -> setDirectory(connection, args);
                     case "resolve" -> resolveCommand(connection, args);
@@ -8068,7 +9257,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 }
             }
         }
-    
+
         static void installSchema(Connection connection) throws Exception {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
@@ -8078,7 +9267,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_matchday_date (
                         season_id TEXT NOT NULL,
@@ -8091,16 +9280,16 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                         FOREIGN KEY (season_id) REFERENCES rn_season(season_id)
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE INDEX IF NOT EXISTS ix_rn_matchday_date_date
                     ON rn_matchday_date(match_date)
                     """);
             }
-    
+
             addColumnIfMissing(connection, "rn_matchday_date", "match_time", "TEXT");
             addColumnIfMissing(connection, "rn_matchday_date", "match_datetime", "TEXT");
-    
+
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
                     CREATE INDEX IF NOT EXISTS ix_rn_matchday_date_datetime
@@ -8108,13 +9297,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                     """);
             }
         }
-    
+
         private static void addColumnIfMissing(
                 Connection connection,
                 String table,
                 String column,
                 String definition) throws Exception {
-    
+
             boolean present = false;
             try (Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery("PRAGMA table_info(" + table + ")")) {
@@ -8125,7 +9314,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                     }
                 }
             }
-    
+
             if (!present) {
                 try (Statement statement = connection.createStatement()) {
                     statement.execute("ALTER TABLE " + table + " ADD COLUMN "
@@ -8133,14 +9322,14 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 }
             }
         }
-    
+
         private static void setDirectory(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 3, "<db> set-directory <directory-config-ConfrontiStorici>");
             Path directory = Path.of(args[2]).toAbsolutePath().normalize();
             if (!Files.isDirectory(directory)) {
                 throw new IllegalArgumentException("Directory non trovata: " + directory);
             }
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 INSERT INTO rn_global_configuration(config_key, config_value, updated_at)
                 VALUES (?, ?, CURRENT_TIMESTAMP)
@@ -8152,10 +9341,10 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 statement.setString(2, directory.toString());
                 statement.executeUpdate();
             }
-    
+
             System.out.println("Directory ConfrontiStorici configurata: " + directory);
         }
-    
+
         private static void resolveCommand(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 3, "<db> resolve <stagione>");
             String season = requireSeason(connection, args[2]);
@@ -8163,19 +9352,19 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
             System.out.println(file);
             System.out.println(Files.isRegularFile(file) ? "TROVATO" : "MANCANTE");
         }
-    
+
         private static void inspectCommand(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 3, "<db> inspect <stagione>");
             String season = requireSeason(connection, args[2]);
             Inspection inspection = inspect(resolveExistingFile(connection, season), season);
             printInspection(inspection);
         }
-    
+
         private static void importCommand(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 3, "<db> import <stagione>");
             String season = requireSeason(connection, args[2]);
             Inspection inspection = inspect(resolveExistingFile(connection, season), season);
-    
+
             connection.setAutoCommit(false);
             try {
                 try (PreparedStatement delete = connection.prepareStatement(
@@ -8183,7 +9372,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                     delete.setString(1, season);
                     delete.executeUpdate();
                 }
-    
+
                 try (PreparedStatement insert = connection.prepareStatement("""
                     INSERT INTO rn_matchday_date (
                         season_id, serie_a_round, match_date,
@@ -8204,7 +9393,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                     }
                     insert.executeBatch();
                 }
-    
+
                 connection.commit();
             } catch (Exception exception) {
                 connection.rollback();
@@ -8212,18 +9401,18 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
             } finally {
                 connection.setAutoCommit(true);
             }
-    
+
             System.out.printf(
                 Locale.ROOT,
                 "Importate %d giornate per %s da %s%n",
                 inspection.dates().size(), season, inspection.file()
             );
         }
-    
+
         private static void showCommand(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 3, "<db> show <stagione>");
             String season = requireSeason(connection, args[2]);
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT serie_a_round, match_date, match_time,
                        match_datetime, source_path, source_sha256
@@ -8251,13 +9440,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 }
             }
         }
-    
+
         private static void validateCommand(Connection connection, String[] args) throws Exception {
             requireArgCount(args, 3, "<db> validate <stagione>");
             String season = requireSeason(connection, args[2]);
             Path file = resolveExistingFile(connection, season);
             Inspection current = inspect(file, season);
-    
+
             String sql = """
                 SELECT COUNT(*) AS total,
                        COUNT(DISTINCT serie_a_round) AS distinct_rounds,
@@ -8268,7 +9457,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 FROM rn_matchday_date
                 WHERE season_id = ?
                 """;
-    
+
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, season);
                 try (ResultSet result = statement.executeQuery()) {
@@ -8279,7 +9468,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                     int last = result.getInt("last_round");
                     String minHash = result.getString("min_hash");
                     String maxHash = result.getString("max_hash");
-    
+
                     List<String> errors = new ArrayList<>();
                     if (total == 0) {
                         errors.add("nessuna data importata");
@@ -8298,7 +9487,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                             || !minHash.equals(current.sha256()))) {
                         errors.add("file DataA.js cambiato dopo l'importazione");
                     }
-    
+
                     if (!errors.isEmpty()) {
                         System.out.println(season + " NON VALIDA");
                         errors.forEach(error -> System.out.println("- " + error));
@@ -8310,13 +9499,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 }
             }
         }
-    
+
         private static Inspection inspect(Path file, String season) throws Exception {
             byte[] bytes = Files.readAllBytes(file);
             String text = decode(bytes);
             Map<Integer, MatchdayDate> parsed = new TreeMap<>();
             Matcher matcher = DATE_LINE_PATTERN.matcher(text);
-    
+
             while (matcher.find()) {
                 int round = Integer.parseInt(matcher.group(1));
                 String rawValue = matcher.group(2).trim();
@@ -8348,13 +9537,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                     throw new IllegalArgumentException("Giornata duplicata nel file: " + round);
                 }
             }
-    
+
             if (parsed.isEmpty()) {
                 throw new IllegalArgumentException(
                     "Nessuna assegnazione dataGiornata[n] trovata in " + file
                 );
             }
-    
+
             int expected = 1;
             for (int round : parsed.keySet()) {
                 if (round != expected) {
@@ -8364,12 +9553,12 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 }
                 expected++;
             }
-    
+
             SeasonYears years = parseSeason(season);
             List<MatchdayDate> dates = parsed.values().stream()
                 .sorted(Comparator.comparingInt(MatchdayDate::round))
                 .toList();
-    
+
             for (MatchdayDate item : dates) {
                 int year = item.date().getYear();
                 if (year != years.startYear() && year != years.endYear()) {
@@ -8378,10 +9567,10 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                     );
                 }
             }
-    
+
             return new Inspection(file, sha256(bytes), dates);
         }
-    
+
         private static void printInspection(Inspection inspection) {
             MatchdayDate first = inspection.dates().getFirst();
             MatchdayDate last = inspection.dates().getLast();
@@ -8391,7 +9580,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
             System.out.println("Ultima   : " + last.round() + " -> " + last.displayValue());
             System.out.println("SHA-256  : " + inspection.sha256());
         }
-    
+
         private static Path resolveExistingFile(Connection connection, String season)
                 throws Exception {
             Path file = resolveFile(connection, season);
@@ -8400,14 +9589,14 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
             }
             return file;
         }
-    
+
         private static Path resolveFile(Connection connection, String season) throws Exception {
             SeasonYears years = parseSeason(season);
             Path directory = configuredDirectory(connection);
             return directory.resolve("DataA-" + years.startYear() + ".js")
                 .toAbsolutePath().normalize();
         }
-    
+
         private static Path configuredDirectory(Connection connection) throws Exception {
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT config_value
@@ -8433,7 +9622,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 }
             }
         }
-    
+
         private static String requireSeason(Connection connection, String value) throws Exception {
             String season = value.trim();
             parseSeason(season);
@@ -8449,7 +9638,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
             }
             return season;
         }
-    
+
         private static SeasonYears parseSeason(String season) {
             Matcher matcher = SEASON_PATTERN.matcher(season);
             if (!matcher.matches()) {
@@ -8464,7 +9653,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
             }
             return new SeasonYears(start, end);
         }
-    
+
         private static String decode(byte[] bytes) throws IOException {
             try {
                 return StandardCharsets.UTF_8.newDecoder()
@@ -8478,24 +9667,24 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 ).toString();
             }
         }
-    
+
         private static String sha256(byte[] bytes) throws Exception {
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
         }
-    
+
         private static void configure(Connection connection) throws Exception {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("PRAGMA foreign_keys = ON");
                 statement.execute("PRAGMA busy_timeout = 10000");
             }
         }
-    
+
         private static void requireArgCount(String[] args, int expected, String usage) {
             if (args.length != expected) {
                 throw new IllegalArgumentException("Uso: " + usage);
             }
         }
-    
+
         private static void usage() {
             System.err.println("Comandi:");
             System.err.println("  <db> set-directory <directory-config-ConfrontiStorici>");
@@ -8505,7 +9694,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
             System.err.println("  <db> show <stagione>");
             System.err.println("  <db> validate <stagione>");
         }
-    
+
         private record MatchdayDate(
             int round,
             LocalDate date,
@@ -8516,13 +9705,13 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                 return dateTime == null ? date.toString() : dateTime.toString();
             }
         }
-    
+
         private record Inspection(Path file, String sha256, List<MatchdayDate> dates) {
         }
-    
+
         private record SeasonYears(int startYear, int endYear) {
         }
-    
+
         /** Isola la costruzione dei formatter per i DataA.js storici. */
         private static final class DateTimeFormatterBuilderSafe {
             DateTimeFormatter dateFormatter() {
@@ -8531,7 +9720,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
                     .appendPattern("MMMM d uuuu")
                     .toFormatter(Locale.ENGLISH);
             }
-    
+
             DateTimeFormatter dateTimeFormatter() {
                 return new java.time.format.DateTimeFormatterBuilder()
                     .parseCaseInsensitive()
@@ -8546,7 +9735,7 @@ File: src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.ja
 File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.io.BufferedWriter;
     import java.io.IOException;
     import java.io.Writer;
@@ -8568,12 +9757,12 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
     import java.util.List;
     import java.util.Locale;
     import java.util.Map;
-    
+
     public final class DatabaseInspector {
-    
+
         private DatabaseInspector() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 2) {
                 System.err.println(
@@ -8581,39 +9770,39 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
                 );
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
             Path output = Path.of(args[1]).toAbsolutePath().normalize();
-    
+
             if (!Files.isRegularFile(database)) {
                 throw new IllegalArgumentException(
                     "Database non trovato: " + database
                 );
             }
-    
+
             Path outputParent = output.getParent();
-    
+
             if (outputParent != null) {
                 Files.createDirectories(outputParent);
             }
-    
+
             Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
-    
+
             long totalStarted = System.nanoTime();
             String jdbcUrl = "jdbc:ucanaccess://" + database;
-    
+
             Map<String, Object> report = new LinkedHashMap<>();
             report.put("schemaVersion", 1);
             report.put("generatedAt", Instant.now().toString());
             report.put("source", inspectSource(database));
-    
+
             try (Connection connection = DriverManager.getConnection(jdbcUrl)) {
                 long openedAt = System.nanoTime();
-    
+
                 connection.setReadOnly(true);
-    
+
                 DatabaseMetaData metadata = connection.getMetaData();
-    
+
                 Map<String, Object> driver = new LinkedHashMap<>();
                 driver.put("name", metadata.getDriverName());
                 driver.put("version", metadata.getDriverVersion());
@@ -8625,35 +9814,35 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
                     metadata.getDatabaseProductVersion()
                 );
                 report.put("driver", driver);
-    
+
                 List<String> tableNames = readTableNames(metadata);
                 List<Map<String, Object>> tables = new ArrayList<>();
-    
+
                 long totalRows = 0;
                 long totalColumns = 0;
-    
+
                 for (String tableName : tableNames) {
                     Map<String, Object> table = inspectTable(
                         connection,
                         metadata,
                         tableName
                     );
-    
+
                     totalRows += ((Number) table.get("rowCount")).longValue();
                     totalColumns += ((Number) table.get("columnCount")).longValue();
-    
+
                     tables.add(table);
                 }
-    
+
                 long finishedAt = System.nanoTime();
-    
+
                 Map<String, Object> summary = new LinkedHashMap<>();
                 summary.put("tableCount", tables.size());
                 summary.put("columnCount", totalColumns);
                 summary.put("rowCount", totalRows);
                 report.put("summary", summary);
                 report.put("tables", tables);
-    
+
                 Map<String, Object> timings = new LinkedHashMap<>();
                 timings.put(
                     "openMilliseconds",
@@ -8669,23 +9858,23 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
                 );
                 report.put("timings", timings);
             }
-    
+
             try (BufferedWriter writer = Files.newBufferedWriter(
                     output,
                     StandardCharsets.UTF_8)) {
-    
+
                 writeJson(report, writer, 0);
                 writer.write(System.lineSeparator());
             }
-    
+
             @SuppressWarnings("unchecked")
             Map<String, Object> summary =
                 (Map<String, Object>) report.get("summary");
-    
+
             @SuppressWarnings("unchecked")
             Map<String, Object> timings =
                 (Map<String, Object>) report.get("timings");
-    
+
             System.out.println();
             System.out.println("Inventario completato");
             System.out.println("Database : " + database);
@@ -8710,119 +9899,119 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
                 ((Number) timings.get("totalMilliseconds")).doubleValue() / 1000.0
             );
         }
-    
+
         private static Map<String, Object> inspectSource(Path database)
                 throws Exception {
-    
+
             Map<String, Object> source = new LinkedHashMap<>();
-    
+
             source.put("path", database.toString());
             source.put("fileName", database.getFileName().toString());
             source.put("sourceType", detectSourceType(database));
             source.put("sizeBytes", Files.size(database));
-    
+
             FileTime modified = Files.getLastModifiedTime(database);
             source.put("lastModified", modified.toInstant().toString());
             source.put("sha256", sha256(database));
-    
+
             return source;
         }
-    
+
         private static String detectSourceType(Path database) {
             String name = database.getFileName()
                 .toString()
                 .toLowerCase(Locale.ROOT);
-    
+
             if (name.endsWith(".fcm")) {
                 return "FCM";
             }
-    
+
             if (name.endsWith(".fca")) {
                 return "FCA";
             }
-    
+
             return "UNKNOWN";
         }
-    
+
         private static List<String> readTableNames(DatabaseMetaData metadata)
                 throws Exception {
-    
+
             List<String> tables = new ArrayList<>();
-    
+
             try (ResultSet rs = metadata.getTables(
                     null,
                     null,
                     "%",
                     new String[]{"TABLE"})) {
-    
+
                 while (rs.next()) {
                     String tableName = rs.getString("TABLE_NAME");
-    
+
                     if (tableName != null && !tableName.isBlank()) {
                         tables.add(tableName);
                     }
                 }
             }
-    
+
             tables.sort(String.CASE_INSENSITIVE_ORDER);
             return tables;
         }
-    
+
         private static Map<String, Object> inspectTable(
                 Connection connection,
                 DatabaseMetaData metadata,
                 String tableName) throws Exception {
-    
+
             Map<String, Object> table = new LinkedHashMap<>();
-    
+
             long rowCount = countRows(connection, tableName);
             List<Map<String, Object>> columns = readColumns(metadata, tableName);
             List<Map<String, Object>> primaryKeys =
                 readPrimaryKeys(metadata, tableName);
             List<Map<String, Object>> indexes = readIndexes(metadata, tableName);
-    
+
             table.put("name", tableName);
             table.put("rowCount", rowCount);
             table.put("columnCount", columns.size());
             table.put("columns", columns);
             table.put("primaryKeys", primaryKeys);
             table.put("indexes", indexes);
-    
+
             return table;
         }
-    
+
         private static long countRows(
                 Connection connection,
                 String tableName) throws Exception {
-    
+
             String escapedName = tableName.replace("]", "]]");
             String sql = "SELECT COUNT(*) FROM [" + escapedName + "]";
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet rs = statement.executeQuery(sql)) {
-    
+
                 rs.next();
                 return rs.getLong(1);
             }
         }
-    
+
         private static List<Map<String, Object>> readColumns(
                 DatabaseMetaData metadata,
                 String tableName) throws Exception {
-    
+
             List<Map<String, Object>> columns = new ArrayList<>();
-    
+
             try (ResultSet rs = metadata.getColumns(
                     null,
                     null,
                     tableName,
                     "%")) {
-    
+
                 while (rs.next()) {
                     Map<String, Object> column = new LinkedHashMap<>();
-    
+
                     int nullableCode = rs.getInt("NULLABLE");
-    
+
                     column.put("name", rs.getString("COLUMN_NAME"));
                     column.put("ordinalPosition", rs.getInt("ORDINAL_POSITION"));
                     column.put("jdbcType", rs.getInt("DATA_TYPE"));
@@ -8851,69 +10040,69 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
                         "generatedColumn",
                         safeGetString(rs, "IS_GENERATEDCOLUMN")
                     );
-    
+
                     columns.add(column);
                 }
             }
-    
+
             columns.sort(Comparator.comparingInt(
                 item -> ((Number) item.get("ordinalPosition")).intValue()
             ));
-    
+
             return columns;
         }
-    
+
         private static List<Map<String, Object>> readPrimaryKeys(
                 DatabaseMetaData metadata,
                 String tableName) throws Exception {
-    
+
             List<Map<String, Object>> primaryKeys = new ArrayList<>();
-    
+
             try (ResultSet rs = metadata.getPrimaryKeys(
                     null,
                     null,
                     tableName)) {
-    
+
                 while (rs.next()) {
                     Map<String, Object> key = new LinkedHashMap<>();
-    
+
                     key.put("name", rs.getString("PK_NAME"));
                     key.put("columnName", rs.getString("COLUMN_NAME"));
                     key.put("keySequence", rs.getInt("KEY_SEQ"));
-    
+
                     primaryKeys.add(key);
                 }
             }
-    
+
             primaryKeys.sort(Comparator.comparingInt(
                 item -> ((Number) item.get("keySequence")).intValue()
             ));
-    
+
             return primaryKeys;
         }
-    
+
         private static List<Map<String, Object>> readIndexes(
                 DatabaseMetaData metadata,
                 String tableName) throws Exception {
-    
+
             List<Map<String, Object>> indexes = new ArrayList<>();
-    
+
             try (ResultSet rs = metadata.getIndexInfo(
                     null,
                     null,
                     tableName,
                     false,
                     false)) {
-    
+
                 while (rs.next()) {
                     String indexName = rs.getString("INDEX_NAME");
-    
+
                     if (indexName == null || indexName.isBlank()) {
                         continue;
                     }
-    
+
                     Map<String, Object> index = new LinkedHashMap<>();
-    
+
                     index.put("name", indexName);
                     index.put("unique", !rs.getBoolean("NON_UNIQUE"));
                     index.put("type", rs.getShort("TYPE"));
@@ -8924,11 +10113,11 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
                     index.put("columnName", rs.getString("COLUMN_NAME"));
                     index.put("sortDirection", rs.getString("ASC_OR_DESC"));
                     index.put("filterCondition", rs.getString("FILTER_CONDITION"));
-    
+
                     indexes.add(index);
                 }
             }
-    
+
     indexes.sort(
         Comparator
             .comparing(
@@ -8941,154 +10130,154 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
                     ((Number) item.get("ordinalPosition")).intValue()
             )
     );
-    
+
             return indexes;
         }
-    
+
         private static Integer nullableInteger(
                 ResultSet rs,
                 String columnName) throws Exception {
-    
+
             int value = rs.getInt(columnName);
             return rs.wasNull() ? null : value;
         }
-    
+
         private static String safeGetString(
                 ResultSet rs,
                 String columnName) {
-    
+
             try {
                 return rs.getString(columnName);
             } catch (Exception ignored) {
                 return null;
             }
         }
-    
+
         private static double nanosToMilliseconds(long nanos) {
             return Math.round((nanos / 1_000_000.0) * 1000.0) / 1000.0;
         }
-    
+
         private static String sha256(Path path) throws Exception {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-    
+
             try (var input = Files.newInputStream(path)) {
                 byte[] buffer = new byte[1024 * 1024];
                 int read;
-    
+
                 while ((read = input.read(buffer)) >= 0) {
                     digest.update(buffer, 0, read);
                 }
             }
-    
+
             return HexFormat.of().formatHex(digest.digest());
         }
-    
+
         private static void writeJson(
                 Object value,
                 Writer writer,
                 int indent) throws IOException {
-    
+
             if (value == null) {
                 writer.write("null");
                 return;
             }
-    
+
             if (value instanceof String text) {
                 writeJsonString(text, writer);
                 return;
             }
-    
+
             if (value instanceof Number || value instanceof Boolean) {
                 writer.write(String.valueOf(value));
                 return;
             }
-    
+
             if (value instanceof Map<?, ?> map) {
                 writeJsonMap(map, writer, indent);
                 return;
             }
-    
+
             if (value instanceof Iterable<?> iterable) {
                 writeJsonArray(iterable, writer, indent);
                 return;
             }
-    
+
             writeJsonString(String.valueOf(value), writer);
         }
-    
+
         private static void writeJsonMap(
                 Map<?, ?> map,
                 Writer writer,
                 int indent) throws IOException {
-    
+
             writer.write("{");
-    
+
             if (!map.isEmpty()) {
                 writer.write(System.lineSeparator());
-    
+
                 int index = 0;
-    
+
                 for (Map.Entry<?, ?> entry : map.entrySet()) {
                     writeIndent(writer, indent + 1);
                     writeJsonString(String.valueOf(entry.getKey()), writer);
                     writer.write(": ");
                     writeJson(entry.getValue(), writer, indent + 1);
-    
+
                     if (++index < map.size()) {
                         writer.write(",");
                     }
-    
+
                     writer.write(System.lineSeparator());
                 }
-    
+
                 writeIndent(writer, indent);
             }
-    
+
             writer.write("}");
         }
-    
+
         private static void writeJsonArray(
                 Iterable<?> iterable,
                 Writer writer,
                 int indent) throws IOException {
-    
+
             List<Object> values = new ArrayList<>();
-    
+
             for (Object value : iterable) {
                 values.add(value);
             }
-    
+
             writer.write("[");
-    
+
             if (!values.isEmpty()) {
                 writer.write(System.lineSeparator());
-    
+
                 for (int index = 0; index < values.size(); index++) {
                     writeIndent(writer, indent + 1);
                     writeJson(values.get(index), writer, indent + 1);
-    
+
                     if (index + 1 < values.size()) {
                         writer.write(",");
                     }
-    
+
                     writer.write(System.lineSeparator());
                 }
-    
+
                 writeIndent(writer, indent);
             }
-    
+
             writer.write("]");
         }
-    
+
         private static void writeJsonString(
                 String text,
                 Writer writer) throws IOException {
-    
+
             writer.write("\"");
-    
+
             for (int index = 0; index < text.length(); index++) {
                 char character = text.charAt(index);
-    
+
                 switch (character) {
                     case '"' -> writer.write("\\\"");
                     case '\\' -> writer.write("\\\\");
@@ -9112,15 +10301,451 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
                     }
                 }
             }
-    
+
             writer.write("\"");
         }
-    
+
         private static void writeIndent(
                 Writer writer,
                 int indent) throws IOException {
-    
+
             writer.write("  ".repeat(indent));
+        }
+    }
+
+## src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
+
+File: src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
+
+    package it.alterlega.recordsnext.gui;
+
+    import it.alterlega.recordsnext.app.culometro.CulometroConfig;
+    import it.alterlega.recordsnext.app.culometro.CulometroConfigLoader;
+    import it.alterlega.recordsnext.app.culometro.CulometroConfigWriter;
+
+    import javax.swing.*;
+    import javax.swing.border.EmptyBorder;
+    import javax.swing.event.ChangeListener;
+    import javax.swing.table.AbstractTableModel;
+    import java.awt.*;
+    import java.math.BigDecimal;
+    import java.nio.file.Path;
+    import java.util.ArrayList;
+    import java.util.LinkedHashMap;
+    import java.util.List;
+    import java.util.Map;
+
+    final class CulometroSettingsDialog extends JDialog {
+        private final Path configFile;
+        private CulometroConfig config;
+
+        private final JCheckBox enabled = new JCheckBox("Genera il Culometro");
+        private final JSpinner minimumMatches = new JSpinner(new SpinnerNumberModel(20, 10, 40, 1));
+        private final JSpinner kScale = new JSpinner(new SpinnerNumberModel(4.15, 3.00, 6.00, 0.05));
+        private final JSpinner secondaryWeight = new JSpinner(new SpinnerNumberModel(0.20, 0.10, 0.35, 0.01));
+        private final JSpinner rarityMultiplier = new JSpinner(new SpinnerNumberModel(5.25, 3.00, 6.50, 0.05));
+        private final JSpinner minimumOccurrences = new JSpinner(new SpinnerNumberModel(3, 1, 20, 1));
+
+        private final JSlider simpleSensitivity = new JSlider(300, 600, 415);
+        private final JSlider simpleReliability = new JSlider(10, 40, 20);
+        private final JComboBox<String> simpleRarity = new JComboBox<>(new String[]{"Bassa", "Normale", "Alta"});
+        private final JComboBox<String> simpleProfile = new JComboBox<>(new String[]{"Equilibrato", "Prudente", "Reattivo", "Personalizzato"});
+        private final JLabel sensitivityValue = new JLabel();
+        private final JLabel reliabilityValue = new JLabel();
+
+        private final JComboBox<String> preset = new JComboBox<>(new String[]{"GOLIARDICO", "NEUTRAL", "CUSTOM"});
+        private final ComponentTableModel componentModel = new ComponentTableModel();
+        private final LabelTableModel labelModel = new LabelTableModel();
+        private boolean synchronizing;
+        private boolean saved;
+
+        CulometroSettingsDialog(Window owner, Path configFile) throws Exception {
+            super(owner, "Culometro · configurazione", ModalityType.APPLICATION_MODAL);
+            this.configFile = configFile;
+            this.config = CulometroConfigLoader.load(configFile);
+            build();
+            load();
+        }
+
+        boolean open() {
+            setVisible(true);
+            return saved;
+        }
+
+        private void build() {
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setMinimumSize(new Dimension(880, 650));
+            setSize(980, 720);
+            setLocationRelativeTo(getOwner());
+
+            JPanel root = new JPanel(new BorderLayout(12, 12));
+            root.setBorder(new EmptyBorder(16, 16, 12, 16));
+            root.setBackground(new Color(244, 247, 252));
+
+            JPanel top = new JPanel(new BorderLayout());
+            top.setOpaque(false);
+            JLabel title = new JLabel("Culometro configurabile");
+            title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+            title.setForeground(new Color(26, 52, 105));
+            top.add(title, BorderLayout.WEST);
+            enabled.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            top.add(enabled, BorderLayout.EAST);
+            root.add(top, BorderLayout.NORTH);
+
+            JTabbedPane tabs = new JTabbedPane();
+            tabs.addTab("Semplice", buildSimplePanel());
+            tabs.addTab("Avanzata", buildAdvancedPanel());
+            tabs.addTab("Pesi fattori", new JScrollPane(buildComponentTable()));
+            tabs.addTab("Etichette", buildLabelsPanel());
+            root.add(tabs, BorderLayout.CENTER);
+
+            JButton save = new JButton("Salva configurazione");
+            JButton cancel = new JButton("Annulla");
+            save.addActionListener(e -> save());
+            cancel.addActionListener(e -> dispose());
+            JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+            buttons.setOpaque(false);
+            buttons.add(cancel);
+            buttons.add(save);
+            root.add(buttons, BorderLayout.SOUTH);
+            setContentPane(root);
+        }
+
+        private JPanel buildSimplePanel() {
+            JPanel page = new JPanel(new BorderLayout(10, 10));
+            page.setBorder(new EmptyBorder(14, 14, 14, 14));
+            page.setBackground(Color.WHITE);
+
+            JPanel controls = new JPanel(new GridBagLayout());
+            controls.setOpaque(false);
+            GridBagConstraints g = new GridBagConstraints();
+            g.gridx = 0;
+            g.gridy = 0;
+            g.anchor = GridBagConstraints.WEST;
+            g.fill = GridBagConstraints.HORIZONTAL;
+            g.weightx = 1;
+            g.insets = new Insets(7, 7, 7, 7);
+
+            addSimpleRow(controls, g, "Profilo di calcolo", simpleProfile,
+                    "Applica valori coordinati, modificabili successivamente.");
+            configureSlider(simpleSensitivity, 50, 5);
+            addSliderRow(controls, g, "Sensibilità dell'indice", simpleSensitivity, sensitivityValue,
+                    "Più bassa = valori più estremi; più alta = classifica più compressa.");
+            configureSlider(simpleReliability, 5, 1);
+            addSliderRow(controls, g, "Partite per piena affidabilità", simpleReliability, reliabilityValue,
+                    "Riduce gli estremi quando il campione è piccolo.");
+            addSimpleRow(controls, g, "Influenza della rarità", simpleRarity,
+                    "Limita quanto un episodio raro può incidere sul risultato.");
+
+            JPanel presets = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+            presets.setOpaque(false);
+            JButton balanced = new JButton("Equilibrato");
+            JButton prudent = new JButton("Prudente");
+            JButton reactive = new JButton("Reattivo");
+            balanced.addActionListener(e -> applySimpleProfile("Equilibrato"));
+            prudent.addActionListener(e -> applySimpleProfile("Prudente"));
+            reactive.addActionListener(e -> applySimpleProfile("Reattivo"));
+            presets.add(new JLabel("Impostazioni rapide:"));
+            presets.add(balanced);
+            presets.add(prudent);
+            presets.add(reactive);
+            g.gridy++;
+            controls.add(presets, g);
+
+            ChangeListener listener = e -> syncSimpleToAdvanced();
+            simpleSensitivity.addChangeListener(listener);
+            simpleReliability.addChangeListener(listener);
+            simpleRarity.addActionListener(e -> syncSimpleToAdvanced());
+            simpleProfile.addActionListener(e -> {
+                if (!synchronizing) applySimpleProfile(String.valueOf(simpleProfile.getSelectedItem()));
+            });
+
+            page.add(controls, BorderLayout.NORTH);
+            JLabel note = new JLabel("<html>Per regolare i singoli fattori usa le schede Avanzata e Pesi fattori. "
+                    + "I valori restano sempre entro i range ammessi.</html>");
+            note.setForeground(new Color(88, 96, 112));
+            page.add(note, BorderLayout.SOUTH);
+            return page;
+        }
+
+        private JPanel buildAdvancedPanel() {
+            JPanel panel = new JPanel(new GridBagLayout());
+            panel.setBorder(new EmptyBorder(18, 18, 18, 18));
+            panel.setBackground(Color.WHITE);
+            GridBagConstraints g = new GridBagConstraints();
+            g.gridx = 0;
+            g.gridy = 0;
+            g.anchor = GridBagConstraints.WEST;
+            g.insets = new Insets(7, 7, 7, 16);
+            addRow(panel, g, "Partite minime affidabili", minimumMatches);
+            addRow(panel, g, "Sensibilità della scala", kScale);
+            addRow(panel, g, "Peso evento secondario", secondaryWeight);
+            addRow(panel, g, "Moltiplicatore massimo rarità", rarityMultiplier);
+            addRow(panel, g, "Occorrenze storiche minime", minimumOccurrences);
+            g.gridy++;
+            g.weighty = 1;
+            panel.add(Box.createVerticalGlue(), g);
+
+            ChangeListener sync = e -> syncAdvancedToSimple();
+            minimumMatches.addChangeListener(sync);
+            kScale.addChangeListener(sync);
+            rarityMultiplier.addChangeListener(sync);
+            return panel;
+        }
+
+        private JTable buildComponentTable() {
+            JTable table = new JTable(componentModel);
+            table.setRowHeight(25);
+            table.setAutoCreateRowSorter(true);
+            return table;
+        }
+
+        private JPanel buildLabelsPanel() {
+            JPanel panel = new JPanel(new BorderLayout(10, 10));
+            panel.setBorder(new EmptyBorder(12, 12, 12, 12));
+            panel.setBackground(Color.WHITE);
+            JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            controls.setOpaque(false);
+            controls.add(new JLabel("Preset attivo:"));
+            controls.add(preset);
+            JButton goliardico = new JButton("Ripristina Goliardico");
+            JButton neutro = new JButton("Ripristina Neutro");
+            goliardico.addActionListener(e -> resetLabels("GOLIARDICO_DEFAULT", "GOLIARDICO"));
+            neutro.addActionListener(e -> resetLabels("NEUTRAL_DEFAULT", "NEUTRAL"));
+            controls.add(goliardico);
+            controls.add(neutro);
+            panel.add(controls, BorderLayout.NORTH);
+            JTable table = new JTable(labelModel);
+            table.setRowHeight(26);
+            panel.add(new JScrollPane(table), BorderLayout.CENTER);
+            JLabel hint = new JLabel("Le etichette sono sempre modificabili. Il reset ripristina la base originale del preset scelto.");
+            hint.setForeground(new Color(88, 96, 112));
+            panel.add(hint, BorderLayout.SOUTH);
+            return panel;
+        }
+
+        private static void configureSlider(JSlider slider, int major, int minor) {
+            slider.setMajorTickSpacing(major);
+            slider.setMinorTickSpacing(minor);
+            slider.setPaintTicks(true);
+        }
+
+        private static void addSimpleRow(JPanel panel, GridBagConstraints g, String label,
+                                         JComponent component, String hint) {
+            JPanel row = new JPanel(new BorderLayout(12, 2));
+            row.setOpaque(false);
+            JLabel title = new JLabel(label);
+            title.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            row.add(title, BorderLayout.WEST);
+            row.add(component, BorderLayout.CENTER);
+            JLabel help = new JLabel(hint);
+            help.setForeground(new Color(96, 104, 120));
+            row.add(help, BorderLayout.SOUTH);
+            panel.add(row, g);
+            g.gridy++;
+        }
+
+        private static void addSliderRow(JPanel panel, GridBagConstraints g, String label,
+                                         JSlider slider, JLabel value, String hint) {
+            JPanel control = new JPanel(new BorderLayout(8, 0));
+            control.setOpaque(false);
+            control.add(slider, BorderLayout.CENTER);
+            value.setPreferredSize(new Dimension(55, 24));
+            value.setHorizontalAlignment(SwingConstants.RIGHT);
+            value.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            control.add(value, BorderLayout.EAST);
+            addSimpleRow(panel, g, label, control, hint);
+        }
+
+        private static void addRow(JPanel panel, GridBagConstraints g, String label, JComponent component) {
+            g.gridx = 0;
+            g.weightx = 0;
+            g.fill = GridBagConstraints.NONE;
+            panel.add(new JLabel(label), g);
+            g.gridx = 1;
+            g.weightx = 1;
+            g.fill = GridBagConstraints.HORIZONTAL;
+            panel.add(component, g);
+            g.gridy++;
+        }
+
+        private void load() {
+            synchronizing = true;
+            enabled.setSelected(config.enabled());
+            minimumMatches.setValue(config.minimumMatches());
+            kScale.setValue(config.kScale().doubleValue());
+            secondaryWeight.setValue(config.secondaryWeight().doubleValue());
+            rarityMultiplier.setValue(config.maximumRarityMultiplier().doubleValue());
+            minimumOccurrences.setValue(config.minimumHistoricalOccurrences());
+            preset.setSelectedItem(config.labelConfiguration().preset());
+            componentModel.set(config.components());
+            labelModel.set(config.labels());
+            syncAdvancedToSimple();
+            simpleProfile.setSelectedItem("Personalizzato");
+            synchronizing = false;
+        }
+
+        private void applySimpleProfile(String profile) {
+            if ("Personalizzato".equals(profile) || synchronizing) return;
+            synchronizing = true;
+            switch (profile) {
+                case "Prudente" -> {
+                    simpleSensitivity.setValue(500);
+                    simpleReliability.setValue(30);
+                    simpleRarity.setSelectedItem("Bassa");
+                }
+                case "Reattivo" -> {
+                    simpleSensitivity.setValue(350);
+                    simpleReliability.setValue(14);
+                    simpleRarity.setSelectedItem("Alta");
+                }
+                default -> {
+                    simpleSensitivity.setValue(415);
+                    simpleReliability.setValue(20);
+                    simpleRarity.setSelectedItem("Normale");
+                }
+            }
+            synchronizing = false;
+            syncSimpleToAdvanced();
+        }
+
+        private void syncSimpleToAdvanced() {
+            if (synchronizing) return;
+            synchronizing = true;
+            kScale.setValue(simpleSensitivity.getValue() / 100.0);
+            minimumMatches.setValue(simpleReliability.getValue());
+            rarityMultiplier.setValue(switch (String.valueOf(simpleRarity.getSelectedItem())) {
+                case "Bassa" -> 3.50;
+                case "Alta" -> 6.50;
+                default -> 5.25;
+            });
+            sensitivityValue.setText(String.format(java.util.Locale.ROOT, "%.2f", simpleSensitivity.getValue() / 100.0));
+            reliabilityValue.setText(String.valueOf(simpleReliability.getValue()));
+            if (!"Personalizzato".equals(simpleProfile.getSelectedItem())) {
+                simpleProfile.setSelectedItem("Personalizzato");
+            }
+            synchronizing = false;
+        }
+
+        private void syncAdvancedToSimple() {
+            if (synchronizing) return;
+            synchronizing = true;
+            simpleSensitivity.setValue((int) Math.round(((Number) kScale.getValue()).doubleValue() * 100));
+            simpleReliability.setValue(((Number) minimumMatches.getValue()).intValue());
+            double rarity = ((Number) rarityMultiplier.getValue()).doubleValue();
+            simpleRarity.setSelectedItem(rarity <= 4.0 ? "Bassa" : rarity >= 6.0 ? "Alta" : "Normale");
+            sensitivityValue.setText(String.format(java.util.Locale.ROOT, "%.2f", simpleSensitivity.getValue() / 100.0));
+            reliabilityValue.setText(String.valueOf(simpleReliability.getValue()));
+            simpleProfile.setSelectedItem("Personalizzato");
+            synchronizing = false;
+        }
+
+        private void resetLabels(String source, String activePreset) {
+            List<CulometroConfig.LabelBand> bands = config.labelConfiguration().presetDefaults().get(source);
+            if (bands == null) return;
+            labelModel.set(bands);
+            preset.setSelectedItem(activePreset);
+        }
+
+        private void save() {
+            try {
+                Map<String, CulometroConfig.Component> components = componentModel.toMap();
+                String selectedPreset = String.valueOf(preset.getSelectedItem());
+                String resetSource = switch (selectedPreset) {
+                    case "NEUTRAL" -> "NEUTRAL_DEFAULT";
+                    case "GOLIARDICO" -> "GOLIARDICO_DEFAULT";
+                    default -> config.labelConfiguration().resetSource();
+                };
+                List<CulometroConfig.LabelBand> activeBands = labelModel.toList();
+                List<CulometroConfig.LabelBand> resetBands = config.labelConfiguration().presetDefaults().get(resetSource);
+                boolean customized = resetBands == null || !activeBands.equals(resetBands);
+                CulometroConfig.LabelConfiguration labels = new CulometroConfig.LabelConfiguration(
+                        selectedPreset, customized, resetSource, activeBands,
+                        config.labelConfiguration().presetDefaults());
+                CulometroConfig updated = new CulometroConfig(
+                        enabled.isSelected(), ((Number) minimumMatches.getValue()).intValue(),
+                        decimal(kScale), decimal(secondaryWeight), decimal(rarityMultiplier),
+                        ((Number) minimumOccurrences.getValue()).intValue(), components, labels);
+                CulometroConfigWriter.save(configFile, updated);
+                config = updated;
+                saved = true;
+                dispose();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Configurazione non valida", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private static BigDecimal decimal(JSpinner spinner) {
+            return BigDecimal.valueOf(((Number) spinner.getValue()).doubleValue());
+        }
+
+        private static final class ComponentTableModel extends AbstractTableModel {
+            private final List<Row> rows = new ArrayList<>();
+            void set(Map<String, CulometroConfig.Component> source) {
+                rows.clear();
+                source.forEach((id, c) -> rows.add(new Row(id, c.enabled(), c.weight(), c.min(), c.max())));
+                fireTableDataChanged();
+            }
+            Map<String, CulometroConfig.Component> toMap() {
+                Map<String, CulometroConfig.Component> result = new LinkedHashMap<>();
+                for (Row r : rows) result.put(r.id, new CulometroConfig.Component(r.enabled, r.weight, r.min, r.max));
+                return result;
+            }
+            public int getRowCount() { return rows.size(); }
+            public int getColumnCount() { return 5; }
+            public String getColumnName(int c) { return new String[]{"Fattore", "Attivo", "Peso", "Min", "Max"}[c]; }
+            public Class<?> getColumnClass(int c) { return c == 1 ? Boolean.class : c >= 2 ? BigDecimal.class : String.class; }
+            public boolean isCellEditable(int r, int c) { return c == 1 || c == 2; }
+            public Object getValueAt(int r, int c) {
+                Row x = rows.get(r);
+                return switch (c) { case 0 -> x.id; case 1 -> x.enabled; case 2 -> x.weight; case 3 -> x.min; default -> x.max; };
+            }
+            public void setValueAt(Object value, int r, int c) {
+                Row x = rows.get(r);
+                if (c == 1) x.enabled = Boolean.TRUE.equals(value);
+                if (c == 2) x.weight = new BigDecimal(String.valueOf(value));
+                fireTableRowsUpdated(r, r);
+            }
+            private static final class Row {
+                final String id;
+                boolean enabled;
+                BigDecimal weight;
+                final BigDecimal min;
+                final BigDecimal max;
+                Row(String id, boolean enabled, BigDecimal weight, BigDecimal min, BigDecimal max) {
+                    this.id = id;
+                    this.enabled = enabled;
+                    this.weight = weight;
+                    this.min = min;
+                    this.max = max;
+                }
+            }
+        }
+
+        private static final class LabelTableModel extends AbstractTableModel {
+            private final List<CulometroConfig.LabelBand> rows = new ArrayList<>();
+            void set(List<CulometroConfig.LabelBand> source) {
+                rows.clear();
+                rows.addAll(source);
+                fireTableDataChanged();
+            }
+            List<CulometroConfig.LabelBand> toList() { return List.copyOf(rows); }
+            public int getRowCount() { return rows.size(); }
+            public int getColumnCount() { return 2; }
+            public String getColumnName(int c) { return c == 0 ? "Da indice" : "Etichetta"; }
+            public Class<?> getColumnClass(int c) { return c == 0 ? BigDecimal.class : String.class; }
+            public boolean isCellEditable(int r, int c) { return true; }
+            public Object getValueAt(int r, int c) {
+                var x = rows.get(r);
+                return c == 0 ? x.min() : x.label();
+            }
+            public void setValueAt(Object value, int r, int c) {
+                var x = rows.get(r);
+                rows.set(r, c == 0
+                        ? new CulometroConfig.LabelBand(new BigDecimal(String.valueOf(value)), x.label())
+                        : new CulometroConfig.LabelBand(x.min(), String.valueOf(value)));
+                fireTableRowsUpdated(r, r);
+            }
         }
     }
 
@@ -9129,18 +10754,18 @@ File: src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
 File: src\main\java\it\alterlega\recordsnext\gui\FcmSeasonDetector.java
 
     package it.alterlega.recordsnext.gui;
-    
+
     import java.nio.file.Path;
     import java.sql.*;
     import java.util.*;
     import java.util.regex.*;
-    
+
     final class FcmSeasonDetector {
         record Detection(String seasonId, int seasonNumber, String evidence) {}
-    
+
         private static final Pattern RANGE = Pattern.compile("(?<!\\d)(20\\d{2})[^0-9]{0,5}(20\\d{2})(?!\\d)");
         private static final Pattern SINGLE = Pattern.compile("(?<!\\d)(20\\d{2})(?!\\d)");
-    
+
         Detection detect(Path fcm) throws Exception {
             Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
             try (Connection c = DriverManager.getConnection("jdbc:ucanaccess://" + fcm.toAbsolutePath())) {
@@ -9153,51 +10778,51 @@ File: src\main\java\it\alterlega\recordsnext\gui\FcmSeasonDetector.java
                 "Impossibile ricavare stagione e numero stagione dalla tabella LEGA del file FCM selezionato."
             );
         }
-    
+
         private Detection detectFromLeague(Connection c) throws SQLException {
             String table = findTable(c, "LEGA");
             if (table == null) {
                 return null;
             }
-    
+
             Set<String> columns = columns(c, table);
             if (!containsIgnoreCase(columns, "STAGIONE")) {
                 return null;
             }
-    
+
             String seasonColumn = actualName(columns, "STAGIONE");
             String yearColumn = actualName(columns, "ANNOARCHIVIO");
             String nameColumn = actualName(columns, "NOME");
-    
+
             StringBuilder sql = new StringBuilder("SELECT TOP 1 [")
                 .append(escape(seasonColumn)).append("]");
             if (yearColumn != null) sql.append(", [").append(escape(yearColumn)).append("]");
             if (nameColumn != null) sql.append(", [").append(escape(nameColumn)).append("]");
             sql.append(" FROM [").append(escape(table)).append("]");
-    
+
             try (Statement st = c.createStatement(); ResultSet r = st.executeQuery(sql.toString())) {
                 if (!r.next()) {
                     return null;
                 }
-    
+
                 int seasonNumber = toPositiveInt(r.getObject(1));
                 if (seasonNumber < 1) {
                     throw new IllegalArgumentException("Il campo LEGA.STAGIONE non contiene un numero stagione valido.");
                 }
-    
+
                 int index = 2;
                 Integer archiveYear = null;
                 if (yearColumn != null) {
                     int value = toPositiveInt(r.getObject(index++));
                     if (value >= 1900 && value <= 2200) archiveYear = value;
                 }
-    
+
                 String leagueName = null;
                 if (nameColumn != null) {
                     Object value = r.getObject(index);
                     if (value != null) leagueName = value.toString();
                 }
-    
+
                 String seasonId = archiveYear == null ? parse(leagueName) : archiveYear + "_" + (archiveYear + 1);
                 if (seasonId == null) {
                     throw new IllegalArgumentException(
@@ -9205,7 +10830,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\FcmSeasonDetector.java
                             + " ma non consente di ricavare gli anni della stagione."
                     );
                 }
-    
+
                 return new Detection(
                     seasonId,
                     seasonNumber,
@@ -9214,7 +10839,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\FcmSeasonDetector.java
                 );
             }
         }
-    
+
         private static String findTable(Connection c, String expected) throws SQLException {
             DatabaseMetaData md = c.getMetaData();
             try (ResultSet tables = md.getTables(null, null, "%", new String[]{"TABLE"})) {
@@ -9225,7 +10850,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\FcmSeasonDetector.java
             }
             return null;
         }
-    
+
         private static Set<String> columns(Connection c, String table) throws SQLException {
             Set<String> out = new LinkedHashSet<>();
             try (ResultSet cols = c.getMetaData().getColumns(null, null, table, "%")) {
@@ -9233,29 +10858,29 @@ File: src\main\java\it\alterlega\recordsnext\gui\FcmSeasonDetector.java
             }
             return out;
         }
-    
+
         private static boolean containsIgnoreCase(Collection<String> values, String expected) {
             return actualName(values, expected) != null;
         }
-    
+
         private static String actualName(Collection<String> values, String expected) {
             for (String value : values) {
                 if (expected.equalsIgnoreCase(value)) return value;
             }
             return null;
         }
-    
+
         private static int toPositiveInt(Object value) {
             if (value instanceof Number n) return n.intValue();
             if (value == null) return -1;
             try { return Integer.parseInt(value.toString().trim()); }
             catch (NumberFormatException ex) { return -1; }
         }
-    
+
         private static String escape(String identifier) {
             return identifier.replace("]", "]]");
         }
-    
+
         private static String parse(String value) {
             if (value == null) return null;
             Matcher range = RANGE.matcher(value);
@@ -9278,17 +10903,17 @@ File: src\main\java\it\alterlega\recordsnext\gui\FcmSeasonDetector.java
 File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
 
     package it.alterlega.recordsnext.gui;
-    
+
     import javax.swing.*;
     import javax.swing.border.EmptyBorder;
     import java.awt.*;
     import java.util.ArrayList;
     import java.util.List;
-    
+
     final class HistoricalMappingDialog extends JDialog {
         private static final Object NEW_IDENTITY = "<Nuova identità storica>";
         private static final Object EXCLUDE = "<Non elaborare>";
-    
+
         private final HistoricalMappingRepository repository;
         private final List<String> seasons;
         private int seasonIndex;
@@ -9302,11 +10927,11 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
         private final JButton previous = new JButton("<< Indietro");
         private final JButton next = new JButton("Salva e avanti >>");
         private boolean saved;
-    
+
         HistoricalMappingDialog(Window owner, HistoricalMappingRepository repository) throws Exception {
             this(owner, repository, null);
         }
-    
+
         HistoricalMappingDialog(Window owner, HistoricalMappingRepository repository, String initialSeason) throws Exception {
             super(owner, "RecordsNext - Associazioni storiche", ModalityType.APPLICATION_MODAL);
             this.repository = repository;
@@ -9318,7 +10943,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
                 loadSeason(index < 0 ? 0 : index);
             }
         }
-    
+
         boolean open() {
             if (seasons.isEmpty()) {
                 JOptionPane.showMessageDialog(getOwner(), "Non ci sono stagioni gestite da configurare.", "RecordsNext", JOptionPane.INFORMATION_MESSAGE);
@@ -9327,7 +10952,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
             setVisible(true);
             return saved;
         }
-    
+
         private void build() {
             setLayout(new BorderLayout(8, 8));
             ((JComponent) getContentPane()).setBorder(new EmptyBorder(10, 12, 10, 12));
@@ -9352,7 +10977,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
             add(buttons, BorderLayout.SOUTH);
             setSize(900, 700); setMinimumSize(new Dimension(780, 540)); setLocationRelativeTo(getOwner());
         }
-    
+
         private void loadSeason(int index) throws Exception {
             seasonIndex = index;
             seasonId = seasons.get(index);
@@ -9370,7 +10995,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
             updateMissingState();
             SwingUtilities.invokeLater(this::focusNextMissing);
         }
-    
+
         private JScrollPane createPage(HistoricalMappingRepository.Kind kind, List<RowEditor> editors) throws Exception {
             JPanel panel = new JPanel(new GridBagLayout());
             panel.setBorder(new EmptyBorder(8, 8, 8, 8));
@@ -9380,7 +11005,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
             panel.add(new JLabel(kind == HistoricalMappingRepository.Kind.COMPETITION ? "Competizione stagione" : "Squadra stagione"), h);
             h.gridx = 1; h.weightx = .58;
             panel.add(new JLabel(kind == HistoricalMappingRepository.Kind.COMPETITION ? "Identità storica/canonica" : "Identità storica/canonica"), h);
-    
+
             int row = 1;
             for (var mapping : repository.load(seasonId, kind)) {
                 RowEditor editor = new RowEditor(mapping, repository.isAnchor(seasonId));
@@ -9399,7 +11024,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
             scroll.getVerticalScrollBar().setUnitIncrement(18);
             return scroll;
         }
-    
+
         private void updateMissingState() {
             long count = competitionEditors.stream().filter(RowEditor::isMissing).count()
                 + teamEditors.stream().filter(RowEditor::isMissing).count();
@@ -9407,7 +11032,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
             missingCount.setForeground(count == 0 ? new Color(20, 120, 55) : new Color(185, 45, 35));
             nextMissing.setEnabled(count > 0);
         }
-    
+
         private void focusNextMissing() {
             List<RowEditor> current = tabs.getSelectedIndex() == 0 ? competitionEditors : teamEditors;
             RowEditor missing = current.stream().filter(RowEditor::isMissing).findFirst().orElse(null);
@@ -9420,7 +11045,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
                 missing.combo.scrollRectToVisible(missing.combo.getBounds());
             }
         }
-    
+
         private void saveAndNext() {
             try {
                 saveCurrent();
@@ -9434,7 +11059,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "RecordsNext", JOptionPane.ERROR_MESSAGE);
             }
         }
-    
+
         private void goPrevious() {
             try {
                 saveCurrent();
@@ -9443,19 +11068,19 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "RecordsNext", JOptionPane.ERROR_MESSAGE);
             }
         }
-    
+
         private void saveCurrent() throws Exception {
             repository.save(seasonId, HistoricalMappingRepository.Kind.COMPETITION,
                 competitionEditors.stream().map(RowEditor::decision).toList());
             repository.save(seasonId, HistoricalMappingRepository.Kind.TEAM,
                 teamEditors.stream().map(RowEditor::decision).toList());
         }
-    
+
         private final class RowEditor {
             final HistoricalMappingRepository.MappingRow row;
             final JLabel sourceLabel;
             final JComboBox<Object> combo = new JComboBox<>();
-    
+
             RowEditor(HistoricalMappingRepository.MappingRow row, boolean anchorSeason) {
                 this.row = row;
                 this.sourceLabel = new JLabel(row.sourceName());
@@ -9463,7 +11088,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
                 combo.addItem(EXCLUDE);
                 if (!anchorSeason) combo.addItem(NEW_IDENTITY);
                 for (var identity : row.candidates()) combo.addItem(identity);
-    
+
                 Long preferredIdentityId = row.identityId() != null
                     ? row.identityId()
                     : row.inheritedIdentityId();
@@ -9487,7 +11112,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
                         }
                     }
                 }
-    
+
                 combo.setRenderer(new DefaultListCellRenderer() {
                     @Override
                     public Component getListCellRendererComponent(JList<?> list, Object value, int index,
@@ -9505,11 +11130,11 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
                 combo.addActionListener(e -> { updateVisualState(); updateMissingState(); });
                 updateVisualState();
             }
-    
+
             boolean isMissing() {
                 return "<Selezionare>".equals(combo.getSelectedItem());
             }
-    
+
             void updateVisualState() {
                 boolean missing = isMissing();
                 sourceLabel.setForeground(missing ? new Color(185, 45, 35) : UIManager.getColor("Label.foreground"));
@@ -9518,7 +11143,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
                 combo.setBorder(missing ? BorderFactory.createLineBorder(new Color(210, 60, 45), 2)
                                         : UIManager.getBorder("ComboBox.border"));
             }
-    
+
             HistoricalMappingRepository.Decision decision() {
                 Object selected = combo.getSelectedItem();
                 if (selected instanceof HistoricalMappingRepository.Identity id) {
@@ -9527,7 +11152,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
                 return new HistoricalMappingRepository.Decision(row.seasonEntityIds(), row.sourceName(), null,
                     NEW_IDENTITY.equals(selected), EXCLUDE.equals(selected));
             }
-    
+
             private String normalize(String value) {
                 return value == null ? "" : value.toLowerCase().replaceAll("[^a-z0-9]", "");
             }
@@ -9539,32 +11164,32 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
 File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.java
 
     package it.alterlega.recordsnext.gui;
-    
+
     import java.nio.file.Path;
     import java.sql.*;
     import java.time.Instant;
     import java.util.*;
-    
+
     final class HistoricalMappingRepository {
         enum Kind { COMPETITION, TEAM }
-    
+
         record Identity(long id, String name) {
             @Override public String toString() { return name; }
         }
-    
+
         record MappingRow(List<Long> seasonEntityIds, String sourceName, String normalizedName,
                           String status, Long identityId, Long inheritedIdentityId,
                           List<Identity> candidates) {}
-    
+
         record Decision(List<Long> seasonEntityIds, String sourceName, Long identityId,
                         boolean createNew, boolean excluded) {}
-    
+
         private final Path database;
-    
+
         HistoricalMappingRepository(Path database) {
             this.database = database.toAbsolutePath().normalize();
         }
-    
+
         /**
          * Prepara il database per la configurazione globale. Gli import FCM/FCA possono
          * produrre due righe tecniche della stessa entita nella stagione ancora; tali
@@ -9586,7 +11211,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 }
             }
         }
-    
+
         /** Tutte le stagioni gestite, inclusa l'attuale, dalla piu recente alla piu vecchia. */
         List<String> seasonsNewestFirst() throws Exception {
             String sql = "SELECT c.season_id " +
@@ -9600,7 +11225,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 return result;
             }
         }
-    
+
         boolean isAnchor(String seasonId) throws Exception {
             try (Connection c = open(); PreparedStatement ps = c.prepareStatement(
                     "SELECT is_anchor FROM rn_season WHERE season_id=?")) {
@@ -9610,7 +11235,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 }
             }
         }
-    
+
         List<MappingRow> load(String seasonId, Kind kind) throws Exception {
             try (Connection c = open()) {
                 String entityTable = kind == Kind.COMPETITION ? "rn_competition_season" : "rn_team_season";
@@ -9618,7 +11243,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 String mappingTable = kind == Kind.COMPETITION ? "rn_competition_mapping" : "rn_team_mapping";
                 String identityTable = kind == Kind.COMPETITION ? "rn_competition_identity" : "rn_team_identity";
                 String identityId = kind == Kind.COMPETITION ? "competition_identity_id" : "team_identity_id";
-    
+
                 // Sono disponibili solo le identita effettivamente mantenute in elaborazione.
                 List<Identity> identities = new ArrayList<>();
                 String identitySql = "SELECT i." + identityId + ",i.canonical_name " +
@@ -9629,7 +11254,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 try (Statement st = c.createStatement(); ResultSet rs = st.executeQuery(identitySql)) {
                     while (rs.next()) identities.add(new Identity(rs.getLong(1), rs.getString(2)));
                 }
-    
+
                 String sql = "SELECT e." + entityId + ",e.source_name,e.normalized_name," +
                     "COALESCE(m.mapping_status,'DA_CONFIGURARE'),m." + identityId + " " +
                     "FROM " + entityTable + " e LEFT JOIN " + mappingTable + " m ON m." + entityId + "=e." + entityId + " " +
@@ -9638,7 +11263,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                     "SELECT MAX(sf2.import_id) FROM rn_source_file sf2 " +
                     "WHERE sf2.season_id=e.season_id AND sf2.source_type='FCM') " +
                     "ORDER BY e.source_name COLLATE NOCASE,e." + entityId;
-    
+
                 LinkedHashMap<String, Group> groups = new LinkedHashMap<>();
                 try (PreparedStatement ps = c.prepareStatement(sql)) {
                     ps.setString(1, seasonId);
@@ -9656,7 +11281,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                         }
                     }
                 }
-    
+
                 List<MappingRow> rows = new ArrayList<>();
                 for (Group group : groups.values()) {
                     List<Identity> ordered = new ArrayList<>(identities);
@@ -9672,8 +11297,8 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 return rows;
             }
         }
-    
-    
+
+
         private static Long findInheritedIdentity(
             Connection c,
             String seasonId,
@@ -9704,7 +11329,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 }
             }
         }
-    
+
         void save(String seasonId, Kind kind, List<Decision> decisions) throws Exception {
             try (Connection c = open()) {
                 c.setAutoCommit(false);
@@ -9741,7 +11366,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 }
             }
         }
-    
+
         int pending(String seasonId) throws Exception {
             int pending = 0;
             for (MappingRow row : load(seasonId, Kind.COMPETITION)) {
@@ -9752,21 +11377,21 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
             }
             return pending;
         }
-    
-    
+
+
         private static void synchronizeGroupedMappings(Connection c, Kind kind) throws Exception {
             String entityTable = kind == Kind.COMPETITION ? "rn_competition_season" : "rn_team_season";
             String entityId = kind == Kind.COMPETITION ? "competition_season_id" : "team_season_id";
             String mappingTable = kind == Kind.COMPETITION ? "rn_competition_mapping" : "rn_team_mapping";
             String identityId = kind == Kind.COMPETITION ? "competition_identity_id" : "team_identity_id";
-    
+
             String groupsSql = "SELECT e.season_id,LOWER(TRIM(e.normalized_name))," +
                 "COUNT(DISTINCT CASE WHEN m.mapping_status='ASSOCIATA' THEN m." + identityId + " END)," +
                 "MIN(CASE WHEN m.mapping_status='ASSOCIATA' THEN m." + identityId + " END)," +
                 "MAX(CASE WHEN m.mapping_status='ESCLUSA' THEN 1 ELSE 0 END) " +
                 "FROM " + entityTable + " e LEFT JOIN " + mappingTable + " m ON m." + entityId + "=e." + entityId + " " +
                 "GROUP BY e.season_id,LOWER(TRIM(e.normalized_name))";
-    
+
             try (Statement st = c.createStatement(); ResultSet rs = st.executeQuery(groupsSql)) {
                 while (rs.next()) {
                     String season = rs.getString(1);
@@ -9794,18 +11419,18 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 }
             }
         }
-    
+
         private static void compactObsoleteSources(Connection c) throws Exception {
             reanchorIdentities(c, Kind.COMPETITION);
             reanchorIdentities(c, Kind.TEAM);
-    
+
             for (Kind kind : Kind.values()) {
                 String entityTable = kind == Kind.COMPETITION ? "rn_competition_season" : "rn_team_season";
                 String entityId = kind == Kind.COMPETITION ? "competition_season_id" : "team_season_id";
                 String mappingTable = kind == Kind.COMPETITION ? "rn_competition_mapping" : "rn_team_mapping";
                 String identityTable = kind == Kind.COMPETITION ? "rn_competition_identity" : "rn_team_identity";
                 String anchorId = kind == Kind.COMPETITION ? "anchor_competition_season_id" : "anchor_team_season_id";
-    
+
                 String stale = "SELECT e." + entityId + " FROM " + entityTable + " e JOIN rn_source_file sf ON sf.source_file_id=e.source_file_id " +
                     "WHERE sf.source_type='FCM' AND sf.import_id<>(SELECT MAX(sf2.import_id) FROM rn_source_file sf2 WHERE sf2.season_id=sf.season_id AND sf2.source_type='FCM') " +
                     "AND NOT EXISTS(SELECT 1 FROM " + identityTable + " i WHERE i." + anchorId + "=e." + entityId + ")";
@@ -9814,7 +11439,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                     st.executeUpdate("DELETE FROM " + entityTable + " WHERE " + entityId + " IN (" + stale + ")");
                 }
             }
-    
+
             List<Long> obsoleteImports = new ArrayList<>();
             String obsoleteSql = "SELECT sf.import_id FROM rn_source_file sf WHERE sf.import_id<>(" +
                 "SELECT MAX(sf2.import_id) FROM rn_source_file sf2 WHERE sf2.season_id=sf.season_id AND sf2.source_type=sf.source_type) " +
@@ -9838,14 +11463,14 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 }
             }
         }
-    
+
         private static void reanchorIdentities(Connection c, Kind kind) throws Exception {
             String identityTable = kind == Kind.COMPETITION ? "rn_competition_identity" : "rn_team_identity";
             String identityId = kind == Kind.COMPETITION ? "competition_identity_id" : "team_identity_id";
             String anchorId = kind == Kind.COMPETITION ? "anchor_competition_season_id" : "anchor_team_season_id";
             String entityTable = kind == Kind.COMPETITION ? "rn_competition_season" : "rn_team_season";
             String entityId = kind == Kind.COMPETITION ? "competition_season_id" : "team_season_id";
-    
+
             String sql = "SELECT i." + identityId + ",e.season_id,e.normalized_name FROM " + identityTable + " i " +
                 "JOIN " + entityTable + " e ON e." + entityId + "=i." + anchorId + " " +
                 "JOIN rn_source_file sf ON sf.source_file_id=e.source_file_id " +
@@ -9882,7 +11507,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
             }
             return c;
         }
-    
+
         private static boolean isAnchor(Connection c, String seasonId) throws SQLException {
             try (PreparedStatement ps = c.prepareStatement("SELECT is_anchor FROM rn_season WHERE season_id=?")) {
                 ps.setString(1, seasonId);
@@ -9891,12 +11516,12 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 }
             }
         }
-    
+
         private static void consolidateDuplicateIdentities(Connection c, Kind kind) throws Exception {
             String identityTable = kind == Kind.COMPETITION ? "rn_competition_identity" : "rn_team_identity";
             String identityId = kind == Kind.COMPETITION ? "competition_identity_id" : "team_identity_id";
             String mappingTable = kind == Kind.COMPETITION ? "rn_competition_mapping" : "rn_team_mapping";
-    
+
             String groupsSql = "SELECT anchor_season_id,LOWER(TRIM(canonical_name)),MIN(" + identityId + ") " +
                 "FROM " + identityTable + " GROUP BY anchor_season_id,LOWER(TRIM(canonical_name)) HAVING COUNT(*)>1";
             List<long[]> duplicateGroups = new ArrayList<>();
@@ -9917,7 +11542,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                     }
                 }
             }
-    
+
             for (long[] pair : duplicateGroups) {
                 long keeper = pair[0];
                 long duplicate = pair[1];
@@ -9934,7 +11559,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 }
             }
         }
-    
+
         private static long createIdentity(Connection c, Kind kind, String seasonId,
                                            long entityId, String name) throws Exception {
             String table = kind == Kind.COMPETITION ? "rn_competition_identity" : "rn_team_identity";
@@ -9949,7 +11574,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 }
             }
         }
-    
+
         private static void updateMapping(Connection c, Kind kind, long entityId, Long identityId,
                                           String status, String method) throws Exception {
             String table = kind == Kind.COMPETITION ? "rn_competition_mapping" : "rn_team_mapping";
@@ -9965,18 +11590,18 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
                 ps.executeUpdate();
             }
         }
-    
+
         private static int similarityRank(String normalized, String candidate) {
             String a = normalize(normalized), b = normalize(candidate);
             if (a.equals(b)) return 0;
             if (a.contains(b) || b.contains(a)) return 1;
             return 2;
         }
-    
+
         private static String normalize(String s) {
             return s == null ? "" : s.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
         }
-    
+
         private static final class Group {
             final String sourceName;
             final String normalizedName;
@@ -9995,18 +11620,1130 @@ File: src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.jav
         }
     }
 
+## src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
+
+File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
+
+    package it.alterlega.recordsnext.gui;
+
+    import it.alterlega.recordsnext.ConfigurationSchema;
+    import it.alterlega.recordsnext.app.PipelineConfig;
+    import it.alterlega.recordsnext.app.ProcessingMode;
+    import it.alterlega.recordsnext.app.ProcessingOptions;
+    import it.alterlega.recordsnext.app.RecordsNextPipeline;
+    import it.alterlega.recordsnext.app.config.ProcessingConfigLoader;
+    import it.alterlega.recordsnext.app.config.ProcessingConfigWriter;
+
+    import javax.swing.*;
+    import javax.swing.border.EmptyBorder;
+    import javax.swing.border.LineBorder;
+    import javax.swing.text.DefaultCaret;
+    import java.awt.*;
+    import java.awt.event.MouseAdapter;
+    import java.awt.event.MouseEvent;
+    import java.awt.event.WindowAdapter;
+    import java.awt.event.WindowEvent;
+    import java.io.InputStream;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.LinkedHashMap;
+    import java.util.Map;
+    import java.util.Properties;
+
+    public final class RecordsNext2Dashboard {
+        private static final Color NAVY = new Color(22, 42, 79);
+        private static final Color BLUE = new Color(38, 86, 171);
+        private static final Color RED = new Color(198, 38, 48);
+        private static final Color BG = new Color(241, 245, 251);
+        private static final Color BORDER = new Color(211, 219, 232);
+        private static final Color MUTED = new Color(82, 92, 110);
+
+        private final Path root = Path.of("").toAbsolutePath().normalize();
+        private final Path processingFile = root.resolve("config/processing.json");
+        private final Path culometroFile = root.resolve("config/culometro.json");
+        private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
+
+        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 2.0");
+        private final CardLayout pages = new CardLayout();
+        private final JPanel pageHost = new JPanel(pages);
+        private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
+        private final Map<String, JCheckBox> familyChecks = new LinkedHashMap<>();
+        private final Map<String, JCheckBox> childChecks = new LinkedHashMap<>();
+        private final Map<String, JLabel> familySummaries = new LinkedHashMap<>();
+        private final Map<String, JTextField> modifierNameFields = new LinkedHashMap<>();
+
+        private final JCheckBox culometro = new JCheckBox("Genera Culometro");
+        private final JCheckBox publish = new JCheckBox("Pubblica nel sito al termine");
+        private final JRadioButton full = new JRadioButton("Completa");
+        private final JRadioButton consolidated = new JRadioButton("Consolidata");
+        private final JTextArea log = new JTextArea();
+        private final JProgressBar progress = new JProgressBar(0, 100);
+        private final JLabel status = new JLabel("Pronto");
+        private final JLabel phase = new JLabel("Nessuna elaborazione in corso");
+        private final JButton run = new JButton("Elabora");
+        private final JTextField exampleSiteDirectory = new JTextField();
+        private final JLabel exampleRootTarget = new JLabel("Non selezionata");
+        private final JLabel exampleViewsTarget = new JLabel("Non selezionata");
+        private final JLabel exampleJsTarget = new JLabel("Non selezionata");
+        private final JButton installExamples = new JButton("Installa esempi");
+        private ProcessingConfigWriter.State state;
+        private JPanel dashboardPage;
+
+        public static void main(String[] args) {
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    new RecordsNext2Dashboard().show();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 2.0", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        }
+
+        private RecordsNext2Dashboard() throws Exception {
+            bootstrap();
+            state = ProcessingConfigWriter.load(processingFile);
+            applyLookAndFeel();
+            build();
+            loadState();
+        }
+
+        private void bootstrap() throws Exception {
+            Files.createDirectories(root.resolve("config"));
+            Files.createDirectories(root.resolve("data/database"));
+            ConfigurationSchema.initializeEmpty(root.resolve("data/database/recordsnext.db"));
+            if (!Files.isRegularFile(processingFile)) {
+                ProcessingConfigWriter.save(processingFile,
+                        new ProcessingConfigWriter.State(true, true, true, true, true, false, false));
+            }
+        }
+
+        private static void applyLookAndFeel() {
+            UIManager.put("Button.font", new Font("Segoe UI", Font.BOLD, 12));
+            UIManager.put("Label.font", new Font("Segoe UI", Font.PLAIN, 12));
+            UIManager.put("CheckBox.font", new Font("Segoe UI", Font.PLAIN, 12));
+            UIManager.put("RadioButton.font", new Font("Segoe UI", Font.PLAIN, 12));
+            UIManager.put("TabbedPane.font", new Font("Segoe UI", Font.BOLD, 12));
+        }
+
+        private void build() {
+            frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            frame.addWindowListener(new WindowAdapter() {
+                @Override public void windowClosing(WindowEvent e) { saveQuietly(); frame.dispose(); }
+            });
+            frame.setMinimumSize(new Dimension(900, 620));
+            frame.setSize(1040, 700);
+            frame.setLocationRelativeTo(null);
+
+            JPanel rootPanel = new JPanel(new BorderLayout());
+            rootPanel.setBackground(BG);
+            rootPanel.add(buildSidebar(), BorderLayout.WEST);
+            rootPanel.add(buildMain(), BorderLayout.CENTER);
+            frame.setContentPane(rootPanel);
+        }
+
+        private JPanel buildSidebar() {
+            JPanel side = new JPanel();
+            side.setPreferredSize(new Dimension(180, 700));
+            side.setBackground(NAVY);
+            side.setLayout(new BoxLayout(side, BoxLayout.Y_AXIS));
+            side.setBorder(new EmptyBorder(18, 12, 16, 12));
+
+            JLabel brand = new JLabel("RecordsNext");
+            brand.setAlignmentX(Component.LEFT_ALIGNMENT);
+            brand.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
+            brand.setForeground(Color.WHITE);
+            side.add(brand);
+            JLabel version = new JLabel("by mauz79 · 2.0");
+            version.setAlignmentX(Component.LEFT_ALIGNMENT);
+            version.setForeground(new Color(174, 192, 224));
+            version.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            side.add(version);
+            side.add(Box.createVerticalStrut(28));
+
+            ButtonGroup group = new ButtonGroup();
+            addNav(side, group, "dashboard", "Dashboard");
+            addNav(side, group, "seasons", "Configurazione stagioni");
+            addNav(side, group, "project", "Progetto e motore");
+            addNav(side, group, "tools", "Debug e strumenti");
+            addNav(side, group, "log", "Log e diagnostica");
+            side.add(Box.createVerticalGlue());
+            JLabel footer = new JLabel("Backend modulare attivo");
+            footer.setForeground(new Color(130, 219, 164));
+            footer.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            side.add(footer);
+            return side;
+        }
+
+        private void addNav(JPanel side, ButtonGroup group, String id, String text) {
+            JToggleButton button = new JToggleButton(text);
+            button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+            button.setAlignmentX(Component.LEFT_ALIGNMENT);
+            button.setHorizontalAlignment(SwingConstants.LEFT);
+            button.setForeground(Color.WHITE);
+            button.setBackground(NAVY);
+            button.setBorder(new EmptyBorder(0, 12, 0, 8));
+            button.setFocusPainted(false);
+            button.addActionListener(e -> showPage(id));
+            group.add(button);
+            side.add(button);
+            side.add(Box.createVerticalStrut(6));
+            navButtons.put(id, button);
+        }
+
+        private JPanel buildMain() {
+            JPanel main = new JPanel(new BorderLayout(14, 12));
+            main.setOpaque(false);
+            main.setBorder(new EmptyBorder(12, 14, 10, 14));
+            main.add(buildHeader(), BorderLayout.NORTH);
+
+            pageHost.setOpaque(false);
+            dashboardPage = buildDashboardPage();
+            pageHost.add(dashboardPage, "dashboard");
+            pageHost.add(buildSeasonsPage(), "seasons");
+            pageHost.add(buildFamiliesPage(), "families");
+            pageHost.add(buildCulometroPage(), "culometro");
+            pageHost.add(buildProjectPage(), "project");
+            pageHost.add(buildPublishPage(), "tools");
+            pageHost.add(buildLogPage(), "log");
+            main.add(pageHost, BorderLayout.CENTER);
+            main.add(buildCompactRunBar(), BorderLayout.SOUTH);
+            navButtons.get("dashboard").setSelected(true);
+            return main;
+        }
+
+        private JPanel buildHeader() {
+            JPanel header = new JPanel(new BorderLayout());
+            header.setOpaque(false);
+            JLabel title = new JLabel("RecordsNext 2.0");
+            title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
+            title.setForeground(RED);
+            header.add(title, BorderLayout.WEST);
+            status.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            status.setForeground(new Color(35, 105, 62));
+            header.add(status, BorderLayout.EAST);
+            return header;
+        }
+
+        private JPanel buildDashboardPage() {
+            JPanel page = new JPanel(new BorderLayout(0, 10));
+            page.setOpaque(false);
+            page.add(centeredSectionTitle(
+                    "Dashboard",
+                    "Configura RecordsNext e avvia l’elaborazione dalla barra inferiore"
+            ), BorderLayout.NORTH);
+
+            JPanel cards = new JPanel(new GridLayout(1, 3, 12, 0));
+            cards.setOpaque(false);
+            cards.setPreferredSize(new Dimension(0, 185));
+            cards.setMaximumSize(new Dimension(Integer.MAX_VALUE, 185));
+            cards.add(actionCard(
+                    "Configurazione stagioni",
+                    seasonSummary() + "\nGestite e manuali\nSorgenti, siti e tabellini",
+                    "Apri configurazione",
+                    this::openSeasonConfiguration
+            ));
+            cards.add(actionCard(
+                    "Famiglie record",
+                    activeFamiliesSummary() + "\n\nSelezione granulare dei sottorecord",
+                    activeFamilyCountFromState() + " famiglie selezionate",
+                    () -> showPage("families")
+            ));
+            cards.add(actionCard(
+                    "Soglie, Fortuna e Culometro",
+                    thresholdsCulometroSummary(),
+                    state.culometro() ? "Culometro attivo" : "Culometro disattivo",
+                    () -> showPage("culometro")
+            ));
+
+            JPanel cardsTop = new JPanel(new BorderLayout());
+            cardsTop.setOpaque(false);
+            cardsTop.add(cards, BorderLayout.NORTH);
+            page.add(cardsTop, BorderLayout.CENTER);
+            return page;
+        }
+
+        private String seasonSummary() {
+            try {
+                Properties properties = new Properties();
+                if (Files.isRegularFile(propertiesFile)) {
+                    try (InputStream input = Files.newInputStream(propertiesFile)) {
+                        properties.load(input);
+                    }
+                }
+                Path database = root.resolve(
+                        properties.getProperty("database", "data/database/recordsnext.db")
+                ).normalize();
+                if (Files.isRegularFile(database)) {
+                    int count = new SeasonConfigurationRepository(database).load().size();
+                    if (count > 0) return count == 1 ? "1 stagione" : count + " stagioni";
+                }
+            } catch (Exception ignored) {
+                // Ripiego sul JSON pubblico, se il database non è ancora disponibile.
+            }
+
+            Path seasons = root.resolve("config/seasons.json");
+            if (!Files.isRegularFile(seasons)) return "Nessuna stagione configurata";
+            try {
+                String json = Files.readString(seasons);
+                int count = json.split("\"seasonNumber\"\s*:", -1).length - 1;
+                if (count == 0) count = json.split("\"seasonId\"\s*:", -1).length - 1;
+                return count == 1 ? "1 stagione" : count + " stagioni";
+            } catch (Exception ex) {
+                return "Stagioni configurate";
+            }
+        }
+
+        private String activeFamiliesSummary() {
+            java.util.List<String> names = new java.util.ArrayList<>();
+            if (state.classics()) names.add("Classici");
+            if (state.series()) names.add("Serie");
+            if (state.ru()) names.add("Riserve d'Ufficio");
+            if (state.modifiers()) names.add("Modificatori");
+            if (names.isEmpty()) return "Nessuna famiglia selezionata";
+            return String.join("\n", names);
+        }
+
+        private String thresholdsCulometroSummary() {
+            String thresholds = state.thresholdsLuck()
+                    ? "Soglie e indicatori di fortuna attivi"
+                    : "Soglie e indicatori di fortuna disattivi";
+            String ru = state.ru()
+                    ? "Componenti RU disponibili"
+                    : "Componenti RU non elaborate";
+            String generation = state.culometro()
+                    ? "Generazione Culometro selezionata"
+                    : "Generazione Culometro non selezionata";
+            return thresholds + "\n" + ru + "\n" + generation;
+        }
+
+        private int activeFamilyCountFromState() {
+            int count = 0;
+            if (state.classics()) count++;
+            if (state.series()) count++;
+            if (state.ru()) count++;
+            if (state.modifiers()) count++;
+            return count;
+        }
+
+        private JPanel buildSeasonsPage() {
+            JPanel page = verticalPage();
+            page.add(pageHeader("Configurazione stagioni",
+                    "Stagioni, sorgenti, siti e collegamenti storici", true));
+            JPanel card = cardPanel(new BorderLayout(10, 10));
+            JLabel text = new JLabel("<html><b>Gestita:</b> FCM/FCA, sito locale e online, DataA.js e tabellini.<br>"
+                    + "<b>Manuale:</b> solo anni nel formato YYYY/YYYY e numero stagione.<br>"
+                    + "Tabellini compatibili: <b>ris*.htm</b>, <b>ris*.html</b> e <b>ris*.php</b>.</html>");
+            card.add(text, BorderLayout.CENTER);
+            JButton open = new JButton("Apri configurazione stagioni");
+            open.addActionListener(e -> openSeasonConfiguration());
+            JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            actions.setOpaque(false);
+            actions.add(open);
+            card.add(actions, BorderLayout.SOUTH);
+            page.add(card);
+            return page;
+        }
+
+        private JPanel buildFamiliesPage() {
+            JPanel page = new JPanel(new BorderLayout(0, 8));
+            page.setOpaque(false);
+            page.add(pageHeader("Famiglie record",
+                    "Attiva la famiglia e scegli i singoli sottorecord da elaborare", true), BorderLayout.NORTH);
+
+            JTabbedPane tabs = new JTabbedPane();
+            tabs.addTab("Classici", familySelectionPanel("classics", "Classici",
+                    ProcessingConfigWriter.CLASSICS, CLASSIC_LABELS));
+            tabs.addTab("Serie", familySelectionPanel("series", "Serie",
+                    ProcessingConfigWriter.SERIES, SERIES_LABELS));
+            tabs.addTab("RU", familySelectionPanel("ru", "Riserve d'Ufficio",
+                    ProcessingConfigWriter.RU, RU_LABELS));
+            tabs.addTab("Modificatori", modifiersSelectionPanel());
+            page.add(tabs, BorderLayout.CENTER);
+
+            JButton save = new JButton("Salva selezione granulare");
+            save.addActionListener(e -> saveState());
+            JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+            bottom.setOpaque(false);
+            bottom.add(save);
+            page.add(bottom, BorderLayout.SOUTH);
+            return page;
+        }
+
+        private JPanel modifiersSelectionPanel() {
+            JPanel rootPanel = new JPanel(new BorderLayout(0, 8));
+            rootPanel.setOpaque(false);
+
+            JPanel names = cardPanel(new GridBagLayout());
+            names.setBorder(BorderFactory.createCompoundBorder(
+                    new LineBorder(BORDER), new EmptyBorder(8, 10, 8, 10)));
+            GridBagConstraints c = new GridBagConstraints();
+            c.insets = new Insets(3, 3, 3, 8);
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            JLabel title = new JLabel("Nomi modificatori personalizzati");
+            title.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            c.gridx = 0; c.gridy = 0; c.gridwidth = 2; c.weightx = 1.0;
+            names.add(title, c);
+            addModifierNameRow(names, c, 1, "MODM1PERS", "Personalizzato 1");
+            addModifierNameRow(names, c, 2, "MODM2PERS", "Personalizzato 2");
+            addModifierNameRow(names, c, 3, "MODM3PERS", "Personalizzato 3");
+            rootPanel.add(names, BorderLayout.NORTH);
+
+            JPanel body = new JPanel();
+            body.setBackground(Color.WHITE);
+            body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+            body.setBorder(new EmptyBorder(8, 10, 8, 10));
+            JCheckBox master = new JCheckBox("Elabora famiglia Modificatori");
+            master.setFont(new Font("Segoe UI", Font.BOLD, 15));
+            familyChecks.put("modifiers", master);
+            JLabel summary = new JLabel();
+            summary.setForeground(MUTED);
+            familySummaries.put("modifiers", summary);
+            JPanel head = new JPanel(new BorderLayout()); head.setOpaque(false);
+            head.add(master, BorderLayout.WEST); head.add(summary, BorderLayout.EAST);
+            body.add(head);
+
+            body.add(modifierGroupPanel("Modificatori personalizzati", new String[] {"MODM1PERS", "MODM2PERS", "MODM3PERS"}));
+            body.add(modifierGroupPanel("Modificatori standard FCM", new String[] {"MODPORTIERE", "MODDIFESA", "MODCENTROCAMPO", "MODATTACCO", "MODMODULO"}));
+            body.add(modifierSimpleCheck("modifiers.home-field-deciding", "Fattore Campo decisivo"));
+            body.add(modifierSimpleCheck("modifiers.home-field-points-gained", "Punti guadagnati col Fattore Campo"));
+            body.add(modifierSimpleCheck("modifiers.home-field-points-lost", "Punti persi fuori casa"));
+            body.add(modifierSimpleCheck("modifiers.home-field-balance", "Saldo Fattore Campo"));
+
+            master.addActionListener(e -> {
+                boolean enabled = master.isSelected();
+                for (String id : ProcessingConfigWriter.MODIFIERS) childChecks.get(id).setEnabled(enabled);
+                updateFamilySummary("modifiers", ProcessingConfigWriter.MODIFIERS);
+            });
+            rootPanel.add(new JScrollPane(body), BorderLayout.CENTER);
+            return rootPanel;
+        }
+
+        private JPanel modifierGroupPanel(String title, String[] sourceFields) {
+            JPanel group = new JPanel();
+            group.setOpaque(false);
+            group.setLayout(new BoxLayout(group, BoxLayout.Y_AXIS));
+            group.setBorder(BorderFactory.createTitledBorder(title));
+            for (String sourceField : sourceFields) {
+                String fixedName = switch (sourceField) {
+                    case "MODPORTIERE" -> "Modificatore Portiere FCM";
+                    case "MODDIFESA" -> "Modificatore Difesa FCM";
+                    case "MODCENTROCAMPO" -> "Modificatore Centrocampo FCM";
+                    case "MODATTACCO" -> "Modificatore Attacco FCM";
+                    case "MODMODULO" -> "Modificatore Modulo FCM";
+                    default -> sourceField;
+                };
+                JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
+                row.setOpaque(false);
+                JLabel label = new JLabel(fixedName + " (" + sourceField + ")");
+                label.setPreferredSize(new Dimension(245, 24));
+                row.add(label);
+                for (String stat : new String[] {"max", "total", "average", "uses"}) {
+                    String id = "modifiers." + sourceField.toLowerCase() + "." + stat;
+                    String text = switch (stat) { case "max" -> "Massimo"; case "total" -> "Totale"; case "average" -> "Media"; default -> "Utilizzi"; };
+                    JCheckBox check = new JCheckBox(text);
+                    check.setToolTipText(id);
+                    check.addActionListener(e -> updateFamilySummary("modifiers", ProcessingConfigWriter.MODIFIERS));
+                    childChecks.put(id, check);
+                    row.add(check);
+                }
+                group.add(row);
+            }
+            return group;
+        }
+
+        private JCheckBox modifierSimpleCheck(String id, String text) {
+            JCheckBox check = new JCheckBox(text);
+            check.setToolTipText(id);
+            check.addActionListener(e -> updateFamilySummary("modifiers", ProcessingConfigWriter.MODIFIERS));
+            childChecks.put(id, check);
+            return check;
+        }
+
+        private void addModifierNameRow(JPanel panel, GridBagConstraints c, int row,
+                                        String sourceField, String label) {
+            c.gridwidth = 1; c.gridy = row; c.gridx = 0; c.weightx = 0.0;
+            JLabel fieldLabel = new JLabel(label + " (" + sourceField + ")");
+            panel.add(fieldLabel, c);
+
+            JTextField field = new JTextField(28);
+            field.setToolTipText("Nome mostrato nei dati e nei visualizzatori");
+            modifierNameFields.put(sourceField, field);
+            c.gridx = 1; c.weightx = 1.0;
+            panel.add(field, c);
+        }
+
+        private JPanel familySelectionPanel(String familyId, String title, String[] ids, Map<String, String> labels) {
+            JPanel body = new JPanel(new BorderLayout(8, 8));
+            body.setBackground(Color.WHITE);
+            body.setBorder(new EmptyBorder(10, 12, 10, 12));
+
+            JCheckBox master = new JCheckBox("Elabora famiglia " + title);
+            master.setFont(new Font("Segoe UI", Font.BOLD, 15));
+            JLabel summary = new JLabel();
+            summary.setForeground(MUTED);
+            familySummaries.put(familyId, summary);
+
+            JPanel top = new JPanel(new BorderLayout());
+            top.setOpaque(false);
+            top.add(master, BorderLayout.WEST);
+            top.add(summary, BorderLayout.EAST);
+            body.add(top, BorderLayout.NORTH);
+            familyChecks.put(familyId, master);
+
+            JPanel grid = new JPanel(new GridLayout(0, 2, 8, 8));
+            grid.setOpaque(false);
+            for (String id : ids) {
+                JCheckBox child = new JCheckBox(labels.getOrDefault(id, id));
+                child.setToolTipText(id);
+                child.addActionListener(e -> updateFamilySummary(familyId, ids));
+                childChecks.put(id, child);
+                grid.add(child);
+            }
+            JPanel gridTop = new JPanel(new BorderLayout());
+            gridTop.setOpaque(false);
+            gridTop.add(grid, BorderLayout.NORTH);
+            master.addActionListener(e -> {
+                boolean enabled = master.isSelected();
+                for (String id : ids) childChecks.get(id).setEnabled(enabled);
+                updateFamilySummary(familyId, ids);
+            });
+            JScrollPane scroll = new JScrollPane(gridTop);
+            scroll.getVerticalScrollBar().setUnitIncrement(16);
+            body.add(scroll, BorderLayout.CENTER);
+
+            JPanel commands = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+            commands.setOpaque(false);
+            JButton all = new JButton("Seleziona tutti");
+            JButton none = new JButton("Deseleziona tutti");
+            all.addActionListener(e -> setChildren(ids, true, familyId));
+            none.addActionListener(e -> setChildren(ids, false, familyId));
+            commands.add(all);
+            commands.add(none);
+            body.add(commands, BorderLayout.SOUTH);
+            return body;
+        }
+
+        private JPanel buildCulometroPage() {
+            JPanel page = new JPanel(new BorderLayout(0, 8));
+            page.setOpaque(false);
+            page.add(pageHeader("Soglie, Fortuna e Culometro",
+                    "Configura gli indicatori di base e scegli separatamente se generare il Culometro", true),
+                    BorderLayout.NORTH);
+
+            JTabbedPane tabs = new JTabbedPane();
+            tabs.addTab("Soglie e Fortuna",
+                    familySelectionPanel("thresholdsLuck", "Soglie e Fortuna",
+                            ProcessingConfigWriter.THRESHOLDS, THRESHOLD_LABELS));
+
+            JPanel culometroPanel = new JPanel(new BorderLayout(10, 10));
+            culometroPanel.setBackground(Color.WHITE);
+            culometroPanel.setBorder(new EmptyBorder(12, 14, 12, 14));
+
+            JLabel explanation = new JLabel("<html>"
+                    + "<b>Generazione opzionale:</b> il Culometro viene prodotto solo quando la casella è selezionata.<br><br>"
+                    + "Usa gli indicatori di Soglie/Fortuna e, quando disponibili, soltanto le RU "
+                    + "di cui il dataset dimostra l'effetto decisivo.<br><br>"
+                    + "<b>Modalità semplice:</b> preset e slider principali. "
+                    + "<b>Modalità avanzata:</b> pesi, rarità, affidabilità ed etichette."
+                    + "</html>");
+            culometroPanel.add(explanation, BorderLayout.CENTER);
+
+            JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+            actions.setOpaque(false);
+            culometro.setText("Genera Culometro");
+            actions.add(culometro);
+            JButton configure = new JButton("Configura preset, slider e pesi");
+            configure.addActionListener(e -> openCulometroSettings());
+            actions.add(configure);
+            culometroPanel.add(actions, BorderLayout.SOUTH);
+            tabs.addTab("Generazione Culometro", culometroPanel);
+
+            JPanel publication = new JPanel(new BorderLayout(8, 8));
+            publication.setBackground(Color.WHITE);
+            publication.setBorder(new EmptyBorder(12, 14, 12, 14));
+            publication.add(new JLabel("<html><b>HTML Culometro:</b><br>"
+                    + "• modello senza dati: copiabile nella cartella della skin FCM;<br>"
+                    + "• pagina con dati incorporati: pubblicabile direttamente nel sito generato;<br>"
+                    + "• dati JavaScript: destinazione <code>js</code> del sito.<br><br>"
+                    + "Questi comandi saranno abilitati quando verrà definito il pacchetto HTML definitivo."
+                    + "</html>"), BorderLayout.CENTER);
+            tabs.addTab("HTML e pubblicazione", publication);
+
+            page.add(tabs, BorderLayout.CENTER);
+
+            JButton save = new JButton("Salva Soglie e Culometro");
+            save.addActionListener(e -> saveState());
+            JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+            bottom.setOpaque(false);
+            bottom.add(save);
+            page.add(bottom, BorderLayout.SOUTH);
+            return page;
+        }
+
+        private JPanel buildProjectPage() {
+            JPanel page = verticalPage();
+            page.add(pageHeader("Progetto e motore",
+                    "Percorsi operativi, configurazioni e stato della pipeline", true));
+            JPanel card = cardPanel(new GridLayout(0, 1, 6, 6));
+            card.add(infoLine("Cartella progetto", root.toString()));
+            card.add(infoLine("Configurazione elaborazione", processingFile.toString()));
+            card.add(infoLine("Configurazione Culometro", culometroFile.toString()));
+            card.add(infoLine("Database predefinito", root.resolve("data/database/recordsnext.db").toString()));
+            card.add(infoLine("Configurazione GUI", Files.isRegularFile(propertiesFile)
+                    ? propertiesFile.toString() : "Default PipelineConfig"));
+            card.add(infoLine("Backend", "Modulare 2.0 attivo"));
+            card.add(infoLine("Modalità selezionata", consolidated.isSelected() ? "Consolidata" : "Completa"));
+            card.add(infoLine("Famiglie attive", String.valueOf(activeFamilyCount())));
+            card.add(infoLine("Sottorecord attivi", String.valueOf(activeChildCount())));
+            card.add(infoLine("Culometro", culometro.isSelected() ? "Attivo" : "Disattivo"));
+            card.add(infoLine("Fase corrente", phase.getText()));
+            page.add(card);
+            return page;
+        }
+
+        private JPanel buildPublishPage() {
+            JPanel page = verticalPage();
+            page.add(pageHeader("Debug e strumenti",
+                    "Diagnostica della pubblicazione e utilità per la skin FCM", true));
+
+            JPanel publishCard = cardPanel(new BorderLayout(8, 8));
+            JLabel text = new JLabel("<html>Gli output vengono prima validati nello staging. La pubblicazione nel sito "
+                    + "avviene solo quando l'opzione è attiva e usa il rollback del publisher.</html>");
+            publishCard.add(text, BorderLayout.CENTER);
+            JPanel options = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            options.setOpaque(false);
+            options.add(publish);
+            publishCard.add(options, BorderLayout.SOUTH);
+            page.add(publishCard);
+            page.add(Box.createVerticalStrut(10));
+
+            JPanel examples = cardPanel(new BorderLayout(10, 10));
+            JPanel heading = new JPanel();
+            heading.setOpaque(false);
+            heading.setLayout(new BoxLayout(heading, BoxLayout.Y_AXIS));
+            JLabel title = new JLabel("Installa esempi nella skin");
+            title.setFont(new Font("Segoe UI", Font.BOLD, 15));
+            title.setForeground(NAVY);
+            JLabel subtitle = new JLabel("Seleziona la cartella della skin FCM. Nessun file viene copiato in questa versione.");
+            subtitle.setForeground(MUTED);
+            heading.add(title);
+            heading.add(Box.createVerticalStrut(2));
+            heading.add(subtitle);
+            examples.add(heading, BorderLayout.NORTH);
+
+            JPanel body = new JPanel(new GridBagLayout());
+            body.setOpaque(false);
+            GridBagConstraints c = new GridBagConstraints();
+            c.insets = new Insets(3, 0, 3, 8);
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.weightx = 0;
+            c.gridx = 0;
+            c.gridy = 0;
+            body.add(new JLabel("Cartella skin:"), c);
+
+            exampleSiteDirectory.setEditable(false);
+            c.gridx = 1;
+            c.weightx = 1;
+            body.add(exampleSiteDirectory, c);
+
+            JButton browse = new JButton("Sfoglia...");
+            browse.addActionListener(e -> chooseExampleSiteDirectory());
+            c.gridx = 2;
+            c.weightx = 0;
+            body.add(browse, c);
+
+            c.gridx = 0;
+            c.gridy++;
+            body.add(new JLabel("HTML indice:"), c);
+            c.gridx = 1;
+            c.gridwidth = 2;
+            body.add(exampleRootTarget, c);
+
+            c.gridx = 0;
+            c.gridy++;
+            c.gridwidth = 1;
+            body.add(new JLabel("Viste e asset:"), c);
+            c.gridx = 1;
+            c.gridwidth = 2;
+            body.add(exampleViewsTarget, c);
+
+            c.gridx = 0;
+            c.gridy++;
+            c.gridwidth = 1;
+            body.add(new JLabel("JavaScript:"), c);
+            c.gridx = 1;
+            c.gridwidth = 2;
+            body.add(exampleJsTarget, c);
+
+            examples.add(body, BorderLayout.CENTER);
+
+            JButton preview = new JButton("Anteprima destinazioni");
+            preview.setEnabled(false);
+            installExamples.setEnabled(false);
+            installExamples.setToolTipText("Disponibile quando sarà definito il pacchetto esempi definitivo");
+            JPanel exampleActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+            exampleActions.setOpaque(false);
+            exampleActions.add(preview);
+            exampleActions.add(installExamples);
+            examples.add(exampleActions, BorderLayout.SOUTH);
+
+            page.add(examples);
+            return page;
+        }
+
+        private void chooseExampleSiteDirectory() {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setDialogTitle("Seleziona la cartella della skin FCM");
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.setAcceptAllFileFilterUsed(false);
+
+            String current = exampleSiteDirectory.getText().trim();
+            if (!current.isEmpty()) {
+                Path currentPath = Path.of(current);
+                if (Files.isDirectory(currentPath)) chooser.setCurrentDirectory(currentPath.toFile());
+            }
+
+            if (chooser.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION) return;
+
+            Path siteRoot = chooser.getSelectedFile().toPath().toAbsolutePath().normalize();
+            exampleSiteDirectory.setText(siteRoot.toString());
+            exampleRootTarget.setText(siteRoot.toString());
+            exampleViewsTarget.setText(siteRoot.resolve("RecordsNext").toString());
+            exampleJsTarget.setText(siteRoot.resolve("js").toString());
+            status.setText("Destinazioni skin rilevate; installazione esempi non ancora attiva");
+            status.setForeground(new Color(145, 91, 18));
+        }
+
+        private JPanel buildLogPage() {
+            JPanel page = new JPanel(new BorderLayout(10, 10));
+            page.setOpaque(false);
+            page.add(pageHeader("Log e diagnostica", "Messaggi della pipeline e tempi di elaborazione", true), BorderLayout.NORTH);
+            log.setEditable(false);
+            log.setFont(new Font("Consolas", Font.PLAIN, 12));
+            log.setLineWrap(false);
+            ((DefaultCaret) log.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+            page.add(new JScrollPane(log), BorderLayout.CENTER);
+            JButton clear = new JButton("Pulisci log");
+            clear.addActionListener(e -> log.setText(""));
+            JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            bottom.setOpaque(false);
+            bottom.add(clear);
+            page.add(bottom, BorderLayout.SOUTH);
+            return page;
+        }
+
+        private JPanel buildCompactRunBar() {
+            JPanel bar = cardPanel(new BorderLayout(10, 0));
+            bar.setBorder(BorderFactory.createCompoundBorder(new LineBorder(BORDER), new EmptyBorder(7, 9, 7, 9)));
+            JPanel options = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+            options.setOpaque(false);
+            ButtonGroup group = new ButtonGroup();
+            group.add(full);
+            group.add(consolidated);
+            options.add(new JLabel("Modalità:"));
+            options.add(consolidated);
+            options.add(full);
+            bar.add(options, BorderLayout.CENTER);
+
+            JButton save = new JButton("Salva");
+            save.addActionListener(e -> saveState());
+            run.setBackground(BLUE);
+            run.setForeground(Color.WHITE);
+            run.addActionListener(e -> runPipeline());
+            JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+            actions.setOpaque(false);
+            actions.add(save);
+            actions.add(run);
+            bar.add(actions, BorderLayout.EAST);
+            return bar;
+        }
+
+        private JPanel pageHeader(String title, String subtitle, boolean back) {
+            JPanel wrapper = new JPanel(new BorderLayout());
+            wrapper.setOpaque(false);
+            wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+            JPanel labels = sectionTitle(title, subtitle, SwingConstants.LEFT);
+            wrapper.add(labels, BorderLayout.CENTER);
+            if (back) {
+                JButton button = new JButton("← Dashboard");
+                button.addActionListener(e -> showPage("dashboard"));
+                JPanel holder = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+                holder.setOpaque(false);
+                holder.add(button);
+                wrapper.add(holder, BorderLayout.EAST);
+            }
+            return wrapper;
+        }
+
+        private JPanel centeredSectionTitle(String title, String subtitle) {
+            return sectionTitle(title, subtitle, SwingConstants.CENTER);
+        }
+
+        private static JPanel sectionTitle(String titleText, String subtitleText, int alignment) {
+            JPanel panel = new JPanel();
+            panel.setOpaque(false);
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            JLabel title = new JLabel(titleText, alignment);
+            title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+            title.setForeground(NAVY);
+            title.setAlignmentX(alignment == SwingConstants.CENTER ? Component.CENTER_ALIGNMENT : Component.LEFT_ALIGNMENT);
+            JLabel subtitle = new JLabel(subtitleText, alignment);
+            subtitle.setForeground(MUTED);
+            subtitle.setAlignmentX(alignment == SwingConstants.CENTER ? Component.CENTER_ALIGNMENT : Component.LEFT_ALIGNMENT);
+            panel.add(title);
+            panel.add(Box.createVerticalStrut(2));
+            panel.add(subtitle);
+            panel.add(Box.createVerticalStrut(10));
+            return panel;
+        }
+
+        private JPanel actionCard(String title, String text, String value, Runnable action) {
+            JPanel card = new JPanel();
+            card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+            card.setBackground(Color.WHITE);
+            card.setBorder(BorderFactory.createCompoundBorder(
+                    new LineBorder(BORDER),
+                    new EmptyBorder(12, 10, 10, 10)
+            ));
+            card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            card.setPreferredSize(new Dimension(230, 185));
+            card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 185));
+
+            JLabel t = new JLabel(title, SwingConstants.CENTER);
+            t.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            t.setForeground(NAVY);
+            t.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JLabel body = new JLabel(
+                    "<html><div style='text-align:center;'>" + text.replace("\n", "<br>") + "</div></html>",
+                    SwingConstants.CENTER
+            );
+            body.setForeground(MUTED);
+            body.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JLabel v = new JLabel(value + "  ›", SwingConstants.CENTER);
+            v.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            v.setForeground(BLUE);
+            v.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            card.add(t);
+            card.add(Box.createVerticalStrut(14));
+            card.add(body);
+            card.add(Box.createVerticalGlue());
+            card.add(v);
+
+            MouseAdapter click = new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) { action.run(); }
+            };
+            card.addMouseListener(click);
+            t.addMouseListener(click);
+            body.addMouseListener(click);
+            v.addMouseListener(click);
+            return card;
+        }
+
+        private static JPanel verticalPage() {
+            JPanel page = new JPanel();
+            page.setOpaque(false);
+            page.setLayout(new BoxLayout(page, BoxLayout.Y_AXIS));
+            return page;
+        }
+
+        private static JPanel cardPanel(LayoutManager layout) {
+            JPanel card = new JPanel(layout);
+            card.setBackground(Color.WHITE);
+            card.setBorder(BorderFactory.createCompoundBorder(new LineBorder(BORDER), new EmptyBorder(10, 11, 10, 11)));
+            card.setAlignmentX(Component.LEFT_ALIGNMENT);
+            return card;
+        }
+
+        private static JPanel infoLine(String label, String value) {
+            JPanel row = new JPanel(new BorderLayout(12, 0));
+            row.setOpaque(false);
+            JLabel left = new JLabel(label);
+            left.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            JLabel right = new JLabel(value);
+            right.setForeground(MUTED);
+            row.add(left, BorderLayout.WEST);
+            row.add(right, BorderLayout.CENTER);
+            return row;
+        }
+
+        private void setChildren(String[] ids, boolean selected, String familyId) {
+            for (String id : ids) childChecks.get(id).setSelected(selected);
+            updateFamilySummary(familyId, ids);
+        }
+
+        private void updateFamilySummary(String familyId, String[] ids) {
+            long selected = java.util.Arrays.stream(ids).filter(id -> childChecks.get(id).isSelected()).count();
+            familySummaries.get(familyId).setText(selected + " / " + ids.length + " selezionati");
+        }
+
+        private void showPage(String id) {
+            pages.show(pageHost, id);
+            JToggleButton button = navButtons.get(id);
+            if (button != null) button.setSelected(true);
+        }
+
+
+        private void refreshDashboard() {
+            if (dashboardPage != null) pageHost.remove(dashboardPage);
+            dashboardPage = buildDashboardPage();
+            pageHost.add(dashboardPage, "dashboard");
+            pageHost.revalidate();
+            pageHost.repaint();
+        }
+
+        private void openSeasonConfiguration() {
+            try {
+                RecordsNextConfigurationDialog dialog = new RecordsNextConfigurationDialog(frame, root, propertiesFile);
+                if (dialog.open()) {
+                    status.setText("Configurazione stagioni salvata");
+                    refreshDashboard();
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, ex.getMessage(), "Configurazione stagioni", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private void openCulometroSettings() {
+            try {
+                CulometroSettingsDialog dialog = new CulometroSettingsDialog(frame, culometroFile);
+                if (dialog.open()) {
+                    culometro.setSelected(true);
+                    saveState();
+                    status.setText("Configurazione Culometro salvata");
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, ex.getMessage(), "Culometro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private void loadState() {
+            familyChecks.get("classics").setSelected(state.classics());
+            familyChecks.get("series").setSelected(state.series());
+            familyChecks.get("ru").setSelected(state.ru());
+            familyChecks.get("modifiers").setSelected(state.modifiers());
+            familyChecks.get("thresholdsLuck").setSelected(state.thresholdsLuck());
+            loadChildren(ProcessingConfigWriter.CLASSICS, "classics");
+            loadChildren(ProcessingConfigWriter.SERIES, "series");
+            loadChildren(ProcessingConfigWriter.RU, "ru");
+            loadChildren(ProcessingConfigWriter.MODIFIERS, "modifiers");
+            loadChildren(ProcessingConfigWriter.THRESHOLDS, "thresholdsLuck");
+            culometro.setSelected(state.culometro());
+            publish.setSelected(state.publishToSite());
+            consolidated.setSelected(true);
+            full.setSelected(false);
+            modifierNameFields.forEach((sourceField, field) ->
+                    field.setText(state.modifierName(sourceField)));
+        }
+
+        private void loadChildren(String[] ids, String familyId) {
+            boolean familyEnabled = familyChecks.get(familyId).isSelected();
+            for (String id : ids) {
+                JCheckBox child = childChecks.get(id);
+                child.setSelected(state.childEnabled(id));
+                child.setEnabled(familyEnabled);
+            }
+            updateFamilySummary(familyId, ids);
+        }
+
+        private void saveState() {
+            try {
+                Map<String, Boolean> children = new LinkedHashMap<>();
+                childChecks.forEach((id, check) -> children.put(id, check.isSelected()));
+                state = new ProcessingConfigWriter.State(
+                        familyChecks.get("classics").isSelected(),
+                        familyChecks.get("series").isSelected(),
+                        familyChecks.get("ru").isSelected(),
+                        familyChecks.get("modifiers").isSelected(),
+                        familyChecks.get("thresholdsLuck").isSelected(),
+                        culometro.isSelected(),
+                        publish.isSelected(),
+                        children,
+                        readModifierNamesFromFields()
+                );
+                ProcessingConfigWriter.save(processingFile, state);
+                status.setText("Configurazione salvata");
+                status.setForeground(new Color(35, 105, 62));
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, ex.getMessage(), "Salvataggio", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private Map<String, String> readModifierNamesFromFields() {
+            Map<String, String> names = new LinkedHashMap<>();
+            for (String sourceField : new String[] {"MODM1PERS", "MODM2PERS", "MODM3PERS"}) {
+                JTextField field = modifierNameFields.get(sourceField);
+                names.put(sourceField, field == null ? "" : field.getText().trim());
+            }
+            return names;
+        }
+
+        private void saveQuietly() {
+            try { saveState(); } catch (Exception ignored) { }
+        }
+
+        private int activeFamilyCount() {
+            return (int) familyChecks.values().stream().filter(AbstractButton::isSelected).count();
+        }
+
+        private int activeChildCount() {
+            return (int) childChecks.values().stream().filter(AbstractButton::isSelected).count();
+        }
+
+        private void runPipeline() {
+            saveState();
+            run.setEnabled(false);
+            log.setText("");
+            progress.setValue(0);
+            phase.setText("Preparazione");
+            status.setText("Elaborazione in corso");
+            status.setForeground(BLUE);
+            showPage("log");
+
+            new SwingWorker<RecordsNextPipeline.Result, String>() {
+                @Override protected RecordsNextPipeline.Result doInBackground() throws Exception {
+                    PipelineConfig cfg = Files.isRegularFile(propertiesFile)
+                            ? PipelineConfig.load(root, propertiesFile)
+                            : PipelineConfig.defaults(root);
+                    ProcessingOptions options = ProcessingConfigLoader.load(processingFile);
+                    ProcessingMode mode = consolidated.isSelected() ? ProcessingMode.CONSOLIDATED : ProcessingMode.FULL;
+                    return new RecordsNextPipeline().run(cfg, options, mode, new RecordsNextPipeline.Listener() {
+                        @Override public void phase(String text, int percent) {
+                            publish(text);
+                            SwingUtilities.invokeLater(() -> {
+                                phase.setText(text);
+                                if (percent >= 0) progress.setValue(percent);
+                            });
+                        }
+                        @Override public void timing(String text) { publish("TEMPO  " + text); }
+                    });
+                }
+
+                @Override protected void process(java.util.List<String> chunks) {
+                    chunks.forEach(v -> log.append(v + System.lineSeparator()));
+                }
+
+                @Override protected void done() {
+                    try {
+                        RecordsNextPipeline.Result result = get();
+                        log.append("\nCompletato · file validi=" + result.files()
+                                + " · pubblicati=" + result.published() + System.lineSeparator());
+                        status.setText("Elaborazione completata");
+                        status.setForeground(new Color(35, 105, 62));
+                        progress.setValue(100);
+                        phase.setText("Elaborazione completata");
+                    } catch (Exception ex) {
+                        Throwable cause = ex.getCause() == null ? ex : ex.getCause();
+                        log.append("ERRORE: " + cause + System.lineSeparator());
+                        status.setText("Errore");
+                        status.setForeground(RED);
+                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 2.0", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        run.setEnabled(true);
+                    }
+                }
+            }.execute();
+        }
+
+        private void show() { frame.setVisible(true); }
+
+        private static Map<String, String> labels(Object... values) {
+            Map<String, String> result = new LinkedHashMap<>();
+            for (int i = 0; i < values.length; i += 2) result.put(String.valueOf(values[i]), String.valueOf(values[i + 1]));
+            return Map.copyOf(result);
+        }
+
+        private static final Map<String, String> CLASSIC_LABELS = labels(
+                "classics.highest-match-score", "Maggior punteggio in una partita",
+                "classics.lowest-match-score", "Minor punteggio in una partita",
+                "classics.most-regulation-goals", "Partita con più gol regolamentari",
+                "classics.largest-regulation-margin", "Maggior scarto regolamentare",
+                "classics.average-points", "Media punteggio",
+                "classics.total-points", "Somma totale punti",
+                "classics.standings-points", "Punti classifica",
+                "classics.wins", "Vittorie",
+                "classics.draws", "Pareggi",
+                "classics.losses", "Sconfitte",
+                "classics.goals-for", "Gol fatti",
+                "classics.goals-against", "Gol subiti",
+                "classics.yellow-cards-team", "Ammonizioni per squadra",
+                "classics.red-cards-team", "Espulsioni per squadra",
+                "classics.red-cards-player", "Espulsioni per giocatore",
+                "classics.assists-team", "Assist per squadra",
+                "classics.own-goals-team", "Autogol per squadra",
+                "classics.penalties-scored", "Rigori segnati",
+                "classics.penalties-missed", "Rigori sbagliati",
+                "classics.penalties-saved", "Rigori parati",
+                "classics.clean-sheets", "Clean sheet"
+        );
+
+        private static final Map<String, String> SERIES_LABELS = labels(
+                "series.unbeaten", "Serie senza sconfitte",
+                "series.winless", "Serie senza vittorie",
+                "series.wins", "Vittorie consecutive",
+                "series.draws", "Pareggi consecutivi",
+                "series.losses", "Sconfitte consecutive",
+                "series.clean-sheets", "Clean sheet consecutivi",
+                "series.captain-bonus", "Bonus Capitano consecutivo"
+        );
+
+        private static final Map<String, String> RU_LABELS = labels(
+                "ru.max-in-match", "Maggior numero di RU in una partita",
+                "ru.matches-with", "Partite con RU",
+                "ru.matches-against", "Partite contro squadre con RU",
+                "ru.deciding", "RU decisive",
+                "ru.deciding-against", "RU decisive subite",
+                "ru.balance", "Bilancio con RU",
+                "ru.balance-against", "Bilancio contro RU",
+                "ru.average-points", "Media punti con RU",
+                "ru.average-points-against", "Media punti contro RU",
+                "ru.role-distribution", "Distribuzione PU, DU, CU e AU"
+        );
+
+        private static final Map<String, String> MODIFIER_LABELS = labels(
+                "modifiers.defence-best-match", "Miglior modificatore difesa in una gara",
+                "modifiers.defence-total", "Totale modificatore difesa",
+                "modifiers.captain-uses", "Utilizzi Capitano",
+                "modifiers.captain-total", "Totale modificatore Capitano",
+                "modifiers.home-field-deciding", "Fattore Campo decisivo",
+                "modifiers.home-field-points-gained", "Punti guadagnati col Fattore Campo",
+                "modifiers.home-field-points-lost", "Punti persi fuori casa",
+                "modifiers.home-field-balance", "Saldo Fattore Campo"
+        );
+
+        private static final Map<String, String> THRESHOLD_LABELS = labels(
+                "thresholds.surgical-win", "Vittoria chirurgica",
+                "thresholds.mocking-loss", "Sconfitta beffa",
+                "thresholds.miraculous-draw", "Pareggio miracolato",
+                "thresholds.narrow-draw", "Pareggio stretto",
+                "thresholds.missed-win-half-point", "Vittoria mancata per mezzo punto",
+                "thresholds.loss-by-a-whisker", "Sconfitta per un pelo",
+                "thresholds.exact-threshold", "Soglia precisa",
+                "thresholds.just-enough", "Giusto giusto",
+                "thresholds.wasted-points", "Spreco punti",
+                "luck.favourable-events", "Eventi favorevoli",
+                "luck.unfavourable-events", "Eventi sfavorevoli",
+                "luck.balance", "Saldo fortuna-sfortuna"
+        );
+    }
+
 ## src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
 
 File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
 
     package it.alterlega.recordsnext.gui;
-    
+
     import it.alterlega.recordsnext.ConfigurationSchema;
     import it.alterlega.recordsnext.app.PipelineConfig;
     import it.alterlega.recordsnext.app.ProcessingOptions;
     import it.alterlega.recordsnext.app.ProcessingMode;
     import it.alterlega.recordsnext.app.RecordsNextPipeline;
-    
+
     import javax.swing.*;
     import javax.swing.border.CompoundBorder;
     import javax.swing.border.EmptyBorder;
@@ -10022,7 +12759,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.util.Properties;
-    
+
     public final class RecordsNextApp {
         private static final String KEY_CLASSIC = "processing.classic";
         private static final String KEY_RU = "processing.ru";
@@ -10031,7 +12768,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
         private static final String KEY_MODE = "processing.mode";
         private static final String KEY_PUBLISH_MODE = "publish.destinationMode";
         private static final String KEY_PUBLISH_CUSTOM = "publish.customDirectory";
-    
+
         private final JFrame frame = new JFrame("FCM RecordsNext 1.0");
         private final JCheckBox classic = new JCheckBox("Record classici");
         private final JCheckBox ru = new JCheckBox("Riserve d'ufficio");
@@ -10054,18 +12791,18 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
         private final Path configPath = root.resolve("config/recordsnext-gui.properties");
         private final Properties properties = new Properties();
         private boolean loadingSelections;
-    
+
         public static void main(String[] args) {
             SwingUtilities.invokeLater(() -> new RecordsNextApp().show());
         }
-    
+
         private RecordsNextApp() {
             bootstrapRuntimeDirectories();
             loadProperties();
             build();
             loadSelections();
         }
-    
+
         private void bootstrapRuntimeDirectories() {
             String[] directories = {
                     "config",
@@ -10083,22 +12820,22 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
                 throw new IllegalStateException("Bootstrap delle cartelle fallito", ex);
             }
         }
-    
+
         private void build() {
             UIManager.put("Button.font", new Font("Segoe UI", Font.BOLD, 13));
             UIManager.put("Label.font", new Font("Segoe UI", Font.PLAIN, 13));
             UIManager.put("CheckBox.font", new Font("Segoe UI", Font.PLAIN, 13));
             UIManager.put("RadioButton.font", new Font("Segoe UI", Font.PLAIN, 13));
-    
+
             Color background = new Color(244, 247, 252);
             Color panelBorder = new Color(196, 205, 222);
             Color blue = new Color(34, 72, 150);
             Color red = new Color(201, 34, 45);
-    
+
             JPanel rootPanel = new JPanel(new BorderLayout(12, 12));
             rootPanel.setBorder(new EmptyBorder(16, 20, 12, 20));
             rootPanel.setBackground(background);
-    
+
             JPanel header = new JPanel(new GridBagLayout());
             header.setOpaque(false);
             header.setPreferredSize(new Dimension(590, 112));
@@ -10109,20 +12846,20 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             hg.weightx = 1;
             hg.fill = GridBagConstraints.HORIZONTAL;
             hg.anchor = GridBagConstraints.CENTER;
-    
+
             JLabel title = new JLabel("FCM RecordsNext 1.0", SwingConstants.CENTER);
             title.setFont(new Font("Segoe UI Black", Font.BOLD, 35));
             title.setForeground(red);
             hg.gridy = 0;
             header.add(title, hg);
-    
+
             JLabel sub = new JLabel("Records storici e tanto altro", SwingConstants.CENTER);
             sub.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 15));
             sub.setForeground(new Color(62, 72, 92));
             hg.gridy = 1;
             hg.insets = new Insets(4, 0, 0, 0);
             header.add(sub, hg);
-    
+
             status.setFont(new Font("Segoe UI", Font.BOLD, 13));
             status.setForeground(new Color(35, 105, 62));
             status.setPreferredSize(new Dimension(540, 26));
@@ -10131,17 +12868,17 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             hg.insets = new Insets(11, 0, 0, 0);
             header.add(status, hg);
             rootPanel.add(header, BorderLayout.NORTH);
-    
+
             JPanel center = new JPanel();
             center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
             center.setOpaque(false);
-    
+
             JPanel options = new JPanel(new GridBagLayout());
             options.setBackground(Color.WHITE);
             options.setBorder(new CompoundBorder(
                     new LineBorder(panelBorder),
                     new EmptyBorder(12, 15, 12, 15)));
-    
+
             GridBagConstraints g = new GridBagConstraints();
             g.gridx = 0;
             g.gridy = 0;
@@ -10149,7 +12886,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             g.fill = GridBagConstraints.HORIZONTAL;
             g.weightx = 1;
             g.insets = new Insets(3, 4, 7, 4);
-    
+
             JLabel modeTitle = new JLabel("Modalità");
             modeTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
             modeTitle.setForeground(blue);
@@ -10163,12 +12900,12 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             options.add(consolidatedMode, g);
             g.gridy++;
             g.insets = new Insets(10, 4, 7, 4);
-    
+
             JLabel sectionTitle = new JLabel("Elaborazioni");
             sectionTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
             sectionTitle.setForeground(blue);
             options.add(sectionTitle, g);
-    
+
             g.insets = new Insets(2, 4, 2, 4);
             g.gridy++;
             options.add(classic, g);
@@ -10178,7 +12915,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             options.add(generateJs, g);
             g.gridy++;
             options.add(publish, g);
-    
+
             ButtonGroup publishGroup = new ButtonGroup();
             publishGroup.add(publishCurrent);
             publishGroup.add(publishCustom);
@@ -10213,7 +12950,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             g.gridy++;
             g.insets = new Insets(0, 4, 2, 4);
             options.add(publishDestination, g);
-    
+
             JLabel savedHint = new JLabel("Le scelte vengono memorizzate automaticamente.");
             savedHint.setForeground(new Color(90, 98, 112));
             savedHint.setFont(new Font("Segoe UI", Font.ITALIC, 11));
@@ -10224,7 +12961,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             options.setMaximumSize(new Dimension(Integer.MAX_VALUE, options.getPreferredSize().height));
             center.add(options);
             center.add(Box.createVerticalStrut(10));
-    
+
             JPanel progressPanel = new JPanel(new GridBagLayout());
             progressPanel.setBackground(Color.WHITE);
             progressPanel.setBorder(new CompoundBorder(
@@ -10236,7 +12973,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             pg.fill = GridBagConstraints.HORIZONTAL;
             pg.anchor = GridBagConstraints.WEST;
             pg.insets = new Insets(2, 2, 3, 2);
-    
+
             JLabel phaseTitle = new JLabel("Operazione corrente");
             phaseTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
             phaseTitle.setForeground(blue);
@@ -10251,7 +12988,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             phaseProgress.setPreferredSize(new Dimension(540, 16));
             pg.gridy = 2;
             progressPanel.add(phaseProgress, pg);
-    
+
             JLabel overallTitle = new JLabel("Avanzamento generale");
             overallTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
             overallTitle.setForeground(blue);
@@ -10271,7 +13008,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             progressPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 126));
             center.add(progressPanel);
             center.add(Box.createVerticalStrut(10));
-    
+
             log.setEditable(false);
             log.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
             log.setLineWrap(true);
@@ -10291,7 +13028,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             logScroll.getHorizontalScrollBar().setUnitIncrement(18);
             center.add(logScroll);
             rootPanel.add(center, BorderLayout.CENTER);
-    
+
             JPanel south = new JPanel(new BorderLayout(0, 8));
             south.setOpaque(false);
             JPanel credits = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -10301,7 +13038,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             credit.setForeground(new Color(82, 89, 105));
             credits.add(credit);
             south.add(credits, BorderLayout.NORTH);
-    
+
             JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
             buttons.setOpaque(false);
             JButton config = new JButton("Configurazione");
@@ -10311,7 +13048,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             buttons.add(exit);
             south.add(buttons, BorderLayout.SOUTH);
             rootPanel.add(south, BorderLayout.SOUTH);
-    
+
             fullMode.addActionListener(e -> saveSelections());
             consolidatedMode.addActionListener(e -> saveSelections());
             classic.addActionListener(e -> saveSelections());
@@ -10340,14 +13077,14 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             start.addActionListener(e -> runPipeline());
             exit.addActionListener(e -> closeApplication());
             config.addActionListener(e -> openConfiguration());
-    
+
             frame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
                     saveSelections();
                 }
             });
-    
+
             frame.setIconImage(createAppIcon());
             frame.setContentPane(rootPanel);
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -10357,7 +13094,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             frame.pack();
             frame.setLocationRelativeTo(null);
         }
-    
+
         private static Image createAppIcon() {
             BufferedImage image = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
             Graphics2D graphics = image.createGraphics();
@@ -10375,11 +13112,11 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             }
             return image;
         }
-    
+
         private void show() {
             frame.setVisible(true);
         }
-    
+
         private void loadProperties() {
             if (!Files.isRegularFile(configPath)) {
                 return;
@@ -10390,7 +13127,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
                 throw new IllegalStateException("Impossibile leggere " + configPath, ex);
             }
         }
-    
+
         private void loadSelections() {
             loadingSelections = true;
             try {
@@ -10421,12 +13158,12 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
                 loadingSelections = false;
             }
         }
-    
+
         private boolean readBoolean(String key, boolean defaultValue) {
             String value = properties.getProperty(key);
             return value == null ? defaultValue : Boolean.parseBoolean(value.trim());
         }
-    
+
         private void saveSelections() {
             if (loadingSelections) {
                 return;
@@ -10450,7 +13187,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
                         + System.lineSeparator());
             }
         }
-    
+
         private void openConfiguration() {
             saveSelections();
             RecordsNextConfigurationDialog dialog =
@@ -10463,7 +13200,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
                 log.append("Configurazione aggiornata." + System.lineSeparator());
             }
         }
-    
+
         private void updatePublishControls() {
             boolean enabled = generateJs.isSelected() && publish.isSelected();
             publishCurrent.setEnabled(enabled);
@@ -10478,7 +13215,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
                 publishResolved.setText("Destinazione non disponibile");
             }
         }
-    
+
         private Properties propertiesForCurrentUi() {
             Properties copy = new Properties();
             copy.putAll(properties);
@@ -10487,7 +13224,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             copy.setProperty(KEY_PUBLISH_CUSTOM, publishDirectory.getText().trim());
             return copy;
         }
-    
+
         private void choosePublishDirectory() {
             JFileChooser chooser = new JFileChooser();
             chooser.setDialogTitle("Seleziona la cartella di pubblicazione");
@@ -10509,12 +13246,12 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
                 saveSelections();
             }
         }
-    
+
         private void closeApplication() {
             saveSelections();
             frame.dispose();
         }
-    
+
         private void runPipeline() {
             saveSelections();
             if (publish.isSelected() && publishCustom.isSelected()
@@ -10566,7 +13303,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
                         frame, ex.getMessage(), "RecordsNext", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-    
+
             start.setEnabled(false);
             log.setText("");
             progress.setValue(0);
@@ -10575,7 +13312,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
             phaseProgress.setIndeterminate(true);
             status.setText("Elaborazione in corso");
             status.setForeground(new Color(35, 82, 150));
-    
+
             new SwingWorker<RecordsNextPipeline.Result, String>() {
                 @Override
                 protected RecordsNextPipeline.Result doInBackground() throws Exception {
@@ -10595,19 +13332,19 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
                                     }
                                 });
                             }
-    
+
                             @Override
                             public void timing(String text) {
                                 publish("TEMPO  " + text);
                             }
                         });
                 }
-    
+
                 @Override
                 protected void process(java.util.List<String> chunks) {
                     chunks.forEach(value -> log.append(value + System.lineSeparator()));
                 }
-    
+
                 @Override
                 protected void done() {
                     try {
@@ -10645,10 +13382,10 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
 File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.java
 
     package it.alterlega.recordsnext.gui;
-    
+
     import it.alterlega.recordsnext.ConfigurationSchema;
     import it.alterlega.recordsnext.RawSqliteImporter;
-    
+
     import javax.swing.*;
     import javax.swing.border.*;
     import javax.swing.filechooser.FileNameExtensionFilter;
@@ -10659,7 +13396,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
     import java.util.List;
     import java.util.regex.Pattern;
     import java.util.stream.Collectors;
-    
+
     final class RecordsNextConfigurationDialog extends JDialog {
         private static final Pattern SEASON = Pattern.compile("\\d{4}_\\d{4}");
         private final Path projectRoot, configPath, databasePath;
@@ -10668,7 +13405,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
         private final List<SeasonEditor> editors = new ArrayList<>();
         private final SeasonConfigurationRepository repository;
         private boolean saved;
-    
+
         RecordsNextConfigurationDialog(Window owner, Path projectRoot, Path configPath) {
             super(owner,"RecordsNext - Configurazione stagioni",ModalityType.APPLICATION_MODAL);
             this.projectRoot=projectRoot; this.configPath=configPath;
@@ -10678,11 +13415,11 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             build(); loadSeasons();
         }
         boolean open(){ setVisible(true); return saved; }
-    
+
         private void build(){
             JPanel root=new JPanel(new BorderLayout(10,10)); root.setBorder(new EmptyBorder(12,14,12,14));
             JPanel top=new JPanel(new BorderLayout());
-            JLabel info=new JLabel("Configurare le stagioni gestite o manuali e, successivamente, i relativi siti.");
+            JLabel info=new JLabel("Configurare stagioni gestite e manuali. Le manuali richiedono solo anni e numero stagione.");
             JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
             JButton mappings = new JButton("Configura associazioni storiche...");
             mappings.addActionListener(e -> openMappings());
@@ -10697,7 +13434,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             buttons.add(cancel); buttons.add(save); root.add(buttons,BorderLayout.SOUTH);
             setContentPane(root); setDefaultCloseOperation(DISPOSE_ON_CLOSE); setSize(980,720); setMinimumSize(new Dimension(860,600)); setLocationRelativeTo(getOwner());
         }
-    
+
         private void loadProperties(){
             if(Files.isRegularFile(configPath)) try(InputStream in=Files.newInputStream(configPath)){properties.load(in);} catch(IOException ex){error("Lettura configurazione",ex);}
         }
@@ -10711,16 +13448,20 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             }
             editors.clear(); seasonsPanel.removeAll();
             Set<String> selected=Arrays.stream(properties.getProperty("seasons","").split(",")).map(String::trim).filter(s->!s.isEmpty()).collect(Collectors.toSet());
+            boolean selectionInitialized = Boolean.parseBoolean(
+                properties.getProperty("seasonsSelectionInitialized", "false")
+            );
             try{
                 for(var loaded:repository.load()) {
                     var row = refreshManagedMetadata(loaded);
-                    addEditor(new SeasonEditor(row,selected.contains(row.seasonId())));
+                    boolean includeByDefault = !selectionInitialized || selected.contains(row.seasonId());
+                    addEditor(new SeasonEditor(row, includeByDefault));
                 }
             }catch(Exception ex){error("Lettura stagioni",ex);}
             refresh();
         }
-    
-    
+
+
         private SeasonConfigurationRepository.SeasonRow refreshManagedMetadata(
             SeasonConfigurationRepository.SeasonRow row
         ) {
@@ -10749,7 +13490,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 return row;
             }
         }
-    
+
         private void addSeason(){
             try {
                 List<SeasonConfigurationRepository.SeasonRow> current=editors.stream().map(SeasonEditor::value).toList();
@@ -10762,11 +13503,11 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 rows.add(row);
                 repository.save(rows);
                 selectSeasonByDefault(row.seasonId());
-    
+
                 if ("GESTITA".equals(row.managementType())) {
                     importForConfiguration(row, rows);
                 }
-    
+
                 loadSeasons();
                 SeasonConfigurationRepository.SeasonRow loaded = repository.load().stream()
                     .filter(r -> r.seasonId().equals(row.seasonId()))
@@ -10777,7 +13518,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 }
             } catch(Exception ex) { error("Aggiunta stagione",ex); }
         }
-    
+
         private void selectSeasonByDefault(String seasonId) throws IOException {
             LinkedHashSet<String> selected = Arrays.stream(properties.getProperty("seasons", "").split(","))
                 .map(String::trim)
@@ -10790,7 +13531,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 properties.store(out, "RecordsNext configuration");
             }
         }
-    
+
         private void importForConfiguration(
             SeasonConfigurationRepository.SeasonRow row,
             List<SeasonConfigurationRepository.SeasonRow> allRows
@@ -10804,7 +13545,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 .seasonId();
             ConfigurationSchema.main(new String[]{databasePath.toString(), anchor});
         }
-    
+
         private void openMappings() {
             try {
                 HistoricalMappingRepository mappingRepository = new HistoricalMappingRepository(databasePath);
@@ -10817,7 +13558,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
         }
         private void addEditor(SeasonEditor e){editors.add(e); seasonsPanel.add(e.panel); seasonsPanel.add(Box.createVerticalStrut(8));}
         private void refresh(){seasonsPanel.revalidate();seasonsPanel.repaint();}
-    
+
         private void saveConfiguration(){
             if(editors.isEmpty()){warn("Aggiungere almeno una stagione.");return;}
             List<SeasonConfigurationRepository.SeasonRow> rows=new ArrayList<>();
@@ -10840,6 +13581,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 return;
             }
             properties.setProperty("seasons",String.join(",",selected));
+            properties.setProperty("seasonsSelectionInitialized", "true");
             rows.stream().filter(r->"GESTITA".equals(r.managementType())).max(Comparator.comparing(r->r.seasonId())).ifPresent(current->
                 properties.setProperty("siteJs",Path.of(current.localSitePath()).resolve("js").toString()));
             try{
@@ -10849,19 +13591,19 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 saved=true;dispose();
             }catch(Exception ex){error("Salvataggio configurazione",ex);}
         }
-    
+
         private void remove(SeasonEditor e){
             int x=JOptionPane.showConfirmDialog(this,"Rimuovere "+e.row.seasonId()+" dalla configurazione?\nI dati già importati non saranno cancellati.","RecordsNext",JOptionPane.YES_NO_OPTION);
             if(x!=JOptionPane.YES_OPTION)return;
             try{repository.removeConfiguration(e.row.seasonId());}catch(Exception ex){error("Rimozione stagione",ex);return;}
             int i=editors.indexOf(e); editors.remove(e); seasonsPanel.remove(e.panel); if(i<seasonsPanel.getComponentCount()) seasonsPanel.remove(i); refresh();
         }
-    
+
         private void choose(JTextField field, int mode, String extension) {
             JFileChooser chooser = new JFileChooser();
             chooser.setFileSelectionMode(mode);
             configureExtensionFilter(chooser, extension);
-    
+
             String text = field.getText().trim();
             Path directory = null;
             if (!text.isEmpty()) {
@@ -10874,7 +13616,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 if (!remembered.isEmpty() && Files.isDirectory(Path.of(remembered))) directory = Path.of(remembered);
             }
             if (directory != null && Files.exists(directory)) chooser.setCurrentDirectory(directory.toFile());
-    
+
             if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 Path selected = chooser.getSelectedFile().toPath().toAbsolutePath().normalize();
                 if (!hasExtension(selected, extension)) {
@@ -10889,14 +13631,14 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 }
             }
         }
-    
+
         private static String chooserKey(String extension, int mode) {
             if (mode == JFileChooser.DIRECTORIES_ONLY) return "chooser.lastSiteDirectory";
             if (".fcm".equalsIgnoreCase(extension)) return "chooser.lastFcmDirectory";
             if (".fca".equalsIgnoreCase(extension)) return "chooser.lastFcaDirectory";
             return null;
         }
-    
+
         private void rememberChooserDirectory(String extension, int mode, Path directory) {
             String key = chooserKey(extension, mode);
             if (key == null || directory == null) return;
@@ -10906,7 +13648,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 try (OutputStream out = Files.newOutputStream(configPath)) { properties.store(out, "RecordsNext configuration"); }
             } catch (IOException ignored) { }
         }
-    
+
         private static void configureExtensionFilter(JFileChooser chooser, String extension) {
             if (extension == null || extension.isBlank()) {
                 return;
@@ -10918,7 +13660,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 normalized
             ));
         }
-    
+
         private static boolean hasExtension(Path path, String extension) {
             if (extension == null || extension.isBlank()) {
                 return true;
@@ -10927,23 +13669,30 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 .endsWith(extension.toLowerCase(Locale.ROOT));
         }
         private void warn(String m){JOptionPane.showMessageDialog(this,m,"RecordsNext",JOptionPane.WARNING_MESSAGE);} private void error(String m,Exception e){JOptionPane.showMessageDialog(this,m+":\n"+e.getMessage(),"Errore RecordsNext",JOptionPane.ERROR_MESSAGE);}
-    
+
         private final class SeasonEditor{
             final SeasonConfigurationRepository.SeasonRow row; final JPanel panel=new JPanel(new GridBagLayout());
             final JCheckBox include=new JCheckBox("Elabora");
             final JTextField fcm=new JTextField(),fca=new JTextField(),site=new JTextField(),online=new JTextField(); final JLabel js=new JLabel(),dataa=new JLabel();
             SeasonEditor(SeasonConfigurationRepository.SeasonRow row,boolean selected){this.row=row;include.setSelected(selected);fcm.setText(row.fcmPath());fca.setText(row.fcaPath());site.setText(row.localSitePath());online.setText(row.onlineSiteUrl());build();updateDerived();}
             void build(){
-                panel.setAlignmentX(Component.LEFT_ALIGNMENT); panel.setMaximumSize(new Dimension(Integer.MAX_VALUE,315)); panel.setBackground(Color.WHITE); panel.setBorder(new CompoundBorder(new LineBorder(new Color(190,199,214)),new EmptyBorder(9,10,9,10)));
+                panel.setAlignmentX(Component.LEFT_ALIGNMENT); panel.setMaximumSize(new Dimension(Integer.MAX_VALUE,"GESTITA".equals(row.managementType())?315:125)); panel.setBackground(Color.WHITE); panel.setBorder(new CompoundBorder(new LineBorder(new Color(190,199,214)),new EmptyBorder(9,10,9,10)));
                 GridBagConstraints g=new GridBagConstraints();g.gridy=0;g.gridx=0;g.gridwidth=2;g.anchor=GridBagConstraints.WEST;
                 String current=row.anchor()?"  -  ATTUALE":"";
                 JLabel title=new JLabel("Stagione "+row.seasonId()+"  (#"+row.seasonNumber()+")  -  "+row.managementType()+current);title.setFont(title.getFont().deriveFont(Font.BOLD,14f));title.setForeground(new Color(25,67,160));panel.add(title,g);
                 JPanel flags=new JPanel(new FlowLayout(FlowLayout.RIGHT,8,0));flags.setOpaque(false);flags.add(include);JButton remove=new JButton("Rimuovi");remove.addActionListener(e->remove(this));flags.add(remove);g.gridx=2;g.gridwidth=2;g.weightx=1;g.anchor=GridBagConstraints.EAST;panel.add(flags,g);
-                if("GESTITA".equals(row.managementType())) {addPath("File FCM",fcm,1,JFileChooser.FILES_ONLY,".fcm"); addPath("File FCA",fca,2,JFileChooser.FILES_ONLY,".fca");}
-                else {addReadOnly("File FCM","Stagione manuale: non previsto",1); addPath("File FCA (facoltativo)",fca,2,JFileChooser.FILES_ONLY,".fca");}
-                addPath("Cartella sito locale",site,3,JFileChooser.DIRECTORIES_ONLY,null); addText("Sito online",online,4);
-                site.getDocument().addDocumentListener(new javax.swing.event.DocumentListener(){public void insertUpdate(javax.swing.event.DocumentEvent e){updateDerived();}public void removeUpdate(javax.swing.event.DocumentEvent e){updateDerived();}public void changedUpdate(javax.swing.event.DocumentEvent e){updateDerived();}});
-                addLabel("Cartella JS",js,5);addLabel("DataA.js",dataa,6);
+                if("GESTITA".equals(row.managementType())) {
+                    addPath("File FCM",fcm,1,JFileChooser.FILES_ONLY,".fcm");
+                    addPath("File FCA",fca,2,JFileChooser.FILES_ONLY,".fca");
+                    addPath("Cartella sito locale",site,3,JFileChooser.DIRECTORIES_ONLY,null);
+                    addText("Sito online",online,4);
+                    site.getDocument().addDocumentListener(new javax.swing.event.DocumentListener(){public void insertUpdate(javax.swing.event.DocumentEvent e){updateDerived();}public void removeUpdate(javax.swing.event.DocumentEvent e){updateDerived();}public void changedUpdate(javax.swing.event.DocumentEvent e){updateDerived();}});
+                    addLabel("Cartella JS",js,5);
+                    addLabel("DataA.js e tabellini",dataa,6);
+                } else {
+                    addReadOnly("Configurazione", "Solo riferimento storico: " + row.seasonId().replace('_','/') + " · stagione n. " + row.seasonNumber(), 1);
+                    addReadOnly("Dati gara", "FCM, FCA, sito, DataA.js e tabellini non previsti", 2);
+                }
                 if ("GESTITA".equals(row.managementType()) && !row.anchor()) {
                     JLabel mappingStatus = new JLabel();
                     mappingStatus.setName("mappingStatus");
@@ -10955,7 +13704,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                     addLabel("Associazioni", currentStatus, 7);
                 }
             }
-    
+
             void updateMappingStatus() {
                 for (Component component : panel.getComponents()) {
                     if (component instanceof JLabel label && "mappingStatus".equals(label.getName())) {
@@ -10975,11 +13724,37 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             void addReadOnly(String label,String text,int y){JLabel value=new JLabel(text);value.setForeground(Color.GRAY);addLabel(label,value,y);}
             void addLabel(String label,JLabel value,int y){GridBagConstraints g=base(label,y);g.gridx=1;g.gridwidth=3;g.weightx=1;g.fill=GridBagConstraints.HORIZONTAL;panel.add(value,g);}
             GridBagConstraints base(String label,int y){GridBagConstraints g=new GridBagConstraints();g.gridy=y;g.gridx=0;g.anchor=GridBagConstraints.WEST;g.insets=new Insets(3,2,3,8);panel.add(new JLabel(label+":"),g);return g;}
-            void updateDerived(){String s=site.getText().trim();if(s.isEmpty()){js.setText("-");dataa.setText("-");return;}Path j=Path.of(s).resolve("js");Path d=j.resolve("DataA.js");js.setText(j.toString());dataa.setText((Files.isRegularFile(d)?"Trovato: ":"Non trovato: ")+d);dataa.setForeground(Files.isRegularFile(d)?new Color(20,120,55):new Color(170,55,35));}
-            String validateFields(){if("GESTITA".equals(row.managementType())){if(fcm.getText().trim().isEmpty()||!Files.isRegularFile(Path.of(fcm.getText().trim())))return row.seasonId()+": selezionare un file FCM esistente.";if(fca.getText().trim().isEmpty()||!Files.isRegularFile(Path.of(fca.getText().trim())))return row.seasonId()+": selezionare un file FCA esistente.";}else if(!fca.getText().trim().isEmpty()&&!Files.isRegularFile(Path.of(fca.getText().trim())))return row.seasonId()+": il file FCA indicato non esiste.";if(site.getText().trim().isEmpty()||!Files.isDirectory(Path.of(site.getText().trim())))return row.seasonId()+": selezionare una cartella sito esistente.";return null;}
-            SeasonConfigurationRepository.SeasonRow value(){return new SeasonConfigurationRepository.SeasonRow(row.seasonId(),row.seasonNumber(),row.anchor(),row.managementType(),row.status(),"GESTITA".equals(row.managementType())?fcm.getText().trim():"",fca.getText().trim(),site.getText().trim(),online.getText().trim());}
+            void updateDerived(){
+                String s=site.getText().trim();
+                if(s.isEmpty()){js.setText("-");dataa.setText("-");return;}
+                Path rootSite=Path.of(s); Path j=rootSite.resolve("js"); Path d=j.resolve("DataA.js");
+                js.setText(j.toString());
+                String matchPage=detectMatchPage(rootSite);
+                dataa.setText((Files.isRegularFile(d)?"DataA trovato":"DataA non trovato")+" · tabellini: "+matchPage);
+                dataa.setForeground(Files.isRegularFile(d)?new Color(20,120,55):new Color(170,55,35));
+            }
+            String detectMatchPage(Path siteRoot){
+                if(!Files.isDirectory(siteRoot)) return "sito non disponibile";
+                try(var files=Files.list(siteRoot)){
+                    return files.filter(Files::isRegularFile)
+                        .map(p->p.getFileName().toString())
+                        .filter(n->n.toLowerCase(Locale.ROOT).matches("ris.*\\.(htm|html|php)"))
+                        .sorted().findFirst().orElse("nessun ris*.htm/html/php");
+                }catch(IOException ex){return "non rilevabile";}
+            }
+            String validateFields(){
+                if("MANUALE".equals(row.managementType())) return null;
+                if(fcm.getText().trim().isEmpty()||!Files.isRegularFile(Path.of(fcm.getText().trim())))return row.seasonId()+": selezionare un file FCM esistente.";
+                if(fca.getText().trim().isEmpty()||!Files.isRegularFile(Path.of(fca.getText().trim())))return row.seasonId()+": selezionare un file FCA esistente.";
+                if(site.getText().trim().isEmpty()||!Files.isDirectory(Path.of(site.getText().trim())))return row.seasonId()+": selezionare una cartella sito esistente.";
+                return null;
+            }
+            SeasonConfigurationRepository.SeasonRow value(){
+                boolean managed="GESTITA".equals(row.managementType());
+                return new SeasonConfigurationRepository.SeasonRow(row.seasonId(),row.seasonNumber(),row.anchor(),row.managementType(),row.status(),managed?fcm.getText().trim():"",managed?fca.getText().trim():"",managed?site.getText().trim():"",managed?online.getText().trim():"");
+            }
         }
-    
+
         private static final class AddSeasonWizard extends JDialog {
             private final JRadioButton managed = new JRadioButton("Gestita", true);
             private final JRadioButton manual = new JRadioButton("Manuale");
@@ -10993,7 +13768,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             private final Properties properties;
             private final Path configPath;
             private SeasonConfigurationRepository.SeasonRow result;
-    
+
             AddSeasonWizard(
                 Window owner,
                 SeasonConfigurationRepository repo,
@@ -11008,23 +13783,23 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 this.configPath = configPath;
                 build();
             }
-    
+
             SeasonConfigurationRepository.SeasonRow open() {
                 setVisible(true);
                 return result;
             }
-    
+
             private void build() {
                 setLayout(new BorderLayout(10, 10));
                 ((JComponent) getContentPane()).setBorder(new EmptyBorder(14, 16, 12, 16));
-    
+
                 ButtonGroup group = new ButtonGroup();
                 group.add(managed);
                 group.add(manual);
-    
+
                 JPanel form = new JPanel(new GridBagLayout());
                 form.setBorder(new TitledBorder("Tipo e sorgenti della stagione"));
-    
+
                 GridBagConstraints g = new GridBagConstraints();
                 g.insets = new Insets(5, 5, 5, 5);
                 g.anchor = GridBagConstraints.WEST;
@@ -11033,19 +13808,19 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 form.add(managed, g);
                 g.gridx = 1;
                 form.add(manual, g);
-    
+
                 addChooser(form, "File FCM", fcm, 1, ".fcm");
                 addChooser(form, "File FCA", fca, 2, ".fca");
-                addField(form, "Stagione manuale (AAAA_AAAA)", manualSeason, 3);
+                addField(form, "Anni stagione manuale (AAAA/AAAA)", manualSeason, 3);
                 addField(form, "Numero stagione", manualNumber, 4);
                 addValue(form, "Dati rilevati", detected, 5);
-    
+
                 managed.addActionListener(e -> updateMode());
                 manual.addActionListener(e -> updateMode());
                 updateMode();
-    
+
                 add(form, BorderLayout.CENTER);
-    
+
                 JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
                 JButton add = new JButton("Aggiungi stagione");
                 JButton cancel = new JButton("Annulla");
@@ -11054,13 +13829,14 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 buttons.add(add);
                 buttons.add(cancel);
                 add(buttons, BorderLayout.SOUTH);
-    
+
                 setSize(720, 390);
                 setLocationRelativeTo(getOwner());
             }
-    
+
             private void updateMode() {
                 boolean isManaged = managed.isSelected();
+                fca.setEnabled(isManaged);
                 fcm.setEnabled(isManaged);
                 manualSeason.setEnabled(!isManaged);
                 manualNumber.setEnabled(!isManaged);
@@ -11068,14 +13844,14 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                     ? "Stagione e numero saranno letti dal file FCM."
                     : "Inserire stagione e numero manualmente.");
             }
-    
+
             private void finish() {
                 try {
                     String seasonId;
                     int seasonNumber;
                     String type;
                     String fcmPath = "";
-    
+
                     if (managed.isSelected()) {
                         if (!file(fcm, ".fcm") || !file(fca, ".fca")) return;
                         var detection = new FcmSeasonDetector().detect(Path.of(fcm.getText().trim()));
@@ -11087,11 +13863,18 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                             seasonId + " (#" + seasonNumber + ") - " + detection.evidence()
                         );
                     } else {
-                        seasonId = manualSeason.getText().trim();
-                        if (!SEASON.matcher(seasonId).matches()) {
-                            warn("Formato stagione non valido.");
+                        String years = manualSeason.getText().trim();
+                        if (!years.matches("\\d{4}/\\d{4}")) {
+                            warn("Usare il formato anni AAAA/AAAA, ad esempio 2005/2006.");
                             return;
                         }
+                        int startYear = Integer.parseInt(years.substring(0,4));
+                        int endYear = Integer.parseInt(years.substring(5,9));
+                        if (endYear != startYear + 1) {
+                            warn("Il secondo anno deve essere successivo al primo.");
+                            return;
+                        }
+                        seasonId = years.replace('/', '_');
                         try {
                             seasonNumber = Integer.parseInt(manualNumber.getText().trim());
                         } catch (NumberFormatException ex) {
@@ -11102,19 +13885,14 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                             warn("Il numero stagione deve essere positivo.");
                             return;
                         }
-                        if (!fca.getText().trim().isEmpty()
-                            && !Files.isRegularFile(Path.of(fca.getText().trim()))) {
-                            warn("Il file FCA indicato non esiste.");
-                            return;
-                        }
                         type = "MANUALE";
                     }
-    
+
                     if (current.stream().anyMatch(r -> r.seasonId().equals(seasonId))) {
                         warn("La stagione " + seasonId + " è già presente.");
                         return;
                     }
-    
+
                     result = new SeasonConfigurationRepository.SeasonRow(
                         seasonId,
                         seasonNumber,
@@ -11122,7 +13900,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                         type,
                         "DA_CONFIGURARE",
                         fcmPath,
-                        fca.getText().trim(),
+                        managed.isSelected() ? fca.getText().trim() : "",
                         "",
                         ""
                     );
@@ -11131,7 +13909,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                     warn(ex.getMessage());
                 }
             }
-    
+
             private boolean file(JTextField field, String extension) {
                 String value = field.getText().trim();
                 if (value.isEmpty() || !Files.isRegularFile(Path.of(value))) {
@@ -11140,7 +13918,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 }
                 return true;
             }
-    
+
             private void addChooser(
                 JPanel panel,
                 String label,
@@ -11193,7 +13971,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 g.insets = new Insets(5, 5, 5, 5);
                 panel.add(button, g);
             }
-    
+
             private void addField(JPanel panel, String label, JTextField field, int row) {
                 GridBagConstraints g = new GridBagConstraints();
                 g.insets = new Insets(5, 5, 5, 5);
@@ -11206,7 +13984,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 g.fill = GridBagConstraints.HORIZONTAL;
                 panel.add(field, g);
             }
-    
+
             private void addValue(JPanel panel, String label, JLabel value, int row) {
                 GridBagConstraints g = new GridBagConstraints();
                 g.insets = new Insets(5, 5, 5, 5);
@@ -11220,7 +13998,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 g.fill = GridBagConstraints.HORIZONTAL;
                 panel.add(value, g);
             }
-    
+
             private void warn(String message) {
                 JOptionPane.showMessageDialog(
                     this,
@@ -11230,7 +14008,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 );
             }
         }
-    
+
     }
 
 ## src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.java
@@ -11238,24 +14016,24 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
 File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.java
 
     package it.alterlega.recordsnext.gui;
-    
+
     import java.nio.file.Path;
     import java.sql.*;
     import java.time.Instant;
     import java.util.*;
-    
+
     final class SeasonConfigurationRepository {
         record SeasonRow(String seasonId, int seasonNumber, boolean anchor,
                          String managementType, String status,
                          String fcmPath, String fcaPath,
                          String localSitePath, String onlineSiteUrl) {}
-    
+
         private final Path database;
-    
+
         SeasonConfigurationRepository(Path database) {
             this.database = database.toAbsolutePath().normalize();
         }
-    
+
         List<SeasonRow> load() throws Exception {
             Class.forName("org.sqlite.JDBC");
             try (Connection c = open()) {
@@ -11289,7 +14067,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.j
                 return out;
             }
         }
-    
+
         int suggestedSeasonNumber(String seasonId, Collection<SeasonRow> current) {
             List<String> ids = new ArrayList<>();
             for (SeasonRow row : current) ids.add(row.seasonId());
@@ -11297,7 +14075,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.j
             ids.sort(Comparator.comparingInt(SeasonConfigurationRepository::startYear));
             return ids.indexOf(seasonId) + 1;
         }
-    
+
         void save(List<SeasonRow> rows) throws Exception {
             Class.forName("org.sqlite.JDBC");
             try (Connection c=open()) {
@@ -11343,7 +14121,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.j
                 } catch(Exception ex) { c.rollback(); throw ex; }
             }
         }
-    
+
         void removeConfiguration(String seasonId) throws Exception {
             try (Connection c=open()) {
                 ensureSchema(c);
@@ -11358,13 +14136,13 @@ File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.j
                 }
             }
         }
-    
+
         private Connection open() throws Exception {
             Connection c=DriverManager.getConnection("jdbc:sqlite:"+database);
             try(Statement s=c.createStatement()) { s.execute("PRAGMA foreign_keys=ON"); s.execute("PRAGMA busy_timeout=10000"); }
             return c;
         }
-    
+
         private static void ensureSchema(Connection c) throws Exception {
             try(Statement s=c.createStatement()) {
                 s.execute("""
@@ -11380,7 +14158,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.j
             addColumnIfMissing(c,"configured_fcm_path","TEXT");
             addColumnIfMissing(c,"configured_fca_path","TEXT");
         }
-    
+
         private static void addColumnIfMissing(Connection c,String name,String type) throws Exception {
             boolean found=false;
             try(Statement s=c.createStatement(); ResultSet r=s.executeQuery("PRAGMA table_info(rn_season_configuration)")) {
@@ -11388,24 +14166,24 @@ File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.j
             }
             if(!found) try(Statement s=c.createStatement()) { s.execute("ALTER TABLE rn_season_configuration ADD COLUMN "+name+" "+type); }
         }
-    
+
         private static String status(SeasonRow r) {
             if ("MANUALE".equals(r.managementType())) {
-                return r.localSitePath().isBlank() ? "DA_CONFIGURARE" : "COMPLETA";
+                return "COMPLETA";
             }
             return !r.fcmPath().isBlank() && !r.fcaPath().isBlank() && !r.localSitePath().isBlank()
                     ? "COMPLETA" : "DA_CONFIGURARE";
         }
-    
+
         private static void nullable(PreparedStatement p,int i,String value) throws Exception {
             String v=value==null?"":value.trim(); if(v.isEmpty()) p.setNull(i,Types.VARCHAR); else p.setString(i,v);
         }
-    
+
         private static int startYear(String seasonId) {
             try { return Integer.parseInt(seasonId.substring(0,4)); }
             catch (Exception ex) { return Integer.MIN_VALUE; }
         }
-    
+
         private static void assignMissingNumbers(List<SeasonRow> rows) {
             List<SeasonRow> chronological = new ArrayList<>(rows);
             chronological.sort(Comparator.comparingInt(r -> startYear(r.seasonId())));
@@ -11427,7 +14205,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.j
 File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.io.BufferedWriter;
     import java.math.BigDecimal;
     import java.nio.charset.StandardCharsets;
@@ -11441,12 +14219,12 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
     import java.util.ArrayList;
     import java.util.List;
     import java.util.Locale;
-    
+
     public final class PlayoffRecordsExporter {
-    
+
         private PlayoffRecordsExporter() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 3) {
                 System.err.println(
@@ -11455,53 +14233,53 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                 );
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0])
                 .toAbsolutePath()
                 .normalize();
-    
+
             String seasonId = args[1].trim();
-    
+
             Path output = Path.of(args[2])
                 .toAbsolutePath()
                 .normalize();
-    
+
             if (seasonId.isBlank()) {
                 throw new IllegalArgumentException(
                     "La stagione non può essere vuota."
                 );
             }
-    
+
             if (output.getParent() != null) {
                 Files.createDirectories(output.getParent());
             }
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             long started = System.nanoTime();
-    
+
             try (Connection connection = DriverManager.getConnection(
                     "jdbc:sqlite:" + database)) {
-    
+
                 ensureViewExists(connection);
-    
+
                 List<TeamSummary> summaries = readSummaries(
                     connection,
                     seasonId
                 );
-    
+
                 List<PlayoffDetail> wins = readDetails(
                     connection,
                     seasonId,
                     "W"
                 );
-    
+
                 List<PlayoffDetail> losses = readDetails(
                     connection,
                     seasonId,
                     "L"
                 );
-    
+
                 writeJson(
                     output,
                     new ExportData(
@@ -11517,16 +14295,16 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                         losses
                     )
                 );
-    
+
                 long finished = System.nanoTime();
-    
+
                 System.out.println("Record play off / play out esportati");
                 System.out.println("Stagione       : " + seasonId);
                 System.out.println("Squadre        : " + summaries.size());
                 System.out.println("Play off vinti : " + wins.size());
                 System.out.println("Play off persi : " + losses.size());
                 System.out.println("Output         : " + output);
-    
+
                 System.out.printf(
                     Locale.ROOT,
                     "Tempo          : %.3f ms%n",
@@ -11534,24 +14312,24 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                 );
             }
         }
-    
+
         private static void ensureViewExists(
                 Connection connection) throws Exception {
-    
+
             String sql = """
                 SELECT COUNT(*)
                 FROM sqlite_master
                 WHERE type = 'view'
                   AND name = 'rn_playoff_result'
                 """;
-    
+
             try (
                 PreparedStatement statement =
                     connection.prepareStatement(sql);
                 ResultSet result = statement.executeQuery()
             ) {
                 result.next();
-    
+
                 if (result.getInt(1) != 1) {
                     throw new IllegalStateException(
                         "Vista rn_playoff_result non trovata. "
@@ -11560,11 +14338,11 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                 }
             }
         }
-    
+
         private static List<TeamSummary> readSummaries(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             String sql = """
                 SELECT
                     source_team_id,
@@ -11585,14 +14363,14 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                     playoff_losses ASC,
                     team_name COLLATE NOCASE
                 """;
-    
+
             List<TeamSummary> rows = new ArrayList<>();
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, seasonId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         rows.add(
@@ -11607,15 +14385,15 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                     }
                 }
             }
-    
+
             return rows;
         }
-    
+
         private static List<PlayoffDetail> readDetails(
                 Connection connection,
                 String seasonId,
                 String resultCode) throws Exception {
-    
+
             String sql = """
                 SELECT
                     season_id,
@@ -11646,15 +14424,15 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                     source_round_id,
                     source_event_id
                 """;
-    
+
             List<PlayoffDetail> rows = new ArrayList<>();
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, seasonId);
                 statement.setString(2, resultCode);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         rows.add(
@@ -11683,47 +14461,47 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                     }
                 }
             }
-    
+
             return rows;
         }
-    
+
         private static void writeJson(
                 Path output,
                 ExportData data) throws Exception {
-    
+
             try (BufferedWriter writer = Files.newBufferedWriter(
                     output,
                     StandardCharsets.UTF_8)) {
-    
+
                 writer.write("{\n");
-    
+
                 writeMeta(writer, data.meta());
                 writer.write(",\n");
-    
+
                 writeSummaries(writer, data.summaries());
                 writer.write(",\n");
-    
+
                 writeDetails(
                     writer,
                     "playOffVinti",
                     data.wins()
                 );
                 writer.write(",\n");
-    
+
                 writeDetails(
                     writer,
                     "playOffPersi",
                     data.losses()
                 );
-    
+
                 writer.write("\n}\n");
             }
         }
-    
+
         private static void writeMeta(
                 BufferedWriter writer,
                 Meta meta) throws Exception {
-    
+
             writer.write("  \"meta\": {\n");
             writeStringProperty(
                 writer,
@@ -11762,16 +14540,16 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
             );
             writer.write("  }");
         }
-    
+
         private static void writeSummaries(
                 BufferedWriter writer,
                 List<TeamSummary> rows) throws Exception {
-    
+
             writer.write("  \"riepilogoSquadre\": [\n");
-    
+
             for (int index = 0; index < rows.size(); index++) {
                 TeamSummary row = rows.get(index);
-    
+
                 writer.write("    {\n");
                 writeStringProperty(
                     writer,
@@ -11809,31 +14587,31 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                     6
                 );
                 writer.write("    }");
-    
+
                 if (index + 1 < rows.size()) {
                     writer.write(",");
                 }
-    
+
                 writer.write("\n");
             }
-    
+
             writer.write("  ]");
         }
-    
+
         private static void writeDetails(
                 BufferedWriter writer,
                 String propertyName,
                 List<PlayoffDetail> rows) throws Exception {
-    
+
             writer.write("  \"");
             writer.write(jsonEscape(propertyName));
             writer.write("\": [\n");
-    
+
             for (int index = 0; index < rows.size(); index++) {
                 PlayoffDetail row = rows.get(index);
-    
+
                 writer.write("    {\n");
-    
+
                 writeStringProperty(
                     writer,
                     "stagione",
@@ -11967,31 +14745,31 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                     false,
                     6
                 );
-    
+
                 writer.write("    }");
-    
+
                 if (index + 1 < rows.size()) {
                     writer.write(",");
                 }
-    
+
                 writer.write("\n");
             }
-    
+
             writer.write("  ]");
         }
-    
+
         private static void writeStringProperty(
                 BufferedWriter writer,
                 String name,
                 String value,
                 boolean comma,
                 int indent) throws Exception {
-    
+
             writer.write(" ".repeat(indent));
             writer.write("\"");
             writer.write(jsonEscape(name));
             writer.write("\": ");
-    
+
             if (value == null) {
                 writer.write("null");
             } else {
@@ -11999,46 +14777,46 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                 writer.write(jsonEscape(value));
                 writer.write("\"");
             }
-    
+
             if (comma) {
                 writer.write(",");
             }
-    
+
             writer.write("\n");
         }
-    
+
         private static void writeNumberProperty(
                 BufferedWriter writer,
                 String name,
                 long value,
                 boolean comma,
                 int indent) throws Exception {
-    
+
             writer.write(" ".repeat(indent));
             writer.write("\"");
             writer.write(jsonEscape(name));
             writer.write("\": ");
             writer.write(Long.toString(value));
-    
+
             if (comma) {
                 writer.write(",");
             }
-    
+
             writer.write("\n");
         }
-    
+
         private static void writeDecimalProperty(
                 BufferedWriter writer,
                 String name,
                 BigDecimal value,
                 boolean comma,
                 int indent) throws Exception {
-    
+
             writer.write(" ".repeat(indent));
             writer.write("\"");
             writer.write(jsonEscape(name));
             writer.write("\": ");
-    
+
             if (value == null) {
                 writer.write("null");
             } else {
@@ -12046,20 +14824,20 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                     value.stripTrailingZeros().toPlainString()
                 );
             }
-    
+
             if (comma) {
                 writer.write(",");
             }
-    
+
             writer.write("\n");
         }
-    
+
         private static String jsonEscape(String value) {
             StringBuilder escaped = new StringBuilder();
-    
+
             for (int index = 0; index < value.length(); index++) {
                 char current = value.charAt(index);
-    
+
                 switch (current) {
                     case '"' -> escaped.append("\\\"");
                     case '\\' -> escaped.append("\\\\");
@@ -12068,7 +14846,7 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                     case '\n' -> escaped.append("\\n");
                     case '\r' -> escaped.append("\\r");
                     case '\t' -> escaped.append("\\t");
-    
+
                     default -> {
                         if (current < 0x20) {
                             escaped.append(
@@ -12084,10 +14862,10 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
                     }
                 }
             }
-    
+
             return escaped.toString();
         }
-    
+
         private record Meta(
             String generatedAt,
             String seasonId,
@@ -12096,7 +14874,7 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
             int losses
         ) {
         }
-    
+
         private record TeamSummary(
             int sourceTeamId,
             long teamIdentityId,
@@ -12105,7 +14883,7 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
             int losses
         ) {
         }
-    
+
         private record PlayoffDetail(
             String seasonId,
             String competitionName,
@@ -12128,7 +14906,7 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
             String result
         ) {
         }
-    
+
         private record ExportData(
             Meta meta,
             List<TeamSummary> summaries,
@@ -12143,7 +14921,7 @@ File: src\main\java\it\alterlega\recordsnext\PlayoffRecordsExporter.java
 File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.security.MessageDigest;
@@ -12160,14 +14938,14 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
     import java.util.HexFormat;
     import java.util.List;
     import java.util.Locale;
-    
+
     public final class RawSqliteImporter {
-    
+
         private static final int BATCH_SIZE = 1000;
-    
+
         private RawSqliteImporter() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 4) {
                 System.err.println(
@@ -12176,64 +14954,64 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 );
                 System.exit(2);
             }
-    
+
             Path source = Path.of(args[0]).toAbsolutePath().normalize();
             String sourceType = args[1].trim().toUpperCase(Locale.ROOT);
             String seasonId = args[2].trim();
             Path sqliteFile = Path.of(args[3]).toAbsolutePath().normalize();
-    
+
             if (!Files.isRegularFile(source)) {
                 throw new IllegalArgumentException(
                     "File sorgente non trovato: " + source
                 );
             }
-    
+
             if (!sourceType.equals("FCM") && !sourceType.equals("FCA")) {
                 throw new IllegalArgumentException(
                     "Tipo sorgente non valido: " + sourceType
                 );
             }
-    
+
             if (seasonId.isBlank()) {
                 throw new IllegalArgumentException("Stagione non specificata.");
             }
-    
+
             if (sqliteFile.getParent() != null) {
                 Files.createDirectories(sqliteFile.getParent());
             }
-    
+
             Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
             Class.forName("org.sqlite.JDBC");
-    
+
             String accessUrl = "jdbc:ucanaccess://" + source;
             String sqliteUrl = "jdbc:sqlite:" + sqliteFile;
-    
+
             long totalStarted = System.nanoTime();
-    
+
             try (
                 Connection access = DriverManager.getConnection(accessUrl);
                 Connection sqlite = DriverManager.getConnection(sqliteUrl)
             ) {
     access.setReadOnly(true);
-    
+
     configureSqlite(sqlite);
     sqlite.setAutoCommit(false);
-    
+
     createMetadataTables(sqlite);
-    
+
                 long importId = registerImport(
                     sqlite,
                     source,
                     sourceType,
                     seasonId
                 );
-    
+
                 DatabaseMetaData metadata = access.getMetaData();
                 List<String> tableNames = readTableNames(metadata);
-    
+
                 long importedRows = 0;
                 long importedColumns = 0;
-    
+
                 for (String tableName : tableNames) {
                     TableImportResult result = importTable(
                         access,
@@ -12244,10 +15022,10 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         seasonId,
                         tableName
                     );
-    
+
                     importedRows += result.rows();
                     importedColumns += result.columns();
-    
+
                     System.out.printf(
                         Locale.ROOT,
                         "%-40s colonne=%4d righe=%8d%n",
@@ -12256,7 +15034,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         result.rows()
                     );
                 }
-    
+
                 finishImport(
                     sqlite,
                     importId,
@@ -12264,11 +15042,11 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                     importedColumns,
                     importedRows
                 );
-    
+
                 sqlite.commit();
-    
+
                 long totalFinished = System.nanoTime();
-    
+
                 System.out.println();
                 System.out.println("Importazione raw completata");
                 System.out.println("Sorgente : " + source);
@@ -12285,7 +15063,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 );
             }
         }
-    
+
         private static void configureSqlite(Connection sqlite) throws Exception {
             try (Statement statement = sqlite.createStatement()) {
                 statement.execute("PRAGMA foreign_keys = ON");
@@ -12294,10 +15072,10 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 statement.execute("PRAGMA temp_store = MEMORY");
             }
         }
-    
+
         private static void createMetadataTables(Connection sqlite)
                 throws Exception {
-    
+
             try (Statement statement = sqlite.createStatement()) {
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_import (
@@ -12317,7 +15095,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         status TEXT NOT NULL
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_table_catalog (
                         import_id INTEGER NOT NULL,
@@ -12335,7 +15113,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         )
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE TABLE IF NOT EXISTS rn_column_catalog (
                         import_id INTEGER NOT NULL,
@@ -12357,13 +15135,13 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                     """);
             }
         }
-    
+
         private static long registerImport(
                 Connection sqlite,
                 Path source,
                 String sourceType,
                 String seasonId) throws Exception {
-    
+
             String sql = """
                 INSERT INTO rn_import (
                     season_id,
@@ -12378,7 +15156,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
-    
+
             try (
                 PreparedStatement statement = sqlite.prepareStatement(
                     sql,
@@ -12398,24 +15176,24 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 statement.setString(8, Instant.now().toString());
                 statement.setString(9, "RUNNING");
                 statement.executeUpdate();
-    
+
                 try (ResultSet keys = statement.getGeneratedKeys()) {
                     if (!keys.next()) {
                         throw new IllegalStateException(
                             "Impossibile ottenere import_id."
                         );
                     }
-    
+
                     return keys.getLong(1);
                 }
             }
         }
-    
+
         private static List<String> readTableNames(DatabaseMetaData metadata)
                 throws Exception {
-    
+
             List<String> tables = new ArrayList<>();
-    
+
             try (
                 ResultSet result = metadata.getTables(
                     null,
@@ -12426,17 +15204,17 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
             ) {
                 while (result.next()) {
                     String name = result.getString("TABLE_NAME");
-    
+
                     if (name != null && !name.isBlank()) {
                         tables.add(name);
                     }
                 }
             }
-    
+
             tables.sort(String.CASE_INSENSITIVE_ORDER);
             return tables;
         }
-    
+
         private static TableImportResult importTable(
                 Connection access,
                 Connection sqlite,
@@ -12445,18 +15223,18 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 String sourceType,
                 String seasonId,
                 String sourceTableName) throws Exception {
-    
+
             String rawTableName = rawTableName(
                 sourceType,
                 seasonId,
                 sourceTableName
             );
-    
+
             List<ColumnDefinition> columns = readColumns(
                 metadata,
                 sourceTableName
             );
-    
+
             dropRawTable(sqlite, rawTableName);
             createRawTable(sqlite, rawTableName, columns);
             registerColumns(
@@ -12465,12 +15243,12 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 sourceTableName,
                 columns
             );
-    
+
             long sourceRowCount = countSourceRows(
                 access,
                 sourceTableName
             );
-    
+
             long importedRowCount = copyRows(
                 access,
                 sqlite,
@@ -12478,7 +15256,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 rawTableName,
                 columns
             );
-    
+
             registerTable(
                 sqlite,
                 importId,
@@ -12490,7 +15268,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 importedRowCount,
                 columns.size()
             );
-    
+
             if (sourceRowCount != importedRowCount) {
                 throw new IllegalStateException(
                     "Audit fallito per " + sourceTableName
@@ -12498,19 +15276,19 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         + ", importate=" + importedRowCount
                 );
             }
-    
+
             return new TableImportResult(
                 columns.size(),
                 importedRowCount
             );
         }
-    
+
         private static List<ColumnDefinition> readColumns(
                 DatabaseMetaData metadata,
                 String tableName) throws Exception {
-    
+
             List<ColumnDefinition> columns = new ArrayList<>();
-    
+
             try (
                 ResultSet result = metadata.getColumns(
                     null,
@@ -12534,7 +15312,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                     );
                 }
             }
-    
+
             columns.sort(
                 (left, right) ->
                     Integer.compare(
@@ -12542,92 +15320,92 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         right.ordinalPosition()
                     )
             );
-    
+
             return columns;
         }
-    
+
         private static void dropRawTable(
                 Connection sqlite,
                 String rawTableName) throws Exception {
-    
+
             try (Statement statement = sqlite.createStatement()) {
                 statement.execute(
                     "DROP TABLE IF EXISTS " + quoteSqlite(rawTableName)
                 );
             }
         }
-    
+
         private static void createRawTable(
                 Connection sqlite,
                 String rawTableName,
                 List<ColumnDefinition> columns) throws Exception {
-    
+
             StringBuilder sql = new StringBuilder();
-    
+
             sql.append("CREATE TABLE ");
             sql.append(quoteSqlite(rawTableName));
             sql.append(" (");
-    
+
             for (int index = 0; index < columns.size(); index++) {
                 if (index > 0) {
                     sql.append(", ");
                 }
-    
+
                 ColumnDefinition column = columns.get(index);
-    
+
                 sql.append(quoteSqlite(column.name()));
                 sql.append(" ");
                 sql.append(sqliteType(column.jdbcType()));
             }
-    
+
             sql.append(")");
-    
+
             try (Statement statement = sqlite.createStatement()) {
                 statement.execute(sql.toString());
             }
         }
-    
+
         private static long copyRows(
                 Connection access,
                 Connection sqlite,
                 String sourceTableName,
                 String rawTableName,
                 List<ColumnDefinition> columns) throws Exception {
-    
+
             String sourceSql =
                 "SELECT * FROM " + quoteAccess(sourceTableName);
-    
+
             StringBuilder insertSql = new StringBuilder();
-    
+
             insertSql.append("INSERT INTO ");
             insertSql.append(quoteSqlite(rawTableName));
             insertSql.append(" (");
-    
+
             for (int index = 0; index < columns.size(); index++) {
                 if (index > 0) {
                     insertSql.append(", ");
                 }
-    
+
                 insertSql.append(
                     quoteSqlite(columns.get(index).name())
                 );
             }
-    
+
             insertSql.append(") VALUES (");
-    
+
             for (int index = 0; index < columns.size(); index++) {
                 if (index > 0) {
                     insertSql.append(", ");
                 }
-    
+
                 insertSql.append("?");
             }
-    
+
             insertSql.append(")");
-    
+
             long importedRows = 0;
             int batchRows = 0;
-    
+
             try (
                 Statement sourceStatement = access.createStatement();
                 ResultSet sourceRows =
@@ -12637,7 +15415,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
             ) {
                 ResultSetMetaData rowMetadata =
                     sourceRows.getMetaData();
-    
+
                 while (sourceRows.next()) {
                     for (
                         int columnIndex = 1;
@@ -12652,35 +15430,35 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                             columnIndex
                         );
                     }
-    
+
                     destination.addBatch();
                     importedRows++;
                     batchRows++;
-    
+
                     if (batchRows >= BATCH_SIZE) {
                         destination.executeBatch();
                         batchRows = 0;
                     }
                 }
-    
+
                 if (batchRows > 0) {
                     destination.executeBatch();
                 }
             }
-    
+
             return importedRows;
         }
-    
+
         private static void setValue(
                 PreparedStatement destination,
                 int destinationIndex,
                 ResultSet source,
                 ResultSetMetaData metadata,
                 int sourceIndex) throws Exception {
-    
+
             int jdbcType = metadata.getColumnType(sourceIndex);
             Object value = source.getObject(sourceIndex);
-    
+
             if (value == null) {
                 destination.setNull(
                     destinationIndex,
@@ -12688,7 +15466,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 );
                 return;
             }
-    
+
             switch (jdbcType) {
                 case Types.BINARY,
                      Types.VARBINARY,
@@ -12698,7 +15476,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         destinationIndex,
                         source.getBytes(sourceIndex)
                     );
-    
+
                 case Types.TINYINT,
                      Types.SMALLINT,
                      Types.INTEGER,
@@ -12707,7 +15485,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         destinationIndex,
                         source.getLong(sourceIndex)
                     );
-    
+
                 case Types.FLOAT,
                      Types.REAL,
                      Types.DOUBLE ->
@@ -12715,21 +15493,21 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         destinationIndex,
                         source.getDouble(sourceIndex)
                     );
-    
+
                 case Types.NUMERIC,
                      Types.DECIMAL ->
                     destination.setBigDecimal(
                         destinationIndex,
                         source.getBigDecimal(sourceIndex)
                     );
-    
+
                 case Types.BIT,
                      Types.BOOLEAN ->
                     destination.setInt(
                         destinationIndex,
                         source.getBoolean(sourceIndex) ? 1 : 0
                     );
-    
+
                 case Types.DATE,
                      Types.TIME,
                      Types.TIMESTAMP,
@@ -12738,7 +15516,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                         destinationIndex,
                         String.valueOf(value)
                     );
-    
+
                 default ->
                     destination.setString(
                         destinationIndex,
@@ -12746,14 +15524,14 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                     );
             }
         }
-    
+
         private static long countSourceRows(
                 Connection access,
                 String tableName) throws Exception {
-    
+
             String sql =
                 "SELECT COUNT(*) FROM " + quoteAccess(tableName);
-    
+
             try (
                 Statement statement = access.createStatement();
                 ResultSet result = statement.executeQuery(sql)
@@ -12762,13 +15540,13 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 return result.getLong(1);
             }
         }
-    
+
         private static void registerColumns(
                 Connection sqlite,
                 long importId,
                 String tableName,
                 List<ColumnDefinition> columns) throws Exception {
-    
+
             String sql = """
                 INSERT INTO rn_column_catalog (
                     import_id,
@@ -12784,10 +15562,10 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
-    
+
             try (PreparedStatement statement =
                      sqlite.prepareStatement(sql)) {
-    
+
                 for (ColumnDefinition column : columns) {
                     statement.setLong(1, importId);
                     statement.setString(2, tableName);
@@ -12796,7 +15574,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                     statement.setInt(5, column.jdbcType());
                     statement.setString(6, column.typeName());
                     statement.setInt(7, column.columnSize());
-    
+
                     if (column.decimalDigits() == null) {
                         statement.setNull(8, Types.INTEGER);
                     } else {
@@ -12805,16 +15583,16 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                             column.decimalDigits()
                         );
                     }
-    
+
                     statement.setInt(9, column.nullableCode());
                     statement.setString(10, column.defaultValue());
                     statement.addBatch();
                 }
-    
+
                 statement.executeBatch();
             }
         }
-    
+
         private static void registerTable(
                 Connection sqlite,
                 long importId,
@@ -12825,7 +15603,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 long sourceRowCount,
                 long importedRowCount,
                 int columnCount) throws Exception {
-    
+
             String sql = """
                 INSERT INTO rn_table_catalog (
                     import_id,
@@ -12840,10 +15618,10 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
-    
+
             try (PreparedStatement statement =
                      sqlite.prepareStatement(sql)) {
-    
+
                 statement.setLong(1, importId);
                 statement.setString(2, seasonId);
                 statement.setString(3, sourceType);
@@ -12859,14 +15637,14 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 statement.executeUpdate();
             }
         }
-    
+
         private static void finishImport(
                 Connection sqlite,
                 long importId,
                 int tableCount,
                 long columnCount,
                 long rowCount) throws Exception {
-    
+
             String sql = """
                 UPDATE rn_import
                 SET completed_at = ?,
@@ -12876,10 +15654,10 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                     status = ?
                 WHERE import_id = ?
                 """;
-    
+
             try (PreparedStatement statement =
                      sqlite.prepareStatement(sql)) {
-    
+
                 statement.setString(1, Instant.now().toString());
                 statement.setInt(2, tableCount);
                 statement.setLong(3, columnCount);
@@ -12889,12 +15667,12 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 statement.executeUpdate();
             }
         }
-    
+
         private static String rawTableName(
                 String sourceType,
                 String seasonId,
                 String sourceTableName) {
-    
+
             return "raw_"
                 + normalizeIdentifier(seasonId)
                 + "_"
@@ -12902,31 +15680,31 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 + "_"
                 + normalizeIdentifier(sourceTableName);
         }
-    
+
         private static String normalizeIdentifier(String value) {
             String normalized = value
                 .trim()
                 .toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9]+", "_")
                 .replaceAll("^_+|_+$", "");
-    
+
             if (normalized.isBlank()) {
                 throw new IllegalArgumentException(
                     "Identificatore non normalizzabile: " + value
                 );
             }
-    
+
             return normalized;
         }
-    
+
         private static String quoteAccess(String name) {
             return "[" + name.replace("]", "]]") + "]";
         }
-    
+
         private static String quoteSqlite(String name) {
             return "\"" + name.replace("\"", "\"\"") + "\"";
         }
-    
+
         private static String sqliteType(int jdbcType) {
             return switch (jdbcType) {
                 case Types.BIT,
@@ -12935,23 +15713,23 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                      Types.SMALLINT,
                      Types.INTEGER,
                      Types.BIGINT -> "INTEGER";
-    
+
                 case Types.FLOAT,
                      Types.REAL,
                      Types.DOUBLE -> "REAL";
-    
+
                 case Types.NUMERIC,
                      Types.DECIMAL -> "NUMERIC";
-    
+
                 case Types.BINARY,
                      Types.VARBINARY,
                      Types.LONGVARBINARY,
                      Types.BLOB -> "BLOB";
-    
+
                 default -> "TEXT";
             };
         }
-    
+
         private static int sqliteNullType(int jdbcType) {
             return switch (sqliteType(jdbcType)) {
                 case "INTEGER" -> Types.INTEGER;
@@ -12961,31 +15739,31 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
                 default -> Types.VARCHAR;
             };
         }
-    
+
         private static Integer nullableInteger(
                 ResultSet result,
                 String columnName) throws Exception {
-    
+
             int value = result.getInt(columnName);
             return result.wasNull() ? null : value;
         }
-    
+
         private static String sha256(Path path) throws Exception {
             MessageDigest digest =
                 MessageDigest.getInstance("SHA-256");
-    
+
             try (var input = Files.newInputStream(path)) {
                 byte[] buffer = new byte[1024 * 1024];
                 int read;
-    
+
                 while ((read = input.read(buffer)) >= 0) {
                     digest.update(buffer, 0, read);
                 }
             }
-    
+
             return HexFormat.of().formatHex(digest.digest());
         }
-    
+
         private record ColumnDefinition(
             String name,
             int ordinalPosition,
@@ -12997,7 +15775,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
             String defaultValue
         ) {
         }
-    
+
         private record TableImportResult(
             int columns,
             long rows
@@ -13010,7 +15788,7 @@ File: src\main\java\it\alterlega\recordsnext\RawSqliteImporter.java
 File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.io.IOException;
     import java.math.BigDecimal;
     import java.nio.charset.StandardCharsets;
@@ -13026,27 +15804,27 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
     import java.util.Map;
     import java.util.Set;
     import java.util.stream.Stream;
-    
+
     /**
      * Genera records2026.recordstagionali.classic.js mantenendo il contratto
      * pubblico di Records2026 e pubblicando soltanto le sezioni/campi previsti.
      */
     public final class Records2026ClassicJsExporter {
-    
+
         private static final String PREFIX = "season_records_";
         private static final String SUFFIX = ".json";
-    
+
         private static final Map<String, Set<String>> PUBLIC_FIELDS = buildPublicFields();
-    
+
         private Records2026ClassicJsExporter() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length < 2) {
                 printUsage();
                 System.exit(2);
             }
-    
+
             Path archiveRoot = Path.of(args[0]).toAbsolutePath().normalize();
             Path outputFile = Path.of(args[1]).toAbsolutePath().normalize();
             List<String> requestedSeasons = new ArrayList<>();
@@ -13056,28 +15834,28 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                     requestedSeasons.add(value);
                 }
             }
-    
+
             ExportResult result = export(archiveRoot, outputFile, requestedSeasons);
             System.out.println("Archivio : " + archiveRoot);
             System.out.println("Output   : " + outputFile);
             System.out.println("Stagioni : " + result.seasonCount());
             System.out.println("Recordset: " + result.entryCount());
         }
-    
+
         public static ExportResult export(Path archiveRoot, Path outputFile, List<String> requestedSeasons)
                 throws IOException {
             if (!Files.isDirectory(archiveRoot)) {
                 throw new IOException("Archivio stagioni non trovato: " + archiveRoot);
             }
-    
+
             List<Path> seasonDirectories = resolveSeasonDirectories(archiveRoot, requestedSeasons);
             if (seasonDirectories.isEmpty()) {
                 throw new IOException("Nessuna stagione trovata in: " + archiveRoot);
             }
-    
+
             List<Entry> entries = new ArrayList<>();
             int seasonsWithRecords = 0;
-    
+
             for (Path seasonDirectory : seasonDirectories) {
                 List<Path> recordFiles = listRecordFiles(seasonDirectory);
                 if (recordFiles.isEmpty()) {
@@ -13085,7 +15863,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                 }
                 seasonsWithRecords++;
                 String season = seasonDirectory.getFileName().toString();
-    
+
                 for (Path recordFile : recordFiles) {
                     String fileName = recordFile.getFileName().toString();
                     String competitionId = fileName.substring(PREFIX.length(), fileName.length() - SUFFIX.length());
@@ -13094,18 +15872,18 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                     Map<String, Object> root = requireObject(parsed, recordFile, "radice");
                     Map<String, Object> sourceRecords = requireObject(root.get("records"), recordFile, "records");
                     Map<String, Object> publicRecords = projectRecords(sourceRecords, recordFile);
-    
+
                     Map<String, Object> publicData = new LinkedHashMap<>();
                     publicData.put("records", publicRecords);
                     String json = escapeScriptTerminator(JsonWriter.write(publicData));
                     entries.add(new Entry(season, competitionId, fileName, json));
                 }
             }
-    
+
             if (entries.isEmpty()) {
                 throw new IOException("Nessun file season_records_*.json trovato in: " + archiveRoot);
             }
-    
+
             Path parent = outputFile.getParent();
             if (parent != null) {
                 Files.createDirectories(parent);
@@ -13114,7 +15892,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             return new ExportResult(seasonsWithRecords, entries.size());
         }
-    
+
         private static Map<String, Object> projectRecords(Map<String, Object> sourceRecords, Path source)
                 throws IOException {
             Map<String, Object> result = new LinkedHashMap<>();
@@ -13124,7 +15902,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                 if (allowedFields == null) {
                     continue;
                 }
-    
+
                 Object value = sectionEntry.getValue();
                 if (!(value instanceof List<?> sourceRows)) {
                     continue;
@@ -13132,7 +15910,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                 if (sourceRows.isEmpty()) {
                     continue;
                 }
-    
+
                 List<Object> publicRows = new ArrayList<>(sourceRows.size());
                 for (Object row : sourceRows) {
                     if (!(row instanceof Map<?, ?> rawMap)) {
@@ -13145,7 +15923,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                             projected.put(fieldName, fieldEntry.getValue());
                         }
                     }
-    
+
                     // Nei JSON sorgente il dettaglio completo e' spesso conservato
                     // nell'array "dettagli". Il file pubblico espone soltanto il
                     // relativo conteggio, calcolato dal generatore legacy.
@@ -13161,7 +15939,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
             }
             return result;
         }
-    
+
         private static Map<String, Set<String>> buildPublicFields() {
             Map<String, Set<String>> fields = new LinkedHashMap<>();
             fields.put("puntiSquadraMax", orderedSet(
@@ -13194,11 +15972,11 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                     "recordId", "nome", "valore", "idSquadra", "squadra", "daGiornataDiA", "aGiornataDiA", "dettagliCount"));
             return fields;
         }
-    
+
         private static Set<String> compactTeamFields() {
             return orderedSet("recordId", "nome", "valore", "idSquadra", "squadra", "dettagliCount");
         }
-    
+
         private static Set<String> orderedSet(String... values) {
             Set<String> result = new LinkedHashSet<>();
             for (String value : values) {
@@ -13206,7 +15984,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
             }
             return Set.copyOf(result);
         }
-    
+
         private static Map<String, Object> requireObject(Object value, Path source, String label) throws IOException {
             if (!(value instanceof Map<?, ?> raw)) {
                 throw new IOException("Oggetto JSON '" + label + "' mancante o non valido: " + source);
@@ -13217,7 +15995,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
             }
             return result;
         }
-    
+
         private static List<Path> resolveSeasonDirectories(Path archiveRoot, List<String> requestedSeasons)
                 throws IOException {
             List<Path> result = new ArrayList<>();
@@ -13233,7 +16011,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                     .filter(Files::isDirectory).forEach(result::add);
             return result;
         }
-    
+
         private static List<Path> listRecordFiles(Path seasonDirectory) throws IOException {
             try (Stream<Path> stream = Files.list(seasonDirectory)) {
                 return stream.filter(Files::isRegularFile)
@@ -13245,7 +16023,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                         .toList();
             }
         }
-    
+
         private static String normalizeJsonText(String text) {
             if (text == null || text.isEmpty()) {
                 return "";
@@ -13256,7 +16034,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
             }
             return normalized.trim();
         }
-    
+
         private static String buildJavascript(List<Entry> entries) {
             StringBuilder output = new StringBuilder();
             output.append("window.RECORDS2026_PREVIEW_CLASSIC = [");
@@ -13273,32 +16051,32 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
             output.append("];\n");
             return output.toString();
         }
-    
+
         private static String escapeScriptTerminator(String json) {
             return json.replace("</script>", "<\\/script>");
         }
-    
+
         private static void printUsage() {
             System.err.println("Uso:");
             System.err.println("  Records2026ClassicJsExporter <archiveRoot> <outputFile> [stagione ...]");
         }
-    
+
         private record Entry(String season, String competitionId, String fileName, String json) {
         }
-    
+
         public record ExportResult(int seasonCount, int entryCount) {
         }
-    
+
         private static final class JsonParser {
             private final String text;
             private final Path source;
             private int index;
-    
+
             JsonParser(String text, Path source) {
                 this.text = text;
                 this.source = source;
             }
-    
+
             Object parse() throws IOException {
                 skipWhitespace();
                 Object value = parseValue();
@@ -13308,7 +16086,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                 }
                 return value;
             }
-    
+
             private Object parseValue() throws IOException {
                 skipWhitespace();
                 if (index >= text.length()) fail("Valore mancante");
@@ -13322,7 +16100,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                     default -> parseNumber();
                 };
             }
-    
+
             private Map<String, Object> parseObject() throws IOException {
                 expect('{');
                 Map<String, Object> result = new LinkedHashMap<>();
@@ -13339,7 +16117,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                     expect(',');
                 }
             }
-    
+
             private List<Object> parseArray() throws IOException {
                 expect('[');
                 List<Object> result = new ArrayList<>();
@@ -13352,7 +16130,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                     expect(',');
                 }
             }
-    
+
             private String parseString() throws IOException {
                 expect('"');
                 StringBuilder result = new StringBuilder();
@@ -13376,7 +16154,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                 fail("Stringa non terminata");
                 return null;
             }
-    
+
             private char parseUnicode() throws IOException {
                 if (index + 4 > text.length()) fail("Escape unicode incompleto");
                 String hex = text.substring(index, index + 4);
@@ -13384,13 +16162,13 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                 try { return (char) Integer.parseInt(hex, 16); }
                 catch (NumberFormatException ex) { fail("Escape unicode non valido: " + hex); return 0; }
             }
-    
+
             private Object parseLiteral(String literal, Object value) throws IOException {
                 if (!text.startsWith(literal, index)) fail("Token non valido");
                 index += literal.length();
                 return value;
             }
-    
+
             private BigDecimal parseNumber() throws IOException {
                 int start = index;
                 if (peek('-')) index++;
@@ -13408,7 +16186,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                 try { return new BigDecimal(text.substring(start, index)); }
                 catch (NumberFormatException ex) { fail("Numero non valido"); return null; }
             }
-    
+
             private void expect(char expected) throws IOException {
                 skipWhitespace();
                 if (index >= text.length() || text.charAt(index) != expected) {
@@ -13416,27 +16194,27 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                 }
                 index++;
             }
-    
+
             private boolean peek(char value) {
                 return index < text.length() && text.charAt(index) == value;
             }
-    
+
             private void skipWhitespace() {
                 while (index < text.length() && Character.isWhitespace(text.charAt(index))) index++;
             }
-    
+
             private void fail(String message) throws IOException {
                 throw new IOException(message + " in " + source + " alla posizione " + index);
             }
         }
-    
+
         private static final class JsonWriter {
             static String write(Object value) {
                 StringBuilder out = new StringBuilder();
                 append(out, value);
                 return out.toString();
             }
-    
+
             private static void append(StringBuilder out, Object value) {
                 if (value == null) { out.append("null"); return; }
                 if (value instanceof String string) { out.append('"').append(escape(string)).append('"'); return; }
@@ -13465,7 +16243,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                 }
                 throw new IllegalArgumentException("Tipo JSON non supportato: " + value.getClass());
             }
-    
+
             static String escape(String value) {
                 StringBuilder escaped = new StringBuilder(value.length() + 16);
                 for (int i = 0; i < value.length(); i++) {
@@ -13494,7 +16272,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
 File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.io.IOException;
     import java.math.BigDecimal;
     import java.nio.charset.StandardCharsets;
@@ -13509,11 +16287,11 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
     import java.util.List;
     import java.util.Map;
     import java.util.stream.Stream;
-    
+
     /** Genera gli output RU pubblici compatibili con Records2026. */
     public final class Records2026RuJsExporter {
         private Records2026RuJsExporter() {}
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 2) {
                 System.err.println("Uso: Records2026RuJsExporter <archive-riserveufficio> <output-js-dir>");
@@ -13525,41 +16303,41 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
             System.out.println("Stagioni : " + result.seasons());
             System.out.println("Annuali  : " + result.annualFiles());
         }
-    
+
         public static ExportResult export(Path archiveRoot, Path outputDir) throws IOException {
             archiveRoot = archiveRoot.toAbsolutePath().normalize();
             outputDir = outputDir.toAbsolutePath().normalize();
             if (!Files.isDirectory(archiveRoot)) throw new IOException("Archivio RU non trovato: " + archiveRoot);
             Files.createDirectories(outputDir);
-    
+
             List<Path> seasonDirs;
             try (Stream<Path> s = Files.list(archiveRoot)) {
                 seasonDirs = s.filter(Files::isDirectory)
                         .sorted(Comparator.comparing(p -> p.getFileName().toString()))
                         .toList();
             }
-    
+
             List<Object> compactItems = new ArrayList<>();
             List<Object> manifestItems = new ArrayList<>();
             int annualFiles = 0;
-    
+
             for (Path seasonDir : seasonDirs) {
                 String season = seasonDir.getFileName().toString();
                 Path jsonPath = seasonDir.resolve("riserveufficio.json");
                 if (!Files.isRegularFile(jsonPath)) continue;
-    
+
                 String rawSource = readUtf8WithoutBom(jsonPath);
                 String source = normalizeJsonText(rawSource);
                 Object parsed = new JsonParser(source, jsonPath).parse();
                 Map<String,Object> root = asObject(parsed, jsonPath, "radice");
-    
+
                 String annualJson = escapeScriptTerminator(stripTrailingLineBreaks(rawSource));
                 String annual = "window.RECORDS2026_STORICO_RU = window.RECORDS2026_STORICO_RU || {};\r\n"
                         + "window.RECORDS2026_STORICO_RU['" + JsonWriter.escape(season) + "'] = " + annualJson + ";\r\n";
                 Path annualPath = outputDir.resolve("records2026.storico.ru." + season.replaceAll("[^\\w]+", "_") + ".js");
                 writeUtf8Bom(annualPath, annual);
                 annualFiles++;
-    
+
                 Map<String,Object> data = new LinkedHashMap<>();
                 data.put("views", compactArrayMap(root.get("views")));
                 data.put("dettaglio", compactArrayMap(root.get("dettaglio")));
@@ -13568,7 +16346,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                 compact.put("stagione", season);
                 compact.put("data", data);
                 compactItems.add(compact);
-    
+
                 Map<String,Object> detail = objectOrEmpty(root.get("dettaglio"));
                 int ruRows = listSize(detail.get("ruDettaglio"));
                 Map<String,Object> meta = objectOrEmpty(root.get("meta"));
@@ -13579,11 +16357,11 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                 manifestItem.put("generated", stringValue(meta.get("generato")));
                 manifestItems.add(manifestItem);
             }
-    
+
             String compactJs = "window.RECORDS2026_PREVIEW_RU = "
                     + escapeScriptTerminator(JsonWriter.write(compactItems)) + ";";
             writeUtf8(outputDir.resolve("records2026.recordstagionali.ru.js"), compactJs);
-    
+
             Map<String,Object> manifestMeta = new LinkedHashMap<>();
             manifestMeta.put("titolo", "Records2026 Storico Riserve d'Ufficio");
             manifestMeta.put("generato", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -13594,10 +16372,10 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
             String manifestJs = "window.RECORDS2026_STORICO_RU_MANIFEST = "
                     + JsonWriter.writePretty(manifest) + ";\r\n";
             writeUtf8Bom(outputDir.resolve("records2026.storico.ru.manifest.js"), manifestJs);
-    
+
             return new ExportResult(compactItems.size(), annualFiles);
         }
-    
+
         private static Map<String,Object> compactArrayMap(Object value) {
             Map<String,Object> out = new LinkedHashMap<>();
             for (Map.Entry<String,Object> e : objectOrEmpty(value).entrySet()) {
@@ -13611,7 +16389,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
             }
             return out;
         }
-    
+
         private static Map<String,Object> compactRow(Object value) {
             Map<String,Object> out = new LinkedHashMap<>();
             if (!(value instanceof Map<?,?> raw)) return out;
@@ -13627,7 +16405,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
             }
             return out;
         }
-    
+
         private static Map<String,Object> asObject(Object value, Path source, String label) throws IOException {
             if (!(value instanceof Map<?,?> raw)) throw new IOException("Oggetto JSON '" + label + "' non valido: " + source);
             Map<String,Object> out = new LinkedHashMap<>();
@@ -13667,17 +16445,17 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
             Files.write(path, out, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         }
         public record ExportResult(int seasons, int annualFiles) {}
-    
+
         private static final class JsonParser {
             private final String text;
             private final Path source;
             private int index;
-    
+
             JsonParser(String text, Path source) {
                 this.text = text;
                 this.source = source;
             }
-    
+
             Object parse() throws IOException {
                 skipWhitespace();
                 Object value = parseValue();
@@ -13687,7 +16465,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                 }
                 return value;
             }
-    
+
             private Object parseValue() throws IOException {
                 skipWhitespace();
                 if (index >= text.length()) fail("Valore mancante");
@@ -13701,7 +16479,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                     default -> parseNumber();
                 };
             }
-    
+
             private Map<String, Object> parseObject() throws IOException {
                 expect('{');
                 Map<String, Object> result = new LinkedHashMap<>();
@@ -13718,7 +16496,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                     expect(',');
                 }
             }
-    
+
             private List<Object> parseArray() throws IOException {
                 expect('[');
                 List<Object> result = new ArrayList<>();
@@ -13731,7 +16509,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                     expect(',');
                 }
             }
-    
+
             private String parseString() throws IOException {
                 expect('"');
                 StringBuilder result = new StringBuilder();
@@ -13755,7 +16533,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                 fail("Stringa non terminata");
                 return null;
             }
-    
+
             private char parseUnicode() throws IOException {
                 if (index + 4 > text.length()) fail("Escape unicode incompleto");
                 String hex = text.substring(index, index + 4);
@@ -13763,13 +16541,13 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                 try { return (char) Integer.parseInt(hex, 16); }
                 catch (NumberFormatException ex) { fail("Escape unicode non valido: " + hex); return 0; }
             }
-    
+
             private Object parseLiteral(String literal, Object value) throws IOException {
                 if (!text.startsWith(literal, index)) fail("Token non valido");
                 index += literal.length();
                 return value;
             }
-    
+
             private BigDecimal parseNumber() throws IOException {
                 int start = index;
                 if (peek('-')) index++;
@@ -13787,7 +16565,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                 try { return new BigDecimal(text.substring(start, index)); }
                 catch (NumberFormatException ex) { fail("Numero non valido"); return null; }
             }
-    
+
             private void expect(char expected) throws IOException {
                 skipWhitespace();
                 if (index >= text.length() || text.charAt(index) != expected) {
@@ -13795,33 +16573,33 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                 }
                 index++;
             }
-    
+
             private boolean peek(char value) {
                 return index < text.length() && text.charAt(index) == value;
             }
-    
+
             private void skipWhitespace() {
                 while (index < text.length() && Character.isWhitespace(text.charAt(index))) index++;
             }
-    
+
             private void fail(String message) throws IOException {
                 throw new IOException(message + " in " + source + " alla posizione " + index);
             }
         }
-    
+
         private static final class JsonWriter {
             static String write(Object value) {
                 StringBuilder out = new StringBuilder();
                 append(out, value);
                 return out.toString();
             }
-    
+
             static String writePretty(Object value) {
                 StringBuilder out = new StringBuilder();
                 appendPretty(out, value, 0);
                 return out.toString();
             }
-    
+
             private static void appendPretty(StringBuilder out, Object value, int depth) {
                 if (value == null || value instanceof String || value instanceof Boolean || value instanceof Number) { append(out, value); return; }
                 String indent = "    ".repeat(depth);
@@ -13852,7 +16630,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                 }
                 append(out, value);
             }
-    
+
             private static void append(StringBuilder out, Object value) {
                 if (value == null) { out.append("null"); return; }
                 if (value instanceof String string) { out.append('"').append(escape(string)).append('"'); return; }
@@ -13881,7 +16659,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
                 }
                 throw new IllegalArgumentException("Tipo JSON non supportato: " + value.getClass());
             }
-    
+
             static String escape(String value) {
                 StringBuilder escaped = new StringBuilder(value.length() + 16);
                 for (int i = 0; i < value.length(); i++) {
@@ -13910,7 +16688,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026RuJsExporter.java
 File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
 
     package it.alterlega.recordsnext;
-    
+
     import it.alterlega.recordsnext.app.PipelinePreflight;
     import it.alterlega.recordsnext.app.ProcessingOptions;
     import it.alterlega.recordsnext.app.manifest.ManifestJsWriter;
@@ -13925,7 +16703,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import it.alterlega.recordsnext.app.thresholds.ThresholdsLuckFamilyJsExporter;
     import it.alterlega.recordsnext.app.culometro.CulometroFamilyJsExporter;
     import it.alterlega.recordsnext.app.model.RecordFamily;
-    
+
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
     import java.nio.file.AtomicMoveNotSupportedException;
@@ -13941,7 +16719,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import java.util.List;
     import java.util.Map;
     import java.util.UUID;
-    
+
     /**
      * Coordina la generazione e la pubblicazione degli output JS compatibili
      * con Records2026.
@@ -13953,7 +16731,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
      *  4. ripristina i file precedenti se una pubblicazione fallisce.
      */
     public final class Records2026SitePublisher {
-    
+
         private static final String CORE_FILE = "fcmRecordsNext_Core.js";
         private static final String CLASSICS_2_FILE = ClassicsFamilyJsExporter.FILE_NAME;
         private static final String RU_2_FILE = RuFamilyJsExporter.FILE_NAME;
@@ -13966,25 +16744,25 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
         private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
         private static final String ANNUAL_PREFIX = "records2026.storico.ru.";
         private static final String ANNUAL_SUFFIX = ".js";
-    
+
         private Records2026SitePublisher() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length < 4 || args.length > 5) {
                 System.err.println("Uso:");
                 System.err.println("  Records2026SitePublisher <classicArchive> <ruArchive> <stagingRoot> <siteJsDir> [--generate-only]");
                 System.exit(2);
             }
-    
+
             Path classicArchive = Path.of(args[0]).toAbsolutePath().normalize();
             Path ruArchive = Path.of(args[1]).toAbsolutePath().normalize();
             Path stagingRoot = Path.of(args[2]).toAbsolutePath().normalize();
             Path siteJsDir = Path.of(args[3]).toAbsolutePath().normalize();
             boolean generateOnly = args.length == 5 && "--generate-only".equalsIgnoreCase(args[4]);
-    
+
             PublishResult result = run(classicArchive, ruArchive, stagingRoot, siteJsDir, generateOnly);
-    
+
             System.out.println("Classic     : " + result.classicEntries() + " recordset");
             System.out.println("RU stagioni : " + result.ruSeasons());
             System.out.println("RU annuali  : " + result.annualFiles());
@@ -13994,7 +16772,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     ? "Pubblicazione: NON ESEGUITA (--generate-only)"
                     : "Pubblicati   : " + result.publishedFiles() + " file in " + siteJsDir);
         }
-    
+
         public static PublishResult run(
                 Path classicArchive,
                 Path ruArchive,
@@ -14003,7 +16781,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 boolean generateOnly) throws IOException {
             return run(classicArchive, ruArchive, stagingRoot, siteJsDir, generateOnly, true, true);
         }
-    
+
         public static PublishResult run(
                 Path classicArchive,
                 Path ruArchive,
@@ -14028,7 +16806,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     null
             );
         }
-    
+
         public static PublishResult run(
                 Path classicArchive,
                 Path ruArchive,
@@ -14056,7 +16834,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     null
             );
         }
-    
+
         public static PublishResult run(
                 Path classicArchive,
                 Path ruArchive,
@@ -14087,7 +16865,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     reportsRoot
             );
         }
-    
+
         private static PublishResult runInternal(
                 Path classicArchive,
                 Path ruArchive,
@@ -14102,7 +16880,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 Path database,
                 LeagueMetadata leagueMetadata,
                 Path reportsRoot) throws IOException {
-    
+
             boolean includeSeries = options != null && options.familyEnabled(RecordFamily.SERIES);
             boolean includeModifiers = options != null && options.familyEnabled(RecordFamily.MODIFIERS);
             boolean includeThresholds = options != null && options.familyEnabled(RecordFamily.THRESHOLDS_LUCK);
@@ -14113,7 +16891,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             boolean includeRecordsNextCore = includeRecordsNextManifest
                     && database != null
                     && leagueMetadata != null;
-    
+
             if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeThresholds && !includeCulometro && !includeRecordsNextManifest && !includeRecordsNextCore) {
                 throw new IOException("Nessun modulo selezionato per la generazione JS");
             }
@@ -14121,13 +16899,13 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             if (includeThresholds || includeCulometro) requireDirectory(reportsRoot, "Report normalizzati");
             if (includeRu) requireDirectory(ruArchive, "Archivio RU");
             Files.createDirectories(stagingRoot);
-    
+
             String runId = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
                     + "_" + UUID.randomUUID().toString().substring(0, 8);
             Path runDir = stagingRoot.resolve("records2026_" + runId);
             Path generatedDir = runDir.resolve("js");
             Files.createDirectories(generatedDir);
-    
+
             int classicEntries = 0;
             int ruSeasons = 0;
             int annualFiles = 0;
@@ -14162,7 +16940,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                         generatedDir.resolve(CULOMETRO_2_FILE)
                 );
             }
-    
+
             if (includeRecordsNextCore) {
                 try {
                     CoreJsExporter.export(
@@ -14176,7 +16954,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     throw new IOException("Generazione Core 2.0 fallita", ex);
                 }
             }
-    
+
             if (includeRecordsNextManifest) {
                 ManifestPublishingSupport.write(
                         generatedDir,
@@ -14185,7 +16963,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                         manifestMetadata
                 );
             }
-    
+
             ValidationResult validation = validateGenerated(
                     generatedDir,
                     annualFiles,
@@ -14206,7 +16984,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             return new PublishResult(classicEntries, ruSeasons, annualFiles,
                     validation.files().size(), published, runDir);
         }
-    
+
         private static ValidationResult validateGenerated(
                 Path generatedDir,
                 int expectedAnnualFiles,
@@ -14218,7 +16996,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 boolean includeCulometro,
                 boolean includeRecordsNextManifest,
                 boolean includeRecordsNextCore) throws IOException {
-    
+
             List<Path> files;
             try (var stream = Files.list(generatedDir)) {
                 files = stream
@@ -14226,12 +17004,12 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                         .sorted(Comparator.comparing(path -> path.getFileName().toString()))
                         .toList();
             }
-    
+
             Map<String, Path> byName = new LinkedHashMap<>();
             for (Path file : files) {
                 byName.put(file.getFileName().toString(), file);
             }
-    
+
             if (includeClassic) {
                 requireFile(byName, CLASSIC_FILE);
                 validatePrefix(byName.get(CLASSIC_FILE), "window.RECORDS2026_PREVIEW_CLASSIC");
@@ -14293,26 +17071,26 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 throw new IOException("Numero file JS inatteso: " + files.size()
                         + ", attesi " + expectedTotal);
             }
-    
+
             return new ValidationResult(files);
         }
-    
+
         private static int publishWithRollback(Path generatedDir, Path siteJsDir, List<Path> generatedFiles)
                 throws IOException {
-    
+
             Path transactionDir = generatedDir.getParent().resolve("publish-transaction");
             Path backupDir = transactionDir.resolve("backup");
             Files.createDirectories(backupDir);
-    
+
             List<String> replacedNames = new ArrayList<>();
             List<String> newlyCreatedNames = new ArrayList<>();
-    
+
             try {
                 for (Path source : generatedFiles) {
                     String name = source.getFileName().toString();
                     Path target = siteJsDir.resolve(name);
                     Path backup = backupDir.resolve(name);
-    
+
                     if (Files.exists(target)) {
                         Files.copy(target, backup,
                                 StandardCopyOption.REPLACE_EXISTING,
@@ -14321,7 +17099,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     } else {
                         newlyCreatedNames.add(name);
                     }
-    
+
                     Path temp = siteJsDir.resolve("." + name + ".recordsnext-" + UUID.randomUUID() + ".tmp");
                     Files.copy(source, temp, StandardCopyOption.REPLACE_EXISTING);
                     moveReplace(temp, target);
@@ -14336,18 +17114,18 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 }
                 throw new IOException("Pubblicazione fallita", publicationFailure);
             }
-    
+
             return generatedFiles.size();
         }
-    
+
         private static IOException rollback(
                 Path siteJsDir,
                 Path backupDir,
                 List<String> replacedNames,
                 List<String> newlyCreatedNames) {
-    
+
             IOException firstFailure = null;
-    
+
             for (String name : newlyCreatedNames) {
                 try {
                     Files.deleteIfExists(siteJsDir.resolve(name));
@@ -14356,7 +17134,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     else firstFailure.addSuppressed(ex);
                 }
             }
-    
+
             for (String name : replacedNames) {
                 try {
                     Path backup = backupDir.resolve(name);
@@ -14368,10 +17146,10 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     else firstFailure.addSuppressed(ex);
                 }
             }
-    
+
             return firstFailure;
         }
-    
+
         private static void moveReplace(Path source, Path target) throws IOException {
             try {
                 Files.move(source, target,
@@ -14381,26 +17159,26 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
             }
         }
-    
+
         private static void requireDirectory(Path path, String label) throws IOException {
             if (!Files.isDirectory(path)) {
                 throw new IOException(label + " inesistente o non valida: " + path);
             }
         }
-    
+
         private static void requireFile(Map<String, Path> files, String name) throws IOException {
             if (!files.containsKey(name)) {
                 throw new IOException("File generato mancante: " + name);
             }
         }
-    
+
         private static boolean isAnnualFile(Path path) {
             String name = path.getFileName().toString();
             return name.startsWith(ANNUAL_PREFIX)
                     && name.endsWith(ANNUAL_SUFFIX)
                     && !name.equals(MANIFEST_FILE);
         }
-    
+
         private static void validatePrefix(Path path, String expectedPrefix) throws IOException {
             String sample = readStart(path, 4096);
             if (!stripBom(sample).stripLeading().startsWith(expectedPrefix)) {
@@ -14408,7 +17186,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                         + ": atteso " + expectedPrefix);
             }
         }
-    
+
         private static void validateContains(Path path, String expectedToken) throws IOException {
             String sample = readStart(path, 8192);
             if (!stripBom(sample).contains(expectedToken)) {
@@ -14416,7 +17194,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                         + ": " + expectedToken);
             }
         }
-    
+
         private static String readStart(Path path, int maxBytes) throws IOException {
             long size = Files.size(path);
             if (size <= 16) {
@@ -14433,11 +17211,11 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 return new String(bytes, 0, offset, StandardCharsets.UTF_8);
             }
         }
-    
+
         private static String stripBom(String value) {
             return !value.isEmpty() && value.charAt(0) == '\uFEFF' ? value.substring(1) : value;
         }
-    
+
         public record PublishResult(
                 int classicEntries,
                 int ruSeasons,
@@ -14446,7 +17224,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 int publishedFiles,
                 Path stagingDirectory) {
         }
-    
+
         private record ValidationResult(List<Path> files) {
         }
     }
@@ -14456,7 +17234,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
 File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.io.IOException;
     import java.math.BigDecimal;
     import java.math.RoundingMode;
@@ -14466,11 +17244,11 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
     import java.time.format.DateTimeFormatter;
     import java.util.*;
     import java.util.stream.Stream;
-    
+
     /** Costruisce riserveufficio.json dai season_normalized_*.json RecordsNext. */
     public final class RiserveUfficioArchiveBuilder {
         private RiserveUfficioArchiveBuilder() {}
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length < 2) {
                 System.err.println("Uso: RiserveUfficioArchiveBuilder <reportsRoot> <archiveRoot> [stagione ...]");
@@ -14488,7 +17266,7 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
             System.out.println("Righe RU     : " + r.reserveRows());
             System.out.println("Viste        : 12/12");
         }
-    
+
         public static Result build(Path reportsRoot, Path archiveRoot, List<String> requested) throws IOException {
             if (!Files.isDirectory(reportsRoot)) throw new IOException("Cartella report non trovata: " + reportsRoot);
             Files.createDirectories(archiveRoot);
@@ -14508,13 +17286,13 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
             if (seasonCount == 0) throw new IOException("Nessuna stagione normalizzata trovata");
             return new Result(seasonCount, fileCount, rowCount);
         }
-    
+
         private static Map<String,Object> buildSeason(String season, List<Path> files) throws IOException {
             List<Map<String,Object>> ruDetail = new ArrayList<>();
             Map<String,Map<String,Object>> matchByKey = new LinkedHashMap<>();
             Map<String,List<Map<String,Object>>> bandsByCompetition = new LinkedHashMap<>();
             Set<String> competitions = new TreeSet<>();
-    
+
             for (Path file : files) {
                 Map<String,Object> doc = object(parse(file));
                 Map<String,Object> meta = object(doc.get("meta"));
@@ -14533,13 +17311,13 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
                     ruDetail.add(detailRow(raw, match, compName));
                 }
             }
-    
+
             ruDetail.sort(compare("competizione", "giornataDiA", "idIncontro", "idSquadra", "ordine"));
             List<Map<String,Object>> teamMatch = teamMatch(ruDetail);
             List<Map<String,Object>> against = against(teamMatch, matchByKey);
             List<Map<String,Object>> decisive = new ArrayList<>(), decisiveAgainst = new ArrayList<>();
             calculateDecisive(teamMatch, bandsByCompetition, decisive, decisiveAgainst);
-    
+
             Map<String,Object> views = new LinkedHashMap<>();
             views.put("partiteConPiuRU", matchesWithMostRu(ruDetail));
             views.put("partiteConRU", sorted(teamMatch, compare("competizione", "giornataDiA", "squadra")));
@@ -14555,11 +17333,11 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
             views.put("mediaPuntiConRU", averagePoints(balanceWith, true));
             views.put("mediaPuntiControRU", averagePoints(balanceAgainst, false));
             views.put("tipoRUUsata", typeUsed(ruDetail));
-    
+
             Map<String,Object> detail = new LinkedHashMap<>();
             detail.put("ruDettaglio", ruDetail);
             detail.put("ruTeamMatch", teamMatch);
-    
+
             stripInternalFields(views);
             stripInternalFields(detail);
             Map<String,Object> meta = linked(
@@ -14575,7 +17353,7 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
             out.put("dettaglio", detail);
             return out;
         }
-    
+
         private static Map<String,Object> detailRow(Map<String,Object> r, Map<String,Object> m, String compName) {
             String side = s(m.get("lato"));
             String result = n(m.get("golFatti")) + "-" + n(m.get("golSubiti"));
@@ -14605,7 +17383,7 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
                     "_puntiCasa", homePoints, "_puntiFuori", awayPoints,
                     "_golCasa", homeGoals, "_golFuori", awayGoals);
         }
-    
+
         private static List<Map<String,Object>> teamMatch(List<Map<String,Object>> detail) {
             Map<String,List<Map<String,Object>>> groups = group(detail, r -> s(r.get("idIncontro")) + "|" + s(r.get("idSquadra")));
             List<Map<String,Object>> out = new ArrayList<>();
@@ -14620,7 +17398,7 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
             }
             return out;
         }
-    
+
         private static List<Map<String,Object>> against(List<Map<String,Object>> teamMatch, Map<String,Map<String,Object>> matchByKey) {
             List<Map<String,Object>> out = new ArrayList<>();
             for (Map<String,Object> ru : teamMatch) {
@@ -14636,7 +17414,7 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
             }
             return out;
         }
-    
+
         private static void calculateDecisive(List<Map<String,Object>> teamMatch, Map<String,List<Map<String,Object>>> bands, List<Map<String,Object>> yes, List<Map<String,Object>> against) {
             for (Map<String,Object> ru : teamMatch) {
                 BigDecimal with = bd(ru.get("puntiSquadra")), value = bd(ru.get("valoreRUTotale")), without = with.subtract(value);
@@ -14653,7 +17431,7 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
                         "esitoSenzaRUAvversaria",oppWithout,"esitoConRUAvversaria",oppWith,"danno",damage(oppWithout,oppWith),"puntiClassificaPersi",lost,"risultatoReale",goalsOpp+"-"+goalsWith,"punteggioReale",plain(ru.get("puntiAvversaria"))+"-"+plain(with)));
             }
         }
-    
+
         private static List<Map<String,Object>> matchesWithMostRu(List<Map<String,Object>> detail) {
             List<Map<String,Object>> out = new ArrayList<>();
             for (List<Map<String,Object>> g : group(detail, r -> s(r.get("idIncontro"))).values()) {
@@ -14675,26 +17453,26 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
             out.sort(compareDesc("numeroRU","valoreRUTotale","competizione","giornataDiA"));
             return out;
         }
-    
+
         private static List<Map<String,Object>> balance(List<Map<String,Object>> source, boolean with) {
             List<Map<String,Object>> out=new ArrayList<>();
             for(List<Map<String,Object>> g:group(source,r->s(r.get("idSquadra"))).values()){Map<String,Object> f=g.get(0);int v=0,d=0,l=0;BigDecimal pf=BigDecimal.ZERO,pa=BigDecimal.ZERO,gf=BigDecimal.ZERO,ga=BigDecimal.ZERO;for(Map<String,Object> r:g){switch(s(r.get("esito"))){case"V"->v++;case"N"->d++;case"P"->l++;}pf=pf.add(bd(r.get("puntiSquadra")));pa=pa.add(bd(r.get("puntiAvversaria")));gf=gf.add(bd(r.get("golSquadra")));ga=ga.add(bd(r.get("golAvversaria")));}int count=g.size();
                 out.add(linked("idSquadra",f.get("idSquadra"),"squadra",f.get("squadra"),with?"partiteConRU":"partiteControRU",count,"V",v,"N",d,"P",l,"percV",percent(v,count),"percN",percent(d,count),"percP",percent(l,count),"mediaPuntiSquadra",average(pf,count),"mediaPuntiAvversaria",average(pa,count),"mediaGolSquadra",average(gf,count),"mediaGolAvversaria",average(ga,count)));}
             out.sort(Comparator.<Map<String,Object>>comparingInt(r->n(r.get(with?"partiteConRU":"partiteControRU"))).reversed().thenComparing(r->s(r.get("squadra"))));return out;
         }
-    
+
         private static List<Map<String,Object>> averagePoints(List<Map<String,Object>> balance, boolean with){List<Map<String,Object>>out=new ArrayList<>();for(Map<String,Object>r:balance)out.add(linked("idSquadra",r.get("idSquadra"),"squadra",r.get("squadra"),with?"partiteConRU":"partiteControRU",r.get(with?"partiteConRU":"partiteControRU"),"mediaPuntiSquadra",r.get("mediaPuntiSquadra"),"mediaPuntiAvversaria",r.get("mediaPuntiAvversaria"),"differenzaMedia",clean(bd(r.get("mediaPuntiSquadra")).subtract(bd(r.get("mediaPuntiAvversaria"))))));out.sort(Comparator.<Map<String,Object>,BigDecimal>comparing(r->bd(r.get("mediaPuntiSquadra"))).reversed().thenComparing(r->s(r.get("squadra"))));return out;}
-    
+
         private static List<Map<String,Object>> typeUsed(List<Map<String,Object>> detail){List<Map<String,Object>>out=new ArrayList<>();for(List<Map<String,Object>>g:group(detail,r->s(r.get("idSquadra"))).values()){Map<String,Object>f=g.get(0);Map<String,Integer>c=new HashMap<>();Map<String,BigDecimal>v=new HashMap<>();for(String t:List.of("PU","DU","CU","AU")){c.put(t,0);v.put(t,BigDecimal.ZERO);}for(Map<String,Object>r:g){String t=s(r.get("tipoRU"));c.put(t,c.getOrDefault(t,0)+1);v.put(t,v.getOrDefault(t,BigDecimal.ZERO).add(bd(r.get("valoreRU"))));}out.add(linked("idSquadra",f.get("idSquadra"),"squadra",f.get("squadra"),"PU",c.get("PU"),"DU",c.get("DU"),"CU",c.get("CU"),"AU",c.get("AU"),"totaleRU",g.size(),"valorePU",clean(v.get("PU")),"valoreDU",clean(v.get("DU")),"valoreCU",clean(v.get("CU")),"valoreAU",clean(v.get("AU")),"valoreTotale",clean(v.values().stream().reduce(BigDecimal.ZERO,BigDecimal::add))));}out.sort(Comparator.<Map<String,Object>>comparingInt(r->n(r.get("totaleRU"))).reversed().thenComparing(r->s(r.get("squadra"))));return out;}
-    
+
         private static List<Map<String,Object>> decisiveBalance(List<Map<String,Object>> rows){List<Map<String,Object>>out=new ArrayList<>();for(List<Map<String,Object>>g:group(rows,r->s(r.get("idSquadra"))).values()){Map<String,Object>f=g.get(0);int w=(int)g.stream().filter(r->"V".equals(s(r.get("esitoConRU")))).count(),d=(int)g.stream().filter(r->"N".equals(s(r.get("esitoConRU")))).count();out.add(linked("idSquadra",f.get("idSquadra"),"squadra",f.get("squadra"),"partiteRUDecisiva",g.size(),"vittorieGrazieRU",w,"pareggiGrazieRU",d,"puntiClassificaGuadagnati",g.stream().mapToInt(r->n(r.get("puntiClassificaGuadagnati"))).sum()));}out.sort(compareDesc("partiteRUDecisiva","puntiClassificaGuadagnati","squadra"));return out;}
         private static List<Map<String,Object>> decisiveAgainstBalance(List<Map<String,Object>> rows){List<Map<String,Object>>out=new ArrayList<>();for(List<Map<String,Object>>g:group(rows,r->s(r.get("idSquadra"))).values()){Map<String,Object>f=g.get(0);int w=(int)g.stream().filter(r->"V".equals(s(r.get("esitoSenzaRUAvversaria")))&&!"V".equals(s(r.get("esitoConRUAvversaria")))).count(),d=(int)g.stream().filter(r->"N".equals(s(r.get("esitoSenzaRUAvversaria")))&&"P".equals(s(r.get("esitoConRUAvversaria")))).count();out.add(linked("idSquadra",f.get("idSquadra"),"squadra",f.get("squadra"),"partiteControRUDecisiva",g.size(),"vittoriePerse",w,"pareggiDiventatiSconfitte",d,"puntiClassificaPersi",g.stream().mapToInt(r->n(r.get("puntiClassificaPersi"))).sum()));}out.sort(compareDesc("partiteControRUDecisiva","puntiClassificaPersi","squadra"));return out;}
-    
+
         private static int goals(BigDecimal score,List<Map<String,Object>>bands){int g=0;List<Map<String,Object>>sorted=new ArrayList<>(bands);sorted.sort(Comparator.comparing(r->bd(r.get("min"))));for(Map<String,Object>b:sorted)if(score.compareTo(bd(b.get("min")))>=0)g=n(b.get("gol"));return g;}
         private static String result(int a,int b){return a>b?"V":a<b?"P":"N";} private static int points(String r){return "V".equals(r)?3:"N".equals(r)?1:0;}
         private static String effect(String a,String b){if("P".equals(a)&&"N".equals(b))return"Da sconfitta a pareggio";if("N".equals(a)&&"V".equals(b))return"Da pareggio a vittoria";if("P".equals(a)&&"V".equals(b))return"Da sconfitta a vittoria";return"";}
         private static String damage(String a,String b){if("V".equals(a)&&"N".equals(b))return"Da vittoria a pareggio";if("N".equals(a)&&"P".equals(b))return"Da pareggio a sconfitta";if("V".equals(a)&&"P".equals(b))return"Da vittoria a sconfitta";return"";}
-    
+
         @SuppressWarnings("unchecked")
         private static void stripInternalFields(Object value){
             if(value instanceof Map<?,?> map){
@@ -14722,13 +17500,13 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
         private static Object clean(BigDecimal x){BigDecimal z=x.setScale(Math.min(2,Math.max(0,x.scale())),RoundingMode.HALF_UP).stripTrailingZeros();return z.scale()<=0?z.longValue():z;}
         private static String plain(Object x){return bd(x).stripTrailingZeros().toPlainString();}private static BigDecimal bd(Object x){if(x==null||s(x).isBlank())return BigDecimal.ZERO;return x instanceof BigDecimal b?b:new BigDecimal(s(x).replace(',','.'));}private static int n(Object x){return bd(x).intValue();}private static String s(Object x){return x==null?"":String.valueOf(x);}
         @SuppressWarnings("unchecked")private static Map<String,Object>object(Object x){return x instanceof Map<?,?>?(Map<String,Object>)x:new LinkedHashMap<>();}@SuppressWarnings("unchecked")private static List<Map<String,Object>>rows(Object x){if(!(x instanceof List<?>l))return new ArrayList<>();List<Map<String,Object>>o=new ArrayList<>();for(Object r:l)if(r instanceof Map<?,?>)o.add((Map<String,Object>)r);return o;}
-    
+
         private static Object parse(Path source) throws IOException {
             String text = Files.readString(source, StandardCharsets.UTF_8);
             if (!text.isEmpty() && text.charAt(0) == '\uFEFF') text = text.substring(1);
             return new JsonParser(text, source).parse();
         }
-    
+
         private static final class JsonParser {
             private final String text; private final Path source; private int index;
             JsonParser(String text, Path source) { this.text = text; this.source = source; }
@@ -14749,7 +17527,7 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
             private boolean peek(char c){ return index<text.length()&&text.charAt(index)==c; }
             private void fail(String m)throws IOException{ throw new IOException("JSON non valido in "+source+" posizione "+index+": "+m); }
         }
-    
+
         private static final class JsonWriter {
             static String writePretty(Object v){ StringBuilder b=new StringBuilder(); write(v,b,0); return b.toString(); }
             private static void write(Object v,StringBuilder b,int depth){
@@ -14761,7 +17539,7 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
             private static void indent(StringBuilder b,int d){ b.append("  ".repeat(d)); }
             private static void quote(String s,StringBuilder b){ b.append('"'); for(int i=0;i<s.length();i++){ char c=s.charAt(i); switch(c){case '"'->b.append("\\\"");case '\\'->b.append("\\\\");case '\b'->b.append("\\b");case '\f'->b.append("\\f");case '\n'->b.append("\\n");case '\r'->b.append("\\r");case '\t'->b.append("\\t");default->{if(c<0x20)b.append(String.format("\\u%04x",(int)c));else b.append(c);}}} b.append('"'); }
         }
-    
+
         public record Result(int seasons,int files,int reserveRows){}
     }
 
@@ -14770,7 +17548,7 @@ File: src\main\java\it\alterlega\recordsnext\RiserveUfficioArchiveBuilder.java
 File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.sql.Connection;
@@ -14784,36 +17562,36 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
     import java.util.Comparator;
     import java.util.List;
     import java.util.Locale;
-    
+
     /**
      * Configuratore transazionale delle associazioni storiche di squadre e
      * competizioni. Opera esclusivamente sul database SQLite gia popolato da
      * RawSqliteImporter e ConfigurationSchema.
      */
     public final class SeasonMappingConfigurator {
-    
+
         private SeasonMappingConfigurator() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length < 2) {
                 printUsage();
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
             if (!Files.isRegularFile(database)) {
                 throw new IllegalArgumentException("Database non trovato: " + database);
             }
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             try (Connection connection = DriverManager.getConnection(
                     "jdbc:sqlite:" + database)) {
-    
+
                 configureConnection(connection);
                 requireSchema(connection);
-    
+
                 String command = args[1].trim().toLowerCase(Locale.ROOT);
                 switch (command) {
                     case "show-seasons" -> showSeasons(connection, args);
@@ -14832,14 +17610,14 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static void configureConnection(Connection connection) throws Exception {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("PRAGMA foreign_keys = ON");
                 statement.execute("PRAGMA busy_timeout = 10000");
             }
         }
-    
+
         private static void requireSchema(Connection connection) throws Exception {
             String[] required = {
                 "rn_season",
@@ -14851,7 +17629,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 "rn_competition_mapping",
                 "rn_team_mapping"
             };
-    
+
             for (String table : required) {
                 try (PreparedStatement statement = connection.prepareStatement(
                         "SELECT COUNT(*) FROM sqlite_master "
@@ -14868,11 +17646,11 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static void showSeasons(Connection connection, String[] args)
                 throws Exception {
             requireArgCount(args, 2, "<db> show-seasons");
-    
+
             String sql = """
                 SELECT
                     s.season_id,
@@ -14896,13 +17674,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 FROM rn_season s
                 ORDER BY COALESCE(s.sort_order, 0) DESC, s.season_id DESC
                 """;
-    
+
             System.out.printf(
                 Locale.ROOT,
                 "%-11s %-6s %3s %3s %6s %6s %-10s%n",
                 "STAGIONE", "ANCORA", "FCM", "FCA", "COMP", "TEAM", "ESITO"
             );
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery(sql)) {
                 while (result.next()) {
@@ -14914,7 +17692,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                         && pendingComp == 0 && pendingTeam == 0
                         ? "COMPLETA"
                         : "IN_CORSO";
-    
+
                     System.out.printf(
                         Locale.ROOT,
                         "%-11s %-6s %3d %3d %6d %6d %-10s%n",
@@ -14929,36 +17707,36 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static void showPending(Connection connection, String[] args)
                 throws Exception {
             requireArgCount(args, 3, "<db> pending <stagione>");
             String seasonId = requireSeason(connection, args[2]);
-    
+
             System.out.println("COMPETIZIONI DA CONFIGURARE");
             printPendingCompetitions(connection, seasonId);
             System.out.println();
             System.out.println("SQUADRE DA CONFIGURARE");
             printPendingTeams(connection, seasonId);
         }
-    
+
         private static void showProposals(Connection connection, String[] args)
                 throws Exception {
             requireArgCount(args, 3, "<db> proposals <stagione>");
             String seasonId = requireSeason(connection, args[2]);
-    
+
             System.out.println("COMPETIZIONI");
             printCompetitionProposals(connection, seasonId);
             System.out.println();
             System.out.println("SQUADRE");
             printTeamProposals(connection, seasonId);
         }
-    
+
         private static void autoExact(Connection connection, String[] args)
                 throws Exception {
             requireArgCount(args, 3, "<db> auto-exact <stagione>");
             String seasonId = requireSeason(connection, args[2]);
-    
+
             runTransaction(connection, () -> {
                 int competitions = applyUnambiguousExactCompetitionMappings(
                     connection, seasonId
@@ -14969,7 +17747,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 System.out.println("Squadre     : " + teams);
             });
         }
-    
+
         private static void associateTeam(Connection connection, String[] args)
                 throws Exception {
             requireArgCount(
@@ -14979,7 +17757,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             );
             long teamSeasonId = parsePositiveLong(args[2], "team-season-id");
             long teamIdentityId = parsePositiveLong(args[3], "team-identity-id");
-    
+
             runTransaction(connection, () -> {
                 SeasonEntity team = requireTeamSeason(connection, teamSeasonId);
                 Identity identity = requireTeamIdentity(connection, teamIdentityId);
@@ -14998,12 +17776,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 );
             });
         }
-    
+
         private static void createTeamIdentity(Connection connection, String[] args)
                 throws Exception {
             requireArgCount(args, 3, "<db> new-team <team-season-id>");
             long teamSeasonId = parsePositiveLong(args[2], "team-season-id");
-    
+
             runTransaction(connection, () -> {
                 SeasonEntity team = requireTeamSeason(connection, teamSeasonId);
                 requirePendingTeam(connection, teamSeasonId);
@@ -15020,7 +17798,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 );
             });
         }
-    
+
         private static void associateCompetition(Connection connection, String[] args)
                 throws Exception {
             requireArgCount(
@@ -15035,7 +17813,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             long competitionIdentityId = parsePositiveLong(
                 args[3], "competition-identity-id"
             );
-    
+
             runTransaction(connection, () -> {
                 SeasonEntity competition = requireCompetitionSeason(
                     connection, competitionSeasonId
@@ -15062,7 +17840,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 );
             });
         }
-    
+
         private static void createCompetitionIdentity(
                 Connection connection,
                 String[] args) throws Exception {
@@ -15074,7 +17852,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             long competitionSeasonId = parsePositiveLong(
                 args[2], "competition-season-id"
             );
-    
+
             runTransaction(connection, () -> {
                 SeasonEntity competition = requireCompetitionSeason(
                     connection, competitionSeasonId
@@ -15094,7 +17872,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 );
             });
         }
-    
+
         private static boolean validateSeason(
                 Connection connection,
                 String[] args,
@@ -15102,7 +17880,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             requireArgCount(args, 3, "<db> validate <stagione>");
             String seasonId = requireSeason(connection, args[2]);
             Validation validation = validate(connection, seasonId);
-    
+
             if (print) {
                 System.out.println("Stagione       : " + seasonId);
                 System.out.println("Sorgenti FCM   : " + validation.fcmSources());
@@ -15115,7 +17893,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 System.out.println("ESITO          : "
                     + (validation.valid() ? "VALIDA" : "NON VALIDA"));
             }
-    
+
             if (!validation.valid()) {
                 throw new IllegalStateException(
                     "Configurazione stagione non valida: " + seasonId
@@ -15123,7 +17901,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             }
             return true;
         }
-    
+
         private static Validation validate(Connection connection, String seasonId)
                 throws Exception {
             int fcm = count(connection, """
@@ -15196,7 +17974,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                        AND tm.mapping_status = 'ASSOCIATA'
                        AND ti.team_identity_id IS NULL)
                 """, seasonId, seasonId);
-    
+
             return new Validation(
                 fcm,
                 fca,
@@ -15207,7 +17985,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 orphanMappings
             );
         }
-    
+
         private static void printPendingCompetitions(
                 Connection connection,
                 String seasonId) throws Exception {
@@ -15222,7 +18000,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 """;
             printPending(connection, sql, seasonId);
         }
-    
+
         private static void printPendingTeams(
                 Connection connection,
                 String seasonId) throws Exception {
@@ -15237,7 +18015,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 """;
             printPending(connection, sql, seasonId);
         }
-    
+
         private static void printPending(
                 Connection connection,
                 String sql,
@@ -15262,7 +18040,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 System.out.println("- nessuna -");
             }
         }
-    
+
         private static void printCompetitionProposals(
                 Connection connection,
                 String seasonId) throws Exception {
@@ -15278,7 +18056,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 """;
             printProposals(connection, sql, seasonId, identities);
         }
-    
+
         private static void printTeamProposals(
                 Connection connection,
                 String seasonId) throws Exception {
@@ -15294,7 +18072,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 """;
             printProposals(connection, sql, seasonId, identities);
         }
-    
+
         private static void printProposals(
                 Connection connection,
                 String sql,
@@ -15309,7 +18087,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                         long localId = result.getLong(1);
                         String localName = result.getString(2);
                         System.out.println(localId + " | " + localName);
-    
+
                         identities.stream()
                             .map(identity -> new ScoredIdentity(
                                 identity,
@@ -15336,7 +18114,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 System.out.println("- nessuna -");
             }
         }
-    
+
         private static int applyUnambiguousExactTeamMappings(
                 Connection connection,
                 String seasonId) throws Exception {
@@ -15365,7 +18143,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 GROUP BY ts.team_season_id
                 HAVING COUNT(*) = 1
                 """;
-    
+
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, seasonId);
                 try (ResultSet result = statement.executeQuery()) {
@@ -15377,7 +18155,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                     }
                 }
             }
-    
+
             for (ExactCandidate candidate : candidates) {
                 updateTeamMapping(
                     connection,
@@ -15389,7 +18167,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             }
             return candidates.size();
         }
-    
+
         private static int applyUnambiguousExactCompetitionMappings(
                 Connection connection,
                 String seasonId) throws Exception {
@@ -15418,7 +18196,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 GROUP BY cs.competition_season_id
                 HAVING COUNT(*) = 1
                 """;
-    
+
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, seasonId);
                 try (ResultSet result = statement.executeQuery()) {
@@ -15430,7 +18208,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                     }
                 }
             }
-    
+
             for (ExactCandidate candidate : candidates) {
                 updateCompetitionMapping(
                     connection,
@@ -15442,7 +18220,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             }
             return candidates.size();
         }
-    
+
         private static void requireIdentityAvailableForTeam(
                 Connection connection,
                 String seasonId,
@@ -15465,7 +18243,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 );
             }
         }
-    
+
         private static void requireIdentityAvailableForCompetition(
                 Connection connection,
                 String seasonId,
@@ -15488,7 +18266,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 );
             }
         }
-    
+
         private static void requirePendingTeam(Connection connection, long id)
                 throws Exception {
             int count = count(connection, """
@@ -15501,7 +18279,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 );
             }
         }
-    
+
         private static void requirePendingCompetition(Connection connection, long id)
                 throws Exception {
             int count = count(connection, """
@@ -15514,7 +18292,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 );
             }
         }
-    
+
         private static long insertTeamIdentity(
                 Connection connection,
                 SeasonEntity team) throws Exception {
@@ -15543,7 +18321,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static long insertCompetitionIdentity(
                 Connection connection,
                 SeasonEntity competition) throws Exception {
@@ -15572,7 +18350,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static void updateTeamMapping(
                 Connection connection,
                 long teamSeasonId,
@@ -15600,7 +18378,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static void updateCompetitionMapping(
                 Connection connection,
                 long competitionSeasonId,
@@ -15628,7 +18406,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static SeasonEntity requireTeamSeason(Connection connection, long id)
                 throws Exception {
             return requireSeasonEntity(
@@ -15639,7 +18417,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 "Squadra stagionale"
             );
         }
-    
+
         private static SeasonEntity requireCompetitionSeason(
                 Connection connection,
                 long id) throws Exception {
@@ -15651,7 +18429,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 "Competizione stagionale"
             );
         }
-    
+
         private static SeasonEntity requireSeasonEntity(
                 Connection connection,
                 String sql,
@@ -15671,7 +18449,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static Identity requireTeamIdentity(Connection connection, long id)
                 throws Exception {
             return requireIdentity(
@@ -15682,7 +18460,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 "Identita squadra"
             );
         }
-    
+
         private static Identity requireCompetitionIdentity(
                 Connection connection,
                 long id) throws Exception {
@@ -15694,7 +18472,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 "Identita competizione"
             );
         }
-    
+
         private static Identity requireIdentity(
                 Connection connection,
                 String sql,
@@ -15710,7 +18488,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static List<Identity> readTeamIdentities(Connection connection)
                 throws Exception {
             return readIdentities(
@@ -15719,7 +18497,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                     + "FROM rn_team_identity ORDER BY canonical_name COLLATE NOCASE"
             );
         }
-    
+
         private static List<Identity> readCompetitionIdentities(Connection connection)
                 throws Exception {
             return readIdentities(
@@ -15728,7 +18506,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                     + "FROM rn_competition_identity ORDER BY canonical_name COLLATE NOCASE"
             );
         }
-    
+
         private static List<Identity> readIdentities(
                 Connection connection,
                 String sql) throws Exception {
@@ -15741,7 +18519,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             }
             return identities;
         }
-    
+
         private static String requireSeason(Connection connection, String raw)
                 throws Exception {
             String seasonId = raw.trim();
@@ -15755,7 +18533,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             }
             return seasonId;
         }
-    
+
         private static int count(
                 Connection connection,
                 String sql,
@@ -15770,7 +18548,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 }
             }
         }
-    
+
         private static long parsePositiveLong(String raw, String label) {
             try {
                 long value = Long.parseLong(raw);
@@ -15785,7 +18563,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 );
             }
         }
-    
+
         private static void requireArgCount(
                 String[] args,
                 int expected,
@@ -15794,7 +18572,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 throw new IllegalArgumentException("Uso: " + usage);
             }
         }
-    
+
         private static double similarity(String left, String right) {
             String a = normalize(left);
             String b = normalize(right);
@@ -15804,7 +18582,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             int max = Math.max(a.length(), b.length());
             return max == 0 ? 1.0d : 1.0d - ((double) levenshtein(a, b) / max);
         }
-    
+
         private static String normalize(String value) {
             return Normalizer.normalize(value, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}+", "")
@@ -15813,7 +18591,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 .trim()
                 .replaceAll("\\s+", " ");
         }
-    
+
         private static int levenshtein(String left, String right) {
             int[] previous = new int[right.length() + 1];
             int[] current = new int[right.length() + 1];
@@ -15835,7 +18613,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             }
             return previous[right.length()];
         }
-    
+
         private static void runTransaction(Connection connection, SqlAction action)
                 throws Exception {
             boolean oldAutoCommit = connection.getAutoCommit();
@@ -15850,7 +18628,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
                 connection.setAutoCommit(oldAutoCommit);
             }
         }
-    
+
         private static void printUsage() {
             System.err.println("Comandi:");
             System.err.println("  <db> show-seasons");
@@ -15868,24 +18646,24 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
             );
             System.err.println("  <db> new-competition <competition-season-id>");
         }
-    
+
         @FunctionalInterface
         private interface SqlAction {
             void run() throws Exception;
         }
-    
+
         private record SeasonEntity(long id, String seasonId, String name) {
         }
-    
+
         private record Identity(long id, String name) {
         }
-    
+
         private record ScoredIdentity(Identity identity, double score) {
         }
-    
+
         private record ExactCandidate(long seasonEntityId, long identityId) {
         }
-    
+
         private record Validation(
             int fcmSources,
             int fcaSources,
@@ -15912,7 +18690,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonMappingConfigurator.java
 File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.sql.Connection;
@@ -15923,12 +18701,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
     import java.util.ArrayList;
     import java.util.List;
     import java.util.Locale;
-    
+
     public final class SeasonNormalizedBatchExporter {
-    
+
         private SeasonNormalizedBatchExporter() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 3) {
                 System.err.println(
@@ -15937,55 +18715,55 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
                 );
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
             String seasonId = args[1].trim();
             Path projectDir = Path.of(args[2]).toAbsolutePath().normalize();
             export(database, seasonId, projectDir);
         }
-    
+
         public static void export(Path database, String seasonId, Path projectDir) throws Exception {
             Path outputDir = projectDir
                 .resolve("data")
                 .resolve("reports")
                 .resolve(seasonId);
-    
+
             Files.createDirectories(outputDir);
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             List<String> competitions = readCompetitions(
                 database,
                 seasonId
             );
-    
+
             if (competitions.isEmpty()) {
                 throw new IllegalStateException(
                     "Nessuna competizione trovata per la stagione "
                         + seasonId
                 );
             }
-    
+
             int completed = 0;
             List<String> failures = new ArrayList<>();
-    
+
             System.out.println(
                 "Competizioni da esportare: "
                     + competitions.size()
             );
-    
+
             for (String competition : competitions) {
                 Path output = outputDir.resolve(
                     "season_normalized_"
                         + slug(competition)
                         + ".json"
                 );
-    
+
                 System.out.println();
                 System.out.println(
                     "=== " + competition + " ==="
                 );
-    
+
                 try {
                     SeasonNormalizedExporter.main(
                         new String[] {
@@ -15996,7 +18774,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
                             output.toString()
                         }
                     );
-    
+
                     completed++;
                 } catch (Exception error) {
                     failures.add(
@@ -16006,11 +18784,11 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
                             + " - "
                             + error.getMessage()
                     );
-    
+
                     error.printStackTrace(System.err);
                 }
             }
-    
+
             System.out.println();
             System.out.println("=== RIEPILOGO BATCH ===");
             System.out.println(
@@ -16028,7 +18806,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
             System.out.println(
                 "Output       : " + outputDir
             );
-    
+
             if (!failures.isEmpty()) {
                 System.out.println();
                 System.out.println("Errori:");
@@ -16036,11 +18814,11 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
                 throw new IllegalStateException("Normalizzazione fallita per " + failures.size() + " competizioni: " + String.join("; ", failures));
             }
         }
-    
+
         private static List<String> readCompetitions(
                 Path database,
                 String seasonId) throws Exception {
-    
+
             String sql = """
                 SELECT DISTINCT competition_name
                 FROM rn_team_match
@@ -16049,20 +18827,20 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
                   AND TRIM(competition_name) <> ''
                 ORDER BY competition_name COLLATE NOCASE
                 """;
-    
+
             List<String> competitions = new ArrayList<>();
-    
+
             try (
                 Connection connection =
                     DriverManager.getConnection(
                         "jdbc:sqlite:" + database
                     );
-    
+
                 PreparedStatement statement =
                     connection.prepareStatement(sql)
             ) {
                 statement.setString(1, seasonId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         competitions.add(
@@ -16071,16 +18849,16 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
                     }
                 }
             }
-    
+
             return competitions;
         }
-    
+
         private static String slug(String value) {
             String normalized = Normalizer.normalize(
                 value,
                 Normalizer.Form.NFD
             );
-    
+
             return normalized
                 .replaceAll("\\p{M}+", "")
                 .toLowerCase(Locale.ROOT)
@@ -16094,7 +18872,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
 File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.io.BufferedWriter;
     import java.math.BigDecimal;
     import java.nio.charset.StandardCharsets;
@@ -16108,12 +18886,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
     import java.util.ArrayList;
     import java.util.List;
     import java.util.Locale;
-    
+
     public final class SeasonNormalizedExporter {
-    
+
         private SeasonNormalizedExporter() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 5) {
                 System.err.println(
@@ -16126,51 +18904,51 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 );
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0])
                 .toAbsolutePath()
                 .normalize();
-    
+
             String seasonId = args[1].trim();
             String competitionName = args[2].trim();
-    
+
             Path projectDir = Path.of(args[3])
                 .toAbsolutePath()
                 .normalize();
-    
+
             Path output = Path.of(args[4])
                 .toAbsolutePath()
                 .normalize();
-    
+
             if (output.getParent() != null) {
                 Files.createDirectories(output.getParent());
             }
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             long started = System.nanoTime();
-    
+
             try (Connection connection = DriverManager.getConnection(
                     "jdbc:sqlite:" + database)) {
-    
+
                 ExportData data = readExportData(
                     connection,
                     seasonId,
                     competitionName,
                     projectDir
                 );
-    
+
                 writeJson(output, data);
-    
+
                 long finished = System.nanoTime();
-    
+
                 System.out.println("Normalized stage 1 completato");
                 System.out.println("Stagione    : " + seasonId);
                 System.out.println("Competizione: " + competitionName);
                 System.out.println("Incontri    : " + data.meta().matchesAnalyzed());
                 System.out.println("Righe squadra: " + data.teamMatches().size());
                 System.out.println("Output      : " + output);
-    
+
                 System.out.printf(
                     Locale.ROOT,
                     "Tempo       : %.3f ms%n",
@@ -16178,76 +18956,76 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 );
             }
         }
-    
+
         private static ExportData readExportData(
                 Connection connection,
                 String seasonId,
                 String competitionName,
                 Path projectDir) throws Exception {
-    
+
             CompetitionInfo competition = readCompetition(
                 connection,
                 seasonId,
                 competitionName
             );
-    
+
             List<Integer> groupIds = readGroupIds(
                 connection,
                 seasonId,
                 competition.identityId()
             );
-    
+
             List<TeamMatch> teamMatches = readTeamMatches(
                 connection,
                 seasonId,
                 competition.identityId(),
                 competitionName
             );
-    
+
             List<ExpulsionDetail> expulsionDetails =
                 readExpulsionDetails(
                     connection,
                     seasonId,
                     competition.identityId()
                 );
-    
+
             List<EventDetail> eventDetails =
                 readEventDetails(
                     connection,
                     seasonId,
                     competition.identityId()
                 );
-    
+
             List<ModifierDetail> modifierDetails =
                 readModifierDetails(
                     connection,
                     seasonId,
                     competition.identityId()
                 );
-    
+
             List<CleanSheetDetail> cleanSheetDetails =
                 readCleanSheetDetails(
                     connection,
                     seasonId,
                     competition.identityId()
                 );
-    
+
             List<ReserveOfficeDetail> reserveOfficeDetails =
                 readReserveOfficeDetails(
                     connection,
                     seasonId,
                     competition.identityId()
                 );
-    
+
             List<GoalBandDetail> goalBandDetails =
                 readGoalBandDetails(
                     connection,
                     seasonId,
                     competition.sourceCompetitionId()
                 );
-    
+
             int matchesAnalyzed = teamMatches.size() / 2;
-    
+
             Meta meta = new Meta(
                 Instant.now().toString(),
                 projectDir.toString(),
@@ -16262,7 +19040,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 matchesAnalyzed,
                 teamMatches.size()
             );
-    
+
             return new ExportData(
                 meta,
                 teamMatches,
@@ -16274,12 +19052,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 goalBandDetails
             );
         }
-    
+
         private static CompetitionInfo readCompetition(
                 Connection connection,
                 String seasonId,
                 String competitionName) throws Exception {
-    
+
             String sql = """
                 SELECT DISTINCT
                     competition_identity_id,
@@ -16288,13 +19066,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 WHERE season_id = ?
                   AND competition_name = ?
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, seasonId);
                 statement.setString(2, competitionName);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
                         throw new IllegalArgumentException(
@@ -16304,12 +19082,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                 + competitionName
                         );
                     }
-    
+
                     CompetitionInfo info = new CompetitionInfo(
                         result.getLong("competition_identity_id"),
                         result.getInt("source_competition_id")
                     );
-    
+
                     if (result.next()) {
                         throw new IllegalStateException(
                             "PiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹ identitÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â  trovate per "
@@ -16318,17 +19096,17 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                 + competitionName
                         );
                     }
-    
+
                     return info;
                 }
             }
         }
-    
+
         private static List<Integer> readGroupIds(
                 Connection connection,
                 String seasonId,
                 long competitionIdentityId) throws Exception {
-    
+
             String sql = """
                 SELECT DISTINCT source_group_id
                 FROM rn_match
@@ -16336,15 +19114,15 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                   AND competition_identity_id = ?
                 ORDER BY source_group_id
                 """;
-    
+
             List<Integer> values = new ArrayList<>();
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, seasonId);
                 statement.setLong(2, competitionIdentityId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         values.add(
@@ -16353,51 +19131,51 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     }
                 }
             }
-    
+
             return values;
         }
-    
+
         private static List<TeamMatch> readTeamMatches(
                 Connection connection,
                 String seasonId,
                 long competitionIdentityId,
                 String competitionName) throws Exception {
-    
+
             String outputHistoricalId =
                 outputHistoricalCompetitionId(competitionName);
-    
+
             String outputCompetitionName =
                 outputCompetitionName(competitionName);
-    
+
             SourceInfo source = readFcmSource(
                 connection,
                 seasonId
             );
-    
+
             String tabellinoTable = rawTable(
                 connection,
                 source.importId(),
                 "TABELLINO"
             );
-    
+
             String gironeTable = rawTable(
                 connection,
                 source.importId(),
                 "GIRONE"
             );
-    
+
             boolean calendarAvailable = tableExists(connection, "rn_matchday_date");
-    
+
             String calendarColumns = calendarAvailable
                 ? "md.match_date, md.match_time, md.match_datetime,"
                 : "NULL AS match_date, NULL AS match_time, NULL AS match_datetime,";
-    
+
             String calendarJoin = calendarAvailable
                 ? "LEFT JOIN rn_matchday_date md "
                     + "ON md.season_id = e.season_id "
                     + "AND md.serie_a_round = e.serie_a_round"
                 : "";
-    
+
             String sql = """
                 SELECT
                     e.season_id,
@@ -16423,7 +19201,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     e.goals_for,
                     e.goals_against,
                     e.result,
-    
+
                     CASE
                         WHEN e.event_type = 'REST' THEN 0
                         WHEN tf.IDINCONTRO IS NULL THEN e.goals_for
@@ -16432,7 +19210,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                             - CAST(COALESCE(tf.GOLSUPPLEMENTARI, 0) AS INTEGER)
                             - CAST(COALESCE(tf.GOLRIGORI, 0) AS INTEGER)
                     END AS regulation_goals_for,
-    
+
                     CASE
                         WHEN e.event_type = 'REST' THEN 0
                         WHEN ta.IDINCONTRO IS NULL THEN e.goals_against
@@ -16441,34 +19219,34 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                             - CAST(COALESCE(ta.GOLSUPPLEMENTARI, 0) AS INTEGER)
                             - CAST(COALESCE(ta.GOLRIGORI, 0) AS INTEGER)
                     END AS regulation_goals_against,
-    
+
                     CASE
                         WHEN e.event_type = 'REST' THEN 0
                         WHEN tf.IDINCONTRO IS NULL THEN 0
                         ELSE 1
                     END AS regulation_goals_found
-    
+
                 FROM rn_team_event e
-    
+
                 JOIN %s g
                   ON g.ID = e.source_group_id
-    
+
                 LEFT JOIN %s tf
                   ON e.event_type = 'HEAD_TO_HEAD'
                  AND tf.IDINCONTRO = e.source_event_id
                  AND tf.IDSQUADRA = e.source_team_id
-    
+
                 LEFT JOIN %s ta
                   ON e.event_type = 'HEAD_TO_HEAD'
                  AND ta.IDINCONTRO = e.source_event_id
                  AND ta.IDSQUADRA = e.opponent_source_team_id
-    
+
                 %s
-    
+
                 WHERE e.season_id = ?
                   AND e.competition_identity_id = ?
                   AND e.event_type IN ('HEAD_TO_HEAD', 'REST')
-    
+
                 ORDER BY
                     e.source_event_id,
                     CASE e.venue
@@ -16483,33 +19261,33 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     quoteIdentifier(tabellinoTable),
                     calendarJoin
                 );
-    
+
             ScorecardBases scorecardBases = readScorecardBases(
                 connection,
                 seasonId
             );
-    
+
             List<TeamMatch> rows = new ArrayList<>();
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, seasonId);
                 statement.setLong(2, competitionIdentityId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         String eventType =
                             result.getString("event_type");
-    
+
                         boolean rest =
                             "REST".equals(eventType);
-    
+
                         String venue =
                             result.getString("venue");
-    
+
                         String side;
-    
+
                         if (rest) {
                             side = "casa";
                         } else {
@@ -16526,31 +19304,31 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                 );
                             };
                         }
-    
+
                         int goalsFor = rest
                             ? 0
                             : result.getInt("goals_for");
-    
+
                         int goalsAgainst = rest
                             ? 0
                             : result.getInt("goals_against");
-    
+
                         int regulationGoalsFor = rest
                             ? 0
                             : result.getInt(
                                 "regulation_goals_for"
                             );
-    
+
                         int regulationGoalsAgainst = rest
                             ? 0
                             : result.getInt(
                                 "regulation_goals_against"
                             );
-    
+
                         BigDecimal scoreFor = zeroIfNull(
                             result.getBigDecimal("score_for")
                         );
-    
+
                         BigDecimal scoreAgainst = rest
                             ? BigDecimal.ZERO
                             : zeroIfNull(
@@ -16558,13 +19336,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                     "score_against"
                                 )
                             );
-    
+
                         BigDecimal partialFor = zeroIfNull(
                             result.getBigDecimal(
                                 "partial_score_for"
                             )
                         );
-    
+
                         BigDecimal partialAgainst = rest
                             ? BigDecimal.ZERO
                             : zeroIfNull(
@@ -16572,13 +19350,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                     "partial_score_against"
                                 )
                             );
-    
+
                         int opponentId = rest
                             ? 0
                             : result.getInt(
                                 "opponent_source_team_id"
                             );
-    
+
                         String opponentName = rest
                             ? ""
                             : emptyIfNull(
@@ -16586,42 +19364,42 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                     "opponent_name"
                                 )
                             );
-    
+
                         int homeGoals;
                         int awayGoals;
                         int regulationHomeGoals;
                         int regulationAwayGoals;
                         BigDecimal homeScore;
                         BigDecimal awayScore;
-    
+
                         if (rest || "HOME".equals(venue)) {
                             homeGoals = goalsFor;
                             awayGoals = goalsAgainst;
-    
+
                             regulationHomeGoals =
                                 regulationGoalsFor;
-    
+
                             regulationAwayGoals =
                                 regulationGoalsAgainst;
-    
+
                             homeScore = scoreFor;
                             awayScore = scoreAgainst;
                         } else {
                             homeGoals = goalsAgainst;
                             awayGoals = goalsFor;
-    
+
                             regulationHomeGoals =
                                 regulationGoalsAgainst;
-    
+
                             regulationAwayGoals =
                                 regulationGoalsFor;
-    
+
                             homeScore = scoreAgainst;
                             awayScore = scoreFor;
                         }
-    
+
                         String resultCode;
-    
+
                         if (rest) {
                             resultCode = "P";
                         } else {
@@ -16639,12 +19417,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                 );
                             };
                         }
-    
+
                         int serieARound =
                             result.getInt("serie_a_round");
-    
+
                         String regulationSource;
-    
+
                         if (rest) {
                             regulationSource =
                                 "GolCasa/GolFuori fallback";
@@ -16659,7 +19437,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                             regulationSource =
                                 "GolCasa/GolFuori fallback";
                         }
-    
+
                         rows.add(
                             new TeamMatch(
                                 result.getString("season_id"),
@@ -16722,7 +19500,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                     + decimalText(awayScore)
                             )
                         );
-    
+
                         if (rest) {
                             rows.add(
                                 new TeamMatch(
@@ -16786,50 +19564,50 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     }
                 }
             }
-    
+
             return rows;
         }
         private static List<ExpulsionDetail> readExpulsionDetails(
                 Connection connection,
                 String seasonId,
                 long competitionIdentityId) throws Exception {
-    
+
             SourceInfo fcmSource = readSource(
                 connection,
                 seasonId,
                 "FCM"
             );
-    
+
             SourceInfo fcaSource = readSource(
                 connection,
                 seasonId,
                 "FCA"
             );
-    
+
             String formazioneTable = rawTable(
                 connection,
                 fcmSource.importId(),
                 "FORMAZIONE"
             );
-    
+
             String giocaInTable = rawTable(
                 connection,
                 fcaSource.importId(),
                 "GIOCAIN"
             );
-    
+
             String punteggioTable = rawTable(
                 connection,
                 fcaSource.importId(),
                 "PUNTEGGIO"
             );
-    
+
             String giocatoreTable = rawTable(
                 connection,
                 fcaSource.importId(),
                 "GIOCATOREA"
             );
-    
+
             String sql = """
                 SELECT
                     tm.source_match_id,
@@ -16839,28 +19617,28 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     f.IDGIOC AS player_id,
                     ga.NOME AS player_name,
                     gi.IDPUNTEGGIO AS score_id
-    
+
                 FROM rn_team_match tm
-    
+
                 JOIN %s f
                   ON f.IDINCONTRO = tm.source_match_id
                  AND f.IDSQUADRA = tm.source_team_id
-    
+
                 JOIN %s gi
                   ON gi.IDGIOCATORE = f.IDGIOC
                  AND gi.GIORNATA = tm.serie_a_round
-    
+
                 JOIN %s p
                   ON p.ID = gi.IDPUNTEGGIO
-    
+
                 JOIN %s ga
                   ON ga.ID = f.IDGIOC
-    
+
                 WHERE tm.season_id = ?
                   AND tm.competition_identity_id = ?
                   AND f.ENTRATO <> 0
                   AND p.ESP <> 0
-    
+
                 ORDER BY
                     tm.source_match_id,
                     f.IDGIOC
@@ -16870,15 +19648,15 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     quoteIdentifier(punteggioTable),
                     quoteIdentifier(giocatoreTable)
                 );
-    
+
             List<ExpulsionDetail> rows = new ArrayList<>();
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, seasonId);
                 statement.setLong(2, competitionIdentityId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         rows.add(
@@ -16895,51 +19673,51 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     }
                 }
             }
-    
+
             return rows;
         }
-    
+
         private static List<EventDetail> readEventDetails(
                 Connection connection,
                 String seasonId,
                 long competitionIdentityId) throws Exception {
-    
+
             SourceInfo fcmSource = readSource(
                 connection,
                 seasonId,
                 "FCM"
             );
-    
+
             SourceInfo fcaSource = readSource(
                 connection,
                 seasonId,
                 "FCA"
             );
-    
+
             String formazioneTable = rawTable(
                 connection,
                 fcmSource.importId(),
                 "FORMAZIONE"
             );
-    
+
             String giocaInTable = rawTable(
                 connection,
                 fcaSource.importId(),
                 "GIOCAIN"
             );
-    
+
             String punteggioTable = rawTable(
                 connection,
                 fcaSource.importId(),
                 "PUNTEGGIO"
             );
-    
+
             String giocatoreTable = rawTable(
                 connection,
                 fcaSource.importId(),
                 "GIOCATOREA"
             );
-    
+
             String sql = """
                 SELECT
                     e.record_key,
@@ -16962,23 +19740,23 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                         WHEN 6 THEN p.AUTOGOL1
                     END AS event_value,
                     e.event_number
-    
+
                 FROM rn_team_match tm
-    
+
                 JOIN %s f
                   ON f.IDINCONTRO = tm.source_match_id
                  AND f.IDSQUADRA = tm.source_team_id
-    
+
                 JOIN %s gi
                   ON gi.IDGIOCATORE = f.IDGIOC
                  AND gi.GIORNATA = tm.serie_a_round
-    
+
                 JOIN %s p
                   ON p.ID = gi.IDPUNTEGGIO
-    
+
                 JOIN %s ga
                   ON ga.ID = f.IDGIOC
-    
+
                 CROSS JOIN (
                     SELECT
                         1 AS event_number,
@@ -16986,45 +19764,45 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                         'ammonizione' AS event_type,
                         'Maggiori ammonizioni' AS event_name,
                         'Amm' AS source_field
-    
+
                     UNION ALL
-    
+
                     SELECT
                         2,
                         'assistSquadre',
                         'assist',
                         'Maggiori assist',
                         'Assist'
-    
+
                     UNION ALL
-    
+
                     SELECT
                         3,
                         'golRigoreSquadre',
                         'gol_su_rigore',
                         'Maggiori gol fatti su rigore',
                         'GolFattiSuRigore1'
-    
+
                     UNION ALL
-    
+
                     SELECT
                         4,
                         'rigoriParatiSquadre',
                         'rigore_parato',
                         'Maggiori rigori parati',
                         'RigPar'
-    
+
                     UNION ALL
-    
+
                     SELECT
                         5,
                         'rigoriSbagliatiSquadre',
                         'rigore_sbagliato',
                         'Maggiori rigori sbagliati',
                         'RigSba'
-    
+
                     UNION ALL
-    
+
                     SELECT
                         6,
                         'autogolSquadre',
@@ -17032,7 +19810,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                         'Maggiori autogol',
                         'Autogol1'
                 ) e
-    
+
                 WHERE tm.season_id = ?
                   AND tm.competition_identity_id = ?
                   AND f.ENTRATO <> 0
@@ -17044,7 +19822,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                         WHEN 5 THEN p.RIGSBA
                         WHEN 6 THEN p.AUTOGOL1
                       END <> 0
-    
+
                 ORDER BY
                     tm.source_match_id,
                     f.rowid,
@@ -17055,15 +19833,15 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     quoteIdentifier(punteggioTable),
                     quoteIdentifier(giocatoreTable)
                 );
-    
+
             List<EventDetail> rows = new ArrayList<>();
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, seasonId);
                 statement.setLong(2, competitionIdentityId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         rows.add(
@@ -17085,51 +19863,51 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     }
                 }
             }
-    
+
             return rows;
         }
-    
+
         private static List<CleanSheetDetail> readCleanSheetDetails(
                 Connection connection,
                 String seasonId,
                 long competitionIdentityId) throws Exception {
-    
+
             SourceInfo fcmSource = readSource(
                 connection,
                 seasonId,
                 "FCM"
             );
-    
+
             SourceInfo fcaSource = readSource(
                 connection,
                 seasonId,
                 "FCA"
             );
-    
+
             String formazioneTable = rawTable(
                 connection,
                 fcmSource.importId(),
                 "FORMAZIONE"
             );
-    
+
             String giocaInTable = rawTable(
                 connection,
                 fcaSource.importId(),
                 "GIOCAIN"
             );
-    
+
             String punteggioTable = rawTable(
                 connection,
                 fcaSource.importId(),
                 "PUNTEGGIO"
             );
-    
+
             String giocatoreTable = rawTable(
                 connection,
                 fcaSource.importId(),
                 "GIOCATOREA"
             );
-    
+
             String sql = """
                 SELECT
                     tm.source_match_id,
@@ -17142,29 +19920,29 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     ga.NOME AS player_name,
                     gi.IDPUNTEGGIO AS score_id,
                     p.GOLSUBITI AS goals_conceded
-    
+
                 FROM rn_team_match tm
-    
+
                 JOIN %s f
                   ON f.IDINCONTRO = tm.source_match_id
                  AND f.IDSQUADRA = tm.source_team_id
-    
+
                 JOIN %s gi
                   ON gi.IDGIOCATORE = f.IDGIOC
                  AND gi.GIORNATA = tm.serie_a_round
-    
+
                 JOIN %s p
                   ON p.ID = gi.IDPUNTEGGIO
-    
+
                 JOIN %s ga
                   ON ga.ID = f.IDGIOC
-    
+
                 WHERE tm.season_id = ?
                   AND tm.competition_identity_id = ?
                   AND f.ENTRATO <> 0
                   AND ga.RUOLO = 1
                   AND p.GOLSUBITI = 0
-    
+
                 ORDER BY
                     f.IDGIOC,
                     tm.source_match_id
@@ -17174,15 +19952,15 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     quoteIdentifier(punteggioTable),
                     quoteIdentifier(giocatoreTable)
                 );
-    
+
             List<CleanSheetDetail> rows = new ArrayList<>();
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, seasonId);
                 statement.setLong(2, competitionIdentityId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         rows.add(
@@ -17203,32 +19981,32 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     }
                 }
             }
-    
+
             return rows;
         }
-    
+
         private static List<ModifierDetail> readModifierDetails(
                 Connection connection,
                 String seasonId,
                 long competitionIdentityId) throws Exception {
-    
+
             SourceInfo source = readFcmSource(
                 connection,
                 seasonId
             );
-    
+
             String tabellinoTable = rawTable(
                 connection,
                 source.importId(),
                 "TABELLINO"
             );
-    
+
             String gironeTable = rawTable(
                 connection,
                 source.importId(),
                 "GIRONE"
             );
-    
+
             String sql = """
                 SELECT
                     x.modifier_type,
@@ -17239,66 +20017,88 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     tm.team_name,
                     tm.opponent_source_team_id,
                     tm.opponent_name,
-    
+
                     CASE x.modifier_number
                         WHEN 1 THEN t.MODM1PERS
                         WHEN 2 THEN t.MODM2PERS
+                        WHEN 3 THEN t.MODM3PERS
+                        WHEN 4 THEN t.MODPORTIERE
+                        WHEN 5 THEN t.MODDIFESA
+                        WHEN 6 THEN t.MODCENTROCAMPO
+                        WHEN 7 THEN t.MODATTACCO
+                        WHEN 8 THEN t.MODMODULO
                     END AS modifier_value
-    
+
                 FROM %s t
-    
+
                 JOIN rn_match m
                   ON m.source_file_id = ?
                  AND m.source_match_id = t.IDINCONTRO
-    
+
                 JOIN rn_team_match tm
                   ON tm.source_file_id = m.source_file_id
                  AND tm.source_match_id = m.source_match_id
                  AND tm.source_team_id = t.IDSQUADRA
-    
+
                 CROSS JOIN (
-                    SELECT
-                        1 AS modifier_number,
-                        'modDifesa' AS modifier_type,
-                        'ModM1Pers' AS source_field
-    
+                    SELECT 1 AS modifier_number, 'modDifesa' AS modifier_type, 'MODM1PERS' AS source_field
                     UNION ALL
-    
-                    SELECT
-                        2 AS modifier_number,
-                        'capitano' AS modifier_type,
-                        'ModM2Pers' AS source_field
+                    SELECT 2, 'capitano', 'MODM2PERS'
+                    UNION ALL
+                    SELECT 3, 'personalizzato3', 'MODM3PERS'
+                    UNION ALL
+                    SELECT 4, 'fcmPortiere', 'MODPORTIERE'
+                    UNION ALL
+                    SELECT 5, 'fcmDifesa', 'MODDIFESA'
+                    UNION ALL
+                    SELECT 6, 'fcmCentrocampo', 'MODCENTROCAMPO'
+                    UNION ALL
+                    SELECT 7, 'fcmAttacco', 'MODATTACCO'
+                    UNION ALL
+                    SELECT 8, 'fcmModulo', 'MODMODULO'
                 ) x
-    
+
                 WHERE m.season_id = ?
                   AND m.competition_identity_id = ?
-    
+
                   AND CASE x.modifier_number
                         WHEN 1 THEN t.MODM1PERSESISTE
                         WHEN 2 THEN t.MODM2PERSESISTE
+                        WHEN 3 THEN t.MODM3PERSESISTE
+                        WHEN 4 THEN t.MODPORTIEREESISTE
+                        WHEN 5 THEN t.MODDIFESAESISTE
+                        WHEN 6 THEN t.MODCENTROCAMPOESISTE
+                        WHEN 7 THEN t.MODATTACCOESISTE
+                        WHEN 8 THEN t.MODMODULOESISTE
                       END <> 0
-    
+
                   AND CASE x.modifier_number
                         WHEN 1 THEN t.MODM1PERS
                         WHEN 2 THEN t.MODM2PERS
+                        WHEN 3 THEN t.MODM3PERS
+                        WHEN 4 THEN t.MODPORTIERE
+                        WHEN 5 THEN t.MODDIFESA
+                        WHEN 6 THEN t.MODCENTROCAMPO
+                        WHEN 7 THEN t.MODATTACCO
+                        WHEN 8 THEN t.MODMODULO
                       END <> 0
-    
+
                 ORDER BY
                     t.rowid,
                     x.modifier_number
                 """.formatted(
                     quoteIdentifier(tabellinoTable)
                 );
-    
+
             List<ModifierDetail> rows = new ArrayList<>();
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setLong(1, source.sourceFileId());
                 statement.setString(2, seasonId);
                 statement.setLong(3, competitionIdentityId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         rows.add(
@@ -17321,18 +20121,18 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     }
                 }
             }
-    
+
             return rows;
         }
-    
+
         private static List<ReserveOfficeDetail> readReserveOfficeDetails(
                 Connection connection,
                 String seasonId,
                 long competitionIdentityId) throws Exception {
-    
+
             SourceInfo source = readFcmSource(connection, seasonId);
             String tabellinoTable = rawTable(connection, source.importId(), "TABELLINO");
-    
+
             String sql = """
                 SELECT
                     m.source_match_id,
@@ -17358,14 +20158,14 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                   AND m.competition_identity_id = ?
                 ORDER BY t.rowid
                 """.formatted(quoteIdentifier(tabellinoTable));
-    
+
             List<ReserveOfficeDetail> rows = new ArrayList<>();
-    
+
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setLong(1, source.sourceFileId());
                 statement.setString(2, seasonId);
                 statement.setLong(3, competitionIdentityId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         String[] players = splitPercent(result.getString("LISTA"));
@@ -17377,12 +20177,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                             Math.max(roles.length,
                             Math.max(votes.length,
                             Math.max(modifiers.length, totals.length))));
-    
+
                         for (int index = 0; index < max; index++) {
                             if (!"-1".equals(item(players, index))) {
                                 continue;
                             }
-    
+
                             int role = parseInteger(item(roles, index));
                             rows.add(new ReserveOfficeDetail(
                                 result.getLong("source_match_id"),
@@ -17403,19 +20203,19 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     }
                 }
             }
-    
+
             return rows;
         }
-    
+
         private static List<GoalBandDetail> readGoalBandDetails(
                 Connection connection,
                 String seasonId,
                 int sourceCompetitionId) throws Exception {
-    
+
             SourceInfo source = readFcmSource(connection, seasonId);
             String goalTable = rawTable(connection, source.importId(), "TABELLAGOL");
             String bandTable = rawTable(connection, source.importId(), "FASCIA");
-    
+
             String sql = """
                 SELECT
                     tg.IDCOMPETIZIONE AS source_competition_id,
@@ -17432,12 +20232,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     quoteIdentifier(goalTable),
                     quoteIdentifier(bandTable)
                 );
-    
+
             List<GoalBandDetail> rows = new ArrayList<>();
-    
+
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, sourceCompetitionId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         rows.add(new GoalBandDetail(
@@ -17450,7 +20250,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     }
                 }
             }
-    
+
             if (rows.isEmpty()) {
                 throw new IllegalStateException(
                     "Nessuna fascia gol trovata per "
@@ -17459,21 +20259,21 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                         + sourceCompetitionId
                 );
             }
-    
+
             return rows;
         }
-    
+
         private static String[] splitPercent(String value) {
             if (value == null || value.isBlank()) {
                 return new String[0];
             }
             return value.split("%", -1);
         }
-    
+
         private static String item(String[] values, int index) {
             return index >= 0 && index < values.length ? values[index].trim() : "";
         }
-    
+
         private static int parseInteger(String value) {
             try {
                 return Integer.parseInt(value.trim());
@@ -17481,7 +20281,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 return 0;
             }
         }
-    
+
         private static BigDecimal parseDecimal(String value) {
             if (value == null || value.isBlank()) {
                 return BigDecimal.ZERO;
@@ -17492,7 +20292,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 return BigDecimal.ZERO;
             }
         }
-    
+
         private static String roleCode(int role) {
             return switch (role) {
                 case 1 -> "PU";
@@ -17502,7 +20302,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 default -> "";
             };
         }
-    
+
         private static String roleName(int role) {
             return switch (role) {
                 case 1 -> "Portiere";
@@ -17512,23 +20312,23 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 default -> "";
             };
         }
-    
+
         private static SourceInfo readFcmSource(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             return readSource(
                 connection,
                 seasonId,
                 "FCM"
             );
         }
-    
+
         private static SourceInfo readSource(
                 Connection connection,
                 String seasonId,
                 String sourceType) throws Exception {
-    
+
             String sql = """
                 SELECT
                     source_file_id,
@@ -17539,13 +20339,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 ORDER BY import_id DESC
                 LIMIT 1
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setString(1, seasonId);
                 statement.setString(2, sourceType);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
                         throw new IllegalArgumentException(
@@ -17555,7 +20355,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                 + seasonId
                         );
                     }
-    
+
                     return new SourceInfo(
                         result.getLong("source_file_id"),
                         result.getLong("import_id")
@@ -17563,28 +20363,28 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 }
             }
         }
-    
+
         private static String rawTable(
                 Connection connection,
                 long importId,
                 String sourceTableName) throws Exception {
-    
+
             String sql = """
                 SELECT raw_table_name
                 FROM rn_table_catalog
                 WHERE import_id = ?
                   AND UPPER(source_table_name) = ?
                 """;
-    
+
             try (PreparedStatement statement =
                      connection.prepareStatement(sql)) {
-    
+
                 statement.setLong(1, importId);
                 statement.setString(
                     2,
                     sourceTableName.toUpperCase(Locale.ROOT)
                 );
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
                         throw new IllegalStateException(
@@ -17592,92 +20392,92 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                                 + sourceTableName
                         );
                     }
-    
+
                     return result.getString("raw_table_name");
                 }
             }
         }
-    
+
         private static String quoteIdentifier(String value) {
             return "\""
                 + value.replace("\"", "\"\"")
                 + "\"";
         }
-    
+
         private static void writeJson(
                 Path output,
                 ExportData data) throws Exception {
-    
+
             try (BufferedWriter writer = Files.newBufferedWriter(
                     output,
                     StandardCharsets.UTF_8)) {
-    
+
                 writer.write("{\n");
-    
+
                 writeMeta(
                     writer,
                     data.meta()
                 );
-    
+
                 writer.write(",\n");
-    
+
                 writeTeamMatches(
                     writer,
                     data.teamMatches()
                 );
-    
+
                 writer.write(",\n");
-    
+
                 writeExpulsionDetails(
                     writer,
                     data.expulsionDetails()
                 );
-    
+
                 writer.write(",\n");
-    
+
                 writeEventDetails(
                     writer,
                     data.eventDetails()
                 );
-    
+
                 writer.write(",\n");
-    
+
                 writeModifierDetails(
                     writer,
                     data.modifierDetails()
                 );
-    
+
                 writer.write(",\n");
-    
+
                 writeCleanSheetDetails(
                     writer,
                     data.cleanSheetDetails()
                 );
-    
+
                 writer.write(",\n");
-    
+
                 writeReserveOfficeDetails(
                     writer,
                     data.reserveOfficeDetails()
                 );
-    
+
                 writer.write(",\n");
-    
+
                 writeGoalBandDetails(
                     writer,
                     data.goalBandDetails()
                 );
-    
+
                 writer.write("}\n");
             }
         }
-    
+
         private static void writeMeta(
                 BufferedWriter writer,
                 Meta meta) throws Exception {
-    
+
             writer.write("  \"meta\": {\n");
-    
+
             writeStringProperty(
                 writer,
                 "generatedAt",
@@ -17685,7 +20485,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writeStringProperty(
                 writer,
                 "projectDir",
@@ -17693,7 +20493,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writeStringProperty(
                 writer,
                 "stagione",
@@ -17701,7 +20501,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writeStringProperty(
                 writer,
                 "competizioneStoricaId",
@@ -17709,7 +20509,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writeStringProperty(
                 writer,
                 "competizioneNome",
@@ -17717,7 +20517,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writeNumberProperty(
                 writer,
                 "idCompetizioneFcm",
@@ -17725,7 +20525,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writeStringProperty(
                 writer,
                 "nomeCompetizioneDb",
@@ -17733,9 +20533,9 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writer.write("    \"idGironiInclusi\": [");
-    
+
             for (
                 int index = 0;
                 index < meta.groupIds().size();
@@ -17744,16 +20544,16 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 if (index > 0) {
                     writer.write(", ");
                 }
-    
+
                 writer.write(
                     Integer.toString(
                         meta.groupIds().get(index)
                     )
                 );
             }
-    
+
             writer.write("],\n");
-    
+
             writeStringProperty(
                 writer,
                 "fcmTablesDir",
@@ -17761,7 +20561,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writeStringProperty(
                 writer,
                 "fcaTablesDir",
@@ -17769,7 +20569,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writeNumberProperty(
                 writer,
                 "incontriAnalizzati",
@@ -17777,7 +20577,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 true,
                 4
             );
-    
+
             writeNumberProperty(
                 writer,
                 "partiteSquadra",
@@ -17785,21 +20585,21 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 false,
                 4
             );
-    
+
             writer.write("  }");
         }
-    
+
         private static void writeTeamMatches(
                 BufferedWriter writer,
                 List<TeamMatch> rows) throws Exception {
-    
+
             writer.write("  \"partiteSquadra\": [\n");
-    
+
             for (int index = 0; index < rows.size(); index++) {
                 TeamMatch row = rows.get(index);
-    
+
                 writer.write("    {\n");
-    
+
                 writeStringProperty(
                     writer,
                     "stagione",
@@ -17807,7 +20607,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "competizioneStoricaId",
@@ -17815,7 +20615,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "competizioneNome",
@@ -17823,7 +20623,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeNumberProperty(
                     writer,
                     "idCompetizioneFcm",
@@ -17831,7 +20631,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "nomeCompetizioneDb",
@@ -17839,7 +20639,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idGirone",
@@ -17847,7 +20647,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "gironeNome",
@@ -17855,7 +20655,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idGiornata",
@@ -17863,7 +20663,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "giornata",
@@ -17871,7 +20671,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeNumberProperty(
                     writer,
                     "giornataDiA",
@@ -17879,7 +20679,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "dataGiornata",
@@ -17887,7 +20687,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "oraGiornata",
@@ -17895,7 +20695,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "dataOraGiornata",
@@ -17903,7 +20703,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeNumberProperty(
                     writer,
                     "ordineGiornata",
@@ -17911,7 +20711,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idIncontro",
@@ -17919,7 +20719,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "urlTabellino",
@@ -17927,7 +20727,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "urlTabellinoLocale",
@@ -17935,7 +20735,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "urlTabellinoOnline",
@@ -17943,7 +20743,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "lato",
@@ -17951,7 +20751,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idSquadra",
@@ -17959,7 +20759,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "squadra",
@@ -17967,7 +20767,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idAvversaria",
@@ -17975,7 +20775,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "avversaria",
@@ -17983,7 +20783,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeDecimalProperty(
                     writer,
                     "puntiFatti",
@@ -17991,7 +20791,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeDecimalProperty(
                     writer,
                     "puntiSubiti",
@@ -17999,7 +20799,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeDecimalProperty(
                     writer,
                     "parzialeFatto",
@@ -18007,7 +20807,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeDecimalProperty(
                     writer,
                     "parzialeSubito",
@@ -18015,7 +20815,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeNumberProperty(
                     writer,
                     "golFatti",
@@ -18023,7 +20823,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeNumberProperty(
                     writer,
                     "golSubiti",
@@ -18031,7 +20831,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeNumberProperty(
                     writer,
                     "golRegolamentariFatti",
@@ -18039,7 +20839,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeNumberProperty(
                     writer,
                     "golRegolamentariSubiti",
@@ -18047,7 +20847,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "risultatoRegolamentari",
@@ -18055,7 +20855,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "fonteGolRegolamentari",
@@ -18063,7 +20863,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "esito",
@@ -18071,7 +20871,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "risultato",
@@ -18079,7 +20879,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "punteggio",
@@ -18087,30 +20887,30 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     false,
                     6
                 );
-    
+
                 writer.write("    }");
-    
+
                 if (index + 1 < rows.size()) {
                     writer.write(",");
                 }
-    
+
                 writer.write("\n");
             }
-    
+
             writer.write("  ]");
         }
-    
+
         private static void writeExpulsionDetails(
                 BufferedWriter writer,
                 List<ExpulsionDetail> rows) throws Exception {
-    
+
             writer.write("  \"espulsioniDettaglio\": [\n");
-    
+
             for (int index = 0; index < rows.size(); index++) {
                 ExpulsionDetail row = rows.get(index);
-    
+
                 writer.write("    {\n");
-    
+
                 writeStringProperty(
                     writer,
                     "idIncontro",
@@ -18118,7 +20918,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeNumberProperty(
                     writer,
                     "giornataDiA",
@@ -18126,7 +20926,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idSquadra",
@@ -18134,7 +20934,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "squadra",
@@ -18142,7 +20942,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idGiocatore",
@@ -18150,7 +20950,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "giocatore",
@@ -18158,7 +20958,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idPunteggio",
@@ -18166,30 +20966,30 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     false,
                     6
                 );
-    
+
                 writer.write("    }");
-    
+
                 if (index + 1 < rows.size()) {
                     writer.write(",");
                 }
-    
+
                 writer.write("\n");
             }
-    
+
             writer.write("  ]");
         }
-    
+
         private static void writeEventDetails(
                 BufferedWriter writer,
                 List<EventDetail> rows) throws Exception {
-    
+
             writer.write("  \"eventiSquadraDettaglio\": [\n");
-    
+
             for (int index = 0; index < rows.size(); index++) {
                 EventDetail row = rows.get(index);
-    
+
                 writer.write("    {\n");
-    
+
                 writeStringProperty(writer, "recordKey", row.recordKey(), true, 6);
                 writeStringProperty(writer, "tipoEvento", row.eventType(), true, 6);
                 writeStringProperty(writer, "nomeEvento", row.eventName(), true, 6);
@@ -18202,30 +21002,30 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 writeStringProperty(writer, "giocatore", row.playerName(), true, 6);
                 writeStringProperty(writer, "idPunteggio", Integer.toString(row.scoreId()), true, 6);
                 writeNumberProperty(writer, "valore", row.value(), false, 6);
-    
+
                 writer.write("    }");
-    
+
                 if (index + 1 < rows.size()) {
                     writer.write(",");
                 }
-    
+
                 writer.write("\n");
             }
-    
+
             writer.write("  ]");
         }
-    
+
         private static void writeModifierDetails(
                 BufferedWriter writer,
                 List<ModifierDetail> rows) throws Exception {
-    
+
             writer.write("  \"modificatoriB2Dettaglio\": [\n");
-    
+
             for (int index = 0; index < rows.size(); index++) {
                 ModifierDetail row = rows.get(index);
-    
+
                 writer.write("    {\n");
-    
+
                 writeStringProperty(
                     writer,
                     "tipo",
@@ -18233,7 +21033,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idIncontro",
@@ -18241,7 +21041,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeNumberProperty(
                     writer,
                     "giornataDiA",
@@ -18249,7 +21049,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idSquadra",
@@ -18257,7 +21057,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "squadra",
@@ -18265,7 +21065,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "idAvversaria",
@@ -18273,7 +21073,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "avversaria",
@@ -18281,7 +21081,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeDecimalProperty(
                     writer,
                     "valore",
@@ -18289,7 +21089,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     true,
                     6
                 );
-    
+
                 writeStringProperty(
                     writer,
                     "campoOrigine",
@@ -18297,30 +21097,30 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     false,
                     6
                 );
-    
+
                 writer.write("    }");
-    
+
                 if (index + 1 < rows.size()) {
                     writer.write(",");
                 }
-    
+
                 writer.write("\n");
             }
-    
+
             writer.write("  ]");
         }
-    
+
         private static void writeCleanSheetDetails(
                 BufferedWriter writer,
                 List<CleanSheetDetail> rows) throws Exception {
-    
+
             writer.write("  \"cleanSheetB3Dettaglio\": [\n");
-    
+
             for (int index = 0; index < rows.size(); index++) {
                 CleanSheetDetail row = rows.get(index);
-    
+
                 writer.write("    {\n");
-    
+
                 writeStringProperty(writer, "tipo", "cleanSheetPortiere", true, 6);
                 writeStringProperty(writer, "idIncontro", Long.toString(row.matchId()), true, 6);
                 writeNumberProperty(writer, "giornataDiA", row.serieARound(), true, 6);
@@ -18340,31 +21140,31 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     false,
                     6
                 );
-    
+
                 writer.write("    }");
-    
+
                 if (index + 1 < rows.size()) {
                     writer.write(",");
                 }
-    
+
                 writer.write("\n");
             }
-    
+
             writer.write("  ]");
         }
-    
+
         private static void writeStringProperty(
                 BufferedWriter writer,
                 String name,
                 String value,
                 boolean comma,
                 int indent) throws Exception {
-    
+
             writer.write(" ".repeat(indent));
             writer.write("\"");
             writer.write(jsonEscape(name));
             writer.write("\": ");
-    
+
             if (value == null) {
                 writer.write("null");
             } else {
@@ -18372,89 +21172,89 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 writer.write(jsonEscape(value));
                 writer.write("\"");
             }
-    
+
             if (comma) {
                 writer.write(",");
             }
-    
+
             writer.write("\n");
         }
-    
+
         private static void writeNumberProperty(
                 BufferedWriter writer,
                 String name,
                 long value,
                 boolean comma,
                 int indent) throws Exception {
-    
+
             writer.write(" ".repeat(indent));
             writer.write("\"");
             writer.write(jsonEscape(name));
             writer.write("\": ");
             writer.write(Long.toString(value));
-    
+
             if (comma) {
                 writer.write(",");
             }
-    
+
             writer.write("\n");
         }
-    
+
         private static void writeDecimalProperty(
                 BufferedWriter writer,
                 String name,
                 BigDecimal value,
                 boolean comma,
                 int indent) throws Exception {
-    
+
             writer.write(" ".repeat(indent));
             writer.write("\"");
             writer.write(jsonEscape(name));
             writer.write("\": ");
-    
+
             if (value == null) {
                 writer.write("null");
             } else {
                 writer.write(decimalText(value));
             }
-    
+
             if (comma) {
                 writer.write(",");
             }
-    
+
             writer.write("\n");
         }
-    
+
         private static String decimalText(BigDecimal value) {
             if (value == null) {
                 return "";
             }
-    
+
             return value
                 .stripTrailingZeros()
                 .toPlainString();
         }
-    
+
         private static BigDecimal zeroIfNull(
                 BigDecimal value) {
-    
+
             return value == null
                 ? BigDecimal.ZERO
                 : value;
         }
-    
+
         private static String emptyIfNull(
                 String value) {
-    
+
             return value == null
                 ? ""
                 : value;
         }
-    
+
         private static boolean tableExists(
                 Connection connection,
                 String tableName) throws Exception {
-    
+
             try (PreparedStatement statement = connection.prepareStatement(
                     "SELECT 1 FROM sqlite_master "
                         + "WHERE type = 'table' AND name = ?")) {
@@ -18464,30 +21264,30 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 }
             }
         }
-    
+
         private static ScorecardBases readScorecardBases(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             if (!tableExists(connection, "rn_season_configuration")) {
                 return new ScorecardBases(null, null);
             }
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT local_site_path, online_site_url
                 FROM rn_season_configuration
                 WHERE season_id = ?
                 """)) {
                 statement.setString(1, seasonId);
-    
+
                 try (ResultSet result = statement.executeQuery()) {
                     if (!result.next()) {
                         return new ScorecardBases(null, null);
                     }
-    
+
                     String localPath = result.getString("local_site_path");
                     String onlineRoot = result.getString("online_site_url");
-    
+
                     String localBase = null;
                     if (localPath != null && !localPath.isBlank()) {
                         Path fileName = Path.of(localPath).normalize().getFileName();
@@ -18495,31 +21295,31 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                             localBase = "../" + fileName + "/ris.htm?Gio=";
                         }
                     }
-    
+
                     String onlineBase = null;
                     if (onlineRoot != null && !onlineRoot.isBlank()) {
                         onlineBase = onlineRoot.replaceAll("/+$", "")
                             + "/ris.htm?Gio=";
                     }
-    
+
                     return new ScorecardBases(localBase, onlineBase);
                 }
             }
         }
-    
+
         private static String scorecardUrl(
                 String seasonId,
                 int serieARound) {
-    
+
             String[] parts = seasonId.split("_", -1);
-    
+
             if (parts.length != 2 || !parts[0].matches("\\d{4}")) {
                 throw new IllegalArgumentException(
                     "Stagione non valida per URL tabellino: "
                         + seasonId
                 );
             }
-    
+
             return "../lega"
                 + parts[0]
                 + "/ris.htm?Gio="
@@ -18527,44 +21327,44 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
         }
         private static String outputHistoricalCompetitionId(
                 String competitionName) {
-    
+
             return switch (competitionName) {
                 case "Coppa Serie A" ->
                     "coppa_lega_serie_a";
-    
+
                 case "Coppa Serie B" ->
                     "coppa_lega_serie_b";
-    
+
                 case "Coppa Serie C" ->
                     "coppa_lega_serie_c";
-    
+
                 default ->
                     historicalCompetitionId(
                         competitionName
                     );
             };
         }
-    
+
         private static String outputCompetitionName(
                 String competitionName) {
-    
+
             return switch (competitionName) {
                 case "Coppa Serie A" ->
                     "Coppa di Lega Serie A";
-    
+
                 case "Coppa Serie B" ->
                     "Coppa di Lega Serie B";
-    
+
                 case "Coppa Serie C" ->
                     "Coppa di Lega Serie C";
-    
+
                 default -> competitionName;
             };
         }
-    
+
         private static String historicalCompetitionId(
                 String competitionName) {
-    
+
             return competitionName
                 .trim()
                 .toLowerCase(Locale.ROOT)
@@ -18577,13 +21377,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 .replaceAll("[^a-z0-9]+", "_")
                 .replaceAll("^_+|_+$", "");
         }
-    
+
         private static String jsonEscape(String value) {
             StringBuilder escaped = new StringBuilder();
-    
+
             for (int index = 0; index < value.length(); index++) {
                 char current = value.charAt(index);
-    
+
                 switch (current) {
                     case '"' -> escaped.append("\\\"");
                     case '\\' -> escaped.append("\\\\");
@@ -18592,7 +21392,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     case '\n' -> escaped.append("\\n");
                     case '\r' -> escaped.append("\\r");
                     case '\t' -> escaped.append("\\t");
-    
+
                     default -> {
                         if (current < 0x20) {
                             escaped.append(
@@ -18608,16 +21408,16 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                     }
                 }
             }
-    
+
             return escaped.toString();
         }
-    
+
         private record CompetitionInfo(
             long identityId,
             int sourceCompetitionId
         ) {
         }
-    
+
         private record Meta(
             String generatedAt,
             String projectDir,
@@ -18633,7 +21433,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
             int teamMatches
         ) {
         }
-    
+
         private record ScorecardBases(
             String localBase,
             String onlineBase
@@ -18641,12 +21441,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
             String localUrl(int serieARound) {
                 return localBase == null ? null : localBase + serieARound;
             }
-    
+
             String onlineUrl(int serieARound) {
                 return onlineBase == null ? null : onlineBase + serieARound;
             }
         }
-    
+
         private record TeamMatch(
             String seasonId,
             String historicalCompetitionId,
@@ -18686,13 +21486,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
             String scoreText
         ) {
         }
-    
+
         private record SourceInfo(
             long sourceFileId,
             long importId
         ) {
         }
-    
+
         private record ExpulsionDetail(
             long matchId,
             int serieARound,
@@ -18703,13 +21503,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
             int scoreId
         ) {
         }
-    
+
         private static void writeGoalBandDetails(
                 BufferedWriter writer,
                 List<GoalBandDetail> rows) throws Exception {
-    
+
             writer.write("  \"fasceGolDettaglio\": [\n");
-    
+
             for (int index = 0; index < rows.size(); index++) {
                 GoalBandDetail row = rows.get(index);
                 writer.write("    {\n");
@@ -18724,10 +21524,10 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 }
                 writer.write("\n");
             }
-    
+
             writer.write("  ]");
         }
-    
+
         private record GoalBandDetail(
             int sourceCompetitionId,
             String sourceBandId,
@@ -18736,13 +21536,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
             int goals
         ) {
         }
-    
+
         private static void writeReserveOfficeDetails(
                 BufferedWriter writer,
                 List<ReserveOfficeDetail> rows) throws Exception {
-    
+
             writer.write("  \"riserveUfficioDettaglio\": [\n");
-    
+
             for (int index = 0; index < rows.size(); index++) {
                 ReserveOfficeDetail row = rows.get(index);
                 writer.write("    {\n");
@@ -18765,10 +21565,10 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
                 }
                 writer.write("\n");
             }
-    
+
             writer.write("  ]");
         }
-    
+
         private record ReserveOfficeDetail(
             long matchId,
             int serieARound,
@@ -18785,7 +21585,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
             BigDecimal value
         ) {
         }
-    
+
         private record EventDetail(
             String recordKey,
             String eventType,
@@ -18801,7 +21601,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
             int value
         ) {
         }
-    
+
         private record CleanSheetDetail(
             long matchId,
             int serieARound,
@@ -18816,7 +21616,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
             BigDecimal value
         ) {
         }
-    
+
         private record ModifierDetail(
             String type,
             long matchId,
@@ -18829,7 +21629,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
             String sourceField
         ) {
         }
-    
+
         private record ExportData(
             Meta meta,
             List<TeamMatch> teamMatches,
@@ -18848,7 +21648,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedExporter.java
 File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.io.IOException;
     import java.math.BigDecimal;
     import java.nio.charset.StandardCharsets;
@@ -18864,7 +21664,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
     import java.util.Map;
     import java.util.Set;
     import java.util.stream.Stream;
-    
+
     /**
      * Costruisce l'archivio season_records_*.json a partire dai JSON normalizzati
      * prodotti da RecordsNext.
@@ -18874,10 +21674,10 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
      * modificatoriB2Dettaglio come tipo=capitano / campoOrigine=ModM2Pers.
      */
     public final class SeasonRecordsArchiveBuilder {
-    
+
         private SeasonRecordsArchiveBuilder() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length < 2) {
                 System.err.println("Uso: SeasonRecordsArchiveBuilder <reportsRoot> <archiveRoot> [stagione ...]");
@@ -18896,13 +21696,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             System.out.println("Competizioni : " + result.competitions());
             System.out.println("Sezioni      : 22/22");
         }
-    
+
         public static Result build(Path reportsRoot, Path archiveRoot, List<String> requestedSeasons) throws IOException {
             if (!Files.isDirectory(reportsRoot)) {
                 throw new IOException("Cartella report non trovata: " + reportsRoot);
             }
             Files.createDirectories(archiveRoot);
-    
+
             List<Path> seasonDirs = resolveSeasonDirs(reportsRoot, requestedSeasons);
             int competitions = 0;
             int seasons = 0;
@@ -18931,7 +21731,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             if (competitions == 0) throw new IOException("Nessun season_normalized_*.json trovato in " + reportsRoot);
             return new Result(seasons, competitions);
         }
-    
+
         private static Map<String, Object> buildCompetition(Map<String, Object> source, Map<String, Object> sourceMeta) {
             List<Map<String, Object>> matches = rows(source.get("partiteSquadra"));
             List<Map<String, Object>> expulsions = rows(source.get("espulsioniDettaglio"));
@@ -18939,7 +21739,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             List<Map<String, Object>> modifiers = rows(source.get("modificatoriB2Dettaglio"));
             List<Map<String, Object>> cleanSheets = rows(source.get("cleanSheetB3Dettaglio"));
             List<Map<String, Object>> goalBands = rows(source.get("fasceGolDettaglio"));
-    
+
             Map<String, Object> records = new LinkedHashMap<>();
             records.put("puntiSquadraMax", pointsMax(matches));
             records.put("serieSenzaSconfitte", unbeatenSeries(matches));
@@ -18961,8 +21761,37 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             records.put("golRigoreSquadre", eventByTeam(events, "golRigoreSquadre", "Maggiori gol fatti su rigore"));
             records.put("modDifesaMax", modifierMax(modifiers));
             records.put("modDifesaTotaleSquadre", modifierTotal(modifiers));
+            records.put("capitanoMax", modifierMaxByType(modifiers, "capitano", "capitanoMax", "Miglior bonus Capitano in una gara"));
             records.put("capitanoVolteSquadre", captainCount(modifiers));
             records.put("capitanoTotaleSquadre", captainTotal(modifiers));
+            records.put("modPersonalizzato3Max", modifierMaxByType(modifiers, "personalizzato3", "modPersonalizzato3Max", "Miglior modificatore personalizzato 3"));
+            records.put("modPersonalizzato3TotaleSquadre", modifierTotalByType(modifiers, "personalizzato3", "modPersonalizzato3TotaleSquadre", "Maggior totale modificatore personalizzato 3"));
+            records.put("modPortiereFcmMax", modifierMaxByType(modifiers, "fcmPortiere", "modPortiereFcmMax", "Miglior Modificatore Portiere FCM"));
+            records.put("modPortiereFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmPortiere", "modPortiereFcmTotaleSquadre", "Maggior totale Modificatore Portiere FCM"));
+            records.put("modDifesaFcmMax", modifierMaxByType(modifiers, "fcmDifesa", "modDifesaFcmMax", "Miglior Modificatore Difesa FCM"));
+            records.put("modDifesaFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmDifesa", "modDifesaFcmTotaleSquadre", "Maggior totale Modificatore Difesa FCM"));
+            records.put("modCentrocampoFcmMax", modifierMaxByType(modifiers, "fcmCentrocampo", "modCentrocampoFcmMax", "Miglior Modificatore Centrocampo FCM"));
+            records.put("modCentrocampoFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmCentrocampo", "modCentrocampoFcmTotaleSquadre", "Maggior totale Modificatore Centrocampo FCM"));
+            records.put("modAttaccoFcmMax", modifierMaxByType(modifiers, "fcmAttacco", "modAttaccoFcmMax", "Miglior Modificatore Attacco FCM"));
+            records.put("modAttaccoFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmAttacco", "modAttaccoFcmTotaleSquadre", "Maggior totale Modificatore Attacco FCM"));
+            records.put("modModuloFcmMax", modifierMaxByType(modifiers, "fcmModulo", "modModuloFcmMax", "Miglior Modificatore Modulo FCM"));
+            records.put("modModuloFcmTotaleSquadre", modifierTotalByType(modifiers, "fcmModulo", "modModuloFcmTotaleSquadre", "Maggior totale Modificatore Modulo FCM"));
+            records.put("modDifesaMediaSquadre", modifierAverageByType(modifiers, "modDifesa", "modDifesaMediaSquadre", "Miglior media Modificatore Difesa"));
+            records.put("modDifesaUtilizziSquadre", modifierUsesByType(modifiers, "modDifesa", "modDifesaUtilizziSquadre", "Maggior numero utilizzi Modificatore Difesa"));
+            records.put("capitanoMediaSquadre", modifierAverageByType(modifiers, "capitano", "capitanoMediaSquadre", "Miglior media Capitano"));
+            records.put("capitanoUtilizziSquadre", modifierUsesByType(modifiers, "capitano", "capitanoUtilizziSquadre", "Maggior numero utilizzi Capitano"));
+            records.put("modPersonalizzato3MediaSquadre", modifierAverageByType(modifiers, "personalizzato3", "modPersonalizzato3MediaSquadre", "Miglior media modificatore personalizzato 3"));
+            records.put("modPersonalizzato3UtilizziSquadre", modifierUsesByType(modifiers, "personalizzato3", "modPersonalizzato3UtilizziSquadre", "Maggior numero utilizzi modificatore personalizzato 3"));
+            records.put("modPortiereFcmMediaSquadre", modifierAverageByType(modifiers, "fcmPortiere", "modPortiereFcmMediaSquadre", "Miglior media Modificatore Portiere FCM"));
+            records.put("modPortiereFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmPortiere", "modPortiereFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Portiere FCM"));
+            records.put("modDifesaFcmMediaSquadre", modifierAverageByType(modifiers, "fcmDifesa", "modDifesaFcmMediaSquadre", "Miglior media Modificatore Difesa FCM"));
+            records.put("modDifesaFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmDifesa", "modDifesaFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Difesa FCM"));
+            records.put("modCentrocampoFcmMediaSquadre", modifierAverageByType(modifiers, "fcmCentrocampo", "modCentrocampoFcmMediaSquadre", "Miglior media Modificatore Centrocampo FCM"));
+            records.put("modCentrocampoFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmCentrocampo", "modCentrocampoFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Centrocampo FCM"));
+            records.put("modAttaccoFcmMediaSquadre", modifierAverageByType(modifiers, "fcmAttacco", "modAttaccoFcmMediaSquadre", "Miglior media Modificatore Attacco FCM"));
+            records.put("modAttaccoFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmAttacco", "modAttaccoFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Attacco FCM"));
+            records.put("modModuloFcmMediaSquadre", modifierAverageByType(modifiers, "fcmModulo", "modModuloFcmMediaSquadre", "Miglior media Modificatore Modulo FCM"));
+            records.put("modModuloFcmUtilizziSquadre", modifierUsesByType(modifiers, "fcmModulo", "modModuloFcmUtilizziSquadre", "Maggior numero utilizzi Modificatore Modulo FCM"));
             records.put("cleanSheetPortiereVolteSquadre", cleanSheetCount(cleanSheets));
             records.put("cleanSheetPortiereTotaleSquadre", cleanSheetTotal(cleanSheets));
             records.put("cleanSheetPortiereSerieSquadre", cleanSheetSeries(matches, cleanSheets));
@@ -18971,20 +21800,20 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             records.put("fattoreCampoTotaleSquadre", homeFieldTotals(matches, modifiers));
             records.put("fattoreCampoPuntiGuadagnatiSquadre", homeFieldStandingsImpact(matches, modifiers, goalBands, true));
             records.put("fattoreCampoPuntiPersiSquadre", homeFieldStandingsImpact(matches, modifiers, goalBands, false));
-    
+
             Map<String, Object> meta = new LinkedHashMap<>();
             meta.putAll(sourceMeta);
             meta.put("builder", "RecordsNext SeasonRecordsArchiveBuilder");
             meta.put("sezioniGenerate", 26);
             meta.put("sezioniAttese", 26);
             meta.put("sezioniNonDisponibili", List.of());
-    
+
             Map<String, Object> result = new LinkedHashMap<>();
             result.put("meta", meta);
             result.put("records", records);
             return result;
         }
-    
+
         private static List<Object> pointsMax(List<Map<String, Object>> matches) {
             List<Map<String, Object>> sorted = new ArrayList<>(matches);
             sorted.sort(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("puntiFatti"))).reversed()
@@ -19021,7 +21850,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             }
             return out;
         }
-    
+
         private static List<Object> unbeatenSeries(List<Map<String, Object>> matches) {
             Map<String, List<Map<String, Object>>> byTeam = group(matches, "idSquadra");
             List<Map<String, Object>> records = new ArrayList<>();
@@ -19044,7 +21873,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     .thenComparing(r -> string(r.get("squadra"))));
             return new ArrayList<>(records.subList(0, Math.min(20, records.size())));
         }
-    
+
         private static void addUnbeaten(List<Map<String, Object>> records, List<Map<String, Object>> series) {
             if (series.isEmpty()) return;
             Map<String, Object> first = series.get(0), last = series.get(series.size() - 1);
@@ -19068,8 +21897,8 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             row.put("dettagli", details);
             records.add(row);
         }
-    
-    
+
+
         private static List<Object> resultSeries(List<Map<String, Object>> matches,
                                                  String resultCode,
                                                  boolean mustMatch,
@@ -19077,12 +21906,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                                                  String name) {
             Map<String, List<Map<String, Object>>> byTeam = group(matches, "idSquadra");
             List<Map<String, Object>> records = new ArrayList<>();
-    
+
             for (List<Map<String, Object>> teamMatches : byTeam.values()) {
                 teamMatches.sort(Comparator
                         .comparingDouble((Map<String, Object> row) -> number(row.get("ordineGiornata")))
                         .thenComparing(row -> string(row.get("idIncontro"))));
-    
+
                 List<Map<String, Object>> current = new ArrayList<>();
                 for (Map<String, Object> match : teamMatches) {
                     boolean matchesResult = resultCode.equals(string(match.get("esito")));
@@ -19096,19 +21925,19 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                 }
                 addResultSeries(records, current, recordId, name);
             }
-    
+
             records.sort(Comparator
                     .comparingDouble((Map<String, Object> row) -> number(row.get("valore"))).reversed()
                     .thenComparing(row -> string(row.get("squadra"))));
             return new ArrayList<>(records.subList(0, Math.min(20, records.size())));
         }
-    
+
         private static void addResultSeries(List<Map<String, Object>> records,
                                             List<Map<String, Object>> series,
                                             String recordId,
                                             String name) {
             if (series.isEmpty()) return;
-    
+
             Map<String, Object> first = series.get(0);
             Map<String, Object> last = series.get(series.size() - 1);
             List<Object> details = new ArrayList<>();
@@ -19124,7 +21953,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                         "esito", row.get("esito")
                 ));
             }
-    
+
             Map<String, Object> record = ordered(
                     "recordId", recordId,
                     "nome", name,
@@ -19142,17 +21971,17 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             record.put("dettagli", details);
             records.add(record);
         }
-    
+
         private static List<Object> expulsionsByTeam(List<Map<String, Object>> rows) {
             return aggregateCount(rows, "idSquadra", "squadra", "espulsioni_squadra",
                     "Maggiori espulsioni squadra", List.of("idIncontro", "giornataDiA", "idGiocatore", "giocatore"));
         }
-    
+
         private static List<Object> expulsionsByPlayer(List<Map<String, Object>> rows) {
             return aggregateCount(rows, "idGiocatore", "giocatore", "espulsioni_giocatore",
                     "Maggiori espulsioni giocatore", List.of("idIncontro", "giornataDiA", "idSquadra", "squadra"));
         }
-    
+
         private static List<Object> aggregateCount(List<Map<String, Object>> rows, String idField, String nameField,
                                                     String recordId, String name, List<String> detailFields) {
             Map<String, List<Map<String, Object>>> groups = group(rows, idField);
@@ -19170,7 +21999,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     .thenComparing(r -> string(r.get(nameField))));
             return new ArrayList<>(out);
         }
-    
+
         private static List<Object> eventByTeam(List<Map<String, Object>> events, String key, String name) {
             List<Map<String, Object>> selected = events.stream().filter(r -> key.equals(string(r.get("recordKey")))).toList();
             Map<String, List<Map<String, Object>>> groups = group(selected, "idSquadra");
@@ -19195,7 +22024,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     .thenComparing(r -> string(r.get("squadra"))));
             return new ArrayList<>(out);
         }
-    
+
         private static List<Object> modifierMax(List<Map<String, Object>> modifiers) {
             List<Map<String, Object>> rows = modifiers.stream().filter(r -> "modDifesa".equals(string(r.get("tipo"))))
                     .sorted(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("valore"))).reversed()
@@ -19207,13 +22036,106 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     "avversaria", r.get("avversaria"), "idIncontro", r.get("idIncontro"), "giornataDiA", r.get("giornataDiA")));
             return out;
         }
-    
+
         private static List<Object> modifierTotal(List<Map<String, Object>> modifiers) {
             List<Map<String, Object>> selected = modifiers.stream().filter(r -> "modDifesa".equals(string(r.get("tipo")))).toList();
             return aggregateSum(selected, "modDifesaTotaleSquadre", "Maggior totale modificatore difesa",
                     List.of("idIncontro", "giornataDiA", "avversaria", "valore"));
         }
-    
+
+        private static List<Object> modifierMaxByType(
+                List<Map<String, Object>> modifiers,
+                String type,
+                String recordId,
+                String label) {
+            List<Map<String, Object>> rows = modifiers.stream()
+                    .filter(r -> type.equals(string(r.get("tipo"))))
+                    .sorted(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("valore"))).reversed()
+                            .thenComparing(r -> string(r.get("squadra"))))
+                    .limit(20)
+                    .toList();
+            List<Object> out = new ArrayList<>();
+            for (Map<String, Object> r : rows) {
+                out.add(ordered(
+                        "recordId", recordId,
+                        "nome", label,
+                        "valore", r.get("valore"),
+                        "idSquadra", r.get("idSquadra"),
+                        "squadra", r.get("squadra"),
+                        "avversaria", r.get("avversaria"),
+                        "idIncontro", r.get("idIncontro"),
+                        "giornataDiA", r.get("giornataDiA"),
+                        "campoOrigine", r.get("campoOrigine")));
+            }
+            return out;
+        }
+
+        private static List<Object> modifierTotalByType(
+                List<Map<String, Object>> modifiers,
+                String type,
+                String recordId,
+                String label) {
+            List<Map<String, Object>> selected = modifiers.stream()
+                    .filter(r -> type.equals(string(r.get("tipo"))))
+                    .toList();
+            return aggregateSum(selected, recordId, label,
+                    List.of("idIncontro", "giornataDiA", "avversaria", "valore", "campoOrigine"));
+        }
+
+        private static List<Object> modifierAverageByType(
+                List<Map<String, Object>> modifiers,
+                String type,
+                String recordId,
+                String label) {
+            List<Map<String, Object>> selected = modifiers.stream()
+                    .filter(r -> type.equals(string(r.get("tipo"))))
+                    .toList();
+            Map<String, List<Map<String, Object>>> groups = group(selected, "idSquadra");
+            List<Map<String, Object>> out = new ArrayList<>();
+            for (List<Map<String, Object>> rows : groups.values()) {
+                if (rows.isEmpty()) continue;
+                Map<String, Object> first = rows.get(0);
+                double sum = rows.stream().mapToDouble(r -> number(r.get("valore"))).sum();
+                Map<String, Object> item = ordered(
+                        "recordId", recordId,
+                        "nome", label,
+                        "valore", cleanNumber(sum / rows.size()),
+                        "utilizzi", rows.size(),
+                        "idSquadra", first.get("idSquadra"),
+                        "squadra", first.get("squadra"));
+                item.put("dettagli", modifierDetails(rows));
+                out.add(item);
+            }
+            sortValueTeam(out);
+            return new ArrayList<>(out);
+        }
+
+        private static List<Object> modifierUsesByType(
+                List<Map<String, Object>> modifiers,
+                String type,
+                String recordId,
+                String label) {
+            List<Map<String, Object>> selected = modifiers.stream()
+                    .filter(r -> type.equals(string(r.get("tipo"))))
+                    .toList();
+            Map<String, List<Map<String, Object>>> groups = group(selected, "idSquadra");
+            List<Map<String, Object>> out = new ArrayList<>();
+            for (List<Map<String, Object>> rows : groups.values()) {
+                if (rows.isEmpty()) continue;
+                Map<String, Object> first = rows.get(0);
+                Map<String, Object> item = ordered(
+                        "recordId", recordId,
+                        "nome", label,
+                        "valore", rows.size(),
+                        "idSquadra", first.get("idSquadra"),
+                        "squadra", first.get("squadra"));
+                item.put("dettagli", modifierDetails(rows));
+                out.add(item);
+            }
+            sortValueTeam(out);
+            return new ArrayList<>(out);
+        }
+
         private static List<Object> captainCount(List<Map<String, Object>> modifiers) {
             List<Map<String, Object>> selected = modifiers.stream()
                     .filter(r -> "capitano".equals(string(r.get("tipo"))))
@@ -19236,7 +22158,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             sortValueTeam(out);
             return new ArrayList<>(out);
         }
-    
+
         private static List<Object> captainTotal(List<Map<String, Object>> modifiers) {
             List<Map<String, Object>> selected = modifiers.stream()
                     .filter(r -> "capitano".equals(string(r.get("tipo"))))
@@ -19245,7 +22167,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     "Maggior totale bonus capitano",
                     List.of("idIncontro", "giornataDiA", "avversaria", "valore"));
         }
-    
+
         private static List<Object> modifierDetails(List<Map<String, Object>> group) {
             List<Object> details = new ArrayList<>();
             for (Map<String, Object> r : group) {
@@ -19257,7 +22179,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             }
             return details;
         }
-    
+
         private static List<Object> captainSeries(List<Map<String, Object>> matches,
                                                    List<Map<String, Object>> modifiers) {
             List<Map<String, Object>> captain = modifiers.stream()
@@ -19266,8 +22188,8 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             return eventSeries(matches, captain, "capitanoSerieSquadre",
                     "Maggior serie bonus capitano");
         }
-    
-    
+
+
         private static List<Object> homeFieldDecisive(List<Map<String, Object>> matches,
                                                        List<Map<String, Object>> modifiers,
                                                        List<Map<String, Object>> goalBands) {
@@ -19308,7 +22230,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     .thenComparing(value -> string(((Map<?, ?>) value).get("idIncontro"))));
             return out;
         }
-    
+
         private static List<Object> homeFieldTotals(List<Map<String, Object>> matches,
                                                      List<Map<String, Object>> modifiers) {
             Map<String, Double> modifierTotals = modifierTotalsByMatchTeam(modifiers);
@@ -19345,7 +22267,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             sortValueTeam(out);
             return new ArrayList<>(out);
         }
-    
+
         private static List<Object> homeFieldStandingsImpact(List<Map<String, Object>> matches,
                                                               List<Map<String, Object>> modifiers,
                                                               List<Map<String, Object>> goalBands,
@@ -19384,7 +22306,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             sortValueTeam(out);
             return new ArrayList<>(out);
         }
-    
+
         private static List<HomeFieldImpact> homeFieldImpacts(List<Map<String, Object>> matches,
                                                                List<Map<String, Object>> modifiers,
                                                                List<Map<String, Object>> goalBands) {
@@ -19410,7 +22332,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             }
             return impacts;
         }
-    
+
         private static Map<String, Double> modifierTotalsByMatchTeam(List<Map<String, Object>> modifiers) {
             Map<String, Double> totals = new LinkedHashMap<>();
             for (Map<String, Object> modifier : modifiers) {
@@ -19419,14 +22341,14 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             }
             return totals;
         }
-    
+
         private static double homeBonus(Map<String, Object> match, Map<String, Double> modifierTotals) {
             String key = string(match.get("idIncontro")) + "|" + string(match.get("idSquadra"));
             double residual = number(match.get("puntiFatti")) - number(match.get("parzialeFatto"))
                     - modifierTotals.getOrDefault(key, 0.0);
             return Math.abs(residual) < 0.000001 ? 0.0 : residual;
         }
-    
+
         private static int goalsForScore(double score, List<Map<String, Object>> goalBands) {
             int goals = 0;
             for (Map<String, Object> band : goalBands) {
@@ -19436,18 +22358,18 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             }
             return goals;
         }
-    
+
         private static int standingsPoints(int goalsFor, int goalsAgainst) {
             if (goalsFor > goalsAgainst) return 3;
             if (goalsFor == goalsAgainst) return 1;
             return 0;
         }
-    
+
         private record HomeFieldImpact(Map<String, Object> home, Map<String, Object> away,
                                        double homeBonus, double homeScoreWithout,
                                        int homeGoalsWithout, int awayGoals, int homePointsDelta) {
         }
-    
+
         private static List<Object> cleanSheetCount(List<Map<String, Object>> clean) {
             Map<String, List<Map<String, Object>>> groups = group(clean, "idSquadra");
             List<Map<String, Object>> out = new ArrayList<>();
@@ -19462,7 +22384,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             sortValueTeam(out);
             return new ArrayList<>(out);
         }
-    
+
         private static List<Object> cleanSheetTotal(List<Map<String, Object>> clean) {
             Map<String, List<Map<String, Object>>> groups = group(clean, "idSquadra");
             List<Map<String, Object>> out = new ArrayList<>();
@@ -19478,7 +22400,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             sortValueTeam(out);
             return new ArrayList<>(out);
         }
-    
+
         private static List<Object> cleanDetails(List<Map<String, Object>> group) {
             List<Map<String, Object>> sorted = new ArrayList<>(group);
             sorted.sort(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("giornataDiA")))
@@ -19489,12 +22411,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     "giocatore", r.get("giocatore"), "valore", r.get("valore")));
             return details;
         }
-    
+
         private static List<Object> cleanSheetSeries(List<Map<String, Object>> matches, List<Map<String, Object>> clean) {
             return eventSeries(matches, clean, "cleanSheetPortiereSerieSquadre",
                     "Maggior serie clean sheet portiere");
         }
-    
+
         private static List<Object> eventSeries(List<Map<String, Object>> matches,
                                                 List<Map<String, Object>> events,
                                                 String recordId, String name) {
@@ -19502,18 +22424,18 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             for (Map<String, Object> r : events) {
                 eventKeys.add(string(r.get("idSquadra")) + "|" + string(r.get("idIncontro")));
             }
-    
+
             Map<String, List<Map<String, Object>>> byTeam = group(matches, "idSquadra");
             List<Map<String, Object>> out = new ArrayList<>();
-    
+
             for (List<Map<String, Object>> teamMatches : byTeam.values()) {
                 teamMatches.sort(Comparator
                         .comparingDouble((Map<String, Object> r) -> number(r.get("giornataDiA")))
                         .thenComparing(r -> string(r.get("idIncontro"))));
-    
+
                 List<Map<String, Object>> best = new ArrayList<>();
                 List<Map<String, Object>> current = new ArrayList<>();
-    
+
                 for (Map<String, Object> match : teamMatches) {
                     String key = string(match.get("idSquadra")) + "|" + string(match.get("idIncontro"));
                     if (eventKeys.contains(key)) {
@@ -19524,14 +22446,14 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     }
                 }
                 if (current.size() > best.size()) best = new ArrayList<>(current);
-    
+
                 if (!best.isEmpty()) out.add(eventSeriesRecord(best, recordId, name));
             }
-    
+
             sortValueTeam(out);
             return new ArrayList<>(out);
         }
-    
+
         private static Map<String, Object> eventSeriesRecord(List<Map<String, Object>> series,
                                                               String recordId, String name) {
             Map<String, Object> first = series.get(0);
@@ -19549,7 +22471,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                             "giornataDiA", r.get("giornataDiA"),
                             "avversaria", r.get("avversaria"))).toList());
         }
-    
+
         private static List<Object> aggregateSum(List<Map<String, Object>> rows, String recordId, String name,
                                                   List<String> detailFields) {
             Map<String, List<Map<String, Object>>> groups = group(rows, "idSquadra");
@@ -19569,30 +22491,30 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             sortValueTeam(out);
             return new ArrayList<>(out);
         }
-    
+
         private static void sortValueTeam(List<Map<String, Object>> out) {
             out.sort(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("valore"))).reversed()
                     .thenComparing(r -> string(r.get("squadra"))));
         }
-    
+
         private static Map<String, List<Map<String, Object>>> group(List<Map<String, Object>> rows, String field) {
             Map<String, List<Map<String, Object>>> groups = new LinkedHashMap<>();
             for (Map<String, Object> row : rows) groups.computeIfAbsent(string(row.get(field)), k -> new ArrayList<>()).add(row);
             return groups;
         }
-    
+
         private static Map<String, Object> project(Map<String, Object> row, List<String> fields) {
             Map<String, Object> result = new LinkedHashMap<>();
             for (String field : fields) result.put(field, row.get(field));
             return result;
         }
-    
+
         private static Map<String, Object> ordered(Object... values) {
             Map<String, Object> map = new LinkedHashMap<>();
             for (int i = 0; i < values.length; i += 2) map.put(String.valueOf(values[i]), values[i + 1]);
             return map;
         }
-    
+
         private static long longNumber(Object value) {
             String text = string(value);
             if (text.isBlank()) return 0L;
@@ -19603,12 +22525,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                 return 0L;
             }
         }
-    
+
         private static Object cleanNumber(double value) {
             if (Math.rint(value) == value) return (long) value;
             return BigDecimal.valueOf(value).stripTrailingZeros();
         }
-    
+
         private static List<Path> resolveSeasonDirs(Path root, List<String> requested) throws IOException {
             if (!requested.isEmpty()) {
                 List<Path> result = new ArrayList<>();
@@ -19624,7 +22546,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                 return stream.filter(Files::isDirectory).sorted(Comparator.comparing(p -> p.getFileName().toString())).toList();
             }
         }
-    
+
         private static List<Path> listNormalizedFiles(Path seasonDir) throws IOException {
             try (Stream<Path> stream = Files.list(seasonDir)) {
                 return stream.filter(Files::isRegularFile)
@@ -19635,7 +22557,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                         .sorted(Comparator.comparing(p -> p.getFileName().toString())).toList();
             }
         }
-    
+
         @SuppressWarnings("unchecked")
         private static List<Map<String, Object>> rows(Object value) {
             if (!(value instanceof List<?> list)) return new ArrayList<>();
@@ -19643,28 +22565,28 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             for (Object item : list) if (item instanceof Map<?, ?> map) result.add((Map<String, Object>) map);
             return result;
         }
-    
+
         @SuppressWarnings("unchecked")
         private static Map<String, Object> object(Object value, Path source, String name) throws IOException {
             if (!(value instanceof Map<?, ?> map)) throw new IOException("Oggetto " + name + " mancante in " + source);
             return (Map<String, Object>) map;
         }
-    
+
         private static String string(Object value) { return value == null ? "" : String.valueOf(value); }
         private static double number(Object value) {
             if (value instanceof Number n) return n.doubleValue();
             if (value == null || string(value).isBlank()) return 0;
             try { return Double.parseDouble(string(value).replace(',', '.')); } catch (NumberFormatException e) { return 0; }
         }
-    
+
         private static Object parse(Path source) throws IOException {
             String text = Files.readString(source, StandardCharsets.UTF_8);
             if (!text.isEmpty() && text.charAt(0) == '\uFEFF') text = text.substring(1);
             return new JsonParser(text, source).parse();
         }
-    
+
         public record Result(int seasons, int competitions) {}
-    
+
         private static final class JsonParser {
             private final String text; private final Path source; private int index;
             JsonParser(String text, Path source) { this.text = text; this.source = source; }
@@ -19685,7 +22607,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             private boolean peek(char c){ return index<text.length()&&text.charAt(index)==c; }
             private void fail(String m)throws IOException{ throw new IOException("JSON non valido in "+source+" posizione "+index+": "+m); }
         }
-    
+
         private static final class JsonWriter {
             static String writePretty(Object v){ StringBuilder b=new StringBuilder(); write(v,b,0); return b.toString(); }
             private static void write(Object v,StringBuilder b,int depth){
@@ -19704,7 +22626,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
 File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.net.URI;
     import java.nio.file.Files;
     import java.nio.file.Path;
@@ -19717,7 +22639,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
     import java.util.Locale;
     import java.util.regex.Matcher;
     import java.util.regex.Pattern;
-    
+
     /**
      * Registro autonomo delle stagioni e delle relative risorse esterne.
      *
@@ -19726,35 +22648,35 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
      * quando questa classe viene eseguita.</p>
      */
     public final class SeasonRegistry {
-    
+
         private static final Pattern SEASON_PATTERN =
             Pattern.compile("^(\\d{4})_(\\d{4})$");
-    
+
         private SeasonRegistry() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length < 2) {
                 printUsage();
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
             if (!Files.isRegularFile(database)) {
                 throw new IllegalArgumentException(
                     "Database SQLite non trovato: " + database
                 );
             }
-    
+
             String command = args[1].trim().toLowerCase(Locale.ROOT);
             Class.forName("org.sqlite.JDBC");
-    
+
             try (Connection connection = DriverManager.getConnection(
                     "jdbc:sqlite:" + database)) {
-    
+
                 configureConnection(connection);
                 installSchema(connection);
-    
+
                 switch (command) {
                     case "show" -> show(connection);
                     case "set-managed" -> setManaged(connection, args);
@@ -19768,7 +22690,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 }
             }
         }
-    
+
         static void installSchema(Connection connection) throws Exception {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
@@ -19793,14 +22715,14 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                             REFERENCES rn_season(season_id)
                     )
                     """);
-    
+
                 statement.execute("""
                     CREATE INDEX IF NOT EXISTS ix_rn_season_configuration_status
                     ON rn_season_configuration(configuration_status)
                     """);
             }
         }
-    
+
         private static void show(Connection connection) throws Exception {
             String sql = """
                 SELECT
@@ -19825,17 +22747,17 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 ORDER BY CAST(SUBSTR(s.season_id, 1, 4) AS INTEGER) DESC,
                          s.season_id DESC
                 """;
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery(sql)) {
-    
+
                 System.out.printf(
                     Locale.ROOT,
                     "%-11s %-6s %-17s %-15s %3s %3s  %s%n",
                     "STAGIONE", "ANCORA", "TIPO", "STATO", "FCM", "FCA",
                     "RISORSE"
                 );
-    
+
                 while (result.next()) {
                     String resources = resourcesSummary(result);
                     System.out.printf(
@@ -19852,25 +22774,25 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 }
             }
         }
-    
+
         private static void setManaged(Connection connection, String[] args)
                 throws Exception {
-    
+
             requireArgumentCount(
                 args,
                 6,
                 "<db> set-managed <stagione> <sito-locale|-> "
                     + "<sito-online|-> <DataA.js|AUTO|->"
             );
-    
+
             String seasonId = requireExistingSeason(connection, args[2]);
             SiteValues sites = parseSites(args[3], args[4], args[5]);
-    
+
             Validation validation = validateManagedSources(connection, seasonId);
             if (!validation.valid()) {
                 throw new IllegalStateException(validation.message());
             }
-    
+
             inTransaction(connection, () -> {
                 upsertConfiguration(
                     connection,
@@ -19880,24 +22802,24 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                     calculateStatus(connection, seasonId, "GESTITA")
                 );
             });
-    
+
             System.out.println("Stagione gestita registrata: " + seasonId);
             printSites(sites);
         }
-    
+
         private static void setManual(Connection connection, String[] args)
                 throws Exception {
-    
+
             requireArgumentCount(
                 args,
                 6,
                 "<db> set-manual <stagione> <sito-locale|-> "
                     + "<sito-online|-> <DataA.js|AUTO|->"
             );
-    
+
             String seasonId = requireValidSeasonId(args[2]);
             SiteValues sites = parseSites(args[3], args[4], args[5]);
-    
+
             inTransaction(connection, () -> {
                 ensureManualSeasonCanBeUsed(connection, seasonId);
                 insertSeasonIfMissing(connection, seasonId);
@@ -19909,25 +22831,25 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                     "COMPLETA"
                 );
             });
-    
+
             System.out.println("Stagione manuale registrata: " + seasonId);
             printSites(sites);
         }
-    
+
         private static void setSites(Connection connection, String[] args)
                 throws Exception {
-    
+
             requireArgumentCount(
                 args,
                 6,
                 "<db> set-sites <stagione> <sito-locale|-> "
                     + "<sito-online|-> <DataA.js|AUTO|->"
             );
-    
+
             String seasonId = requireExistingSeason(connection, args[2]);
             SiteValues sites = parseSites(args[3], args[4], args[5]);
             String managementType = requireConfiguredType(connection, seasonId);
-    
+
             inTransaction(connection, () -> {
                 upsertConfiguration(
                     connection,
@@ -19937,43 +22859,43 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                     calculateStatus(connection, seasonId, managementType)
                 );
             });
-    
+
             System.out.println("Risorse stagione aggiornate: " + seasonId);
             printSites(sites);
         }
-    
+
         private static void validateCommand(Connection connection, String[] args)
                 throws Exception {
-    
+
             requireArgumentCount(args, 3, "<db> validate <stagione>");
             String seasonId = requireExistingSeason(connection, args[2]);
             String managementType = requireConfiguredType(connection, seasonId);
-    
+
             Validation validation = validateSeason(
                 connection,
                 seasonId,
                 managementType
             );
-    
+
             if (!validation.valid()) {
                 System.out.println(seasonId + "  NON VALIDA");
                 System.out.println(validation.message());
                 System.exit(1);
             }
-    
+
             String status = calculateStatus(connection, seasonId, managementType);
             updateStoredStatus(connection, seasonId, status);
-    
+
             System.out.println(seasonId + "  VALIDA");
             System.out.println("Tipo  : " + managementType);
             System.out.println("Stato : " + status);
         }
-    
+
         private static Validation validateSeason(
                 Connection connection,
                 String seasonId,
                 String managementType) throws Exception {
-    
+
             if (managementType.equals("GESTITA")) {
                 Validation sources = validateManagedSources(connection, seasonId);
                 if (!sources.valid()) {
@@ -19985,24 +22907,24 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                         + " possiede sorgenti FCM/FCA importate."
                 );
             }
-    
+
             SiteValues sites = readSites(connection, seasonId);
             try {
                 validateStoredSites(sites);
             } catch (IllegalArgumentException exception) {
                 return Validation.error(exception.getMessage());
             }
-    
+
             return Validation.ok();
         }
-    
+
         private static Validation validateManagedSources(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             SourceCount fcm = readSourceCount(connection, seasonId, "FCM");
             SourceCount fca = readSourceCount(connection, seasonId, "FCA");
-    
+
             if (fcm.configured() != 1 || fca.configured() != 1) {
                 return Validation.error(
                     "La stagione " + seasonId
@@ -20011,7 +22933,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                         + ", FCA=" + fca.configured() + "."
                 );
             }
-    
+
             if (fcm.completedImports() != 1 || fca.completedImports() != 1) {
                 return Validation.error(
                     "Le sorgenti della stagione " + seasonId
@@ -20020,15 +22942,15 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                         + ", FCA=" + fca.completedImports() + "."
                 );
             }
-    
+
             return Validation.ok();
         }
-    
+
         private static SourceCount readSourceCount(
                 Connection connection,
                 String seasonId,
                 String sourceType) throws Exception {
-    
+
             String sql = """
                 SELECT
                     COUNT(*) AS configured_count,
@@ -20040,7 +22962,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 WHERE f.season_id = ?
                   AND f.source_type = ?
                 """;
-    
+
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, seasonId);
                 statement.setString(2, sourceType);
@@ -20053,11 +22975,11 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 }
             }
         }
-    
+
         private static int countSources(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT COUNT(*)
                 FROM rn_source_file
@@ -20070,29 +22992,29 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 }
             }
         }
-    
+
         private static String calculateStatus(
                 Connection connection,
                 String seasonId,
                 String managementType) throws Exception {
-    
+
             if (managementType.equals("MANUALE")) {
                 return "COMPLETA";
             }
-    
+
             Validation sources = validateManagedSources(connection, seasonId);
             if (!sources.valid()) {
                 return "DA_CONFIGURARE";
             }
-    
+
             long pendingMappings = countPendingMappings(connection, seasonId);
             return pendingMappings == 0 ? "COMPLETA" : "IN_CORSO";
         }
-    
+
         private static long countPendingMappings(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             String sql = """
                 SELECT
                     (SELECT COUNT(*)
@@ -20109,7 +23031,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                      WHERE ts.season_id = ?
                        AND tm.mapping_status = 'DA_CONFIGURARE')
                 """;
-    
+
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, seasonId);
                 statement.setString(2, seasonId);
@@ -20119,11 +23041,11 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 }
             }
         }
-    
+
         private static void ensureManualSeasonCanBeUsed(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             if (countSources(connection, seasonId) != 0) {
                 throw new IllegalStateException(
                     "La stagione " + seasonId
@@ -20131,7 +23053,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                         + "registrata come MANUALE."
                 );
             }
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT is_anchor
                 FROM rn_season
@@ -20148,14 +23070,14 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 }
             }
         }
-    
+
         private static void insertSeasonIfMissing(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             int startYear = startYear(seasonId);
             String now = Instant.now().toString();
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 INSERT INTO rn_season (
                     season_id,
@@ -20175,16 +23097,16 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 statement.executeUpdate();
             }
         }
-    
+
         private static void upsertConfiguration(
                 Connection connection,
                 String seasonId,
                 String managementType,
                 SiteValues sites,
                 String status) throws Exception {
-    
+
             String now = Instant.now().toString();
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 INSERT INTO rn_season_configuration (
                     season_id,
@@ -20215,12 +23137,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 statement.executeUpdate();
             }
         }
-    
+
         private static void updateStoredStatus(
                 Connection connection,
                 String seasonId,
                 String status) throws Exception {
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 UPDATE rn_season_configuration
                 SET configuration_status = ?,
@@ -20233,11 +23155,11 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 statement.executeUpdate();
             }
         }
-    
+
         private static String requireConfiguredType(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT management_type
                 FROM rn_season_configuration
@@ -20254,11 +23176,11 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 }
             }
         }
-    
+
         private static SiteValues readSites(
                 Connection connection,
                 String seasonId) throws Exception {
-    
+
             try (PreparedStatement statement = connection.prepareStatement("""
                 SELECT local_site_path, online_site_url, dataa_path
                 FROM rn_season_configuration
@@ -20279,15 +23201,15 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 }
             }
         }
-    
+
         private static SiteValues parseSites(
                 String localArgument,
                 String onlineArgument,
                 String dataAArgument) {
-    
+
             String local = nullable(localArgument);
             String online = nullable(onlineArgument);
-    
+
             if (local != null) {
                 Path localPath = Path.of(local).toAbsolutePath().normalize();
                 if (!Files.isDirectory(localPath)) {
@@ -20297,9 +23219,9 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 }
                 local = localPath.toString();
             }
-    
+
             validateOnlineUrl(online);
-    
+
             String dataA;
             if (dataAArgument.trim().equalsIgnoreCase("AUTO")) {
                 if (local == null) {
@@ -20327,10 +23249,10 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                     dataA = dataAPath.toString();
                 }
             }
-    
+
             return new SiteValues(local, online, dataA);
         }
-    
+
         private static void validateStoredSites(SiteValues sites) {
             if (sites.localSite() != null
                     && !Files.isDirectory(Path.of(sites.localSite()))) {
@@ -20339,9 +23261,9 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                         + sites.localSite()
                 );
             }
-    
+
             validateOnlineUrl(sites.onlineSite());
-    
+
             if (sites.dataA() != null
                     && !Files.isRegularFile(Path.of(sites.dataA()))) {
                 throw new IllegalArgumentException(
@@ -20349,12 +23271,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 );
             }
         }
-    
+
         private static void validateOnlineUrl(String value) {
             if (value == null) {
                 return;
             }
-    
+
             URI uri;
             try {
                 uri = URI.create(value);
@@ -20364,7 +23286,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                     exception
                 );
             }
-    
+
             String scheme = uri.getScheme();
             if (scheme == null
                     || !(scheme.equalsIgnoreCase("http")
@@ -20375,13 +23297,13 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 );
             }
         }
-    
+
         private static String requireExistingSeason(
                 Connection connection,
                 String value) throws Exception {
-    
+
             String seasonId = requireValidSeasonId(value);
-    
+
             try (PreparedStatement statement = connection.prepareStatement(
                     "SELECT COUNT(*) FROM rn_season WHERE season_id = ?")) {
                 statement.setString(1, seasonId);
@@ -20394,10 +23316,10 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                     }
                 }
             }
-    
+
             return seasonId;
         }
-    
+
         private static String requireValidSeasonId(String value) {
             String seasonId = value.trim();
             Matcher matcher = SEASON_PATTERN.matcher(seasonId);
@@ -20407,7 +23329,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                         + ". Atteso AAAA_AAAA."
                 );
             }
-    
+
             int start = Integer.parseInt(matcher.group(1));
             int end = Integer.parseInt(matcher.group(2));
             if (end != start + 1) {
@@ -20417,11 +23339,11 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
             }
             return seasonId;
         }
-    
+
         private static int startYear(String seasonId) {
             return Integer.parseInt(seasonId.substring(0, 4));
         }
-    
+
         private static String resourcesSummary(ResultSet result) throws Exception {
             StringBuilder value = new StringBuilder();
             appendResource(value, "locale", result.getString("local_site_path"));
@@ -20429,7 +23351,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
             appendResource(value, "DataA", result.getString("dataa_path"));
             return value.length() == 0 ? "-" : value.toString();
         }
-    
+
         private static void appendResource(
                 StringBuilder builder,
                 String label,
@@ -20442,7 +23364,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
             }
             builder.append(label).append('=').append(value);
         }
-    
+
         private static void printSites(SiteValues sites) {
             System.out.println(
                 "Locale: " + displayNullable(sites.localSite())
@@ -20454,16 +23376,16 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 "DataA : " + displayNullable(sites.dataA())
             );
         }
-    
+
         private static String displayNullable(String value) {
             return value == null ? "-" : value;
         }
-    
+
         private static String nullable(String value) {
             String trimmed = value.trim();
             return trimmed.isBlank() || trimmed.equals("-") ? null : trimmed;
         }
-    
+
         private static void requireArgumentCount(
                 String[] args,
                 int expected,
@@ -20472,7 +23394,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 throw new IllegalArgumentException("Uso: " + usage);
             }
         }
-    
+
         private static void configureConnection(Connection connection)
                 throws Exception {
             try (Statement statement = connection.createStatement()) {
@@ -20480,11 +23402,11 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 statement.execute("PRAGMA busy_timeout = 10000");
             }
         }
-    
+
         private static void inTransaction(
                 Connection connection,
                 SqlOperation operation) throws Exception {
-    
+
             boolean originalAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
             try {
@@ -20497,7 +23419,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
                 connection.setAutoCommit(originalAutoCommit);
             }
         }
-    
+
         private static void printUsage() {
             System.err.println("Comandi:");
             System.err.println("  <db> show");
@@ -20515,27 +23437,27 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
             );
             System.err.println("  <db> validate <stagione>");
         }
-    
+
         @FunctionalInterface
         private interface SqlOperation {
             void run() throws Exception;
         }
-    
+
         private record SiteValues(
             String localSite,
             String onlineSite,
             String dataA
         ) {
         }
-    
+
         private record SourceCount(int configured, int completedImports) {
         }
-    
+
         private record Validation(boolean valid, String message) {
             static Validation ok() {
                 return new Validation(true, "OK");
             }
-    
+
             static Validation error(String message) {
                 return new Validation(false, message);
             }
@@ -20547,66 +23469,66 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRegistry.java
 File: src\main\java\it\alterlega\recordsnext\SerieAQueryProbe.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Path;
     import java.sql.Connection;
     import java.sql.DriverManager;
     import java.sql.ResultSet;
     import java.sql.Statement;
     import java.util.Locale;
-    
+
     public final class SerieAQueryProbe {
-    
+
         private SerieAQueryProbe() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 1) {
                 System.err.println("Uso: SerieAQueryProbe <recordsnext.db>");
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             try (Connection connection = DriverManager.getConnection(
                     "jdbc:sqlite:" + database)) {
-    
+
                 printCompetition(connection);
                 printGironi(connection);
                 printCounts(connection);
                 printMatches(connection);
             }
         }
-    
+
         private static void printCompetition(Connection connection)
                 throws Exception {
-    
+
             String sql = """
                 SELECT ID, NOME
                 FROM raw_2025_2026_fcm_competizione
                 WHERE ID = 4
                 """;
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery(sql)) {
-    
+
                 if (!result.next()) {
                     throw new IllegalStateException(
                         "Competizione Serie A con ID 4 non trovata."
                     );
                 }
-    
+
                 System.out.println("=== COMPETIZIONE ===");
                 System.out.println("ID   : " + result.getInt("ID"));
                 System.out.println("Nome : " + result.getString("NOME"));
             }
         }
-    
+
         private static void printGironi(Connection connection)
                 throws Exception {
-    
+
             String sql = """
                 SELECT
                     g.ID,
@@ -20629,13 +23551,13 @@ File: src\main\java\it\alterlega\recordsnext\SerieAQueryProbe.java
                 GROUP BY g.ID, g.NOME
                 ORDER BY g.ID
                 """;
-    
+
             System.out.println();
             System.out.println("=== GIRONI SERIE A ===");
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery(sql)) {
-    
+
                 while (result.next()) {
                     System.out.printf(
                         Locale.ROOT,
@@ -20649,10 +23571,10 @@ File: src\main\java\it\alterlega\recordsnext\SerieAQueryProbe.java
                 }
             }
         }
-    
+
         private static void printCounts(Connection connection)
                 throws Exception {
-    
+
             String sql = """
                 SELECT
                     COUNT(*) AS tutti,
@@ -20671,12 +23593,12 @@ File: src\main\java\it\alterlega\recordsnext\SerieAQueryProbe.java
                     ON g.ID = i.IDGIRONE
                 WHERE g.IDCOMPETIZIONE = 4
                 """;
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery(sql)) {
-    
+
                 result.next();
-    
+
                 System.out.println();
                 System.out.println("=== CONTEGGI ===");
                 System.out.println("Tutti   : " + result.getLong("tutti"));
@@ -20684,10 +23606,10 @@ File: src\main\java\it\alterlega\recordsnext\SerieAQueryProbe.java
                 System.out.println("Validi  : " + result.getLong("validi"));
             }
         }
-    
+
         private static void printMatches(Connection connection)
                 throws Exception {
-    
+
             String sql = """
                 SELECT
                     i.ID AS id_incontro,
@@ -20722,15 +23644,15 @@ File: src\main\java\it\alterlega\recordsnext\SerieAQueryProbe.java
                     i.ID
                 LIMIT 15
                 """;
-    
+
             long started = System.nanoTime();
-    
+
             System.out.println();
             System.out.println("=== PRIME 15 PARTITE ===");
-    
+
             try (Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery(sql)) {
-    
+
                 while (result.next()) {
                     System.out.printf(
                         Locale.ROOT,
@@ -20747,9 +23669,9 @@ File: src\main\java\it\alterlega\recordsnext\SerieAQueryProbe.java
                     );
                 }
             }
-    
+
             long finished = System.nanoTime();
-    
+
             System.out.printf(
                 Locale.ROOT,
                 "%nTempo query e lettura campione: %.3f ms%n",
@@ -20763,23 +23685,23 @@ File: src\main\java\it\alterlega\recordsnext\SerieAQueryProbe.java
 File: src\main\java\it\alterlega\recordsnext\SerieARoundProbe.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Path;
     import java.sql.Connection;
     import java.sql.DriverManager;
     import java.sql.ResultSet;
     import java.sql.Statement;
-    
+
     public final class SerieARoundProbe {
-    
+
         private SerieARoundProbe() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             String sql = """
                 WITH giornate AS (
                     SELECT
@@ -20814,19 +23736,19 @@ File: src\main\java\it\alterlega\recordsnext\SerieARoundProbe.java
                 FROM giornate
                 ORDER BY primo_incontro
                 """;
-    
+
             try (Connection connection = DriverManager.getConnection(
                         "jdbc:sqlite:" + database);
                  Statement statement = connection.createStatement();
                  ResultSet result = statement.executeQuery(sql)) {
-    
+
                 int giornate = 0;
                 int incontri = 0;
-    
+
                 while (result.next()) {
                     giornate++;
                     incontri += result.getInt("incontri");
-    
+
                     System.out.printf(
                         "%2d | IDGIORNATA=%4d | Serie A=%2d | incontri=%d | %s%n",
                         result.getInt("giornata_competizione"),
@@ -20836,7 +23758,7 @@ File: src\main\java\it\alterlega\recordsnext\SerieARoundProbe.java
                         result.getString("descrizione")
                     );
                 }
-    
+
                 System.out.println();
                 System.out.println("Giornate : " + giornate);
                 System.out.println("Incontri : " + incontri);
@@ -20849,68 +23771,68 @@ File: src\main\java\it\alterlega\recordsnext\SerieARoundProbe.java
 File: src\main\java\it\alterlega\recordsnext\SqliteAudit.java
 
     package it.alterlega.recordsnext;
-    
+
     import java.nio.file.Path;
     import java.sql.Connection;
     import java.sql.DriverManager;
     import java.sql.ResultSet;
     import java.sql.Statement;
-    
+
     public final class SqliteAudit {
-    
+
         private SqliteAudit() {
         }
-    
+
         public static void main(String[] args) throws Exception {
             if (args.length != 1) {
                 System.err.println("Uso: SqliteAudit <recordsnext.db>");
                 System.exit(2);
             }
-    
+
             Path database = Path.of(args[0]).toAbsolutePath().normalize();
-    
+
             Class.forName("org.sqlite.JDBC");
-    
+
             try (Connection connection =
                      DriverManager.getConnection("jdbc:sqlite:" + database);
                  Statement statement = connection.createStatement()) {
-    
+
                 printValue(
                     statement,
                     "Importazioni completate",
                     "SELECT COUNT(*) FROM rn_import WHERE status='COMPLETED'"
                 );
-    
+
                 printValue(
                     statement,
                     "Tabelle catalogate",
                     "SELECT COUNT(*) FROM rn_table_catalog"
                 );
-    
+
                 printValue(
                     statement,
                     "Colonne catalogate",
                     "SELECT COUNT(*) FROM rn_column_catalog"
                 );
-    
+
                 printValue(
                     statement,
                     "Righe sorgente",
                     "SELECT SUM(source_row_count) FROM rn_table_catalog"
                 );
-    
+
                 printValue(
                     statement,
                     "Righe importate",
                     "SELECT SUM(imported_row_count) FROM rn_table_catalog"
                 );
-    
+
                 printValue(
                     statement,
                     "Audit falliti",
                     "SELECT COUNT(*) FROM rn_table_catalog WHERE audit_ok<>1"
                 );
-    
+
                 printValue(
                     statement,
                     "Tabelle raw reali",
@@ -20921,10 +23843,10 @@ File: src\main\java\it\alterlega\recordsnext\SqliteAudit.java
                       AND name LIKE 'raw_%'
                     """
                 );
-    
+
                 System.out.println();
                 System.out.println("=== IMPORTAZIONI ===");
-    
+
                 try (ResultSet result = statement.executeQuery(
                         """
                         SELECT source_type,
@@ -20935,7 +23857,7 @@ File: src\main\java\it\alterlega\recordsnext\SqliteAudit.java
                         FROM rn_import
                         ORDER BY import_id
                         """)) {
-    
+
                     while (result.next()) {
                         System.out.printf(
                             "%s tabelle=%d colonne=%d righe=%d stato=%s%n",
@@ -20947,17 +23869,17 @@ File: src\main\java\it\alterlega\recordsnext\SqliteAudit.java
                         );
                     }
                 }
-    
+
                 System.out.println();
                 System.out.println("Audit SQLite completato.");
             }
         }
-    
+
         private static void printValue(
                 Statement statement,
                 String label,
                 String sql) throws Exception {
-    
+
             try (ResultSet result = statement.executeQuery(sql)) {
                 result.next();
                 System.out.printf("%-24s: %d%n", label, result.getLong(1));
@@ -20970,20 +23892,20 @@ File: src\main\java\it\alterlega\recordsnext\SqliteAudit.java
 File: src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporterTest.java
 
     package it.alterlega.recordsnext.app.classics;
-    
+
     import org.junit.jupiter.api.Test;
     import org.junit.jupiter.api.io.TempDir;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
-    
+
     import static org.junit.jupiter.api.Assertions.assertEquals;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class ClassicsFamilyJsExporterTest {
         @TempDir
         Path temp;
-    
+
         @Test
         void writesNativeFamilyContractFromConsolidatedArchive() throws Exception {
             Path archive = temp.resolve("archive");
@@ -20997,11 +23919,11 @@ File: src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExport
                             + "\"valore\":99.5,"
                             + "\"squadra\":\"Test\"}]}}"
             );
-    
+
             Path output = temp.resolve(ClassicsFamilyJsExporter.FILE_NAME);
             var result = ClassicsFamilyJsExporter.export(archive, output);
             String js = Files.readString(output);
-    
+
             assertEquals(1, result.seasonCount());
             assertEquals(1, result.entryCount());
             assertTrue(js.startsWith("window.fcmRecordsNextClassics = {"));
@@ -21017,20 +23939,20 @@ File: src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExport
 File: src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTest.java
 
     package it.alterlega.recordsnext.app.config;
-    
+
     import it.alterlega.recordsnext.app.model.CoreRecordCatalog;
     import it.alterlega.recordsnext.app.model.RecordFamily;
     import org.junit.jupiter.api.Test;
     import org.junit.jupiter.api.io.TempDir;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
-    
+
     import static org.junit.jupiter.api.Assertions.*;
-    
+
     class ProcessingConfigLoaderTest {
         @TempDir Path temp;
-    
+
         @Test
         void loadsFamiliesAndKeepsCulometroDisabled() throws Exception {
             Path file = temp.resolve("processing.json");
@@ -21052,7 +23974,7 @@ File: src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTe
             assertTrue(options.selection().enabledChildren().contains("modifiers.defence"));
             assertFalse(options.selection().enabledChildren().contains("modifiers.captain"));
         }
-    
+
         @Test
         void enablesCulometroOnlyWhenExplicitlyRequested() throws Exception {
             Path file = temp.resolve("processing.json");
@@ -21066,7 +23988,7 @@ File: src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTe
             assertTrue(options.culometroEnabled());
             assertTrue(options.selection().enabledChildren().contains(CoreRecordCatalog.CULOMETRO_ID));
         }
-    
+
         @Test
         void rejectsUnsupportedSchema() throws Exception {
             Path file = temp.resolve("processing.json");
@@ -21075,15 +23997,231 @@ File: src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTe
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterGranularTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterGranularTest.java
+
+    package it.alterlega.recordsnext.app.config;
+
+    import org.junit.jupiter.api.Test;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.LinkedHashMap;
+    import java.util.Map;
+
+    import static org.junit.jupiter.api.Assertions.*;
+
+    class ProcessingConfigWriterGranularTest {
+
+        @Test
+        void persistsAndReloadsGranularChildSelection() throws Exception {
+            Map<String, Boolean> children = new LinkedHashMap<>();
+            children.put("classics.highest-match-score", true);
+            children.put("classics.lowest-match-score", false);
+            children.put("series.wins", true);
+            children.put("thresholds.surgical-win", true);
+            children.put("luck.balance", false);
+
+            Map<String, String> modifierNames = new LinkedHashMap<>();
+            modifierNames.put("MODM1PERS", "Modificatore Difesa");
+            modifierNames.put("MODM2PERS", "Capitano");
+            modifierNames.put("MODM3PERS", "");
+
+            ProcessingConfigWriter.State state =
+                    new ProcessingConfigWriter.State(
+                            true,
+                            true,
+                            false,
+                            false,
+                            true,
+                            false,
+                            false,
+                            children,
+                            modifierNames
+                    );
+
+            Path file = Files.createTempFile(
+                    "processing-granular-",
+                    ".json"
+            );
+
+            try {
+                ProcessingConfigWriter.save(file, state);
+
+                String json = Files.readString(file);
+
+                assertTrue(
+                        json.contains("\"highest-match-score\": true")
+                );
+                assertTrue(
+                        json.contains("\"lowest-match-score\": false")
+                );
+                assertTrue(
+                        json.contains("\"surgical-win\": true")
+                );
+                assertTrue(
+                        json.contains("\"balance\": false")
+                );
+
+                assertTrue(
+                        json.contains(
+                                "\"MODM1PERS\": \"Modificatore Difesa\""
+                        )
+                );
+                assertTrue(
+                        json.contains(
+                                "\"MODM2PERS\": \"Capitano\""
+                        )
+                );
+                assertTrue(
+                        json.contains(
+                                "\"MODM3PERS\": \"\""
+                        )
+                );
+
+                ProcessingConfigWriter.State loaded =
+                        ProcessingConfigWriter.load(file);
+
+                assertTrue(
+                        loaded.childEnabled(
+                                "classics.highest-match-score"
+                        )
+                );
+                assertFalse(
+                        loaded.childEnabled(
+                                "classics.lowest-match-score"
+                        )
+                );
+                assertTrue(
+                        loaded.childEnabled("series.wins")
+                );
+                assertTrue(
+                        loaded.childEnabled(
+                                "thresholds.surgical-win"
+                        )
+                );
+                assertFalse(
+                        loaded.childEnabled("luck.balance")
+                );
+
+                assertEquals(
+                        "Modificatore Difesa",
+                        loaded.modifierNames().get("MODM1PERS")
+                );
+                assertEquals(
+                        "Capitano",
+                        loaded.modifierNames().get("MODM2PERS")
+                );
+                assertEquals(
+                        "",
+                        loaded.modifierNames().get("MODM3PERS")
+                );
+            } finally {
+                Files.deleteIfExists(file);
+            }
+        }
+    }
+
+## src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterTest.java
+
+    package it.alterlega.recordsnext.app.config;
+
+    import org.junit.jupiter.api.Test;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+
+    import static org.junit.jupiter.api.Assertions.*;
+
+    class ProcessingConfigWriterTest {
+        @Test
+        void roundTripsDashboardSelections() throws Exception {
+            Path file = Files.createTempFile("processing-gui-", ".json");
+
+            try {
+                var requested = new ProcessingConfigWriter.State(
+                        true,
+                        true,
+                        false,
+                        true,
+                        true,
+                        true,
+                        false,
+                        java.util.Map.of(),
+                        java.util.Map.of(
+                                "MODM1PERS", "Difesa personalizzato",
+                                "MODM2PERS", "Capitano",
+                                "MODM3PERS", "Bonus fair play"
+                        )
+                );
+
+                ProcessingConfigWriter.save(file, requested);
+
+                ProcessingConfigWriter.State loaded =
+                        ProcessingConfigWriter.load(file);
+
+                assertTrue(loaded.classics());
+                assertTrue(loaded.series());
+                assertFalse(loaded.ru());
+                assertTrue(loaded.modifiers());
+                assertTrue(loaded.thresholdsLuck());
+                assertTrue(loaded.culometro());
+                assertFalse(loaded.publishToSite());
+                assertEquals("Difesa personalizzato", loaded.modifierName("MODM1PERS"));
+                assertEquals("Capitano", loaded.modifierName("MODM2PERS"));
+                assertEquals("Bonus fair play", loaded.modifierName("MODM3PERS"));
+
+                assertFalse(loaded.children().isEmpty());
+
+                assertEquals(
+                        true,
+                        loaded.children().get("classics.highest-match-score")
+                );
+                assertEquals(
+                        true,
+                        loaded.children().get("series.wins")
+                );
+                assertEquals(
+                        true,
+                        loaded.children().get("modifiers.home-field-deciding")
+                );
+                assertEquals(
+                        true,
+                        loaded.children().get("thresholds.exact-threshold")
+                );
+                assertEquals(
+                        true,
+                        loaded.children().get("luck.balance")
+                );
+
+                String json = Files.readString(file);
+
+                assertTrue(json.contains("\"home-field-deciding\": true"));
+                assertTrue(json.contains("\"children\""));
+                assertTrue(json.contains("\"highest-match-score\": true"));
+                assertTrue(json.contains("\"wins\": true"));
+                assertTrue(json.contains("\"exact-threshold\": true"));
+                assertTrue(json.contains("\"modifierNames\""));
+                assertTrue(json.contains("\"MODM1PERS\": \"Difesa personalizzato\""));
+            } finally {
+                Files.deleteIfExists(file);
+            }
+        }
+    }
+
+
 ## src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
 
     package it.alterlega.recordsnext.app.core;
-    
+
     import static org.junit.jupiter.api.Assertions.assertEquals;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.sql.Connection;
@@ -21091,10 +24229,10 @@ File: src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
     import java.sql.Statement;
     import org.junit.jupiter.api.Test;
     import org.junit.jupiter.api.io.TempDir;
-    
+
     class CoreJsExporterTest {
         @TempDir Path temp;
-    
+
         @Test
         void exportsCanonicalCoreData() throws Exception {
             Path db = temp.resolve("recordsnext.db");
@@ -21114,11 +24252,11 @@ File: src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
                 s.execute("INSERT INTO rn_configured_team VALUES(100,'2025_2026',1,7,'River Pino F.C.','river pino fc',1,7,10,'River Pino','ASSOCIATA','ANCHOR',NULL)");
                 s.execute("INSERT INTO rn_configured_competition VALUES(200,'2025_2026',1,1,'Serie A','serie a',20,'Serie A','ASSOCIATA','ANCHOR',NULL)");
             }
-    
+
             Path out = temp.resolve("fcmRecordsNext_Core.js");
             var result = CoreJsExporter.export(db, out, "alterlega", "AlterLega");
             String js = Files.readString(out);
-    
+
             assertEquals(1, result.seasons());
             assertEquals(1, result.canonicalTeams());
             assertEquals(1, result.seasonTeams());
@@ -21135,20 +24273,20 @@ File: src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
 File: src\test\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoaderTest.java
 
     package it.alterlega.recordsnext.app.core;
-    
+
     import org.junit.jupiter.api.Test;
     import org.junit.jupiter.api.io.TempDir;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
-    
+
     import static org.junit.jupiter.api.Assertions.assertEquals;
     import static org.junit.jupiter.api.Assertions.assertThrows;
-    
+
     class LeagueMetadataLoaderTest {
         @TempDir
         Path temp;
-    
+
         @Test
         void readsLeagueMetadataFromNestedConfiguration() throws Exception {
             Path file = temp.resolve("league.json");
@@ -21162,19 +24300,19 @@ File: src\test\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoaderTest.j
                       }
                     }
                     """);
-    
+
             LeagueMetadata metadata = LeagueMetadataLoader.load(file);
-    
+
             assertEquals("alterlega", metadata.leagueId());
             assertEquals("AlterLega", metadata.leagueName());
             assertEquals("2025_2026", metadata.currentSeasonId());
         }
-    
+
         @Test
         void rejectsMissingRequiredFields() throws Exception {
             Path file = temp.resolve("league.json");
             Files.writeString(file, "{\"leagueId\":\"alterlega\"}");
-    
+
             assertThrows(Exception.class, () -> LeagueMetadataLoader.load(file));
         }
     }
@@ -21184,20 +24322,20 @@ File: src\test\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoaderTest.j
 File: src\test\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoaderTest.java
 
     package it.alterlega.recordsnext.app.culometro;
-    
+
     import org.junit.jupiter.api.Test;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
-    
+
     import static org.junit.jupiter.api.Assertions.*;
-    
+
     class CulometroConfigLoaderTest {
         @Test
         void loadsResettableGoliardicPresetAndRejectsWeightOutsideRange() throws Exception {
             Path ok = Path.of("config/culometro.json");
             CulometroConfig c = CulometroConfigLoader.load(ok);
-    
+
             assertTrue(c.enabled());
             assertEquals(20, c.minimumMatches());
             assertEquals("GOLIARDICO", c.labelConfiguration().preset());
@@ -21206,13 +24344,13 @@ File: src\test\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
             assertEquals("Co' 'sso culo puoi andare a cazzi", c.labels().get(0).label());
             assertEquals(c.labels(), c.labelConfiguration().resetBands());
             assertTrue(c.labelConfiguration().presetDefaults().containsKey("NEUTRAL_DEFAULT"));
-    
+
             String bad = Files.readString(ok)
                     .replace("\"weight\": 1.15", "\"weight\": 9.15");
-    
+
             Path temp = Files.createTempFile("culometro-bad-", ".json");
             Files.writeString(temp, bad);
-    
+
             try {
                 assertThrows(
                         IllegalArgumentException.class,
@@ -21222,36 +24360,36 @@ File: src\test\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
                 Files.deleteIfExists(temp);
             }
         }
-    
+
         @Test
         void requiresCustomizedFlagWhenActiveLabelsDifferFromResetPreset() throws Exception {
             Path ok = Path.of("config/culometro.json");
             String original = Files.readString(ok);
-    
+
             String label = "Co' 'sso culo puoi andare a cazzi";
             int firstOccurrence = original.indexOf(label);
-    
+
             assertTrue(
                     firstOccurrence >= 0,
                     "Etichetta goliardica predefinita non trovata nel file di configurazione"
             );
-    
+
             String changed =
                     original.substring(0, firstOccurrence)
                             + "Etichetta modificata"
                             + original.substring(firstOccurrence + label.length());
-    
+
             changed = changed.replace(
                     "\"customized\": false",
                     "\"customized\": true"
             );
-    
+
             Path temp = Files.createTempFile("culometro-custom-", ".json");
             Files.writeString(temp, changed);
-    
+
             try {
                 CulometroConfig config = CulometroConfigLoader.load(temp);
-    
+
                 assertTrue(config.labelConfiguration().customized());
                 assertEquals("GOLIARDICO", config.labelConfiguration().preset());
                 assertEquals(
@@ -21277,12 +24415,12 @@ File: src\test\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
 File: src\test\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExporterTest.java
 
     package it.alterlega.recordsnext.app.culometro;
-    
+
     import org.junit.jupiter.api.Test;
     import java.nio.file.Files;
     import java.nio.file.Path;
     import static org.junit.jupiter.api.Assertions.*;
-    
+
     class CulometroFamilyJsExporterTest {
         @Test void exportsRankingWithEditableLabels() throws Exception {
             Path dir=Files.createTempDirectory("culometro-test-");
@@ -21303,17 +24441,17 @@ File: src\test\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
 File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriterTest.java
 
     package it.alterlega.recordsnext.app.manifest;
-    
+
     import it.alterlega.recordsnext.app.PipelinePreflight;
     import it.alterlega.recordsnext.app.ProcessingOptions;
     import org.junit.jupiter.api.Test;
-    
+
     import java.time.OffsetDateTime;
     import java.util.List;
-    
+
     import static org.junit.jupiter.api.Assertions.assertFalse;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class ManifestJsWriterTest {
         @Test
         void legacyClassicsAndRuProduceManifestWithoutCulometro() {
@@ -21329,9 +24467,9 @@ File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriterTest.j
                     List.of("2025_2026"),
                     List.of("fcmRecordsNext_Classics.js", "fcmRecordsNext_RU.js")
             );
-    
+
             String js = ManifestJsWriter.render(options, preflight, metadata);
-    
+
             assertTrue(js.startsWith("window.fcmRecordsNextManifest = {"));
             assertTrue(js.contains("requestedFamilies: [\"classics\", \"ru\"]"));
             assertTrue(js.contains("culometroGenerated: false"));
@@ -21345,27 +24483,27 @@ File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriterTest.j
 File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupportTest.java
 
     package it.alterlega.recordsnext.app.manifest;
-    
+
     import it.alterlega.recordsnext.app.PipelinePreflight;
     import it.alterlega.recordsnext.app.ProcessingOptions;
     import org.junit.jupiter.api.Test;
     import org.junit.jupiter.api.io.TempDir;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.time.OffsetDateTime;
     import java.util.List;
-    
+
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class ManifestPublishingSupportTest {
         @TempDir
         Path tempDir;
-    
+
         @Test
         void manifestIncludesAlreadyGeneratedFilesAndItself() throws Exception {
             Files.writeString(tempDir.resolve("records2026.recordstagionali.classic.js"), "window.TEST = {};\n");
-    
+
             ProcessingOptions options = new ProcessingOptions(true, false, true, false);
             PipelinePreflight.Result preflight = PipelinePreflight.evaluate(options);
             ManifestMetadata metadata = new ManifestMetadata(
@@ -21378,10 +24516,10 @@ File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
                     List.of("2025_2026"),
                     List.of()
             );
-    
+
             Path manifest = ManifestPublishingSupport.write(tempDir, options, preflight, metadata);
             String js = Files.readString(manifest);
-    
+
             assertTrue(js.contains("records2026.recordstagionali.classic.js"));
             assertTrue(js.contains("fcmRecordsNext_Manifest.js"));
             assertTrue(js.contains("window.fcmRecordsNextManifest"));
@@ -21393,16 +24531,16 @@ File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
 File: src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import org.junit.jupiter.api.Test;
-    
+
     import java.util.EnumSet;
     import java.util.Set;
-    
+
     import static org.junit.jupiter.api.Assertions.assertEquals;
     import static org.junit.jupiter.api.Assertions.assertFalse;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class ExecutionPlannerTest {
         @Test
         void missingCaptainSkipsOnlyCaptainSeries() {
@@ -21413,26 +24551,26 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
                     true,
                     false
             );
-    
+
             ExecutionPlan plan = ExecutionPlanner.plan(
                     selection,
                     DependencyInventory.legacyCapabilities(false, true, true, false)
             );
-    
+
             ExecutionPlanItem captain = plan.items().stream()
                     .filter(item -> item.child().id().equals("series.captain-bonus"))
                     .findFirst()
                     .orElseThrow();
-    
+
             ExecutionPlanItem classic = plan.items().stream()
                     .filter(item -> item.child().id().equals("classics.highest-match-score"))
                     .findFirst()
                     .orElseThrow();
-    
+
             assertEquals(OutputStatus.SKIPPED_REQUIRED_DEPENDENCY, captain.status());
             assertEquals(OutputStatus.GENERATED_COMPLETE, classic.status());
         }
-    
+
         @Test
         void culometroRemainsNotSelectedByDefault() {
             ProcessingSelection selection = new ProcessingSelection(
@@ -21442,20 +24580,20 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
                     true,
                     false
             );
-    
+
             ExecutionPlan plan = ExecutionPlanner.plan(
                     selection,
                     DependencyInventory.legacyCapabilities(false, true, true, true)
             );
-    
+
             ExecutionPlanItem culometro = plan.items().stream()
                     .filter(item -> item.child().id().equals(CoreRecordCatalog.CULOMETRO_ID))
                     .findFirst()
                     .orElseThrow();
-    
+
             assertEquals(OutputStatus.SKIPPED_NOT_SELECTED, culometro.status());
         }
-    
+
         @Test
         void explicitCulometroCanBePlanned() {
             ProcessingSelection selection = new ProcessingSelection(
@@ -21465,17 +24603,17 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
                     true,
                     false
             );
-    
+
             ExecutionPlan plan = ExecutionPlanner.plan(
                     selection,
                     DependencyInventory.legacyCapabilities(false, true, true, true)
             );
-    
+
             assertTrue(plan.executableItems().stream()
                     .anyMatch(item -> item.child().id().equals(CoreRecordCatalog.CULOMETRO_ID)));
             assertFalse(plan.hasFailures());
         }
-    
+
         @Test
         void planGroupsItemsByFamily() {
             ProcessingSelection selection = new ProcessingSelection(
@@ -21485,12 +24623,12 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
                     true,
                     false
             );
-    
+
             ExecutionPlan plan = ExecutionPlanner.plan(
                     selection,
                     DependencyInventory.legacyCapabilities(false, true, false, false)
             );
-    
+
             assertEquals(RecordFamily.values().length, plan.byFamily().size());
         }
     }
@@ -21500,16 +24638,16 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
 File: src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTest.java
 
     package it.alterlega.recordsnext.app.model;
-    
+
     import static org.junit.jupiter.api.Assertions.assertEquals;
     import static org.junit.jupiter.api.Assertions.assertFalse;
     import static org.junit.jupiter.api.Assertions.assertThrows;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     import java.util.EnumSet;
     import java.util.Set;
     import org.junit.jupiter.api.Test;
-    
+
     class ModularProcessingModelTest {
         @Test
         void missingCaptainSkipsOnlyCaptainSeries() {
@@ -21517,7 +24655,7 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTes
                     .filter(item -> item.id().equals("series.captain-bonus"))
                     .findFirst()
                     .orElseThrow();
-    
+
             ProcessingSelection selection = new ProcessingSelection(
                     EnumSet.of(RecordFamily.SERIES),
                     Set.of(),
@@ -21525,25 +24663,25 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTes
                     true,
                     false
             );
-    
+
             DependencyEvaluation result = DependencyEvaluator.evaluate(
                     child,
                     selection,
                     Set.of("data.ordered-matches")
             );
-    
+
             assertEquals(OutputStatus.SKIPPED_REQUIRED_DEPENDENCY, result.status());
             assertEquals(Set.of("modifier.captain"), result.missingRequired());
             assertFalse(result.canGenerate());
         }
-    
+
         @Test
         void culometroIsNotSelectedAutomatically() {
             RecordChild child = CoreRecordCatalog.children().stream()
                     .filter(item -> item.id().equals(CoreRecordCatalog.CULOMETRO_ID))
                     .findFirst()
                     .orElseThrow();
-    
+
             ProcessingSelection selection = new ProcessingSelection(
                     EnumSet.of(RecordFamily.THRESHOLDS_LUCK),
                     Set.of(),
@@ -21551,18 +24689,18 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTes
                     true,
                     false
             );
-    
+
             assertFalse(selection.isChildSelected(child));
             assertEquals(OutputStatus.SKIPPED_NOT_SELECTED, selection.selectionStatus(child));
         }
-    
+
         @Test
         void culometroCanBeExplicitlySelected() {
             RecordChild child = CoreRecordCatalog.children().stream()
                     .filter(item -> item.id().equals(CoreRecordCatalog.CULOMETRO_ID))
                     .findFirst()
                     .orElseThrow();
-    
+
             ProcessingSelection selection = new ProcessingSelection(
                     EnumSet.of(RecordFamily.THRESHOLDS_LUCK),
                     Set.of(CoreRecordCatalog.CULOMETRO_ID),
@@ -21570,18 +24708,18 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTes
                     true,
                     false
             );
-    
+
             DependencyEvaluation result = DependencyEvaluator.evaluate(
                     child,
                     selection,
                     Set.of("configuration.culometro")
             );
-    
+
             assertTrue(selection.isChildSelected(child));
             assertEquals(OutputStatus.GENERATED_PARTIAL, result.status());
             assertEquals(Set.of("modifier.home-field"), result.missingOptional());
         }
-    
+
         @Test
         void publishingRequiresJavascriptGeneration() {
             assertThrows(
@@ -21602,50 +24740,121 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTes
 File: src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExporterTest.java
 
     package it.alterlega.recordsnext.app.modifiers;
-    
+
     import org.junit.jupiter.api.Test;
     import org.junit.jupiter.api.io.TempDir;
-    
+
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
     import java.nio.file.Path;
-    
+    import java.util.Map;
+
+    import static org.junit.jupiter.api.Assertions.assertEquals;
     import static org.junit.jupiter.api.Assertions.assertFalse;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class ModifiersFamilyJsExporterTest {
-        @TempDir Path temp;
-    
+        @TempDir
+        Path temp;
+
         @Test
-        void exportsCompleteModifierFamilyIncludingHomeField() throws Exception {
+        void exportsDirectlyFromRecordsArchiveIncludingFcmAndCustomModifiers() throws Exception {
+            Path season2006 = temp.resolve("archive/2006_2007");
+            Path season2025 = temp.resolve("archive/2025_2026");
+            Files.createDirectories(season2006);
+            Files.createDirectories(season2025);
+
+            Files.writeString(season2006.resolve("season_records_serie_a.json"), """
+                {"records":{
+                  "modDifesaFcmMax":[{"recordId":"fcm-max","valore":4,"squadra":"A"}],
+                  "modDifesaFcmTotaleSquadre":[{"recordId":"fcm-total","valore":18,"squadra":"A"}],
+                  "modDifesaFcmMediaSquadre":[{"recordId":"fcm-average","valore":1.5,"squadra":"A"}],
+                  "modDifesaFcmUtilizziSquadre":[{"recordId":"fcm-uses","valore":12,"squadra":"A"}],
+                  "puntiSquadraMax":[{"recordId":"x","valore":99}]
+                }}
+                """, StandardCharsets.UTF_8);
+
+            Files.writeString(season2025.resolve("season_records_serie_a.json"), """
+                {"records":{
+                  "modDifesaMax":[{"recordId":"custom-max","valore":6,"squadra":"B"}],
+                  "modDifesaTotaleSquadre":[{"recordId":"custom-total","valore":22,"squadra":"B"}],
+                  "modDifesaMediaSquadre":[{"recordId":"custom-average","valore":1.1,"squadra":"B"}],
+                  "modDifesaUtilizziSquadre":[{"recordId":"custom-uses","valore":20,"squadra":"B"}],
+                  "capitanoMax":[{"recordId":"captain-max","valore":3,"squadra":"B"}],
+                  "capitanoTotaleSquadre":[{"recordId":"captain-total","valore":15,"squadra":"B"}],
+                  "capitanoMediaSquadre":[{"recordId":"captain-average","valore":0.75,"squadra":"B"}],
+                  "capitanoUtilizziSquadre":[{"recordId":"captain-uses","valore":20,"squadra":"B"}]
+                }}
+                """, StandardCharsets.UTF_8);
+
+            Path output = temp.resolve("fcmRecordsNext_Modifiers.js");
+            ModifiersFamilyJsExporter.ExportResult result = ModifiersFamilyJsExporter.export(
+                    temp.resolve("archive"),
+                    output,
+                    Map.of(
+                            "MODM1PERS", "Difesa configurato",
+                            "MODM2PERS", "Capitano configurato",
+                            "MODM3PERS", "Terzo bonus"
+                    )
+            );
+
+            String js = Files.readString(output, StandardCharsets.UTF_8);
+
+            assertEquals(2, result.seasonCount());
+            assertEquals(2, result.entryCount());
+            assertTrue(js.startsWith("window.fcmRecordsNextModifiers = "));
+            assertTrue(js.contains("2006_2007"));
+            assertTrue(js.contains("2025_2026"));
+            assertTrue(js.contains("modDifesaFcmMax"));
+            assertTrue(js.contains("modDifesaFcmTotaleSquadre"));
+            assertTrue(js.contains("modDifesaFcmMediaSquadre"));
+            assertTrue(js.contains("modDifesaFcmUtilizziSquadre"));
+            assertTrue(js.contains("modDifesaMax"));
+            assertTrue(js.contains("modDifesaTotaleSquadre"));
+            assertTrue(js.contains("modDifesaMediaSquadre"));
+            assertTrue(js.contains("modDifesaUtilizziSquadre"));
+            assertTrue(js.contains("capitanoMax"));
+            assertTrue(js.contains("capitanoTotaleSquadre"));
+            assertTrue(js.contains("capitanoMediaSquadre"));
+            assertTrue(js.contains("capitanoUtilizziSquadre"));
+            assertFalse(js.contains("puntiSquadraMax"));
+            assertTrue(js.contains("generatedSections"));
+            assertTrue(js.contains("Difesa configurato"));
+            assertTrue(js.contains("Capitano configurato"));
+            assertTrue(js.contains("Modificatore Difesa FCM"));
+            assertTrue(js.contains("GENERATED_COMPLETE"));
+        }
+
+        @Test
+        void excludesDisabledModifierOutputs() throws Exception {
             Path season = temp.resolve("archive/2025_2026");
             Files.createDirectories(season);
             Files.writeString(season.resolve("season_records_serie_a.json"), """
                 {"records":{
-                  "puntiSquadraMax":[{"recordId":"x","valore":99}],
-                  "modDifesaMax":[{"recordId":"d","valore":6,"squadra":"A"}],
-                  "capitanoTotaleSquadre":[{"recordId":"c","valore":3,"squadra":"A"}],
-                  "fattoreCampoDecisivo":[{"recordId":"fc","valore":1,"squadra":"A"}],
-                  "fattoreCampoTotaleSquadre":[{"recordId":"fct","valore":18,"squadra":"A"}],
-                  "fattoreCampoPuntiGuadagnatiSquadre":[{"recordId":"fcg","valore":3,"squadra":"A"}],
-                  "fattoreCampoPuntiPersiSquadre":[{"recordId":"fcp","valore":3,"squadra":"B"}]
+                  "modDifesaMax":[{"recordId":"custom-max","valore":6}],
+                  "capitanoMax":[{"recordId":"captain-max","valore":3}],
+                  "modDifesaFcmMax":[{"recordId":"fcm-max","valore":4}]
                 }}
                 """, StandardCharsets.UTF_8);
-    
-            Path output = temp.resolve("fcmRecordsNext_Modifiers.js");
-            ModifiersFamilyJsExporter.export(temp.resolve("archive"), output);
+
+            Path output = temp.resolve("filtered.js");
+            ModifiersFamilyJsExporter.export(
+                    temp.resolve("archive"),
+                    output,
+                    Map.of(),
+                    Map.of(
+                            "modifiers.modm1pers.max", true,
+                            "modifiers.modm2pers.max", false,
+                            "modifiers.moddifesa.max", true
+                    )
+            );
+
             String js = Files.readString(output, StandardCharsets.UTF_8);
-    
-            assertTrue(js.startsWith("window.fcmRecordsNextModifiers = "));
             assertTrue(js.contains("modDifesaMax"));
-            assertTrue(js.contains("capitanoTotaleSquadre"));
-            assertTrue(js.contains("fattoreCampoDecisivo"));
-            assertTrue(js.contains("fattoreCampoTotaleSquadre"));
-            assertTrue(js.contains("fattoreCampoPuntiGuadagnatiSquadre"));
-            assertTrue(js.contains("fattoreCampoPuntiPersiSquadre"));
-            assertFalse(js.contains("puntiSquadraMax"));
-            assertTrue(js.contains("GENERATED_COMPLETE"));
-            assertFalse(js.contains("GENERATED_PARTIAL"));
+            assertTrue(js.contains("modDifesaFcmMax"));
+            assertFalse(js.contains("\"capitanoMax\":["));
+		assertTrue(js.contains("\"availableSections\""));
+    assertTrue(js.contains("\"generatedSections\""));
         }
     }
 
@@ -21654,21 +24863,21 @@ File: src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
 File: src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
 
     package it.alterlega.recordsnext.app;
-    
+
     import org.junit.jupiter.api.Test;
-    
+
     import java.nio.file.Path;
-    
+
     import static org.junit.jupiter.api.Assertions.assertEquals;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class PipelineConfigDefaultsTest {
         @Test
         void usesDocumentedDefaultDirectoriesWithoutPropertiesFile() {
             Path root = Path.of("D:/DEV_APPS/RecordsNext2.0").toAbsolutePath().normalize();
-    
+
             PipelineConfig config = PipelineConfig.defaults(root);
-    
+
             assertEquals(root.resolve("data/reports"), config.reports());
             assertEquals(
                 root.resolve("data/records-archive/stagioni"),
@@ -21691,32 +24900,32 @@ File: src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
 File: src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 
     package it.alterlega.recordsnext.app;
-    
+
     import it.alterlega.recordsnext.app.model.CoreRecordCatalog;
     import it.alterlega.recordsnext.app.model.OutputStatus;
     import it.alterlega.recordsnext.app.model.ProcessingSelection;
     import it.alterlega.recordsnext.app.model.RecordFamily;
     import org.junit.jupiter.api.Test;
-    
+
     import java.util.Set;
-    
+
     import static org.junit.jupiter.api.Assertions.assertEquals;
     import static org.junit.jupiter.api.Assertions.assertFalse;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class PipelinePreflightTest {
         @Test
         void legacyClassicsAndRuAreExecutable() {
             var result = PipelinePreflight.evaluate(
                     new ProcessingOptions(true, true, true, false)
             );
-    
+
             assertEquals(2, result.selectedCount());
             assertEquals(2, result.executableCount());
             assertEquals(2, result.completeCount());
             assertEquals(0, result.skippedDependencyCount());
         }
-    
+
         @Test
         void captainSeriesIsSkippedWithoutCaptainDependency() {
             var selection = new ProcessingSelection(
@@ -21726,11 +24935,11 @@ File: src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
                     true,
                     false
             );
-    
+
             var result = PipelinePreflight.evaluate(
                     ProcessingOptions.modular(selection)
             );
-    
+
             assertEquals(1, result.selectedCount());
             assertEquals(0, result.executableCount());
             assertEquals(OutputStatus.SKIPPED_REQUIRED_DEPENDENCY,
@@ -21738,7 +24947,7 @@ File: src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
             assertTrue(result.relevantItems().getFirst()
                     .missingRequired().contains("modifier.captain"));
         }
-    
+
         @Test
         void culometroRemainsOptIn() {
             var ordinary = new ProcessingSelection(
@@ -21751,10 +24960,10 @@ File: src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
             var ordinaryResult = PipelinePreflight.evaluate(
                     ProcessingOptions.modular(ordinary)
             );
-    
+
             assertFalse(ordinaryResult.relevantItems().stream()
                     .anyMatch(item -> item.child().id().equals(CoreRecordCatalog.CULOMETRO_ID)));
-    
+
             var easterEgg = new ProcessingSelection(
                     Set.of(RecordFamily.THRESHOLDS_LUCK),
                     Set.of(CoreRecordCatalog.CULOMETRO_ID),
@@ -21765,7 +24974,7 @@ File: src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
             var easterEggResult = PipelinePreflight.evaluate(
                     ProcessingOptions.modular(easterEgg)
             );
-    
+
             assertTrue(easterEggResult.relevantItems().stream()
                     .anyMatch(item -> item.child().id().equals(CoreRecordCatalog.CULOMETRO_ID)));
         }
@@ -21776,16 +24985,16 @@ File: src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 File: src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTest.java
 
     package it.alterlega.recordsnext.app;
-    
+
     import it.alterlega.recordsnext.app.model.ProcessingSelection;
     import it.alterlega.recordsnext.app.model.RecordFamily;
     import org.junit.jupiter.api.Test;
-    
+
     import java.util.Set;
-    
+
     import static org.junit.jupiter.api.Assertions.assertFalse;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class ProcessingOptionsIntegrationTest {
         @Test void legacyConstructorBuildsEquivalentModularSelection(){ProcessingOptions o=new ProcessingOptions(true,false,true,false);assertTrue(o.classic());assertFalse(o.ru());assertTrue(o.familyEnabled(RecordFamily.CLASSICS));assertFalse(o.culometroEnabled());}
         @Test void modularFactoryPreservesAllSelectedFamilies(){ProcessingOptions o=ProcessingOptions.modular(new ProcessingSelection(Set.of(RecordFamily.CLASSICS,RecordFamily.THRESHOLDS_LUCK),Set.of(),false,true,false));assertTrue(o.familyEnabled(RecordFamily.THRESHOLDS_LUCK));}
@@ -21799,16 +25008,16 @@ File: src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTes
 File: src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
 
     package it.alterlega.recordsnext.app.ru;
-    
+
     import org.junit.jupiter.api.Test;
-    
+
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
     import java.nio.file.Path;
-    
+
     import static org.junit.jupiter.api.Assertions.assertEquals;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class RuFamilyJsExporterTest {
         @Test
         void writesNativeRuFamilyOutput() throws Exception {
@@ -21823,10 +25032,10 @@ File: src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
                             + "\"dettaglio\":{\"ruDettaglio\":[]},\"curiosita\":[]}",
                     StandardCharsets.UTF_8
             );
-    
+
             Path output = root.resolve(RuFamilyJsExporter.FILE_NAME);
             RuFamilyJsExporter.ExportResult result = RuFamilyJsExporter.export(archive, output);
-    
+
             String js = Files.readString(output, StandardCharsets.UTF_8);
             assertEquals(1, result.seasonCount());
             assertEquals(1, result.annualFileCount());
@@ -21842,36 +25051,36 @@ File: src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
 File: src\test\java\it\alterlega\recordsnext\app\series\SeriesCompleteIntegrationTest.java
 
     package it.alterlega.recordsnext.app.series;
-    
+
     import it.alterlega.recordsnext.SeasonRecordsArchiveBuilder;
     import org.junit.jupiter.api.Test;
     import org.junit.jupiter.api.io.TempDir;
-    
+
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.util.List;
-    
+
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class SeriesCompleteIntegrationTest {
         @TempDir
         Path temp;
-    
+
         @Test
         void exportsAllResultSeries() throws Exception {
             Path reports = temp.resolve("reports");
             Path season = reports.resolve("2025_2026");
             Files.createDirectories(season);
             Files.writeString(season.resolve("season_normalized_serie_a.json"), normalized(), StandardCharsets.UTF_8);
-    
+
             Path archive = temp.resolve("archive");
             SeasonRecordsArchiveBuilder.build(reports, archive, List.of("2025_2026"));
-    
+
             Path output = temp.resolve(SeriesFamilyJsExporter.FILE_NAME);
             SeriesFamilyJsExporter.export(archive, output);
             String js = Files.readString(output, StandardCharsets.UTF_8);
-    
+
             assertTrue(js.startsWith(SeriesFamilyJsExporter.GLOBAL_NAME));
             assertTrue(js.contains("serieVittorie"));
             assertTrue(js.contains("seriePareggi"));
@@ -21879,7 +25088,7 @@ File: src\test\java\it\alterlega\recordsnext\app\series\SeriesCompleteIntegratio
             assertTrue(js.contains("serieSenzaVittorie"));
             assertTrue(js.contains("GENERATED_COMPLETE"));
         }
-    
+
         private static String normalized() {
             return """
                 {
@@ -21908,20 +25117,20 @@ File: src\test\java\it\alterlega\recordsnext\app\series\SeriesCompleteIntegratio
 File: src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
 
     package it.alterlega.recordsnext.app.series;
-    
+
     import org.junit.jupiter.api.Test;
     import org.junit.jupiter.api.io.TempDir;
-    
+
     import java.nio.charset.StandardCharsets;
     import java.nio.file.Files;
     import java.nio.file.Path;
-    
+
     import static org.junit.jupiter.api.Assertions.assertFalse;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class SeriesFamilyJsExporterTest {
         @TempDir Path temp;
-    
+
         @Test
         void exportsAvailableSeriesSectionsAsCompleteFamily() throws Exception {
             Path season = temp.resolve("archive/2025_2026");
@@ -21938,11 +25147,11 @@ File: src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTe
                   "cleanSheetPortiereSerieSquadre":[{"recordId":"g","valore":4,"squadra":"A"}]
                 }}
                 """, StandardCharsets.UTF_8);
-    
+
             Path output = temp.resolve("fcmRecordsNext_Series.js");
             SeriesFamilyJsExporter.export(temp.resolve("archive"), output);
             String js = Files.readString(output, StandardCharsets.UTF_8);
-    
+
             assertTrue(js.startsWith("window.fcmRecordsNextSeries = "));
             assertTrue(js.contains("serieVittorie"));
             assertTrue(js.contains("seriePareggi"));
@@ -21962,19 +25171,19 @@ File: src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTe
 File: src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporterTest.java
 
     package it.alterlega.recordsnext.app.thresholds;
-    
+
     import org.junit.jupiter.api.Test;
     import org.junit.jupiter.api.io.TempDir;
-    
+
     import java.nio.file.Files;
     import java.nio.file.Path;
-    
+
     import static org.junit.jupiter.api.Assertions.assertFalse;
     import static org.junit.jupiter.api.Assertions.assertTrue;
-    
+
     class ThresholdsLuckFamilyJsExporterTest {
         @TempDir Path temp;
-    
+
         @Test
         void exportsCompleteObjectiveThresholdAndLuckEventsWithoutCulometro() throws Exception {
             Path reports = temp.resolve("reports/2025_2026");
@@ -22018,18 +25227,832 @@ File: src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\Diagnose_Modifiers_2006_v1.java
+
+File: src\test\java\it\alterlega\recordsnext\Diagnose_Modifiers_2006_v1.java
+
+    package it.alterlega.recordsnext;
+
+    import java.sql.Connection;
+    import java.sql.DatabaseMetaData;
+    import java.sql.DriverManager;
+    import java.sql.ResultSet;
+    import java.sql.ResultSetMetaData;
+    import java.sql.Statement;
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Locale;
+
+    public final class Diagnose_Modifiers_2006_v1 {
+
+        private Diagnose_Modifiers_2006_v1() {
+        }
+
+        public static void main(String[] args) throws Exception {
+            if (args.length != 1) {
+                System.err.println(
+                    "Uso: Diagnose_Modifiers_2006_v1 <recordsnext.db>"
+                );
+                System.exit(1);
+            }
+
+            String database = args[0];
+            String url = "jdbc:sqlite:" + database;
+
+            try (Connection connection = DriverManager.getConnection(url)) {
+                diagnose(connection);
+            }
+        }
+
+        private static void diagnose(Connection connection) throws Exception {
+            Long importId = findImportId(connection);
+
+            if (importId == null) {
+                throw new IllegalStateException(
+                    "Import FCM 2006_2007 non trovato"
+                );
+            }
+
+            System.out.println("Import ID FCM 2006_2007: " + importId);
+
+            String tableName = findTabellinoTable(
+                connection,
+                importId
+            );
+
+            if (tableName == null) {
+                throw new IllegalStateException(
+                    "Tabella TABELLINO raw non trovata per import " + importId
+                );
+            }
+
+            System.out.println("Tabella TABELLINO: " + tableName);
+            System.out.println();
+
+            List<String> modifierColumns = findModifierColumns(
+                connection,
+                tableName
+            );
+
+            System.out.println("=== COLONNE MODIFICATORI ===");
+
+            for (String column : modifierColumns) {
+                System.out.println(column);
+            }
+
+            System.out.println();
+            System.out.println("=== CONTEGGI NON NULL / NON ZERO ===");
+
+            try (Statement statement = connection.createStatement()) {
+                for (String column : modifierColumns) {
+                    String quotedTable = quote(tableName);
+                    String quotedColumn = quote(column);
+
+                    String sql =
+                        "SELECT " +
+                        "COUNT(*) AS righe_totali, " +
+                        "SUM(CASE WHEN " + quotedColumn +
+                        " IS NOT NULL THEN 1 ELSE 0 END) AS non_null, " +
+                        "SUM(CASE WHEN CAST(" + quotedColumn +
+                        " AS DOUBLE) <> 0 THEN 1 ELSE 0 END) AS non_zero " +
+                        "FROM " + quotedTable;
+
+                    try (ResultSet result = statement.executeQuery(sql)) {
+                        if (result.next()) {
+                            System.out.printf(
+                                Locale.ROOT,
+                                "%-35s totali=%d nonNull=%d nonZero=%d%n",
+                                column,
+                                result.getLong("righe_totali"),
+                                result.getLong("non_null"),
+                                result.getLong("non_zero")
+                            );
+                        }
+                    } catch (Exception ex) {
+                        System.out.printf(
+                            "%-35s ERRORE LETTURA: %s%n",
+                            column,
+                            ex.getMessage()
+                        );
+                    }
+                }
+            }
+
+            System.out.println();
+            System.out.println("=== PRIME RIGHE CON VALORI MODIFICATORE ===");
+
+            String where = buildWhere(modifierColumns);
+
+            if (where.isBlank()) {
+                System.out.println(
+                    "Nessuna colonna modificatore individuata."
+                );
+                return;
+            }
+
+            StringBuilder select = new StringBuilder();
+
+            appendColumnIfPresent(
+                modifierColumns,
+                select,
+                "IDINCONTRO"
+            );
+
+            appendColumnIfPresent(
+                modifierColumns,
+                select,
+                "IDSQUADRA"
+            );
+
+            for (String column : modifierColumns) {
+                if (select.length() > 0) {
+                    select.append(", ");
+                }
+
+                select.append(quote(column));
+            }
+
+            String sql =
+                "SELECT TOP 100 " + select +
+                " FROM " + quote(tableName) +
+                " WHERE " + where;
+
+            try (Statement statement = connection.createStatement();
+                 ResultSet result = statement.executeQuery(sql)) {
+
+                printResultSet(result);
+            }
+        }
+
+        private static Long findImportId(
+                Connection connection
+        ) throws Exception {
+
+            String sql =
+                "SELECT id " +
+                "FROM rn_import " +
+                "WHERE season_id = '2006_2007' " +
+                "AND source_type = 'FCM' " +
+                "ORDER BY id DESC";
+
+            try (Statement statement = connection.createStatement();
+                 ResultSet result = statement.executeQuery(sql)) {
+
+                if (result.next()) {
+                    return result.getLong("id");
+                }
+            }
+
+            return null;
+        }
+
+        private static String findTabellinoTable(
+                Connection connection,
+                long importId
+        ) throws Exception {
+
+            DatabaseMetaData metadata = connection.getMetaData();
+
+            String prefix = "raw_" + importId + "_";
+
+            try (ResultSet tables = metadata.getTables(
+                    null,
+                    null,
+                    "%",
+                    new String[] { "TABLE" }
+            )) {
+                while (tables.next()) {
+                    String tableName = tables.getString("TABLE_NAME");
+
+                    if (tableName == null) {
+                        continue;
+                    }
+
+                    String upper = tableName.toUpperCase(Locale.ROOT);
+
+                    if (upper.startsWith(prefix.toUpperCase(Locale.ROOT))
+                            && upper.endsWith("_TABELLINO")) {
+                        return tableName;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static List<String> findModifierColumns(
+                Connection connection,
+                String tableName
+        ) throws Exception {
+
+            List<String> columns = new ArrayList<>();
+
+            DatabaseMetaData metadata = connection.getMetaData();
+
+            try (ResultSet result = metadata.getColumns(
+                    null,
+                    null,
+                    tableName,
+                    "%"
+            )) {
+                while (result.next()) {
+                    String column = result.getString("COLUMN_NAME");
+
+                    if (column == null) {
+                        continue;
+                    }
+
+                    String normalized = column
+                        .replace("_", "")
+                        .toUpperCase(Locale.ROOT);
+
+                    if (normalized.contains("MOD")
+                            || normalized.contains("DIF")
+                            || normalized.contains("PERS")
+                            || normalized.contains("CAPIT")) {
+                        columns.add(column);
+                    }
+                }
+            }
+
+            return columns;
+        }
+
+        private static String buildWhere(
+                List<String> columns
+        ) {
+            StringBuilder where = new StringBuilder();
+
+            for (String column : columns) {
+                if (column.equalsIgnoreCase("IDINCONTRO")
+                        || column.equalsIgnoreCase("IDSQUADRA")) {
+                    continue;
+                }
+
+                if (where.length() > 0) {
+                    where.append(" OR ");
+                }
+
+                String quoted = quote(column);
+
+                where.append("(")
+                    .append(quoted)
+                    .append(" IS NOT NULL AND CAST(")
+                    .append(quoted)
+                    .append(" AS DOUBLE) <> 0)");
+            }
+
+            return where.toString();
+        }
+
+        private static void appendColumnIfPresent(
+                List<String> columns,
+                StringBuilder select,
+                String wanted
+        ) {
+            for (String column : columns) {
+                if (column.equalsIgnoreCase(wanted)) {
+                    if (select.length() > 0) {
+                        select.append(", ");
+                    }
+
+                    select.append(quote(column));
+                    return;
+                }
+            }
+        }
+
+        private static void printResultSet(
+                ResultSet result
+        ) throws Exception {
+
+            ResultSetMetaData metadata = result.getMetaData();
+            int count = metadata.getColumnCount();
+
+            while (result.next()) {
+                for (int index = 1; index <= count; index++) {
+                    if (index > 1) {
+                        System.out.print(" | ");
+                    }
+
+                    System.out.print(
+                        metadata.getColumnLabel(index)
+                            + "="
+                            + result.getObject(index)
+                    );
+                }
+
+                System.out.println();
+            }
+        }
+
+        private static String quote(String identifier) {
+            return "\"" + identifier.replace("\"", "\"\"") + "\"";
+        }
+    }
+
+## src\test\java\it\alterlega\recordsnext\Diagnose_Modifiers_2006_v2.java
+
+File: src\test\java\it\alterlega\recordsnext\Diagnose_Modifiers_2006_v2.java
+
+    package it.alterlega.recordsnext;
+
+    import java.sql.Connection;
+    import java.sql.DriverManager;
+    import java.sql.PreparedStatement;
+    import java.sql.ResultSet;
+    import java.sql.ResultSetMetaData;
+    import java.sql.Statement;
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Locale;
+
+    public final class Diagnose_Modifiers_2006_v2 {
+
+        private Diagnose_Modifiers_2006_v2() {
+        }
+
+        public static void main(String[] args) throws Exception {
+            if (args.length != 1) {
+                System.err.println(
+                    "Uso: Diagnose_Modifiers_2006_v2 <recordsnext.db>"
+                );
+                System.exit(1);
+            }
+
+            String databasePath = args[0];
+
+            try (Connection connection =
+                     DriverManager.getConnection("jdbc:sqlite:" + databasePath)) {
+
+                runDiagnosis(connection);
+            }
+        }
+
+        private static void runDiagnosis(Connection connection) throws Exception {
+            System.out.println("=== SCHEMA rn_import ===");
+
+            List<ColumnInfo> importColumns =
+                readTableColumns(connection, "rn_import");
+
+            if (importColumns.isEmpty()) {
+                throw new IllegalStateException(
+                    "Tabella rn_import non trovata oppure priva di colonne."
+                );
+            }
+
+            for (ColumnInfo column : importColumns) {
+                System.out.printf(
+                    Locale.ROOT,
+                    "%-35s tipo=%-15s pk=%d%n",
+                    column.name,
+                    column.type,
+                    column.primaryKey
+                );
+            }
+
+            String primaryKeyColumn = findPrimaryKeyColumn(importColumns);
+
+            System.out.println();
+            System.out.println(
+                "Colonna identificativa scelta: " + primaryKeyColumn
+            );
+
+            ImportRow importRow = findImport2006(
+                connection,
+                importColumns,
+                primaryKeyColumn
+            );
+
+            if (importRow == null) {
+                System.out.println();
+                System.out.println(
+                    "Nessuna riga rn_import contenente 2006_2007 trovata."
+                );
+
+                printImportRows(connection);
+                return;
+            }
+
+            System.out.println();
+            System.out.println("=== IMPORT 2006_2007 TROVATO ===");
+            System.out.println("Chiave import: " + importRow.importKey);
+            System.out.println("Riga completa:");
+            System.out.println(importRow.description);
+
+            List<String> rawTables = findRawTabellinoTables(connection);
+
+            System.out.println();
+            System.out.println("=== TABELLE RAW TABELLINO DISPONIBILI ===");
+
+            for (String table : rawTables) {
+                System.out.println(table);
+            }
+
+            List<String> matchingTables = matchImportTables(
+                rawTables,
+                importRow.importKey
+            );
+
+            if (matchingTables.isEmpty()) {
+                System.out.println();
+                System.out.println(
+                    "Nessuna tabella raw associata automaticamente alla chiave "
+                        + importRow.importKey
+                );
+                return;
+            }
+
+            for (String table : matchingTables) {
+                inspectTabellino(connection, table);
+            }
+        }
+
+        private static ImportRow findImport2006(
+                Connection connection,
+                List<ColumnInfo> columns,
+                String primaryKeyColumn
+        ) throws Exception {
+
+            String sql = "SELECT * FROM rn_import";
+
+            try (Statement statement = connection.createStatement();
+                 ResultSet result = statement.executeQuery(sql)) {
+
+                ResultSetMetaData metadata = result.getMetaData();
+                int columnCount = metadata.getColumnCount();
+
+                while (result.next()) {
+                    StringBuilder rowText = new StringBuilder();
+                    boolean containsSeason = false;
+                    boolean containsFcm = false;
+
+                    for (int index = 1; index <= columnCount; index++) {
+                        String columnName =
+                            metadata.getColumnLabel(index);
+
+                        Object value = result.getObject(index);
+                        String text = value == null
+                            ? ""
+                            : value.toString();
+
+                        if (rowText.length() > 0) {
+                            rowText.append(" | ");
+                        }
+
+                        rowText
+                            .append(columnName)
+                            .append("=")
+                            .append(text);
+
+                        String normalized =
+                            text.toUpperCase(Locale.ROOT);
+
+                        if (normalized.contains("2006_2007")
+                                || normalized.contains("2006/2007")) {
+                            containsSeason = true;
+                        }
+
+                        if (normalized.equals("FCM")
+                                || normalized.contains("FCM")) {
+                            containsFcm = true;
+                        }
+                    }
+
+                    if (containsSeason && containsFcm) {
+                        Object key = result.getObject(primaryKeyColumn);
+
+                        return new ImportRow(
+                            key == null ? "" : key.toString(),
+                            rowText.toString()
+                        );
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static void printImportRows(
+                Connection connection
+        ) throws Exception {
+
+            System.out.println();
+            System.out.println("=== PRIME RIGHE rn_import ===");
+
+            try (Statement statement = connection.createStatement();
+                 ResultSet result =
+                     statement.executeQuery("SELECT * FROM rn_import LIMIT 30")) {
+
+                printResultSet(result);
+            }
+        }
+
+        private static List<ColumnInfo> readTableColumns(
+                Connection connection,
+                String tableName
+        ) throws Exception {
+
+            List<ColumnInfo> columns = new ArrayList<>();
+
+            String sql =
+                "PRAGMA table_info(" + quoteIdentifier(tableName) + ")";
+
+            try (Statement statement = connection.createStatement();
+                 ResultSet result = statement.executeQuery(sql)) {
+
+                while (result.next()) {
+                    columns.add(
+                        new ColumnInfo(
+                            result.getString("name"),
+                            result.getString("type"),
+                            result.getInt("pk")
+                        )
+                    );
+                }
+            }
+
+            return columns;
+        }
+
+        private static String findPrimaryKeyColumn(
+                List<ColumnInfo> columns
+        ) {
+            for (ColumnInfo column : columns) {
+                if (column.primaryKey > 0) {
+                    return column.name;
+                }
+            }
+
+            for (ColumnInfo column : columns) {
+                String normalized =
+                    column.name.toLowerCase(Locale.ROOT);
+
+                if (normalized.equals("import_id")
+                        || normalized.equals("id_import")
+                        || normalized.equals("importid")) {
+                    return column.name;
+                }
+            }
+
+            for (ColumnInfo column : columns) {
+                if (column.name.toLowerCase(Locale.ROOT).contains("id")) {
+                    return column.name;
+                }
+            }
+
+            return columns.get(0).name;
+        }
+
+        private static List<String> findRawTabellinoTables(
+                Connection connection
+        ) throws Exception {
+
+            List<String> tables = new ArrayList<>();
+
+            String sql =
+                "SELECT name "
+                    + "FROM sqlite_master "
+                    + "WHERE type = 'table' "
+                    + "AND UPPER(name) LIKE '%TABELLINO%' "
+                    + "ORDER BY name";
+
+            try (Statement statement = connection.createStatement();
+                 ResultSet result = statement.executeQuery(sql)) {
+
+                while (result.next()) {
+                    tables.add(result.getString("name"));
+                }
+            }
+
+            return tables;
+        }
+
+        private static List<String> matchImportTables(
+            List<String> tables,
+            String importKey
+    ) {
+        List<String> matches = new ArrayList<>();
+
+        String expectedTable =
+            "raw_2006_2007_fcm_tabellino";
+
+        for (String table : tables) {
+            if (table.equalsIgnoreCase(expectedTable)) {
+                matches.add(table);
+            }
+        }
+
+        return matches;
+    }
+
+        private static void inspectTabellino(
+                Connection connection,
+                String tableName
+        ) throws Exception {
+
+            System.out.println();
+            System.out.println(
+                "============================================================"
+            );
+            System.out.println("TABELLA: " + tableName);
+            System.out.println(
+                "============================================================"
+            );
+
+            List<ColumnInfo> allColumns =
+                readTableColumns(connection, tableName);
+
+            List<String> modifierColumns = new ArrayList<>();
+
+            System.out.println();
+            System.out.println("=== COLONNE CANDIDATE ===");
+
+            for (ColumnInfo column : allColumns) {
+                String normalized = column.name
+                    .replace("_", "")
+                    .toUpperCase(Locale.ROOT);
+
+                if (normalized.contains("MOD")
+                        || normalized.contains("DIF")
+                        || normalized.contains("PERS")
+                        || normalized.contains("CAPIT")) {
+
+                    modifierColumns.add(column.name);
+                    System.out.println(column.name);
+                }
+            }
+
+            if (modifierColumns.isEmpty()) {
+                System.out.println(
+                    "Nessuna colonna candidata trovata."
+                );
+                return;
+            }
+
+            System.out.println();
+            System.out.println("=== CONTEGGI VALORI ===");
+
+            for (String column : modifierColumns) {
+                String quotedTable =
+                    quoteIdentifier(tableName);
+
+                String quotedColumn =
+                    quoteIdentifier(column);
+
+                String sql =
+                    "SELECT "
+                        + "COUNT(*) AS totale, "
+                        + "SUM(CASE WHEN " + quotedColumn
+                        + " IS NOT NULL THEN 1 ELSE 0 END) AS non_null, "
+                        + "SUM(CASE WHEN TRIM(CAST(" + quotedColumn
+                        + " AS TEXT)) NOT IN ('', '0', '0.0', '0,0') "
+                        + "THEN 1 ELSE 0 END) AS valorizzati "
+                        + "FROM " + quotedTable;
+
+                try (Statement statement = connection.createStatement();
+                     ResultSet result = statement.executeQuery(sql)) {
+
+                    if (result.next()) {
+                        System.out.printf(
+                            Locale.ROOT,
+                            "%-40s totale=%d nonNull=%d valorizzati=%d%n",
+                            column,
+                            result.getLong("totale"),
+                            result.getLong("non_null"),
+                            result.getLong("valorizzati")
+                        );
+                    }
+                } catch (Exception ex) {
+                    System.out.printf(
+                        "%-40s ERRORE: %s%n",
+                        column,
+                        ex.getMessage()
+                    );
+                }
+            }
+
+            String whereClause =
+                buildNonEmptyWhere(modifierColumns);
+
+            System.out.println();
+            System.out.println("=== PRIME RIGHE VALORIZZATE ===");
+
+            String sql =
+                "SELECT * FROM "
+                    + quoteIdentifier(tableName)
+                    + " WHERE "
+                    + whereClause
+                    + " LIMIT 100";
+
+            try (Statement statement = connection.createStatement();
+                 ResultSet result = statement.executeQuery(sql)) {
+
+                printResultSet(result);
+            }
+        }
+
+        private static String buildNonEmptyWhere(
+                List<String> columns
+        ) {
+            StringBuilder where = new StringBuilder();
+
+            for (String column : columns) {
+                if (where.length() > 0) {
+                    where.append(" OR ");
+                }
+
+                String quoted = quoteIdentifier(column);
+
+                where.append("(")
+                    .append(quoted)
+                    .append(" IS NOT NULL AND TRIM(CAST(")
+                    .append(quoted)
+                    .append(" AS TEXT)) NOT IN ('', '0', '0.0', '0,0'))");
+            }
+
+            return where.toString();
+        }
+
+        private static void printResultSet(
+                ResultSet result
+        ) throws Exception {
+
+            ResultSetMetaData metadata =
+                result.getMetaData();
+
+            int columnCount =
+                metadata.getColumnCount();
+
+            int rowNumber = 0;
+
+            while (result.next()) {
+                rowNumber++;
+
+                System.out.println("--- riga " + rowNumber + " ---");
+
+                for (int index = 1; index <= columnCount; index++) {
+                    Object value = result.getObject(index);
+
+                    if (value == null) {
+                        continue;
+                    }
+
+                    String text = value.toString();
+
+                    if (text.isBlank()) {
+                        continue;
+                    }
+
+                    System.out.println(
+                        metadata.getColumnLabel(index)
+                            + "="
+                            + text
+                    );
+                }
+            }
+
+            if (rowNumber == 0) {
+                System.out.println(
+                    "Nessuna riga valorizzata trovata."
+                );
+            }
+        }
+
+        private static String quoteIdentifier(
+                String identifier
+        ) {
+            return "\""
+                + identifier.replace("\"", "\"\"")
+                + "\"";
+        }
+
+        private record ColumnInfo(
+            String name,
+            String type,
+            int primaryKey
+        ) {
+        }
+
+        private record ImportRow(
+            String importKey,
+            String description
+        ) {
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
 
 File: src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
 
     package it.alterlega.recordsnext;
-    
+
     import static org.junit.jupiter.api.Assertions.assertEquals;
-    
+
     import org.junit.jupiter.api.Test;
-    
+
     class RecordsNextApplicationTest {
-    
+
         @Test
         void usesJava21() {
             assertEquals(21, Runtime.version().feature());
@@ -22074,224 +26097,58 @@ File: config\culometro.json
       "schemaVersion": "2.0",
       "enabled": true,
       "minimumMatches": 20,
-      "normalization": {
-        "mode": "PER_MATCH",
-        "centerOnHistoricalMean": true,
-        "kScale": 4.15
-      },
-      "overlap": {
-        "strategy": "PRIMARY_PLUS_SECONDARY",
-        "secondaryWeight": 0.2,
-        "tagWeight": 0.0,
-        "maxSecondary": 1,
-        "maxTags": 2
-      },
-      "rarity": {
-        "enabled": true,
-        "profile": "NORMAL",
-        "maximumMultiplier": 5.25,
-        "minimumHistoricalOccurrences": 3
-      },
+      "normalization": { "mode": "PER_MATCH", "centerOnHistoricalMean": true, "kScale": 4.15 },
+      "overlap": { "strategy": "PRIMARY_PLUS_SECONDARY", "secondaryWeight": 0.2, "tagWeight": 0.0, "maxSecondary": 1, "maxTags": 2 },
+      "rarity": { "enabled": true, "profile": "NORMAL", "maximumMultiplier": 5.25, "minimumHistoricalOccurrences": 3 },
       "components": [
-        {
-          "componentId": "JUST_ENOUGH",
-          "enabled": true,
-          "weight": 1.15,
-          "allowedRange": {
-            "min": 0.5,
-            "max": 2.0
-          }
-        },
-        {
-          "componentId": "MISSED_WIN_HALF_POINT",
-          "enabled": true,
-          "weight": 1.35,
-          "allowedRange": {
-            "min": 0.75,
-            "max": 2.5
-          }
-        },
-        {
-          "componentId": "LOSS_BY_A_WHISKER",
-          "enabled": true,
-          "weight": 1.45,
-          "allowedRange": {
-            "min": 0.75,
-            "max": 2.5
-          }
-        },
-        {
-          "componentId": "MIRACLE_DRAW",
-          "enabled": true,
-          "weight": 1.1,
-          "allowedRange": {
-            "min": 0.5,
-            "max": 2.0
-          }
-        },
-        {
-          "componentId": "TIGHT_DRAW",
-          "enabled": true,
-          "weight": 1.1,
-          "allowedRange": {
-            "min": 0.5,
-            "max": 2.0
-          }
-        },
-        {
-          "componentId": "ONE_GOAL_WIN",
-          "enabled": true,
-          "weight": 0.7,
-          "allowedRange": {
-            "min": 0.5,
-            "max": 1.5
-          }
-        },
-        {
-          "componentId": "ONE_GOAL_LOSS",
-          "enabled": true,
-          "weight": 0.7,
-          "allowedRange": {
-            "min": 0.5,
-            "max": 1.5
-          }
-        },
-        {
-          "componentId": "RU_DECISIVE",
-          "enabled": true,
-          "weight": 1.4,
-          "allowedRange": {
-            "min": 0.75,
-            "max": 2.5
-          }
-        }
+        { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
+        { "componentId": "MISSED_WIN_HALF_POINT", "enabled": true, "weight": 1.35, "allowedRange": { "min": 0.75, "max": 2.5 } },
+        { "componentId": "ONE_GOAL_WIN", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
+        { "componentId": "RU_DECISIVE", "enabled": true, "weight": 1.4, "allowedRange": { "min": 0.75, "max": 2.5 } },
+        { "componentId": "ONE_GOAL_LOSS", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
+        { "componentId": "TIGHT_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
+        { "componentId": "LOSS_BY_A_WHISKER", "enabled": true, "weight": 1.45, "allowedRange": { "min": 0.75, "max": 2.5 } },
+        { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } }
       ],
       "labels": {
         "preset": "GOLIARDICO",
         "customized": false,
         "resetSource": "GOLIARDICO_DEFAULT",
         "bands": [
-          {
-            "min": 90,
-            "label": "Co' 'sso culo puoi andare a cazzi"
-          },
-          {
-            "min": 85,
-            "label": "Protetto dagli dei"
-          },
-          {
-            "min": 73,
-            "label": "Culone conclamato"
-          },
-          {
-            "min": 66,
-            "label": "Fortunello"
-          },
-          {
-            "min": 53.00001,
-            "label": "Non ti lamentare"
-          },
-          {
-            "min": 48,
-            "label": "Ne carne ne pesce"
-          },
-          {
-            "min": 35,
-            "label": "Doveva andare meglio"
-          },
-          {
-            "min": 28,
-            "label": "Sfigatello"
-          },
-          {
-            "min": 16,
-            "label": "Sfiga cieca"
-          },
-          {
-            "min": 11,
-            "label": "Raccoglitore di cetrioli"
-          },
-          {
-            "min": 0,
-            "label": "Vai a farti una vasca a Lourdes"
-          }
+          { "min": 90, "label": "Co' 'sso culo puoi andare a cazzi" },
+          { "min": 85, "label": "Protetto dagli dei" },
+          { "min": 73, "label": "Culone conclamato" },
+          { "min": 66, "label": "Fortunello" },
+          { "min": 53.00001, "label": "Non ti lamentare" },
+          { "min": 48, "label": "Ne carne ne pesce" },
+          { "min": 35, "label": "Doveva andare meglio" },
+          { "min": 28, "label": "Sfigatello" },
+          { "min": 16, "label": "Sfiga cieca" },
+          { "min": 11, "label": "Raccoglitore di cetrioli" },
+          { "min": 0, "label": "Vai a farti una vasca a Lourdes" }
         ],
         "presetDefaults": {
-          "GOLIARDICO_DEFAULT": [
-            {
-              "min": 90,
-              "label": "Co' 'sso culo puoi andare a cazzi"
-            },
-            {
-              "min": 85,
-              "label": "Protetto dagli dei"
-            },
-            {
-              "min": 73,
-              "label": "Culone conclamato"
-            },
-            {
-              "min": 66,
-              "label": "Fortunello"
-            },
-            {
-              "min": 53.00001,
-              "label": "Non ti lamentare"
-            },
-            {
-              "min": 48,
-              "label": "Ne carne ne pesce"
-            },
-            {
-              "min": 35,
-              "label": "Doveva andare meglio"
-            },
-            {
-              "min": 28,
-              "label": "Sfigatello"
-            },
-            {
-              "min": 16,
-              "label": "Sfiga cieca"
-            },
-            {
-              "min": 11,
-              "label": "Raccoglitore di cetrioli"
-            },
-            {
-              "min": 0,
-              "label": "Vai a farti una vasca a Lourdes"
-            }
-          ],
           "NEUTRAL_DEFAULT": [
-            {
-              "min": 90,
-              "label": "Fortuna eccezionale"
-            },
-            {
-              "min": 75,
-              "label": "Molto fortunato"
-            },
-            {
-              "min": 60,
-              "label": "Piuttosto fortunato"
-            },
-            {
-              "min": 45,
-              "label": "In equilibrio"
-            },
-            {
-              "min": 30,
-              "label": "Piuttosto sfortunato"
-            },
-            {
-              "min": 15,
-              "label": "Molto sfortunato"
-            },
-            {
-              "min": 0,
-              "label": "Sfortuna eccezionale"
-            }
+            { "min": 90, "label": "Fortuna eccezionale" },
+            { "min": 75, "label": "Molto fortunato" },
+            { "min": 60, "label": "Piuttosto fortunato" },
+            { "min": 45, "label": "In equilibrio" },
+            { "min": 30, "label": "Piuttosto sfortunato" },
+            { "min": 15, "label": "Molto sfortunato" },
+            { "min": 0, "label": "Sfortuna eccezionale" }
+          ],
+          "GOLIARDICO_DEFAULT": [
+            { "min": 90, "label": "Co' 'sso culo puoi andare a cazzi" },
+            { "min": 85, "label": "Protetto dagli dei" },
+            { "min": 73, "label": "Culone conclamato" },
+            { "min": 66, "label": "Fortunello" },
+            { "min": 53.00001, "label": "Non ti lamentare" },
+            { "min": 48, "label": "Ne carne ne pesce" },
+            { "min": 35, "label": "Doveva andare meglio" },
+            { "min": 28, "label": "Sfigatello" },
+            { "min": 16, "label": "Sfiga cieca" },
+            { "min": 11, "label": "Raccoglitore di cetrioli" },
+            { "min": 0, "label": "Vai a farti una vasca a Lourdes" }
           ]
         }
       }
@@ -22337,45 +26194,154 @@ File: config\manifest.example.json
 File: config\processing.json
 
     {
-        "schemaVersion":  "2.0",
-        "processing":  {
-                           "families":  {
-                                            "classics":  {
-                                                             "enabled":  true,
-                                                             "children":  "ALL"
-                                                         },
-                                            "series":  {
-                                                           "enabled":  true,
-                                                           "children":  "ALL"
-                                                       },
-                                            "ru":  {
-                                                       "enabled":  true,
-                                                       "children":  "ALL"
-                                                   },
-                                            "modifiers":  {
-                                                              "enabled":  true,
-                                                              "children":  {
-                                                                               "defence":  true,
-                                                                               "captain":  true,
-                                                                               "homeField":  false
-                                                                           }
-                                                          },
-                                            "thresholdsLuck":  {
-                                                                   "enabled":  true,
-                                                                   "children":  "ALL"
-                                                               }
-                                        },
-                           "culometro":  {
-                                             "enabled":  true,
-                                             "configFile":  "config\\culometro.json"
-                                         },
-                           "output":  {
-                                          "writeManifest":  true,
-                                          "writeCore":  true,
-                                          "publishToSite":  false
-                                      }
-                       }
+      "schemaVersion": "2.0",
+      "processing": {
+        "families": {
+          "classics": {
+            "enabled": true,
+            "children": {
+                              "highest-match-score": true,
+                              "lowest-match-score": true,
+                              "most-regulation-goals": true,
+                              "largest-regulation-margin": true,
+                              "average-points": true,
+                              "total-points": true,
+                              "standings-points": true,
+                              "wins": true,
+                              "draws": true,
+                              "losses": true,
+                              "goals-for": true,
+                              "goals-against": true,
+                              "yellow-cards-team": true,
+                              "red-cards-team": true,
+                              "red-cards-player": true,
+                              "assists-team": true,
+                              "own-goals-team": true,
+                              "penalties-scored": true,
+                              "penalties-missed": true,
+                              "penalties-saved": true,
+                              "clean-sheets": true
+                            }
+          },
+          "series": {
+            "enabled": true,
+            "children": {
+                              "unbeaten": true,
+                              "winless": true,
+                              "wins": true,
+                              "draws": true,
+                              "losses": true,
+                              "clean-sheets": true,
+                              "captain-bonus": true
+                            }
+          },
+          "ru": {
+            "enabled": true,
+            "children": {
+                              "max-in-match": true,
+                              "matches-with": true,
+                              "matches-against": true,
+                              "deciding": true,
+                              "deciding-against": true,
+                              "balance": true,
+                              "balance-against": true,
+                              "average-points": true,
+                              "average-points-against": true,
+                              "role-distribution": true
+                            }
+          },
+          "modifiers": {
+            "enabled": true,
+            "children": {
+                              "modm1pers.max": true,
+                              "modm1pers.total": true,
+                              "modm1pers.average": true,
+                              "modm1pers.uses": true,
+                              "modm2pers.max": true,
+                              "modm2pers.total": true,
+                              "modm2pers.average": true,
+                              "modm2pers.uses": true,
+                              "modm3pers.max": false,
+                              "modm3pers.total": false,
+                              "modm3pers.average": false,
+                              "modm3pers.uses": false,
+                              "modportiere.max": false,
+                              "modportiere.total": false,
+                              "modportiere.average": false,
+                              "modportiere.uses": false,
+                              "moddifesa.max": true,
+                              "moddifesa.total": true,
+                              "moddifesa.average": true,
+                              "moddifesa.uses": true,
+                              "modcentrocampo.max": false,
+                              "modcentrocampo.total": false,
+                              "modcentrocampo.average": false,
+                              "modcentrocampo.uses": false,
+                              "modattacco.max": false,
+                              "modattacco.total": false,
+                              "modattacco.average": false,
+                              "modattacco.uses": false,
+                              "modmodulo.max": false,
+                              "modmodulo.total": false,
+                              "modmodulo.average": false,
+                              "modmodulo.uses": false,
+                              "home-field-deciding": true,
+                              "home-field-points-gained": true,
+                              "home-field-points-lost": true,
+                              "home-field-balance": true
+                            }
+          },
+          "thresholdsLuck": {
+            "enabled": true,
+            "children": {
+                              "surgical-win": true,
+                              "mocking-loss": true,
+                              "miraculous-draw": true,
+                              "narrow-draw": true,
+                              "missed-win-half-point": true,
+                              "loss-by-a-whisker": true,
+                              "exact-threshold": true,
+                              "just-enough": true,
+                              "wasted-points": true,
+                              "favourable-events": true,
+                              "unfavourable-events": true,
+                              "balance": true
+                            }
+          }
+        },
+        "modifierNames": {
+          "MODM1PERS": "Modificatore Difesa",
+          "MODM2PERS": "Capitano",
+          "MODM3PERS": ""
+        },
+        "culometro": {
+          "enabled": true,
+          "configFile": "config\\culometro.json"
+        },
+        "output": {
+          "writeManifest": true,
+          "writeCore": true,
+          "publishToSite": false
+        }
+      }
     }
+
+## config\recordsnext-gui.properties
+
+File: config\recordsnext-gui.properties
+
+    #RecordsNext configuration
+    #Thu Aug 06 15:11:23 CEST 2026
+    processing.classic=true
+    processing.generateJs=true
+    processing.mode=FULL
+    processing.publish=true
+    processing.ru=true
+    publish.customDirectory=
+    publish.destinationMode=currentSeason
+    seasons=2025_2026,2024_2025,2023_2024,2022_2023,2021_2022,2020_2021,2019_2020,2018_2019,2017_2018,2016_2017,2015_2016,2014_2015,2013_2014,2012_2013,2011_2012,2010_2011,2009_2010,2008_2009,2007_2008,2006_2007
+    seasonsSelectionInitialized=true
+    siteJs=E\:\\fantacalcio\\Lega2025\\js
 
 ## config\seasons.json
 
@@ -22421,6 +26387,212 @@ File: config\teams.json
       ]
     }
 
+## tools\Audit-RecordsNext2Js.js
+
+File: tools\Audit-RecordsNext2Js.js
+
+    'use strict';
+    const fs = require('fs');
+    const path = require('path');
+    const vm = require('vm');
+
+    function loadJs(file) {
+      const sandbox = { window: {} };
+      sandbox.globalThis = sandbox;
+      vm.createContext(sandbox);
+      vm.runInContext(fs.readFileSync(file, 'utf8'), sandbox, { filename: file });
+      const values = Object.entries(sandbox.window);
+      if (values.length === 0) throw new Error('Nessuna variabile window.* trovata');
+      return { variable: values[0][0], data: values[0][1] };
+    }
+    function uniq(a){ return [...new Set(a.filter(v => v !== undefined && v !== null && String(v).trim() !== ''))]; }
+    function seasonOf(x){ return x?.stagione ?? x?.seasonId ?? x?.season ?? null; }
+    function compOf(x){ return x?.competizioneNome ?? x?.competitionName ?? x?.competizioneStoricaId ?? x?.competitionId ?? null; }
+    function walk(node, stats, inheritedSeason=null, inheritedComp=null, key='root') {
+      if (node == null) return;
+      if (Array.isArray(node)) {
+        stats.arrays++;
+        if (node.length === 0) stats.emptyArrays.push(key);
+        for (const item of node) walk(item, stats, inheritedSeason, inheritedComp, key);
+        return;
+      }
+      if (typeof node !== 'object') return;
+      stats.objects++;
+      const s = seasonOf(node) ?? inheritedSeason;
+      const c = compOf(node) ?? inheritedComp;
+      if (s) stats.seasons.push(String(s));
+      if (c) stats.competitions.push(String(c));
+      if (node.urlTabellino || node.scorecardUrl) stats.scorecardLinks++;
+      if (node.recordId) stats.recordIds.push(String(node.recordId));
+      if (node.eventType) stats.eventTypes.push(String(node.eventType));
+      for (const [k,v] of Object.entries(node)) walk(v, stats, s, c, k);
+    }
+    function countRows(data) {
+      const top = ['events','seasonAggregates','globalAggregates','absoluteOccurrences','ranking'];
+      const out = {};
+      for (const k of top) out[k] = Array.isArray(data[k]) ? data[k].length : (data[k] == null ? 0 : 1);
+      return out;
+    }
+    function statusText(data){
+      const s = Array.isArray(data.outputStatus) ? data.outputStatus : [];
+      return s.map(x => x.status || x.code || '').filter(Boolean).join(', ') || 'NON_DICHIARATO';
+    }
+    function esc(v){ return String(v ?? '').replace(/\|/g,'\\|').replace(/\r?\n/g,' '); }
+
+    const dir = process.argv[2];
+    const outDir = process.argv[3] || process.cwd();
+    if (!dir || !fs.existsSync(dir)) { console.error('Uso: node Audit-RecordsNext2Js.js <cartella-js> [cartella-output]'); process.exit(2); }
+    fs.mkdirSync(outDir,{recursive:true});
+    const files = fs.readdirSync(dir).filter(n => /^fcmRecordsNext_.*\.js$/i.test(n)).sort();
+    const loaded = {};
+    const errors = [];
+    for (const name of files) {
+      try { loaded[name] = loadJs(path.join(dir,name)); }
+      catch(e) { errors.push({file:name,error:e.message}); }
+    }
+    const core = loaded['fcmRecordsNext_Core.js']?.data || {};
+    const expectedSeasons = uniq((core.seasons || []).map(seasonOf));
+    const rows = [];
+    for (const [file, obj] of Object.entries(loaded)) {
+      const d = obj.data;
+      const stats={arrays:0,objects:0,seasons:[],competitions:[],scorecardLinks:0,recordIds:[],eventTypes:[],emptyArrays:[]};
+      walk(d,stats);
+      const seasons=uniq(stats.seasons).sort();
+      const comps=uniq(stats.competitions).sort();
+      const missing=expectedSeasons.filter(s=>!seasons.includes(String(s)));
+      const declared=d.metadata?.seasonCount ?? null;
+      const counts=countRows(d);
+      rows.push({
+        file, variable:obj.variable, familyId:d.familyId || (file.includes('Core')?'core':file.includes('Manifest')?'manifest':''),
+        schemaVersion:d.schemaVersion || '', status:statusText(d), declaredSeasonCount:declared,
+        actualSeasonCount:seasons.length, expectedSeasonCount:expectedSeasons.length,
+        seasons, missingSeasons:missing, competitionCount:comps.length, competitions:comps,
+        events:counts.events, seasonAggregates:counts.seasonAggregates, globalAggregates:counts.globalAggregates,
+        absoluteOccurrences:counts.absoluteOccurrences, ranking:counts.ranking,
+        recordIdCount:uniq(stats.recordIds).length, recordIds:uniq(stats.recordIds).sort(),
+        eventTypeCount:uniq(stats.eventTypes).length, eventTypes:uniq(stats.eventTypes).sort(),
+        scorecardLinks:stats.scorecardLinks, emptyTopLevel: ['events','seasonAggregates','globalAggregates','absoluteOccurrences','ranking'].filter(k=>Array.isArray(d[k])&&d[k].length===0),
+        metadata:d.metadata || {}
+      });
+    }
+    const audit={generatedAt:new Date().toISOString(),sourceDirectory:path.resolve(dir),expectedSeasons,filesFound:files.length,filesLoaded:rows.length,errors,rows};
+    fs.writeFileSync(path.join(outDir,'RecordsNext2_JS_AUDIT.json'),JSON.stringify(audit,null,2),'utf8');
+    const headers=['File','Famiglia','Stato','Stagioni dichiarate','Stagioni reali','Stagioni attese','Stagioni mancanti','Competizioni','Eventi','Aggregati stagione','Ranking','Record ID','Tipi evento','Link tabellino'];
+    const csv=[headers.join(';')];
+    for(const r of rows) csv.push([r.file,r.familyId,r.status,r.declaredSeasonCount??'',r.actualSeasonCount,r.expectedSeasonCount,r.missingSeasons.join(','),r.competitionCount,r.events,r.seasonAggregates,r.ranking,r.recordIdCount,r.eventTypeCount,r.scorecardLinks].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';'));
+    fs.writeFileSync(path.join(outDir,'RecordsNext2_JS_AUDIT.csv'),'\ufeff'+csv.join('\r\n'),'utf8');
+    let md='# Audit JS RecordsNext 2.0\n\n';
+    md+=`Generato: ${audit.generatedAt}\n\nCartella analizzata: \`${audit.sourceDirectory}\`\n\n`;
+    md+=`Stagioni attese dal Core: **${expectedSeasons.length}** (${expectedSeasons.join(', ') || 'non rilevate'})\n\n`;
+    md+='## Riepilogo\n\n| File | Famiglia | Stato | Stagioni reali/attese | Mancanti | Competizioni | Eventi | Aggregati | Ranking | Link |\n|---|---|---:|---:|---|---:|---:|---:|---:|---:|\n';
+    for(const r of rows) md+=`| ${esc(r.file)} | ${esc(r.familyId)} | ${esc(r.status)} | ${r.actualSeasonCount}/${r.expectedSeasonCount} | ${esc(r.missingSeasons.join(', ')||'—')} | ${r.competitionCount} | ${r.events} | ${r.seasonAggregates} | ${r.ranking} | ${r.scorecardLinks} |\n`;
+    md+='\n## Anomalie rilevate\n\n';
+    let anomaly=0;
+    for(const r of rows){
+      if(r.expectedSeasonCount>0 && r.actualSeasonCount>0 && r.actualSeasonCount<r.expectedSeasonCount){ md+=`- **${r.file}** copre ${r.actualSeasonCount}/${r.expectedSeasonCount} stagioni. Mancano: ${r.missingSeasons.join(', ')}.\n`; anomaly++; }
+      if(/PARTIAL|SKIPPED|ERROR/i.test(r.status)){ md+=`- **${r.file}** dichiara stato: ${r.status}.\n`; anomaly++; }
+      if(r.declaredSeasonCount!=null && r.declaredSeasonCount!==r.actualSeasonCount){ md+=`- **${r.file}** dichiara seasonCount=${r.declaredSeasonCount}, ma nel contenuto risultano ${r.actualSeasonCount} stagioni.\n`; anomaly++; }
+    }
+    if(!anomaly) md+='Nessuna anomalia automatica rilevata.\n';
+    md+='\n## Dettaglio per file\n';
+    for(const r of rows){
+     md+=`\n### ${r.file}\n\n`;
+     md+=`- Variabile globale: \`window.${r.variable}\`\n- Schema: ${r.schemaVersion||'—'}\n- Stato: ${r.status}\n- Stagioni: ${r.seasons.join(', ')||'—'}\n- Competizioni (${r.competitionCount}): ${r.competitions.join(', ')||'—'}\n- Eventi: ${r.events}; aggregati stagionali: ${r.seasonAggregates}; ranking: ${r.ranking}\n- Record ID (${r.recordIdCount}): ${r.recordIds.join(', ')||'—'}\n- Tipi evento (${r.eventTypeCount}): ${r.eventTypes.join(', ')||'—'}\n- Link tabellino rilevati: ${r.scorecardLinks}\n`;
+    }
+    if(errors.length){ md+='\n## Errori di lettura\n\n'; for(const e of errors) md+=`- ${e.file}: ${e.error}\n`; }
+    fs.writeFileSync(path.join(outDir,'RecordsNext2_JS_AUDIT.md'),md,'utf8');
+    console.log(JSON.stringify({files:rows.length,expectedSeasons:expectedSeasons.length,output:outDir},null,2));
+
+## tools\Create-RecordsNext2RealJsZip.ps1
+
+File: tools\Create-RecordsNext2RealJsZip.ps1
+
+    $ErrorActionPreference = "Stop"
+
+    $projectRoot = "D:\DEV_APPS\RecordsNext2.0"
+    $siteJsRoot  = "E:\fantacalcio\Lega2025\js"
+    $zipPath     = "D:\DEV_APPS\downloads\RecordsNext2_JS_REALI.zip"
+
+    $files = @()
+
+    if (Test-Path -LiteralPath $projectRoot) {
+        $files += Get-ChildItem `
+            -LiteralPath $projectRoot `
+            -Recurse `
+            -File `
+            -ErrorAction SilentlyContinue |
+            Where-Object {
+                $_.Name -like "fcmRecordsNext*.js"
+            } |
+            ForEach-Object {
+                $_.FullName
+            }
+    }
+
+    if (Test-Path -LiteralPath $siteJsRoot) {
+        $files += Get-ChildItem `
+            -LiteralPath $siteJsRoot `
+            -File `
+            -ErrorAction SilentlyContinue |
+            Where-Object {
+                $_.Name -like "fcmRecordsNext*.js"
+            } |
+            ForEach-Object {
+                $_.FullName
+            }
+    }
+
+    $files = @(
+        $files |
+            Where-Object {
+                -not [string]::IsNullOrWhiteSpace($_)
+            } |
+            Sort-Object -Unique
+    )
+
+    Write-Host ""
+    Write-Host "File JS trovati: $($files.Count)" -ForegroundColor Cyan
+
+    if ($files.Count -eq 0) {
+        Write-Host ""
+        Write-Host "Nessun file fcmRecordsNext*.js trovato." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Percorsi controllati:"
+        Write-Host "  $projectRoot"
+        Write-Host "  $siteJsRoot"
+        Write-Host ""
+        Write-Host "Lo ZIP non e stato creato."
+        exit 1
+    }
+
+    Write-Host ""
+
+    $files |
+        ForEach-Object {
+            Write-Host $_
+        }
+
+    if (Test-Path -LiteralPath $zipPath) {
+        Remove-Item -LiteralPath $zipPath -Force
+    }
+
+    Compress-Archive `
+        -LiteralPath $files `
+        -DestinationPath $zipPath `
+        -Force
+
+    Write-Host ""
+    Write-Host "ZIP creato correttamente:" -ForegroundColor Green
+    Write-Host $zipPath
+
+    $hash = Get-FileHash `
+        -LiteralPath $zipPath `
+        -Algorithm SHA256
+
+    Write-Host ""
+    Write-Host "SHA256:"
+    Write-Host $hash.Hash
+
 ## tools\Create-RecordsNext2WorkingCodeMd.ps1
 
 File: tools\Create-RecordsNext2WorkingCodeMd.ps1
@@ -22429,49 +26601,49 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     param(
         [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
     )
-    
+
     Set-StrictMode -Version Latest
     $ErrorActionPreference = "Stop"
-    
+
     $DocsDir = Join-Path $ProjectDir "docs"
     $OutputFile = Join-Path $DocsDir "CODICE_FUNZIONANTE_RECORDSNEXT2.md"
-    
+
     if (-not (Test-Path -LiteralPath $ProjectDir)) {
         throw "Directory progetto non trovata: $ProjectDir"
     }
-    
+
     if (-not (Test-Path -LiteralPath $DocsDir)) {
         New-Item -ItemType Directory -Path $DocsDir -Force | Out-Null
     }
-    
+
     function Add-IndentedFileSection {
         param(
             [Parameter(Mandatory = $true)]
             [System.Text.StringBuilder]$Builder,
-    
+
             [Parameter(Mandatory = $true)]
             [string]$Title,
-    
+
             [Parameter(Mandatory = $true)]
             [string]$RelativePath
         )
-    
+
         $FullPath = Join-Path $ProjectDir $RelativePath
-    
+
         [void]$Builder.AppendLine("## " + $Title)
         [void]$Builder.AppendLine("")
-    
+
         if (-not (Test-Path -LiteralPath $FullPath)) {
             [void]$Builder.AppendLine("> File non presente: " + $RelativePath)
             [void]$Builder.AppendLine("")
             return
         }
-    
+
         [void]$Builder.AppendLine("File: " + $RelativePath)
         [void]$Builder.AppendLine("")
-    
+
         $Lines = Get-Content -LiteralPath $FullPath -Encoding UTF8
-    
+
         if ($Lines.Count -eq 0) {
             [void]$Builder.AppendLine("    [file vuoto]")
         }
@@ -22480,20 +26652,20 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
                 [void]$Builder.AppendLine("    " + $Line)
             }
         }
-    
+
         [void]$Builder.AppendLine("")
     }
-    
+
     $Builder = New-Object System.Text.StringBuilder
     $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
-    
+
     [void]$Builder.AppendLine("# Codice funzionante RecordsNext 2.0")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("> Documento generato automaticamente.")
     [void]$Builder.AppendLine("> Data generazione: " + $GeneratedAt)
     [void]$Builder.AppendLine("> Directory progetto: " + $ProjectDir)
     [void]$Builder.AppendLine("")
-    
+
     [void]$Builder.AppendLine("## Regole della bibbia")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("- Le decisioni progettuali consolidate sono separate dal codice implementato.")
@@ -22501,7 +26673,7 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     [void]$Builder.AppendLine("- Lo stato implementato deve essere aggiornato soltanto dopo test.")
     [void]$Builder.AppendLine("- Le questioni ancora aperte non devono essere presentate come funzionalita.")
     [void]$Builder.AppendLine("")
-    
+
     [void]$Builder.AppendLine("## Stato sintetico")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("### Decisioni consolidate")
@@ -22515,29 +26687,60 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     [void]$Builder.AppendLine("- Link ai tabellini per i record riferiti a partite specifiche.")
     [void]$Builder.AppendLine("- JS pubblici nella cartella js del sito.")
     [void]$Builder.AppendLine("- Un solo HTML indice nella root del sito.")
-    [void]$Builder.AppendLine("- Viste HTML dimostrative nella cartella RecordsNext.")
+    [void]$Builder.AppendLine("- HTML statici senza dati incorporati: visualizzatori dei JS pubblici.")
+    [void]$Builder.AppendLine("- Viste HTML nella cartella RecordsNext e un solo indice nella root.")
+    [void]$Builder.AppendLine("- JS statici di rendering nella cartella js della skin: fcmRecordsNextFunzioni_common.js e fcmRecordsNextFunzioni_viewer.js.")
+    [void]$Builder.AppendLine("- Profili grafici iniziali: mauzstrom, fantablue2 e neutral.")
+    [void]$Builder.AppendLine("- Il profilo mauzstrom usa Trebuchet MS.")
+    [void]$Builder.AppendLine("- Nei nuovi nomi file RecordsNext si usa underscore, non trattino.")
     [void]$Builder.AppendLine("")
-    
+
     [void]$Builder.AppendLine("### Implementato e verificato")
     [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("- Struttura iniziale del progetto.")
-    [void]$Builder.AppendLine("- Documentazione architetturale iniziale.")
-    [void]$Builder.AppendLine("- Generatore della bibbia aggiornato con documentazione e sorgenti reali.")
+    [void]$Builder.AppendLine("- Base funzionante RecordsNext 1.0.2 importata nel progetto 2.0.")
+    [void]$Builder.AppendLine("- Accesso ai database FCM e FCA tramite UCanAccess.")
+    [void]$Builder.AppendLine("- Configurazione delle stagioni gestite e manuali.")
+    [void]$Builder.AppendLine("- Importazione, normalizzazione e consolidamento storico delle stagioni gestite.")
+    [void]$Builder.AppendLine("- Modello modulare con famiglie, figli, dipendenze, planner e preflight.")
+    [void]$Builder.AppendLine("- GUI RecordsNext 2.0 con configurazione granulare delle famiglie.")
+    [void]$Builder.AppendLine("- Configurazione gerarchica dei Modificatori per tipo e statistica.")
+    [void]$Builder.AppendLine("- Nomi configurabili per MODM1PERS, MODM2PERS e MODM3PERS.")
+    [void]$Builder.AppendLine("- Modificatori standard FCM distinti dai modificatori personalizzati.")
+    [void]$Builder.AppendLine("- Generazione diretta di fcmRecordsNext_Modifiers.js dagli archivi season_records.")
+    [void]$Builder.AppendLine("- Statistiche Massimo, Totale, Media e Utilizzi per i modificatori selezionati.")
+    [void]$Builder.AppendLine("- Esportazione verificata del MODDIFESA FCM della stagione 2006_2007.")
+    [void]$Builder.AppendLine("- Metadati availableSections e generatedSections distinti.")
+    [void]$Builder.AppendLine("- Test automatici: 38 eseguiti, 0 failure, 0 errori.")
+    [void]$Builder.AppendLine("- Verifica reale del JS Modificatori completata con tutte le sezioni selezionate presenti.")
     [void]$Builder.AppendLine("")
-    
+
+    [void]$Builder.AppendLine("### Non ancora implementato o da completare")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("- Elaboratore nativo completo della famiglia Serie.")
+    [void]$Builder.AppendLine("- Elaboratore nativo completo della famiglia Soglie e Fortuna.")
+    [void]$Builder.AppendLine("- Culometro definitivo e relativo contratto dati pubblico.")
+    [void]$Builder.AppendLine("- Contratto JavaScript pubblico definitivo di tutte le famiglie.")
+    [void]$Builder.AppendLine("- Visualizzatori HTML 2.0 definitivi.")
+    [void]$Builder.AppendLine("- JS statici definitivi dei visualizzatori.")
+    [void]$Builder.AppendLine("- Installer definitivo dei visualizzatori e dei profili CSS.")
+    [void]$Builder.AppendLine("")
+
     [void]$Builder.AppendLine("### Non ancora implementato")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("- Lettura FCM e FCA.")
     [void]$Builder.AppendLine("- Modello dati.")
     [void]$Builder.AppendLine("- Elaboratori delle famiglie.")
     [void]$Builder.AppendLine("- Esportatori JS.")
-    [void]$Builder.AppendLine("- GUI.")
+    [void]$Builder.AppendLine("- Consolidamento GUI 2.0.")
     [void]$Builder.AppendLine("- Installer.")
     [void]$Builder.AppendLine("- Viste HTML 2.0.")
     [void]$Builder.AppendLine("")
-    
+
     Add-IndentedFileSection -Builder $Builder -Title "README" -RelativePath "README.md"
     Add-IndentedFileSection -Builder $Builder -Title "Architettura" -RelativePath "docs\ARCHITETTURA_RECORDSNEXT2.md"
+    Add-IndentedFileSection -Builder $Builder -Title "Architettura visualizzatori HTML" -RelativePath "docs\ARCHITETTURA_VISUALIZZATORI_HTML.md"
+    Add-IndentedFileSection -Builder $Builder -Title "Installazione visualizzatori HTML" -RelativePath "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md"
+    Add-IndentedFileSection -Builder $Builder -Title "Personalizzazione visualizzatori HTML" -RelativePath "docs\PERSONALIZZAZIONE_VISUALIZZATORI_HTML.md"
     Add-IndentedFileSection -Builder $Builder -Title "Catalogo record" -RelativePath "docs\CATALOGO_RECORD.md"
     Add-IndentedFileSection -Builder $Builder -Title "Dipendenze output" -RelativePath "docs\DIPENDENZE_OUTPUT.md"
     Add-IndentedFileSection -Builder $Builder -Title "Decisioni aperte" -RelativePath "docs\DECISIONI_APERTE.md"
@@ -22545,7 +26748,7 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     Add-IndentedFileSection -Builder $Builder -Title "Configurazione" -RelativePath "docs\CONFIGURAZIONE_RECORDSNEXT2.md"
     Add-IndentedFileSection -Builder $Builder -Title "Stato implementazione" -RelativePath "docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md"
     Add-IndentedFileSection -Builder $Builder -Title "Changelog" -RelativePath "CHANGELOG.md"
-    
+
     $SourceExtensions = @(
         ".java",
         ".ps1",
@@ -22556,43 +26759,43 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
         ".xml",
         ".properties"
     )
-    
+
     $SourceRoots = @(
         "src",
         "config",
         "tools"
     )
-    
+
     [void]$Builder.AppendLine("## File reali del progetto")
     [void]$Builder.AppendLine("")
-    
+
     $IncludedFiles = New-Object System.Collections.Generic.List[string]
-    
+
     foreach ($RelativeRoot in $SourceRoots) {
         $FullRoot = Join-Path $ProjectDir $RelativeRoot
-    
+
         if (-not (Test-Path -LiteralPath $FullRoot)) {
             continue
         }
-    
+
         $Files = Get-ChildItem -LiteralPath $FullRoot -File -Recurse |
             Where-Object { $SourceExtensions -contains $_.Extension.ToLowerInvariant() } |
             Sort-Object FullName
-    
+
         foreach ($File in $Files) {
             $RelativePath = $File.FullName.Substring($ProjectDir.Length).TrimStart("\")
             [void]$IncludedFiles.Add($RelativePath)
-    
+
             Add-IndentedFileSection `
                 -Builder $Builder `
                 -Title $RelativePath `
                 -RelativePath $RelativePath
         }
     }
-    
+
     [void]$Builder.AppendLine("## Indice dei file inclusi")
     [void]$Builder.AppendLine("")
-    
+
     if ($IncludedFiles.Count -eq 0) {
         [void]$Builder.AppendLine("- Nessun file sorgente presente.")
     }
@@ -22601,22 +26804,346 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
             [void]$Builder.AppendLine("- " + $RelativePath)
         }
     }
-    
+
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("## Fine documento")
-    
+
     $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText(
         $OutputFile,
         $Builder.ToString(),
         $Utf8NoBom
     )
-    
+
     Write-Host ""
     Write-Host "Bibbia generata:" -ForegroundColor Green
     Write-Host $OutputFile
     Write-Host ""
     Write-Host ("Dimensione: {0} byte" -f (Get-Item -LiteralPath $OutputFile).Length)
+
+## tools\Diagnose_Modifiers_2006_v1.java
+
+File: tools\Diagnose_Modifiers_2006_v1.java
+
+    package it.alterlega.recordsnext;
+
+    import java.sql.Connection;
+    import java.sql.DatabaseMetaData;
+    import java.sql.DriverManager;
+    import java.sql.ResultSet;
+    import java.sql.ResultSetMetaData;
+    import java.sql.Statement;
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Locale;
+
+    public final class Diagnose_Modifiers_2006_v1 {
+
+        private Diagnose_Modifiers_2006_v1() {
+        }
+
+        public static void main(String[] args) throws Exception {
+            if (args.length != 1) {
+                System.err.println(
+                    "Uso: Diagnose_Modifiers_2006_v1 <recordsnext.db>"
+                );
+                System.exit(1);
+            }
+
+            String database = args[0];
+            String url = "jdbc:sqlite:" + database;
+
+            try (Connection connection = DriverManager.getConnection(url)) {
+                diagnose(connection);
+            }
+        }
+
+        private static void diagnose(Connection connection) throws Exception {
+            Long importId = findImportId(connection);
+
+            if (importId == null) {
+                throw new IllegalStateException(
+                    "Import FCM 2006_2007 non trovato"
+                );
+            }
+
+            System.out.println("Import ID FCM 2006_2007: " + importId);
+
+            String tableName = findTabellinoTable(
+                connection,
+                importId
+            );
+
+            if (tableName == null) {
+                throw new IllegalStateException(
+                    "Tabella TABELLINO raw non trovata per import " + importId
+                );
+            }
+
+            System.out.println("Tabella TABELLINO: " + tableName);
+            System.out.println();
+
+            List<String> modifierColumns = findModifierColumns(
+                connection,
+                tableName
+            );
+
+            System.out.println("=== COLONNE MODIFICATORI ===");
+
+            for (String column : modifierColumns) {
+                System.out.println(column);
+            }
+
+            System.out.println();
+            System.out.println("=== CONTEGGI NON NULL / NON ZERO ===");
+
+            try (Statement statement = connection.createStatement()) {
+                for (String column : modifierColumns) {
+                    String quotedTable = quote(tableName);
+                    String quotedColumn = quote(column);
+
+                    String sql =
+                        "SELECT " +
+                        "COUNT(*) AS righe_totali, " +
+                        "SUM(CASE WHEN " + quotedColumn +
+                        " IS NOT NULL THEN 1 ELSE 0 END) AS non_null, " +
+                        "SUM(CASE WHEN CAST(" + quotedColumn +
+                        " AS DOUBLE) <> 0 THEN 1 ELSE 0 END) AS non_zero " +
+                        "FROM " + quotedTable;
+
+                    try (ResultSet result = statement.executeQuery(sql)) {
+                        if (result.next()) {
+                            System.out.printf(
+                                Locale.ROOT,
+                                "%-35s totali=%d nonNull=%d nonZero=%d%n",
+                                column,
+                                result.getLong("righe_totali"),
+                                result.getLong("non_null"),
+                                result.getLong("non_zero")
+                            );
+                        }
+                    } catch (Exception ex) {
+                        System.out.printf(
+                            "%-35s ERRORE LETTURA: %s%n",
+                            column,
+                            ex.getMessage()
+                        );
+                    }
+                }
+            }
+
+            System.out.println();
+            System.out.println("=== PRIME RIGHE CON VALORI MODIFICATORE ===");
+
+            String where = buildWhere(modifierColumns);
+
+            if (where.isBlank()) {
+                System.out.println(
+                    "Nessuna colonna modificatore individuata."
+                );
+                return;
+            }
+
+            StringBuilder select = new StringBuilder();
+
+            appendColumnIfPresent(
+                modifierColumns,
+                select,
+                "IDINCONTRO"
+            );
+
+            appendColumnIfPresent(
+                modifierColumns,
+                select,
+                "IDSQUADRA"
+            );
+
+            for (String column : modifierColumns) {
+                if (select.length() > 0) {
+                    select.append(", ");
+                }
+
+                select.append(quote(column));
+            }
+
+            String sql =
+                "SELECT TOP 100 " + select +
+                " FROM " + quote(tableName) +
+                " WHERE " + where;
+
+            try (Statement statement = connection.createStatement();
+                 ResultSet result = statement.executeQuery(sql)) {
+
+                printResultSet(result);
+            }
+        }
+
+        private static Long findImportId(
+                Connection connection
+        ) throws Exception {
+
+            String sql =
+                "SELECT id " +
+                "FROM rn_import " +
+                "WHERE season_id = '2006_2007' " +
+                "AND source_type = 'FCM' " +
+                "ORDER BY id DESC";
+
+            try (Statement statement = connection.createStatement();
+                 ResultSet result = statement.executeQuery(sql)) {
+
+                if (result.next()) {
+                    return result.getLong("id");
+                }
+            }
+
+            return null;
+        }
+
+        private static String findTabellinoTable(
+                Connection connection,
+                long importId
+        ) throws Exception {
+
+            DatabaseMetaData metadata = connection.getMetaData();
+
+            String prefix = "raw_" + importId + "_";
+
+            try (ResultSet tables = metadata.getTables(
+                    null,
+                    null,
+                    "%",
+                    new String[] { "TABLE" }
+            )) {
+                while (tables.next()) {
+                    String tableName = tables.getString("TABLE_NAME");
+
+                    if (tableName == null) {
+                        continue;
+                    }
+
+                    String upper = tableName.toUpperCase(Locale.ROOT);
+
+                    if (upper.startsWith(prefix.toUpperCase(Locale.ROOT))
+                            && upper.endsWith("_TABELLINO")) {
+                        return tableName;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static List<String> findModifierColumns(
+                Connection connection,
+                String tableName
+        ) throws Exception {
+
+            List<String> columns = new ArrayList<>();
+
+            DatabaseMetaData metadata = connection.getMetaData();
+
+            try (ResultSet result = metadata.getColumns(
+                    null,
+                    null,
+                    tableName,
+                    "%"
+            )) {
+                while (result.next()) {
+                    String column = result.getString("COLUMN_NAME");
+
+                    if (column == null) {
+                        continue;
+                    }
+
+                    String normalized = column
+                        .replace("_", "")
+                        .toUpperCase(Locale.ROOT);
+
+                    if (normalized.contains("MOD")
+                            || normalized.contains("DIF")
+                            || normalized.contains("PERS")
+                            || normalized.contains("CAPIT")) {
+                        columns.add(column);
+                    }
+                }
+            }
+
+            return columns;
+        }
+
+        private static String buildWhere(
+                List<String> columns
+        ) {
+            StringBuilder where = new StringBuilder();
+
+            for (String column : columns) {
+                if (column.equalsIgnoreCase("IDINCONTRO")
+                        || column.equalsIgnoreCase("IDSQUADRA")) {
+                    continue;
+                }
+
+                if (where.length() > 0) {
+                    where.append(" OR ");
+                }
+
+                String quoted = quote(column);
+
+                where.append("(")
+                    .append(quoted)
+                    .append(" IS NOT NULL AND CAST(")
+                    .append(quoted)
+                    .append(" AS DOUBLE) <> 0)");
+            }
+
+            return where.toString();
+        }
+
+        private static void appendColumnIfPresent(
+                List<String> columns,
+                StringBuilder select,
+                String wanted
+        ) {
+            for (String column : columns) {
+                if (column.equalsIgnoreCase(wanted)) {
+                    if (select.length() > 0) {
+                        select.append(", ");
+                    }
+
+                    select.append(quote(column));
+                    return;
+                }
+            }
+        }
+
+        private static void printResultSet(
+                ResultSet result
+        ) throws Exception {
+
+            ResultSetMetaData metadata = result.getMetaData();
+            int count = metadata.getColumnCount();
+
+            while (result.next()) {
+                for (int index = 1; index <= count; index++) {
+                    if (index > 1) {
+                        System.out.print(" | ");
+                    }
+
+                    System.out.print(
+                        metadata.getColumnLabel(index)
+                            + "="
+                            + result.getObject(index)
+                    );
+                }
+
+                System.out.println();
+            }
+        }
+
+        private static String quote(String identifier) {
+            return "\"" + identifier.replace("\"", "\"\"") + "\"";
+        }
+    }
 
 ## tools\Initialize-RecordsNext2Project.ps1
 
@@ -22637,17 +27164,930 @@ File: tools\Initialize-RecordsNext2Project.ps1
     }
     Write-Host "Struttura RecordsNext 2.0 pronta: $ProjectDir" -ForegroundColor Green
 
+## tools\Install-RecordsNextVisualizzatori_v1.ps1
+
+File: tools\Install-RecordsNextVisualizzatori_v1.ps1
+
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$SkinDir,
+
+        [ValidateSet('mauzstrom','fantablue2','neutral')]
+        [string]$Profile = 'neutral',
+
+        [string]$PackageDir = (Join-Path $PSScriptRoot '..\release\visualizzatori')
+    )
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+
+    $package = [System.IO.Path]::GetFullPath($PackageDir)
+    $skin = [System.IO.Path]::GetFullPath($SkinDir)
+
+    if (-not (Test-Path -LiteralPath $package -PathType Container)) {
+        throw "Pacchetto visualizzatori non trovato: $package"
+    }
+    if (-not (Test-Path -LiteralPath $skin -PathType Container)) {
+        throw "Cartella skin non trovata: $skin"
+    }
+
+    $skinJs = Join-Path $skin 'js'
+    $skinViews = Join-Path $skin 'RecordsNext'
+    New-Item -ItemType Directory -Path $skinJs -Force | Out-Null
+    New-Item -ItemType Directory -Path $skinViews -Force | Out-Null
+
+    Copy-Item -LiteralPath (Join-Path $package 'recordsnext.html') -Destination (Join-Path $skin 'recordsnext.html') -Force
+    Get-ChildItem -LiteralPath (Join-Path $package 'RecordsNext') -File -Filter '*.html' |
+        Copy-Item -Destination $skinViews -Force
+
+    Copy-Item -LiteralPath (Join-Path $package 'js\fcmRecordsNextFunzioni_common.js') -Destination $skinJs -Force
+    Copy-Item -LiteralPath (Join-Path $package 'js\fcmRecordsNextFunzioni_viewer.js') -Destination $skinJs -Force
+
+    $profileCss = Join-Path $package ("profiles\{0}\recordsnext.css" -f $Profile)
+    if (-not (Test-Path -LiteralPath $profileCss -PathType Leaf)) {
+        throw "Profilo CSS non trovato: $profileCss"
+    }
+    Copy-Item -LiteralPath $profileCss -Destination (Join-Path $skinViews 'recordsnext.css') -Force
+
+    Write-Host ''
+    Write-Host 'Visualizzatori RecordsNext installati.'
+    Write-Host "Skin    : $skin"
+    Write-Host "Profilo : $Profile"
+    Write-Host "Indice  : $(Join-Path $skin 'recordsnext.html')"
+    Write-Host "Viste   : $skinViews"
+    Write-Host "Funzioni: $skinJs"
+
+## tools\Install-RecordsNextVisualizzatori_v2.ps1
+
+File: tools\Install-RecordsNextVisualizzatori_v2.ps1
+
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$SkinDir,
+
+        [ValidateSet('mauzstrom','fantablue2','neutral')]
+        [string]$Profile = 'neutral',
+
+        [string]$PackageDir = (Join-Path $PSScriptRoot '..\release\visualizzatori')
+    )
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+
+    $package = [System.IO.Path]::GetFullPath($PackageDir)
+    $skin = [System.IO.Path]::GetFullPath($SkinDir)
+
+    if (-not (Test-Path -LiteralPath $package -PathType Container)) {
+        throw "Pacchetto visualizzatori non trovato: $package"
+    }
+    if (-not (Test-Path -LiteralPath $skin -PathType Container)) {
+        throw "Cartella skin non trovata: $skin"
+    }
+
+    $skinJs = Join-Path $skin 'js'
+    $skinViews = Join-Path $skin 'RecordsNext'
+    New-Item -ItemType Directory -Path $skinJs -Force | Out-Null
+    New-Item -ItemType Directory -Path $skinViews -Force | Out-Null
+
+    Copy-Item -LiteralPath (Join-Path $package 'recordsnext.html') -Destination (Join-Path $skin 'recordsnext.html') -Force
+    Get-ChildItem -LiteralPath (Join-Path $package 'RecordsNext') -File -Filter '*.html' |
+        Copy-Item -Destination $skinViews -Force
+
+    Copy-Item -LiteralPath (Join-Path $package 'js\fcmRecordsNextFunzioni_common.js') -Destination $skinJs -Force
+    Copy-Item -LiteralPath (Join-Path $package 'js\fcmRecordsNextFunzioni_viewer.js') -Destination $skinJs -Force
+
+    $profileCss = Join-Path $package ("profiles\{0}\recordsnext.css" -f $Profile)
+    if (-not (Test-Path -LiteralPath $profileCss -PathType Leaf)) {
+        throw "Profilo CSS non trovato: $profileCss"
+    }
+    Copy-Item -LiteralPath $profileCss -Destination (Join-Path $skinViews 'recordsnext.css') -Force
+
+    Write-Host ''
+    Write-Host 'Visualizzatori RecordsNext installati.'
+    Write-Host "Skin    : $skin"
+    Write-Host "Profilo : $Profile"
+    Write-Host "Indice  : $(Join-Path $skin 'recordsnext.html')"
+    Write-Host "Viste   : $skinViews"
+    Write-Host "Funzioni: $skinJs"
+
+## tools\Prepare-RecordsNextVisualizzatoriPreview_v2.ps1
+
+File: tools\Prepare-RecordsNextVisualizzatoriPreview_v2.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    $stagingRoot = Join-Path $ProjectDir "data\site-export-staging"
+    $viewerRoot = Join-Path $ProjectDir "release\visualizzatori"
+    $viewerJs = Join-Path $viewerRoot "js"
+
+    if (-not (Test-Path -LiteralPath $stagingRoot)) {
+        throw "Cartella staging non trovata: $stagingRoot"
+    }
+
+    $latest = Get-ChildItem -LiteralPath $stagingRoot -Directory |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    if ($null -eq $latest) {
+        throw "Nessuna elaborazione presente nello staging."
+    }
+
+    $sourceJs = Join-Path $latest.FullName "js"
+    if (-not (Test-Path -LiteralPath $sourceJs)) {
+        throw "Cartella JS non trovata nell'ultima elaborazione: $sourceJs"
+    }
+
+    New-Item -ItemType Directory -Path $viewerJs -Force | Out-Null
+
+    Get-ChildItem -LiteralPath $sourceJs -File -Filter "fcmRecordsNext_*.js" |
+        Copy-Item -Destination $viewerJs -Force
+
+    Write-Host "Preview preparata dall'elaborazione:" -ForegroundColor Green
+    Write-Host $latest.FullName
+    Write-Host ""
+    Write-Host "Apri nel browser:" -ForegroundColor Cyan
+    Write-Host (Join-Path $viewerRoot "recordsnext.html")
+
+## tools\Run-RecordsNext2JsAudit_v1.ps1
+
+File: tools\Run-RecordsNext2JsAudit_v1.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0",
+        [string]$JsDir = "",
+        [string]$OutputDir = ""
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    if ([string]::IsNullOrWhiteSpace($JsDir)) {
+        $stagingRoot = Join-Path $ProjectDir "data\site-export-staging"
+        $latest = Get-ChildItem -LiteralPath $stagingRoot -Directory |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+        if ($null -eq $latest) {
+            throw "Nessuna elaborazione trovata in $stagingRoot"
+        }
+
+        $JsDir = Join-Path $latest.FullName "js"
+    }
+
+    if (-not (Test-Path -LiteralPath $JsDir)) {
+        throw "Cartella JS non trovata: $JsDir"
+    }
+
+    if ([string]::IsNullOrWhiteSpace($OutputDir)) {
+        $OutputDir = Join-Path $ProjectDir "reports\js-audit"
+    }
+
+    New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+
+    $nodeScript = Join-Path $ProjectDir "tools\Audit-RecordsNext2Js.js"
+    if (-not (Test-Path -LiteralPath $nodeScript)) {
+        throw "Script Node non trovato: $nodeScript"
+    }
+
+    node $nodeScript $JsDir $OutputDir
+    if ($LASTEXITCODE -ne 0) {
+        throw "Audit JS terminato con errore."
+    }
+
+    Write-Host ""
+    Write-Host "Audit completato:" -ForegroundColor Green
+    Write-Host (Join-Path $OutputDir "RecordsNext2_JS_AUDIT.md")
+    Write-Host (Join-Path $OutputDir "RecordsNext2_JS_AUDIT.csv")
+    Write-Host (Join-Path $OutputDir "RecordsNext2_JS_AUDIT.json")
+
+## tools\Run-RecordsNext2JsAudit_v2.ps1
+
+File: tools\Run-RecordsNext2JsAudit_v2.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0",
+        [string]$JsDir = "",
+        [string]$OutputDir = ""
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    function Get-PropertyValue {
+        param($Object, [string[]]$Names)
+        if ($null -eq $Object) { return $null }
+        foreach ($name in $Names) {
+            $property = $Object.PSObject.Properties[$name]
+            if ($null -ne $property -and $null -ne $property.Value -and -not [string]::IsNullOrWhiteSpace([string]$property.Value)) {
+                return $property.Value
+            }
+        }
+        return $null
+    }
+
+    function Add-UniqueValue {
+        param([System.Collections.Generic.HashSet[string]]$Set, $Value)
+        if ($null -ne $Value -and -not [string]::IsNullOrWhiteSpace([string]$Value)) {
+            [void]$Set.Add([string]$Value)
+        }
+    }
+
+    function Read-RecordsNextJs {
+        param([string]$Path)
+
+        $text = [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8).Trim([char]0xFEFF)
+        $match = [regex]::Match($text, '(?s)^\s*window\.([A-Za-z0-9_]+)\s*=\s*(\{.*\})\s*;?\s*$')
+        if (-not $match.Success) {
+            throw "Formato window.<variabile> = {...}; non riconosciuto"
+        }
+
+        return [pscustomobject]@{
+            Variable = $match.Groups[1].Value
+            Data = ($match.Groups[2].Value | ConvertFrom-Json)
+        }
+    }
+
+    function Visit-Node {
+        param(
+            $Node,
+            [string]$InheritedSeason,
+            [string]$InheritedCompetition,
+            [hashtable]$Stats
+        )
+
+        if ($null -eq $Node) { return }
+
+        if ($Node -is [string] -or $Node -is [ValueType]) { return }
+
+        if ($Node -is [System.Collections.IEnumerable] -and -not ($Node -is [pscustomobject]) -and -not ($Node -is [hashtable])) {
+            $count = 0
+            foreach ($item in $Node) {
+                $count++
+                Visit-Node -Node $item -InheritedSeason $InheritedSeason -InheritedCompetition $InheritedCompetition -Stats $Stats
+            }
+            $Stats.Arrays++
+            return
+        }
+
+        $Stats.Objects++
+
+        $season = Get-PropertyValue -Object $Node -Names @('stagione','seasonId','season')
+        if ($null -eq $season) { $season = $InheritedSeason }
+
+        $competition = Get-PropertyValue -Object $Node -Names @('competizioneNome','competitionName','competizioneStoricaId','competitionId','competizione')
+        if ($null -eq $competition) { $competition = $InheritedCompetition }
+
+        Add-UniqueValue -Set $Stats.Seasons -Value $season
+        Add-UniqueValue -Set $Stats.Competitions -Value $competition
+
+        if ($null -ne (Get-PropertyValue -Object $Node -Names @('urlTabellino','scorecardUrl'))) {
+            $Stats.ScorecardLinks++
+        }
+
+        Add-UniqueValue -Set $Stats.RecordIds -Value (Get-PropertyValue -Object $Node -Names @('recordId'))
+        Add-UniqueValue -Set $Stats.EventTypes -Value (Get-PropertyValue -Object $Node -Names @('eventType'))
+
+        foreach ($property in $Node.PSObject.Properties) {
+            Visit-Node -Node $property.Value -InheritedSeason ([string]$season) -InheritedCompetition ([string]$competition) -Stats $Stats
+        }
+    }
+
+    function Get-TopLevelCount {
+        param($Data, [string]$Name)
+        $property = $Data.PSObject.Properties[$Name]
+        if ($null -eq $property -or $null -eq $property.Value) { return 0 }
+        if ($property.Value -is [System.Array]) { return $property.Value.Count }
+        return 1
+    }
+
+    if ([string]::IsNullOrWhiteSpace($JsDir)) {
+        $stagingRoot = Join-Path $ProjectDir "data\site-export-staging"
+        if (-not (Test-Path -LiteralPath $stagingRoot)) {
+            throw "Cartella staging non trovata: $stagingRoot"
+        }
+
+        $latest = Get-ChildItem -LiteralPath $stagingRoot -Directory |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+        if ($null -eq $latest) {
+            throw "Nessuna elaborazione trovata in $stagingRoot"
+        }
+
+        $JsDir = Join-Path $latest.FullName "js"
+    }
+
+    if (-not (Test-Path -LiteralPath $JsDir)) {
+        throw "Cartella JS non trovata: $JsDir"
+    }
+
+    if ([string]::IsNullOrWhiteSpace($OutputDir)) {
+        $OutputDir = Join-Path $ProjectDir "reports\js-audit"
+    }
+
+    New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+
+    $files = Get-ChildItem -LiteralPath $JsDir -File |
+        Where-Object { $_.Name -match '^fcmRecordsNext_.*\.js$' } |
+        Sort-Object Name
+
+    if ($files.Count -eq 0) {
+        throw "Nessun file fcmRecordsNext_*.js trovato in $JsDir"
+    }
+
+    $loaded = @{}
+    $errors = @()
+    foreach ($file in $files) {
+        try {
+            $loaded[$file.Name] = Read-RecordsNextJs -Path $file.FullName
+        }
+        catch {
+            $errors += [pscustomobject]@{ file = $file.Name; error = $_.Exception.Message }
+        }
+    }
+
+    $expectedSeasons = New-Object 'System.Collections.Generic.HashSet[string]'
+    if ($loaded.ContainsKey('fcmRecordsNext_Core.js')) {
+        $core = $loaded['fcmRecordsNext_Core.js'].Data
+        $seasonProperty = $core.PSObject.Properties['seasons']
+        if ($null -ne $seasonProperty) {
+            foreach ($seasonItem in @($seasonProperty.Value)) {
+                Add-UniqueValue -Set $expectedSeasons -Value (Get-PropertyValue -Object $seasonItem -Names @('stagione','seasonId','season'))
+            }
+        }
+    }
+
+    $expectedSeasonArray = @($expectedSeasons | Sort-Object)
+    $rows = @()
+
+    foreach ($fileName in ($loaded.Keys | Sort-Object)) {
+        $entry = $loaded[$fileName]
+        $data = $entry.Data
+        $stats = @{
+            Arrays = 0
+            Objects = 0
+            Seasons = New-Object 'System.Collections.Generic.HashSet[string]'
+            Competitions = New-Object 'System.Collections.Generic.HashSet[string]'
+            RecordIds = New-Object 'System.Collections.Generic.HashSet[string]'
+            EventTypes = New-Object 'System.Collections.Generic.HashSet[string]'
+            ScorecardLinks = 0
+        }
+
+        Visit-Node -Node $data -InheritedSeason $null -InheritedCompetition $null -Stats $stats
+
+        $seasons = @($stats.Seasons | Sort-Object)
+        $competitions = @($stats.Competitions | Sort-Object)
+        $recordIds = @($stats.RecordIds | Sort-Object)
+        $eventTypes = @($stats.EventTypes | Sort-Object)
+        $missing = @($expectedSeasonArray | Where-Object { $_ -notin $seasons })
+
+        $statusParts = @()
+        $outputStatusProperty = $data.PSObject.Properties['outputStatus']
+        if ($null -ne $outputStatusProperty) {
+            foreach ($statusItem in @($outputStatusProperty.Value)) {
+                $statusValue = Get-PropertyValue -Object $statusItem -Names @('status','code')
+                if ($null -ne $statusValue) { $statusParts += [string]$statusValue }
+            }
+        }
+        $statusText = if ($statusParts.Count -gt 0) { $statusParts -join ', ' } else { 'NON_DICHIARATO' }
+
+        $familyId = Get-PropertyValue -Object $data -Names @('familyId')
+        if ($null -eq $familyId) {
+            if ($fileName -like '*Core*') { $familyId = 'core' }
+            elseif ($fileName -like '*Manifest*') { $familyId = 'manifest' }
+            else { $familyId = '' }
+        }
+
+        $declaredSeasonCount = $null
+        $metadataProperty = $data.PSObject.Properties['metadata']
+        if ($null -ne $metadataProperty -and $null -ne $metadataProperty.Value) {
+            $declaredSeasonCount = Get-PropertyValue -Object $metadataProperty.Value -Names @('seasonCount')
+        }
+
+        $rows += [pscustomobject]@{
+            File = $fileName
+            Variable = $entry.Variable
+            FamilyId = [string]$familyId
+            SchemaVersion = [string](Get-PropertyValue -Object $data -Names @('schemaVersion'))
+            Status = $statusText
+            DeclaredSeasonCount = $declaredSeasonCount
+            ActualSeasonCount = $seasons.Count
+            ExpectedSeasonCount = $expectedSeasonArray.Count
+            Seasons = $seasons
+            MissingSeasons = $missing
+            CompetitionCount = $competitions.Count
+            Competitions = $competitions
+            Events = Get-TopLevelCount -Data $data -Name 'events'
+            SeasonAggregates = Get-TopLevelCount -Data $data -Name 'seasonAggregates'
+            GlobalAggregates = Get-TopLevelCount -Data $data -Name 'globalAggregates'
+            AbsoluteOccurrences = Get-TopLevelCount -Data $data -Name 'absoluteOccurrences'
+            Ranking = Get-TopLevelCount -Data $data -Name 'ranking'
+            RecordIdCount = $recordIds.Count
+            RecordIds = $recordIds
+            EventTypeCount = $eventTypes.Count
+            EventTypes = $eventTypes
+            ScorecardLinks = $stats.ScorecardLinks
+        }
+    }
+
+    $generatedAt = (Get-Date).ToString('o')
+    $jsonPath = Join-Path $OutputDir 'RecordsNext2_JS_AUDIT.json'
+    $csvPath = Join-Path $OutputDir 'RecordsNext2_JS_AUDIT.csv'
+    $mdPath = Join-Path $OutputDir 'RecordsNext2_JS_AUDIT.md'
+
+    $audit = [pscustomobject]@{
+        generatedAt = $generatedAt
+        sourceDirectory = (Resolve-Path -LiteralPath $JsDir).Path
+        expectedSeasons = $expectedSeasonArray
+        filesFound = $files.Count
+        filesLoaded = $rows.Count
+        errors = $errors
+        rows = $rows
+    }
+
+    $json = $audit | ConvertTo-Json -Depth 100
+    [System.IO.File]::WriteAllText($jsonPath, $json, (New-Object System.Text.UTF8Encoding($false)))
+
+    $csvRows = $rows | Select-Object `
+        File, FamilyId, Status, DeclaredSeasonCount, ActualSeasonCount, ExpectedSeasonCount,
+        @{Name='MissingSeasons';Expression={$_.MissingSeasons -join ','}},
+        CompetitionCount, Events, SeasonAggregates, Ranking, RecordIdCount, EventTypeCount, ScorecardLinks
+    $csvText = $csvRows | ConvertTo-Csv -Delimiter ';' -NoTypeInformation
+    [System.IO.File]::WriteAllLines($csvPath, $csvText, (New-Object System.Text.UTF8Encoding($true)))
+
+    $lines = New-Object System.Collections.Generic.List[string]
+    $lines.Add('# Audit JS RecordsNext 2.0')
+    $lines.Add('')
+    $lines.Add("Generato: $generatedAt")
+    $lines.Add('')
+    $lines.Add("Cartella analizzata: `$((Resolve-Path -LiteralPath $JsDir).Path)`")
+    $lines.Add('')
+    $lines.Add("Stagioni attese dal Core: **$($expectedSeasonArray.Count)** ($($expectedSeasonArray -join ', '))")
+    $lines.Add('')
+    $lines.Add('## Riepilogo')
+    $lines.Add('')
+    $lines.Add('| File | Famiglia | Stato | Stagioni reali/attese | Mancanti | Competizioni | Eventi | Aggregati | Ranking | Link |')
+    $lines.Add('|---|---|---|---:|---|---:|---:|---:|---:|---:|')
+    foreach ($row in $rows) {
+        $missingText = if ($row.MissingSeasons.Count -gt 0) { $row.MissingSeasons -join ', ' } else { '—' }
+        $lines.Add("| $($row.File) | $($row.FamilyId) | $($row.Status) | $($row.ActualSeasonCount)/$($row.ExpectedSeasonCount) | $missingText | $($row.CompetitionCount) | $($row.Events) | $($row.SeasonAggregates) | $($row.Ranking) | $($row.ScorecardLinks) |")
+    }
+
+    $lines.Add('')
+    $lines.Add('## Anomalie rilevate')
+    $lines.Add('')
+    $anomalyCount = 0
+    foreach ($row in $rows) {
+        if ($row.ExpectedSeasonCount -gt 0 -and $row.ActualSeasonCount -gt 0 -and $row.ActualSeasonCount -lt $row.ExpectedSeasonCount) {
+            $lines.Add("- **$($row.File)** copre $($row.ActualSeasonCount)/$($row.ExpectedSeasonCount) stagioni. Mancano: $($row.MissingSeasons -join ', ').")
+            $anomalyCount++
+        }
+        if ($row.Status -match 'PARTIAL|SKIPPED|ERROR') {
+            $lines.Add("- **$($row.File)** dichiara stato: $($row.Status).")
+            $anomalyCount++
+        }
+        if ($null -ne $row.DeclaredSeasonCount -and [int]$row.DeclaredSeasonCount -ne $row.ActualSeasonCount) {
+            $lines.Add("- **$($row.File)** dichiara seasonCount=$($row.DeclaredSeasonCount), ma nel contenuto risultano $($row.ActualSeasonCount) stagioni.")
+            $anomalyCount++
+        }
+    }
+    if ($anomalyCount -eq 0) {
+        $lines.Add('Nessuna anomalia automatica rilevata.')
+    }
+
+    $lines.Add('')
+    $lines.Add('## Dettaglio per file')
+    foreach ($row in $rows) {
+        $lines.Add('')
+        $lines.Add("### $($row.File)")
+        $lines.Add('')
+        $lines.Add("- Variabile globale: ``window.$($row.Variable)``")
+        $lines.Add("- Schema: $($row.SchemaVersion)")
+        $lines.Add("- Stato: $($row.Status)")
+        $lines.Add("- Stagioni: $($row.Seasons -join ', ')")
+        $lines.Add("- Competizioni ($($row.CompetitionCount)): $($row.Competitions -join ', ')")
+        $lines.Add("- Eventi: $($row.Events); aggregati stagionali: $($row.SeasonAggregates); ranking: $($row.Ranking)")
+        $lines.Add("- Record ID ($($row.RecordIdCount)): $($row.RecordIds -join ', ')")
+        $lines.Add("- Tipi evento ($($row.EventTypeCount)): $($row.EventTypes -join ', ')")
+        $lines.Add("- Link tabellino rilevati: $($row.ScorecardLinks)")
+    }
+
+    if ($errors.Count -gt 0) {
+        $lines.Add('')
+        $lines.Add('## Errori di lettura')
+        $lines.Add('')
+        foreach ($errorItem in $errors) {
+            $lines.Add("- $($errorItem.file): $($errorItem.error)")
+        }
+    }
+
+    [System.IO.File]::WriteAllLines($mdPath, $lines, (New-Object System.Text.UTF8Encoding($false)))
+
+    Write-Host ''
+    Write-Host 'Audit completato senza Node.js:' -ForegroundColor Green
+    Write-Host $mdPath
+    Write-Host $csvPath
+    Write-Host $jsonPath
+
+## tools\Run-RecordsNext2JsAudit_v3.ps1
+
+File: tools\Run-RecordsNext2JsAudit_v3.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0",
+        [string]$JsDir = "",
+        [string]$OutputDir = ""
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    function Get-PropertyValue {
+        param($Object, [string[]]$Names)
+        if ($null -eq $Object) { return $null }
+        foreach ($name in $Names) {
+            $property = $Object.PSObject.Properties[$name]
+            if ($null -ne $property -and $null -ne $property.Value -and -not [string]::IsNullOrWhiteSpace([string]$property.Value)) {
+                return $property.Value
+            }
+        }
+        return $null
+    }
+
+    function Add-UniqueValue {
+        param([System.Collections.Generic.HashSet[string]]$Set, $Value)
+        if ($null -ne $Value -and -not [string]::IsNullOrWhiteSpace([string]$Value)) {
+            [void]$Set.Add([string]$Value)
+        }
+    }
+
+    function Read-RecordsNextJs {
+        param([string]$Path)
+
+        $text = [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8).Trim([char]0xFEFF)
+        $match = [regex]::Match($text, '(?s)^\s*window\.([A-Za-z0-9_]+)\s*=\s*(\{.*\})\s*;?\s*$')
+        if (-not $match.Success) {
+            throw "Formato window.<variabile> = {...}; non riconosciuto"
+        }
+
+        return [pscustomobject]@{
+            Variable = $match.Groups[1].Value
+            Data = ($match.Groups[2].Value | ConvertFrom-Json)
+        }
+    }
+
+    function Visit-Node {
+        param(
+            $Node,
+            [string]$InheritedSeason,
+            [string]$InheritedCompetition,
+            [hashtable]$Stats
+        )
+
+        if ($null -eq $Node) { return }
+
+        if ($Node -is [string] -or $Node -is [ValueType]) { return }
+
+        if ($Node -is [System.Collections.IEnumerable] -and -not ($Node -is [pscustomobject]) -and -not ($Node -is [hashtable])) {
+            $count = 0
+            foreach ($item in $Node) {
+                $count++
+                Visit-Node -Node $item -InheritedSeason $InheritedSeason -InheritedCompetition $InheritedCompetition -Stats $Stats
+            }
+            $Stats.Arrays++
+            return
+        }
+
+        $Stats.Objects++
+
+        $season = Get-PropertyValue -Object $Node -Names @('stagione','seasonId','season')
+        if ($null -eq $season) { $season = $InheritedSeason }
+
+        $competition = Get-PropertyValue -Object $Node -Names @('competizioneNome','competitionName','competizioneStoricaId','competitionId','competizione')
+        if ($null -eq $competition) { $competition = $InheritedCompetition }
+
+        Add-UniqueValue -Set $Stats.Seasons -Value $season
+        Add-UniqueValue -Set $Stats.Competitions -Value $competition
+
+        if ($null -ne (Get-PropertyValue -Object $Node -Names @('urlTabellino','scorecardUrl'))) {
+            $Stats.ScorecardLinks++
+        }
+
+        Add-UniqueValue -Set $Stats.RecordIds -Value (Get-PropertyValue -Object $Node -Names @('recordId'))
+        Add-UniqueValue -Set $Stats.EventTypes -Value (Get-PropertyValue -Object $Node -Names @('eventType'))
+
+        foreach ($property in $Node.PSObject.Properties) {
+            Visit-Node -Node $property.Value -InheritedSeason ([string]$season) -InheritedCompetition ([string]$competition) -Stats $Stats
+        }
+    }
+
+    function Get-TopLevelCount {
+        param($Data, [string]$Name)
+        $property = $Data.PSObject.Properties[$Name]
+        if ($null -eq $property -or $null -eq $property.Value) { return 0 }
+        if ($property.Value -is [System.Array]) { return $property.Value.Count }
+        return 1
+    }
+
+    if ([string]::IsNullOrWhiteSpace($JsDir)) {
+        $stagingRoot = Join-Path $ProjectDir "data\site-export-staging"
+        if (-not (Test-Path -LiteralPath $stagingRoot)) {
+            throw "Cartella staging non trovata: $stagingRoot"
+        }
+
+        $latest = Get-ChildItem -LiteralPath $stagingRoot -Directory |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+        if ($null -eq $latest) {
+            throw "Nessuna elaborazione trovata in $stagingRoot"
+        }
+
+        $JsDir = Join-Path $latest.FullName "js"
+    }
+
+    if (-not (Test-Path -LiteralPath $JsDir)) {
+        throw "Cartella JS non trovata: $JsDir"
+    }
+
+    if ([string]::IsNullOrWhiteSpace($OutputDir)) {
+        $OutputDir = Join-Path $ProjectDir "reports\js-audit"
+    }
+
+    New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+
+    $files = Get-ChildItem -LiteralPath $JsDir -File |
+        Where-Object { $_.Name -match '^fcmRecordsNext_.*\.js$' } |
+        Sort-Object Name
+
+    if ($files.Count -eq 0) {
+        throw "Nessun file fcmRecordsNext_*.js trovato in $JsDir"
+    }
+
+    $loaded = @{}
+    $errors = @()
+    foreach ($file in $files) {
+        try {
+            $loaded[$file.Name] = Read-RecordsNextJs -Path $file.FullName
+        }
+        catch {
+            $errors += [pscustomobject]@{ file = $file.Name; error = $_.Exception.Message }
+        }
+    }
+
+    $expectedSeasons = New-Object 'System.Collections.Generic.HashSet[string]'
+    if ($loaded.ContainsKey('fcmRecordsNext_Core.js')) {
+        $core = $loaded['fcmRecordsNext_Core.js'].Data
+        $seasonProperty = $core.PSObject.Properties['seasons']
+        if ($null -ne $seasonProperty) {
+            foreach ($seasonItem in @($seasonProperty.Value)) {
+                Add-UniqueValue -Set $expectedSeasons -Value (Get-PropertyValue -Object $seasonItem -Names @('stagione','seasonId','season'))
+            }
+        }
+    }
+
+    $expectedSeasonArray = @($expectedSeasons | Sort-Object)
+    $rows = @()
+
+    foreach ($fileName in ($loaded.Keys | Sort-Object)) {
+        $entry = $loaded[$fileName]
+        $data = $entry.Data
+        $stats = @{
+            Arrays = 0
+            Objects = 0
+            Seasons = New-Object 'System.Collections.Generic.HashSet[string]'
+            Competitions = New-Object 'System.Collections.Generic.HashSet[string]'
+            RecordIds = New-Object 'System.Collections.Generic.HashSet[string]'
+            EventTypes = New-Object 'System.Collections.Generic.HashSet[string]'
+            ScorecardLinks = 0
+        }
+
+        Visit-Node -Node $data -InheritedSeason $null -InheritedCompetition $null -Stats $stats
+
+        $seasons = @($stats.Seasons | Sort-Object)
+        $competitions = @($stats.Competitions | Sort-Object)
+        $recordIds = @($stats.RecordIds | Sort-Object)
+        $eventTypes = @($stats.EventTypes | Sort-Object)
+        $missing = @($expectedSeasonArray | Where-Object { $_ -notin $seasons })
+
+        $statusParts = @()
+        $outputStatusProperty = $data.PSObject.Properties['outputStatus']
+        if ($null -ne $outputStatusProperty) {
+            foreach ($statusItem in @($outputStatusProperty.Value)) {
+                $statusValue = Get-PropertyValue -Object $statusItem -Names @('status','code')
+                if ($null -ne $statusValue) { $statusParts += [string]$statusValue }
+            }
+        }
+        $statusText = if ($statusParts.Count -gt 0) { $statusParts -join ', ' } else { 'NON_DICHIARATO' }
+
+        $familyId = Get-PropertyValue -Object $data -Names @('familyId')
+        if ($null -eq $familyId) {
+            if ($fileName -like '*Core*') { $familyId = 'core' }
+            elseif ($fileName -like '*Manifest*') { $familyId = 'manifest' }
+            else { $familyId = '' }
+        }
+
+        $declaredSeasonCount = $null
+        $metadataProperty = $data.PSObject.Properties['metadata']
+        if ($null -ne $metadataProperty -and $null -ne $metadataProperty.Value) {
+            $declaredSeasonCount = Get-PropertyValue -Object $metadataProperty.Value -Names @('seasonCount')
+        }
+
+        $rows += [pscustomobject]@{
+            File = $fileName
+            Variable = $entry.Variable
+            FamilyId = [string]$familyId
+            SchemaVersion = [string](Get-PropertyValue -Object $data -Names @('schemaVersion'))
+            Status = $statusText
+            DeclaredSeasonCount = $declaredSeasonCount
+            ActualSeasonCount = $seasons.Count
+            ExpectedSeasonCount = $expectedSeasonArray.Count
+            Seasons = $seasons
+            MissingSeasons = $missing
+            CompetitionCount = $competitions.Count
+            Competitions = $competitions
+            Events = Get-TopLevelCount -Data $data -Name 'events'
+            SeasonAggregates = Get-TopLevelCount -Data $data -Name 'seasonAggregates'
+            GlobalAggregates = Get-TopLevelCount -Data $data -Name 'globalAggregates'
+            AbsoluteOccurrences = Get-TopLevelCount -Data $data -Name 'absoluteOccurrences'
+            Ranking = Get-TopLevelCount -Data $data -Name 'ranking'
+            RecordIdCount = $recordIds.Count
+            RecordIds = $recordIds
+            EventTypeCount = $eventTypes.Count
+            EventTypes = $eventTypes
+            ScorecardLinks = $stats.ScorecardLinks
+        }
+    }
+
+    $generatedAt = (Get-Date).ToString('o')
+    $jsonPath = Join-Path $OutputDir 'RecordsNext2_JS_AUDIT.json'
+    $csvPath = Join-Path $OutputDir 'RecordsNext2_JS_AUDIT.csv'
+    $mdPath = Join-Path $OutputDir 'RecordsNext2_JS_AUDIT.md'
+
+    $audit = [pscustomobject]@{
+        generatedAt = $generatedAt
+        sourceDirectory = (Resolve-Path -LiteralPath $JsDir).Path
+        expectedSeasons = $expectedSeasonArray
+        filesFound = $files.Count
+        filesLoaded = $rows.Count
+        errors = $errors
+        rows = $rows
+    }
+
+    $json = $audit | ConvertTo-Json -Depth 100
+    [System.IO.File]::WriteAllText($jsonPath, $json, (New-Object System.Text.UTF8Encoding($false)))
+
+    $csvRows = $rows | Select-Object `
+        File, FamilyId, Status, DeclaredSeasonCount, ActualSeasonCount, ExpectedSeasonCount,
+        @{Name='MissingSeasons';Expression={$_.MissingSeasons -join ','}},
+        CompetitionCount, Events, SeasonAggregates, Ranking, RecordIdCount, EventTypeCount, ScorecardLinks
+    $csvText = $csvRows | ConvertTo-Csv -Delimiter ';' -NoTypeInformation
+    [System.IO.File]::WriteAllLines($csvPath, $csvText, (New-Object System.Text.UTF8Encoding($true)))
+
+    $lines = New-Object System.Collections.Generic.List[string]
+    $lines.Add('# Audit JS RecordsNext 2.0')
+    $lines.Add('')
+    $lines.Add("Generato: $generatedAt")
+    $lines.Add('')
+    $resolvedJsDir = (Resolve-Path -LiteralPath $JsDir).Path
+    $lines.Add(("Cartella analizzata: {0}" -f $resolvedJsDir))
+    $lines.Add('')
+    $lines.Add("Stagioni attese dal Core: **$($expectedSeasonArray.Count)** ($($expectedSeasonArray -join ', '))")
+    $lines.Add('')
+    $lines.Add('## Riepilogo')
+    $lines.Add('')
+    $lines.Add('| File | Famiglia | Stato | Stagioni reali/attese | Mancanti | Competizioni | Eventi | Aggregati | Ranking | Link |')
+    $lines.Add('|---|---|---|---:|---|---:|---:|---:|---:|---:|')
+    foreach ($row in $rows) {
+        $missingText = if ($row.MissingSeasons.Count -gt 0) { $row.MissingSeasons -join ', ' } else { '—' }
+        $lines.Add("| $($row.File) | $($row.FamilyId) | $($row.Status) | $($row.ActualSeasonCount)/$($row.ExpectedSeasonCount) | $missingText | $($row.CompetitionCount) | $($row.Events) | $($row.SeasonAggregates) | $($row.Ranking) | $($row.ScorecardLinks) |")
+    }
+
+    $lines.Add('')
+    $lines.Add('## Anomalie rilevate')
+    $lines.Add('')
+    $anomalyCount = 0
+    foreach ($row in $rows) {
+        if ($row.ExpectedSeasonCount -gt 0 -and $row.ActualSeasonCount -gt 0 -and $row.ActualSeasonCount -lt $row.ExpectedSeasonCount) {
+            $lines.Add("- **$($row.File)** copre $($row.ActualSeasonCount)/$($row.ExpectedSeasonCount) stagioni. Mancano: $($row.MissingSeasons -join ', ').")
+            $anomalyCount++
+        }
+        if ($row.Status -match 'PARTIAL|SKIPPED|ERROR') {
+            $lines.Add("- **$($row.File)** dichiara stato: $($row.Status).")
+            $anomalyCount++
+        }
+        if ($null -ne $row.DeclaredSeasonCount -and [int]$row.DeclaredSeasonCount -ne $row.ActualSeasonCount) {
+            $lines.Add("- **$($row.File)** dichiara seasonCount=$($row.DeclaredSeasonCount), ma nel contenuto risultano $($row.ActualSeasonCount) stagioni.")
+            $anomalyCount++
+        }
+    }
+    if ($anomalyCount -eq 0) {
+        $lines.Add('Nessuna anomalia automatica rilevata.')
+    }
+
+    $lines.Add('')
+    $lines.Add('## Dettaglio per file')
+    foreach ($row in $rows) {
+        $lines.Add('')
+        $lines.Add("### $($row.File)")
+        $lines.Add('')
+        $lines.Add("- Variabile globale: ``window.$($row.Variable)``")
+        $lines.Add("- Schema: $($row.SchemaVersion)")
+        $lines.Add("- Stato: $($row.Status)")
+        $lines.Add("- Stagioni: $($row.Seasons -join ', ')")
+        $lines.Add("- Competizioni ($($row.CompetitionCount)): $($row.Competitions -join ', ')")
+        $lines.Add("- Eventi: $($row.Events); aggregati stagionali: $($row.SeasonAggregates); ranking: $($row.Ranking)")
+        $lines.Add("- Record ID ($($row.RecordIdCount)): $($row.RecordIds -join ', ')")
+        $lines.Add("- Tipi evento ($($row.EventTypeCount)): $($row.EventTypes -join ', ')")
+        $lines.Add("- Link tabellino rilevati: $($row.ScorecardLinks)")
+    }
+
+    if ($errors.Count -gt 0) {
+        $lines.Add('')
+        $lines.Add('## Errori di lettura')
+        $lines.Add('')
+        foreach ($errorItem in $errors) {
+            $lines.Add("- $($errorItem.file): $($errorItem.error)")
+        }
+    }
+
+    [System.IO.File]::WriteAllLines($mdPath, $lines, (New-Object System.Text.UTF8Encoding($false)))
+
+    Write-Host ''
+    Write-Host 'Audit completato senza Node.js:' -ForegroundColor Green
+    Write-Host $mdPath
+    Write-Host $csvPath
+    Write-Host $jsonPath
+
+## tools\Start-RecordsNext2-GUI-v7.ps1
+
+File: tools\Start-RecordsNext2-GUI-v7.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0",
+        [string]$InstalledRoot = "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext-1.0.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    Set-Location $ProjectDir
+
+    & "$ProjectDir\mvnw.cmd" dependency:build-classpath `
+        "-Dmdep.outputFile=target\maven-classpath.txt"
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Impossibile costruire il classpath Maven."
+    }
+
+    $mavenCp = Get-Content `
+        "$ProjectDir\target\maven-classpath.txt" `
+        -Raw
+
+    $ucanRoot = Join-Path $InstalledRoot "runtime\ucanaccess"
+
+    $required = @(
+        "$ucanRoot\ucanaccess-2.0.9.5.jar"
+        "$ucanRoot\lib\jackcess-2.1.0.jar"
+        "$ucanRoot\lib\hsqldb.jar"
+        "$ucanRoot\lib\commons-lang-2.6.jar"
+        "$ucanRoot\lib\commons-logging-1.1.1.jar"
+    )
+
+    $missing = $required | Where-Object { -not (Test-Path -LiteralPath $_) }
+
+    if ($missing.Count -gt 0) {
+        $message = "Mancano i seguenti file UCanAccess:`r`n" + ($missing -join "`r`n")
+        throw $message
+    }
+
+    $ucanCp = $required -join ";"
+
+    $fullCp = @(
+        "$ProjectDir\target\classes"
+        $mavenCp.Trim()
+        $ucanCp
+    ) -join ";"
+
+    java `
+        -cp $fullCp `
+        it.alterlega.recordsnext.gui.RecordsNext2Dashboard
+
 ## Indice dei file inclusi
 
 - src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporter.java
 - src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner.java
 - src\main\java\it\alterlega\recordsnext\app\config\MiniJson.java
 - src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoader.java
+- src\main\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriter.java
 - src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
 - src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadata.java
 - src\main\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoader.java
 - src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfig.java
 - src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader.java
+- src\main\java\it\alterlega\recordsnext\app\culometro\CulometroConfigWriter.java
 - src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExporter.java
 - src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
 - src\main\java\it\alterlega\recordsnext\app\manifest\ManifestMetadata.java
@@ -22681,9 +28121,11 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\main\java\it\alterlega\recordsnext\ConfigurationSchema.java
 - src\main\java\it\alterlega\recordsnext\ConfrontiStoriciCalendarImporter.java
 - src\main\java\it\alterlega\recordsnext\DatabaseInspector.java
+- src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
 - src\main\java\it\alterlega\recordsnext\gui\FcmSeasonDetector.java
 - src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingDialog.java
 - src\main\java\it\alterlega\recordsnext\gui\HistoricalMappingRepository.java
+- src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
 - src\main\java\it\alterlega\recordsnext\gui\RecordsNextApp.java
 - src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.java
 - src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.java
@@ -22703,6 +28145,8 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\main\java\it\alterlega\recordsnext\SqliteAudit.java
 - src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTest.java
+- src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterGranularTest.java
+- src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterTest.java
 - src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoaderTest.java
 - src\test\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoaderTest.java
@@ -22719,15 +28163,28 @@ File: tools\Initialize-RecordsNext2Project.ps1
 - src\test\java\it\alterlega\recordsnext\app\series\SeriesCompleteIntegrationTest.java
 - src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\Diagnose_Modifiers_2006_v1.java
+- src\test\java\it\alterlega\recordsnext\Diagnose_Modifiers_2006_v2.java
 - src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
 - config\competitions.json
 - config\culometro.json
 - config\league.json
 - config\manifest.example.json
 - config\processing.json
+- config\recordsnext-gui.properties
 - config\seasons.json
 - config\teams.json
+- tools\Audit-RecordsNext2Js.js
+- tools\Create-RecordsNext2RealJsZip.ps1
 - tools\Create-RecordsNext2WorkingCodeMd.ps1
+- tools\Diagnose_Modifiers_2006_v1.java
 - tools\Initialize-RecordsNext2Project.ps1
+- tools\Install-RecordsNextVisualizzatori_v1.ps1
+- tools\Install-RecordsNextVisualizzatori_v2.ps1
+- tools\Prepare-RecordsNextVisualizzatoriPreview_v2.ps1
+- tools\Run-RecordsNext2JsAudit_v1.ps1
+- tools\Run-RecordsNext2JsAudit_v2.ps1
+- tools\Run-RecordsNext2JsAudit_v3.ps1
+- tools\Start-RecordsNext2-GUI-v7.ps1
 
 ## Fine documento

@@ -1,4 +1,4 @@
-ï»¿# Configurazione RecordsNext 2.0
+# Configurazione RecordsNext 2.0
 
 ## Scopo
 
@@ -13,6 +13,35 @@ Questi file costituiscono la prima configurazione concreta del progetto.
 - `config/processing.json`: famiglie e figli richiesti.
 - `config/culometro.json`: configurazione separata dell'easter egg.
 - `config/manifest.example.json`: forma preliminare del manifest prodotto.
+
+## Configurazione granulare dei Modificatori
+
+La sezione Modificatori di `config/processing.json` conserva separatamente le selezioni per ogni campo disponibile.
+
+Per ogni modificatore sono configurabili:
+
+- `max`;
+- `total`;
+- `average`;
+- `uses`.
+
+I modificatori personalizzati sono:
+
+- `modm1pers`;
+- `modm2pers`;
+- `modm3pers`.
+
+I relativi nomi visualizzati sono configurabili nella GUI e vengono salvati nella configurazione.
+
+I modificatori standard FCM sono:
+
+- `modportiere`;
+- `moddifesa`;
+- `modcentrocampo`;
+- `modattacco`;
+- `modmodulo`.
+
+I nomi dei modificatori standard FCM restano espliciti e non devono essere confusi con quelli personalizzati.
 
 ## Regole consolidate
 
@@ -39,3 +68,41 @@ I valori presenti sono iniziali o di esempio. Prima dell'elaborazione reale sarÃ
 - il formato del tabellino di ogni stagione;
 - i mapping delle squadre;
 - i mapping delle competizioni.
+
+
+## Installazione dei visualizzatori nella skin
+
+La configurazione dell'installer deve prevedere:
+
+- cartella della skin FCM;
+- profilo grafico da installare;
+- conferma della struttura di destinazione;
+- sovrascrittura controllata dei soli file RecordsNext.
+
+Profili iniziali ammessi:
+
+- `mauzstrom`;
+- `fantablue2`;
+- `neutral`.
+
+Struttura dei profili nel progetto:
+
+```text
+templates\skins\mauzstrom\recordsnext.css
+templates\skins\fantablue2\recordsnext.css
+templates\skins\neutral\recordsnext.css
+```
+
+Il profilo `mauzstrom` usa Trebuchet MS come font principale.
+
+La procedura `Installa visualizzatori RecordsNext nella skin` deve copiare:
+
+```text
+recordsnext.html                         -> root della skin
+RecordsNext\*.html                     -> RecordsNext della skin
+RecordsNext\recordsnext.css            -> RecordsNext della skin
+js\fcmRecordsNextFunzioni_common.js    -> js della skin
+js\fcmRecordsNextFunzioni_viewer.js    -> js della skin
+```
+
+Non deve copiare i file dati `fcmRecordsNext_*.js`, che vengono generati dalla pipeline.

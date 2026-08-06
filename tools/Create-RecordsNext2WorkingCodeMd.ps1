@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
 )
@@ -88,14 +88,42 @@ $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 [void]$Builder.AppendLine("- Link ai tabellini per i record riferiti a partite specifiche.")
 [void]$Builder.AppendLine("- JS pubblici nella cartella js del sito.")
 [void]$Builder.AppendLine("- Un solo HTML indice nella root del sito.")
-[void]$Builder.AppendLine("- Viste HTML dimostrative nella cartella RecordsNext.")
+[void]$Builder.AppendLine("- HTML statici senza dati incorporati: visualizzatori dei JS pubblici.")
+[void]$Builder.AppendLine("- Viste HTML nella cartella RecordsNext e un solo indice nella root.")
+[void]$Builder.AppendLine("- JS statici di rendering nella cartella js della skin: fcmRecordsNextFunzioni_common.js e fcmRecordsNextFunzioni_viewer.js.")
+[void]$Builder.AppendLine("- Profili grafici iniziali: mauzstrom, fantablue2 e neutral.")
+[void]$Builder.AppendLine("- Il profilo mauzstrom usa Trebuchet MS.")
+[void]$Builder.AppendLine("- Nei nuovi nomi file RecordsNext si usa underscore, non trattino.")
 [void]$Builder.AppendLine("")
 
 [void]$Builder.AppendLine("### Implementato e verificato")
 [void]$Builder.AppendLine("")
-[void]$Builder.AppendLine("- Struttura iniziale del progetto.")
-[void]$Builder.AppendLine("- Documentazione architetturale iniziale.")
-[void]$Builder.AppendLine("- Generatore della bibbia aggiornato con documentazione e sorgenti reali.")
+[void]$Builder.AppendLine("- Base funzionante RecordsNext 1.0.2 importata nel progetto 2.0.")
+[void]$Builder.AppendLine("- Accesso ai database FCM e FCA tramite UCanAccess.")
+[void]$Builder.AppendLine("- Configurazione delle stagioni gestite e manuali.")
+[void]$Builder.AppendLine("- Importazione, normalizzazione e consolidamento storico delle stagioni gestite.")
+[void]$Builder.AppendLine("- Modello modulare con famiglie, figli, dipendenze, planner e preflight.")
+[void]$Builder.AppendLine("- GUI RecordsNext 2.0 con configurazione granulare delle famiglie.")
+[void]$Builder.AppendLine("- Configurazione gerarchica dei Modificatori per tipo e statistica.")
+[void]$Builder.AppendLine("- Nomi configurabili per MODM1PERS, MODM2PERS e MODM3PERS.")
+[void]$Builder.AppendLine("- Modificatori standard FCM distinti dai modificatori personalizzati.")
+[void]$Builder.AppendLine("- Generazione diretta di fcmRecordsNext_Modifiers.js dagli archivi season_records.")
+[void]$Builder.AppendLine("- Statistiche Massimo, Totale, Media e Utilizzi per i modificatori selezionati.")
+[void]$Builder.AppendLine("- Esportazione verificata del MODDIFESA FCM della stagione 2006_2007.")
+[void]$Builder.AppendLine("- Metadati availableSections e generatedSections distinti.")
+[void]$Builder.AppendLine("- Test automatici: 38 eseguiti, 0 failure, 0 errori.")
+[void]$Builder.AppendLine("- Verifica reale del JS Modificatori completata con tutte le sezioni selezionate presenti.")
+[void]$Builder.AppendLine("")
+
+[void]$Builder.AppendLine("### Non ancora implementato o da completare")
+[void]$Builder.AppendLine("")
+[void]$Builder.AppendLine("- Elaboratore nativo completo della famiglia Serie.")
+[void]$Builder.AppendLine("- Elaboratore nativo completo della famiglia Soglie e Fortuna.")
+[void]$Builder.AppendLine("- Culometro definitivo e relativo contratto dati pubblico.")
+[void]$Builder.AppendLine("- Contratto JavaScript pubblico definitivo di tutte le famiglie.")
+[void]$Builder.AppendLine("- Visualizzatori HTML 2.0 definitivi.")
+[void]$Builder.AppendLine("- JS statici definitivi dei visualizzatori.")
+[void]$Builder.AppendLine("- Installer definitivo dei visualizzatori e dei profili CSS.")
 [void]$Builder.AppendLine("")
 
 [void]$Builder.AppendLine("### Non ancora implementato")
@@ -104,13 +132,16 @@ $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 [void]$Builder.AppendLine("- Modello dati.")
 [void]$Builder.AppendLine("- Elaboratori delle famiglie.")
 [void]$Builder.AppendLine("- Esportatori JS.")
-[void]$Builder.AppendLine("- GUI.")
+[void]$Builder.AppendLine("- Consolidamento GUI 2.0.")
 [void]$Builder.AppendLine("- Installer.")
 [void]$Builder.AppendLine("- Viste HTML 2.0.")
 [void]$Builder.AppendLine("")
 
 Add-IndentedFileSection -Builder $Builder -Title "README" -RelativePath "README.md"
 Add-IndentedFileSection -Builder $Builder -Title "Architettura" -RelativePath "docs\ARCHITETTURA_RECORDSNEXT2.md"
+Add-IndentedFileSection -Builder $Builder -Title "Architettura visualizzatori HTML" -RelativePath "docs\ARCHITETTURA_VISUALIZZATORI_HTML.md"
+Add-IndentedFileSection -Builder $Builder -Title "Installazione visualizzatori HTML" -RelativePath "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md"
+Add-IndentedFileSection -Builder $Builder -Title "Personalizzazione visualizzatori HTML" -RelativePath "docs\PERSONALIZZAZIONE_VISUALIZZATORI_HTML.md"
 Add-IndentedFileSection -Builder $Builder -Title "Catalogo record" -RelativePath "docs\CATALOGO_RECORD.md"
 Add-IndentedFileSection -Builder $Builder -Title "Dipendenze output" -RelativePath "docs\DIPENDENZE_OUTPUT.md"
 Add-IndentedFileSection -Builder $Builder -Title "Decisioni aperte" -RelativePath "docs\DECISIONI_APERTE.md"

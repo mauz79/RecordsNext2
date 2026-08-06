@@ -1,40 +1,132 @@
-﻿{
-    "schemaVersion":  "2.0",
-    "processing":  {
-                       "families":  {
-                                        "classics":  {
-                                                         "enabled":  true,
-                                                         "children":  "ALL"
-                                                     },
-                                        "series":  {
-                                                       "enabled":  true,
-                                                       "children":  "ALL"
-                                                   },
-                                        "ru":  {
-                                                   "enabled":  true,
-                                                   "children":  "ALL"
-                                               },
-                                        "modifiers":  {
-                                                          "enabled":  true,
-                                                          "children":  {
-                                                                           "defence":  true,
-                                                                           "captain":  true,
-                                                                           "homeField":  false
-                                                                       }
-                                                      },
-                                        "thresholdsLuck":  {
-                                                               "enabled":  true,
-                                                               "children":  "ALL"
-                                                           }
-                                    },
-                       "culometro":  {
-                                         "enabled":  true,
-                                         "configFile":  "config\\culometro.json"
-                                     },
-                       "output":  {
-                                      "writeManifest":  true,
-                                      "writeCore":  true,
-                                      "publishToSite":  false
-                                  }
-                   }
+{
+  "schemaVersion": "2.0",
+  "processing": {
+    "families": {
+      "classics": {
+        "enabled": true,
+        "children": {
+                          "highest-match-score": true,
+                          "lowest-match-score": true,
+                          "most-regulation-goals": true,
+                          "largest-regulation-margin": true,
+                          "average-points": true,
+                          "total-points": true,
+                          "standings-points": true,
+                          "wins": true,
+                          "draws": true,
+                          "losses": true,
+                          "goals-for": true,
+                          "goals-against": true,
+                          "yellow-cards-team": true,
+                          "red-cards-team": true,
+                          "red-cards-player": true,
+                          "assists-team": true,
+                          "own-goals-team": true,
+                          "penalties-scored": true,
+                          "penalties-missed": true,
+                          "penalties-saved": true,
+                          "clean-sheets": true
+                        }
+      },
+      "series": {
+        "enabled": true,
+        "children": {
+                          "unbeaten": true,
+                          "winless": true,
+                          "wins": true,
+                          "draws": true,
+                          "losses": true,
+                          "clean-sheets": true,
+                          "captain-bonus": true
+                        }
+      },
+      "ru": {
+        "enabled": true,
+        "children": {
+                          "max-in-match": true,
+                          "matches-with": true,
+                          "matches-against": true,
+                          "deciding": true,
+                          "deciding-against": true,
+                          "balance": true,
+                          "balance-against": true,
+                          "average-points": true,
+                          "average-points-against": true,
+                          "role-distribution": true
+                        }
+      },
+      "modifiers": {
+        "enabled": true,
+        "children": {
+                          "modm1pers.max": true,
+                          "modm1pers.total": true,
+                          "modm1pers.average": true,
+                          "modm1pers.uses": true,
+                          "modm2pers.max": true,
+                          "modm2pers.total": true,
+                          "modm2pers.average": true,
+                          "modm2pers.uses": true,
+                          "modm3pers.max": false,
+                          "modm3pers.total": false,
+                          "modm3pers.average": false,
+                          "modm3pers.uses": false,
+                          "modportiere.max": false,
+                          "modportiere.total": false,
+                          "modportiere.average": false,
+                          "modportiere.uses": false,
+                          "moddifesa.max": true,
+                          "moddifesa.total": true,
+                          "moddifesa.average": true,
+                          "moddifesa.uses": true,
+                          "modcentrocampo.max": false,
+                          "modcentrocampo.total": false,
+                          "modcentrocampo.average": false,
+                          "modcentrocampo.uses": false,
+                          "modattacco.max": false,
+                          "modattacco.total": false,
+                          "modattacco.average": false,
+                          "modattacco.uses": false,
+                          "modmodulo.max": false,
+                          "modmodulo.total": false,
+                          "modmodulo.average": false,
+                          "modmodulo.uses": false,
+                          "home-field-deciding": true,
+                          "home-field-points-gained": true,
+                          "home-field-points-lost": true,
+                          "home-field-balance": true
+                        }
+      },
+      "thresholdsLuck": {
+        "enabled": true,
+        "children": {
+                          "surgical-win": true,
+                          "mocking-loss": true,
+                          "miraculous-draw": true,
+                          "narrow-draw": true,
+                          "missed-win-half-point": true,
+                          "loss-by-a-whisker": true,
+                          "exact-threshold": true,
+                          "just-enough": true,
+                          "wasted-points": true,
+                          "favourable-events": true,
+                          "unfavourable-events": true,
+                          "balance": true
+                        }
+      }
+    },
+    "modifierNames": {
+      "MODM1PERS": "Modificatore Difesa",
+      "MODM2PERS": "Capitano",
+      "MODM3PERS": ""
+    },
+    "culometro": {
+      "enabled": true,
+      "configFile": "config\\culometro.json"
+    },
+    "output": {
+      "writeManifest": true,
+      "writeCore": true,
+      "publishToSite": false
+    }
+  }
 }
