@@ -152,7 +152,7 @@ final class SeasonConfigurationRepository {
 
     private static String status(SeasonRow r) {
         if ("MANUALE".equals(r.managementType())) {
-            return r.localSitePath().isBlank() ? "DA_CONFIGURARE" : "COMPLETA";
+            return "COMPLETA";
         }
         return !r.fcmPath().isBlank() && !r.fcaPath().isBlank() && !r.localSitePath().isBlank()
                 ? "COMPLETA" : "DA_CONFIGURARE";
