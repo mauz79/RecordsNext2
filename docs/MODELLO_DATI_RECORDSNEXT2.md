@@ -1,4 +1,4 @@
-﻿# Modello dati RecordsNext 2.0
+# Modello dati RecordsNext 2.0
 
 ## 1. Scopo
 
@@ -1006,3 +1006,33 @@ Restano da definire:
 ## Aggiornamento Serie complete v2
 
 La famiglia Serie include vittorie consecutive, pareggi consecutivi, sconfitte consecutive, imbattibilita, serie senza vittorie, serie Capitano e serie clean sheet. Stato: `GENERATED_COMPLETE`.
+
+
+## Contratto dati dei visualizzatori
+
+Gli HTML non sono parte del modello dati e non devono contenere copie serializzate dei dataset.
+
+Il contratto pubblico verso i visualizzatori e costituito dai JavaScript generati:
+
+- `fcmRecordsNext_Manifest.js`: disponibilita, versioni, file prodotti e stato degli output;
+- `fcmRecordsNext_Core.js`: metadati e strutture comuni;
+- file della singola famiglia: viste dati complete e filtrabili;
+- `fcmRecordsNext_Culometro.js`: presente soltanto quando la generazione opzionale e richiesta ed eseguibile.
+
+I file di funzioni statiche:
+
+- `fcmRecordsNextFunzioni_common.js`;
+- `fcmRecordsNextFunzioni_viewer.js`;
+
+non contengono dati della lega. Espongono esclusivamente funzioni di accesso, validazione, filtro, ordinamento, formattazione e rendering.
+
+Ogni dataset pubblico deve dichiarare almeno:
+
+- versione dello schema;
+- famiglia;
+- data e stato della generazione;
+- stagioni incluse;
+- disponibilita delle viste;
+- dati completi necessari ai filtri;
+- eventuali dipendenze mancanti;
+- link ai tabellini quando la riga rappresenta una partita.

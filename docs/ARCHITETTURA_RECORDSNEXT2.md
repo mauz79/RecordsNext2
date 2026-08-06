@@ -93,3 +93,81 @@ Ogni record riferito a una partita specifica conserva identificativo, link local
 ## Fuori perimetro iniziale
 
 Palmares, albo d'oro, promozioni, retrocessioni, bilancio prossimo turno, confronti diretti e altre funzioni non-record.
+
+
+## Architettura dei visualizzatori HTML
+
+### Regola vincolante
+
+Gli HTML a corredo di RecordsNext 2.0 non devono contenere dati incorporati, record precalcolati, nomi di squadre o classifiche scritte nel markup.
+
+Devono essere visualizzatori statici dei JavaScript generati dal programma. Questa separazione consente di:
+
+- distribuire gli HTML insieme al plugin;
+- installarli nella skin una sola volta;
+- aggiornare i dati senza riscrivere le pagine;
+- cambiare grafica senza rigenerare i dati;
+- offrire una base utile a chi vuole costruire visualizzatori propri.
+
+### Strati
+
+```text
+HTML statici
+    |
+    v
+fcmRecordsNextFunzioni_common.js
+fcmRecordsNextFunzioni_viewer.js
+    |
+    v
+fcmRecordsNext_Manifest.js
+fcmRecordsNext_Core.js
+fcmRecordsNext_*.js
+```
+
+Responsabilita:
+
+- HTML: struttura semantica, aree filtri, navigazione e contenitori risultati;
+- CSS: resa grafica del profilo scelto;
+- JS funzioni: controllo disponibilita, lettura dati, filtri, ordinamenti e rendering;
+- JS dati: dati completi, metadati, stato degli output e link ai tabellini.
+
+### File statici installabili nella skin
+
+```text
+recordsnext.html
+RecordsNext\classici.html
+RecordsNext\serie.html
+RecordsNext\riserve_ufficio.html
+RecordsNext\modificatori.html
+RecordsNext\soglie_fortuna.html
+RecordsNext\culometro.html
+RecordsNext\recordsnext.css
+js\fcmRecordsNextFunzioni_common.js
+js\fcmRecordsNextFunzioni_viewer.js
+```
+
+Nei nomi dei nuovi file RecordsNext si usa l'underscore, non il trattino.
+
+### File dati generati
+
+I file `fcmRecordsNext_*.js` vengono prodotti dalla pipeline e pubblicati nella cartella `js` del sito. Non fanno parte del pacchetto statico della skin.
+
+### Profili grafici
+
+I profili iniziali sono:
+
+- `mauzstrom`: Trebuchet MS come font principale;
+- `fantablue2`;
+- `neutral`: stile moderno autonomo ispirato ai principi grafici di ReNewo.
+
+La GUI installa sempre gli stessi HTML e JS di rendering. Il profilo scelto determina soltanto il file copiato come `RecordsNext\recordsnext.css`.
+
+### Dati mancanti
+
+La presenza di una pagina HTML non implica la presenza del relativo output dati. In assenza del JS richiesto, la pagina deve mostrare uno stato vuoto leggibile e non produrre errori JavaScript.
+
+### Soglie, Fortuna e Culometro
+
+Soglie e Fortuna resta una famiglia dati autonoma. Nella GUI viene raggruppata con il Culometro perche il Culometro dipende da questi indicatori e puo dipendere anche da componenti delle Riserve d'Ufficio.
+
+Il Culometro resta opzionale e viene generato soltanto quando selezionato esplicitamente. Anche `culometro.html` resta un visualizzatore statico senza dati incorporati.

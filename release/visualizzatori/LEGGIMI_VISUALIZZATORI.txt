@@ -1,0 +1,30 @@
+RECORDSNEXT 2.0 - VISUALIZZATORI STATICI
+
+Questi file non contengono dati di lega.
+Gli HTML leggono esclusivamente i file fcmRecordsNext_*.js presenti nella cartella js del sito.
+
+File statici da installare nella skin:
+- recordsnext.html nella root
+- cartella RecordsNext con HTML e recordsnext.css
+- js/fcmRecordsNextFunzioni_common.js
+- js/fcmRecordsNextFunzioni_viewer.js
+
+Profili grafici disponibili:
+- mauzstrom
+- fantablue2
+- neutral
+
+Esempio installazione:
+  .\tools\Install-RecordsNextVisualizzatori_v1.ps1 -SkinDir "E:\percorso\skin" -Profile mauzstrom
+
+I file fcmRecordsNext_Core.js, Manifest e famiglie NON fanno parte del pacchetto statico:
+sono prodotti da RecordsNext e pubblicati nella cartella js del sito.
+
+
+VERSIONE 2 - ALLINEAMENTO AI JS REALI
+- Classici, Serie e Modificatori: una vista per ogni record annidato in data.records.
+- Riserve d'Ufficio: viste e dettagli aggregati tra tutte le stagioni.
+- Soglie/Fortuna: eventi e riepiloghi per stagione/squadra.
+- Culometro: classifica, eventi e configurazione.
+- Filtri per stagione, competizione e ricerca libera.
+- Link ai tabellini riconosciuti da urlTabellino e scorecardUrl.
