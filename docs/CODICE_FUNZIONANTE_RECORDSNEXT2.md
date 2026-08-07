@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-07 17:44:03 +02:00
+> Data generazione: 2026-08-07 17:57:20 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -32069,16 +32069,18 @@ File: tools\Test_RecordsNext2_RUSemantic_v26.ps1
 
     $problems | Export-Csv -LiteralPath $outCsv -NoTypeInformation -Encoding UTF8
 
-    $summary = $checkNames = @($checks.Keys | ForEach-Object { $_ })
+    $checkNames = @($checks.Keys)
+    $summary = @(
         foreach ($name in $checkNames) {
-        $count = @($problems | Where-Object Sezione -eq $name).Count
-        [pscustomobject]@{
-            Record = $name
-            StagioniControllate = $checks[$name]
-            Problemi = $count
-            Esito = if ($count -eq 0) { "OK" } else { "ERRORE" }
+            $count = @($problems | Where-Object Sezione -eq $name).Count
+            [pscustomobject]@{
+                Record = $name
+                StagioniControllate = $checks[$name]
+                Problemi = $count
+                Esito = if ($count -eq 0) { "OK" } else { "ERRORE" }
+            }
         }
-    }
+    )
 
     Write-Host ""
     Write-Host "=== AUDIT SEMANTICO RU v26 ==="
