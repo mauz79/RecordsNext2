@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-07 12:16:37 +02:00
+> Data generazione: 2026-08-07 17:44:03 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -12084,15 +12084,36 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         }
 
         private JPanel buildHeader() {
-            JPanel header = new JPanel(new BorderLayout());
+            JPanel header = new JPanel(new GridBagLayout());
             header.setOpaque(false);
-            JLabel title = new JLabel("RecordsNext 2.0");
+            header.setPreferredSize(new Dimension(0, 42));
+
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridy = 0;
+            c.fill = GridBagConstraints.HORIZONTAL;
+
+            JPanel leftSpacer = new JPanel();
+            leftSpacer.setOpaque(false);
+            leftSpacer.setPreferredSize(new Dimension(180, 1));
+            c.gridx = 0;
+            c.weightx = 0.0;
+            header.add(leftSpacer, c);
+
+            JLabel title = new JLabel("RecordsNext 2.0", SwingConstants.CENTER);
             title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
             title.setForeground(RED);
-            header.add(title, BorderLayout.WEST);
+            c.gridx = 1;
+            c.weightx = 1.0;
+            header.add(title, c);
+
             status.setFont(new Font("Segoe UI", Font.BOLD, 12));
             status.setForeground(new Color(35, 105, 62));
-            header.add(status, BorderLayout.EAST);
+            status.setHorizontalAlignment(SwingConstants.RIGHT);
+            status.setPreferredSize(new Dimension(180, 24));
+            c.gridx = 2;
+            c.weightx = 0.0;
+            header.add(status, c);
+
             return header;
         }
 
@@ -12658,16 +12679,27 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             JPanel wrapper = new JPanel(new BorderLayout());
             wrapper.setOpaque(false);
             wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
-            JPanel labels = sectionTitle(title, subtitle, SwingConstants.LEFT);
+            wrapper.setPreferredSize(new Dimension(0, 72));
+
+            JPanel leftSpacer = new JPanel();
+            leftSpacer.setOpaque(false);
+            leftSpacer.setPreferredSize(new Dimension(150, 36));
+            wrapper.add(leftSpacer, BorderLayout.WEST);
+
+            JPanel labels = sectionTitle(title, subtitle, SwingConstants.CENTER);
             wrapper.add(labels, BorderLayout.CENTER);
+
+            JPanel holder = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+            holder.setOpaque(false);
+            holder.setPreferredSize(new Dimension(150, 36));
+
             if (back) {
                 JButton button = new JButton("← Dashboard");
                 button.addActionListener(e -> showPage("dashboard"));
-                JPanel holder = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-                holder.setOpaque(false);
                 holder.add(button);
-                wrapper.add(holder, BorderLayout.EAST);
             }
+
+            wrapper.add(holder, BorderLayout.EAST);
             return wrapper;
         }
 
@@ -22040,7 +22072,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
         }
 
         private static Map<String, Object> buildCompetition(Map<String, Object> source, Map<String, Object> sourceMeta) {
-            List<Map<String, Object>> matches = rows(source.get("partiteSquadra"));
+            List<Map<String, Object>> matches = validTeamMatches(rows(source.get("partiteSquadra")));
             List<Map<String, Object>> expulsions = rows(source.get("espulsioniDettaglio"));
             List<Map<String, Object>> events = rows(source.get("eventiSquadraDettaglio"));
             List<Map<String, Object>> modifiers = rows(source.get("modificatoriB2Dettaglio"));
@@ -22943,7 +22975,7 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
 
             for (List<Map<String, Object>> teamMatches : byTeam.values()) {
                 teamMatches.sort(Comparator
-                        .comparingDouble((Map<String, Object> r) -> number(r.get("giornataDiA")))
+                        .comparingDouble((Map<String, Object> r) -> number(r.get("ordineGiornata")))
                         .thenComparing(r -> string(r.get("idIncontro"))));
 
                 List<Map<String, Object>> best = new ArrayList<>();
@@ -23008,6 +23040,24 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
         private static void sortValueTeam(List<Map<String, Object>> out) {
             out.sort(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("valore"))).reversed()
                     .thenComparing(r -> string(r.get("squadra"))));
+        }
+
+        /**
+         * Scarta righe tecniche/non disputate presenti in partiteSquadra.
+         * Una riga valida deve identificare una vera squadra, un vero incontro
+         * e un avversario leggibile. Le righe con idSquadra=0 o nomi vuoti
+         * non devono mai entrare nei record Classici/Serie.
+         */
+        private static List<Map<String, Object>> validTeamMatches(List<Map<String, Object>> matches) {
+            List<Map<String, Object>> valid = new ArrayList<>();
+            for (Map<String, Object> row : matches) {
+                if (longNumber(row.get("idSquadra")) == 0L) continue;
+                if (string(row.get("squadra")).isBlank()) continue;
+                if (string(row.get("idIncontro")).isBlank()) continue;
+                if (string(row.get("avversaria")).isBlank()) continue;
+                valid.add(row);
+            }
+            return valid;
         }
 
         private static Map<String, List<Map<String, Object>>> group(List<Map<String, Object>> rows, String field) {
@@ -24455,6 +24505,102 @@ File: src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExport
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\classics\ClassicsInvalidTeamRowsTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\classics\ClassicsInvalidTeamRowsTest.java
+
+    package it.alterlega.recordsnext.app.classics;
+
+    import it.alterlega.recordsnext.SeasonRecordsArchiveBuilder;
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.List;
+
+    import static org.junit.jupiter.api.Assertions.assertFalse;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+
+    class ClassicsInvalidTeamRowsTest {
+
+        @TempDir
+        Path temp;
+
+        @Test
+        void technicalRowsWithEmptyTeamOrIdZeroNeverReachClassicRecords() throws Exception {
+            Path reports = temp.resolve("reports");
+            Path season = reports.resolve("2025_2026");
+            Path archive = temp.resolve("archive");
+            Files.createDirectories(season);
+
+            String json = """
+                    {
+                      "meta": {
+                        "stagione": "2025_2026",
+                        "competizioneStoricaId": "serie_a",
+                        "competizioneNome": "Serie A"
+                      },
+                      "partiteSquadra": [
+                        {
+                          "stagione": "2025_2026",
+                          "competizioneStoricaId": "serie_a",
+                          "competizioneNome": "Serie A",
+                          "idIncontro": 1,
+                          "idSquadra": 0,
+                          "squadra": "",
+                          "avversaria": "Squadra B",
+                          "puntiFatti": 0,
+                          "puntiSubiti": 68,
+                          "golFatti": 0,
+                          "golSubiti": 1,
+                          "golRegolamentariFatti": 0,
+                          "golRegolamentariSubiti": 1,
+                          "esito": "P",
+                          "ordineGiornata": 1
+                        },
+                        {
+                          "stagione": "2025_2026",
+                          "competizioneStoricaId": "serie_a",
+                          "competizioneNome": "Serie A",
+                          "idIncontro": 2,
+                          "idSquadra": 10,
+                          "squadra": "Squadra A",
+                          "avversaria": "Squadra B",
+                          "puntiFatti": 63,
+                          "puntiSubiti": 68,
+                          "golFatti": 0,
+                          "golSubiti": 1,
+                          "golRegolamentariFatti": 0,
+                          "golRegolamentariSubiti": 1,
+                          "esito": "S",
+                          "ordineGiornata": 2
+                        }
+                      ],
+                      "espulsioniDettaglio": [],
+                      "eventiSquadraDettaglio": [],
+                      "modificatoriB2Dettaglio": [],
+                      "cleanSheetB3Dettaglio": [],
+                      "fasceGolDettaglio": []
+                    }
+                    """;
+
+            Files.writeString(season.resolve("season_normalized_serie_a.json"), json);
+
+            SeasonRecordsArchiveBuilder.build(reports, archive, List.of("2025_2026"));
+
+            String output = Files.readString(
+                    archive.resolve("2025_2026").resolve("season_records_serie_a.json")
+            );
+
+            assertFalse(output.contains("\"idSquadra\": 0"), output);
+            assertFalse(output.contains("\"squadra\": \"\""), output);
+            assertTrue(output.contains("\"squadra\": \"Squadra A\""), output);
+            assertTrue(output.contains("\"puntiSquadraMin\""), output);
+            assertTrue(output.contains("\"valore\": 63"), output);
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\app\classics\ClassicsTwentyOneContractTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\classics\ClassicsTwentyOneContractTest.java
@@ -24918,7 +25064,7 @@ File: src\test\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoader
             CulometroConfig c = CulometroConfigLoader.load(ok);
 
             assertTrue(c.enabled());
-            assertEquals(20, c.minimumMatches());
+            assertEquals(14, c.minimumMatches());
             assertEquals("GOLIARDICO", c.labelConfiguration().preset());
             assertFalse(c.labelConfiguration().customized());
             assertEquals("GOLIARDICO_DEFAULT", c.labelConfiguration().resetSource());
@@ -25910,19 +26056,19 @@ File: config\culometro.json
     {
       "schemaVersion": "2.0",
       "enabled": true,
-      "minimumMatches": 20,
-      "normalization": { "mode": "PER_MATCH", "centerOnHistoricalMean": true, "kScale": 4.15 },
+      "minimumMatches": 14,
+      "normalization": { "mode": "PER_MATCH", "centerOnHistoricalMean": true, "kScale": 3.5 },
       "overlap": { "strategy": "PRIMARY_PLUS_SECONDARY", "secondaryWeight": 0.2, "tagWeight": 0.0, "maxSecondary": 1, "maxTags": 2 },
-      "rarity": { "enabled": true, "profile": "NORMAL", "maximumMultiplier": 5.25, "minimumHistoricalOccurrences": 3 },
+      "rarity": { "enabled": true, "profile": "NORMAL", "maximumMultiplier": 6.5, "minimumHistoricalOccurrences": 3 },
       "components": [
-        { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
         { "componentId": "MISSED_WIN_HALF_POINT", "enabled": true, "weight": 1.35, "allowedRange": { "min": 0.75, "max": 2.5 } },
         { "componentId": "ONE_GOAL_WIN", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
         { "componentId": "RU_DECISIVE", "enabled": true, "weight": 1.4, "allowedRange": { "min": 0.75, "max": 2.5 } },
         { "componentId": "ONE_GOAL_LOSS", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
         { "componentId": "TIGHT_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
+        { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } },
         { "componentId": "LOSS_BY_A_WHISKER", "enabled": true, "weight": 1.45, "allowedRange": { "min": 0.75, "max": 2.5 } },
-        { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } }
+        { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } }
       ],
       "labels": {
         "preset": "GOLIARDICO",
@@ -25942,15 +26088,6 @@ File: config\culometro.json
           { "min": 0, "label": "Vai a farti una vasca a Lourdes" }
         ],
         "presetDefaults": {
-          "NEUTRAL_DEFAULT": [
-            { "min": 90, "label": "Fortuna eccezionale" },
-            { "min": 75, "label": "Molto fortunato" },
-            { "min": 60, "label": "Piuttosto fortunato" },
-            { "min": 45, "label": "In equilibrio" },
-            { "min": 30, "label": "Piuttosto sfortunato" },
-            { "min": 15, "label": "Molto sfortunato" },
-            { "min": 0, "label": "Sfortuna eccezionale" }
-          ],
           "GOLIARDICO_DEFAULT": [
             { "min": 90, "label": "Co' 'sso culo puoi andare a cazzi" },
             { "min": 85, "label": "Protetto dagli dei" },
@@ -25963,6 +26100,15 @@ File: config\culometro.json
             { "min": 16, "label": "Sfiga cieca" },
             { "min": 11, "label": "Raccoglitore di cetrioli" },
             { "min": 0, "label": "Vai a farti una vasca a Lourdes" }
+          ],
+          "NEUTRAL_DEFAULT": [
+            { "min": 90, "label": "Fortuna eccezionale" },
+            { "min": 75, "label": "Molto fortunato" },
+            { "min": 60, "label": "Piuttosto fortunato" },
+            { "min": 45, "label": "In equilibrio" },
+            { "min": 30, "label": "Piuttosto sfortunato" },
+            { "min": 15, "label": "Molto sfortunato" },
+            { "min": 0, "label": "Sfortuna eccezionale" }
           ]
         }
       }
@@ -26207,6 +26353,120 @@ File: config\teams.json
         "EXCLUDED"
       ]
     }
+
+## tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
+
+File: tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
+
+    $ErrorActionPreference = "Stop"
+
+    $ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    $Viewer = Join-Path $ProjectDir "release\visualizzatori\js\fcmRecordsNextFunzioni_viewer.js"
+    $Stamp = Get-Date -Format "yyyyMMdd_HHmmss"
+    $Backup = Join-Path $ProjectDir ("backup_league_direction_v31_" + $Stamp + "\fcmRecordsNextFunzioni_viewer.js")
+
+    Set-Location $ProjectDir
+
+    if (-not (Test-Path -LiteralPath $Viewer)) {
+        throw "Viewer non trovato: $Viewer"
+    }
+
+    New-Item -ItemType Directory -Path (Split-Path -Parent $Backup) -Force | Out-Null
+    Copy-Item -LiteralPath $Viewer -Destination $Backup -Force
+
+    $text = [System.IO.File]::ReadAllText($Viewer)
+
+    $marker = "  function leagueRecordViews() {"
+    if (-not $text.Contains($marker)) {
+        throw "Funzione leagueRecordViews non trovata."
+    }
+
+    if (-not $text.Contains("function leagueRecordDirection(view)")) {
+        $directionFunction = @'
+      function leagueRecordDirection(view) {
+        var id = String(view && view.id || '');
+        var label = String(view && view.label || '').toLowerCase();
+
+        if (id === 'puntiSquadraMin') return 'min';
+        if (label.indexOf('minor ') === 0) return 'min';
+        if (label.indexOf('minimo ') === 0) return 'min';
+        if (label.indexOf('piu basso') === 0) return 'min';
+        if (label.indexOf('più basso') === 0) return 'min';
+
+        return 'max';
+      }
+
+    '@
+        $text = $text.Replace($marker, $directionFunction + $marker)
+    }
+
+    $oldSort = @'
+          candidates.sort(function (a, b) {
+            return b.score - a.score;
+          });
+    '@
+
+    $newSort = @'
+          var direction = leagueRecordDirection(entry.view);
+
+          candidates.sort(function (a, b) {
+            return direction === 'min' ? a.score - b.score : b.score - a.score;
+          });
+    '@
+
+    if ($text.Contains($oldSort)) {
+        $text = $text.Replace($oldSort, $newSort)
+    }
+    elseif (-not $text.Contains("var direction = leagueRecordDirection(entry.view);")) {
+        throw "Blocco ordinamento Record di lega non riconosciuto."
+    }
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Viewer, $text, $utf8NoBom)
+
+    Write-Host ""
+    Write-Host "=== VERIFICA PATCH RECORD DI LEGA ==="
+
+    $checks = @(
+        "function leagueRecordDirection(view)",
+        "id === 'puntiSquadraMin'",
+        "var direction = leagueRecordDirection(entry.view);",
+        "direction === 'min' ? a.score - b.score : b.score - a.score"
+    )
+
+    foreach ($check in $checks) {
+        if (-not ([System.IO.File]::ReadAllText($Viewer).Contains($check))) {
+            throw "Verifica fallita: $check"
+        }
+        Write-Host ("OK: " + $check)
+    }
+
+    if (Get-Command node -ErrorAction SilentlyContinue) {
+        Write-Host ""
+        Write-Host "=== NODE --CHECK ==="
+        & node --check $Viewer
+        if ($LASTEXITCODE -ne 0) {
+            throw "node --check fallito. Backup: $Backup"
+        }
+    }
+
+    Write-Host ""
+    Write-Host "=== MAVEN TEST ==="
+    & .\mvnw.cmd test
+    if ($LASTEXITCODE -ne 0) {
+        throw "Maven test falliti. Backup: $Backup"
+    }
+
+    Write-Host ""
+    Write-Host "=== GIT DIFF --CHECK ==="
+    & git diff --check
+    if ($LASTEXITCODE -ne 0) {
+        throw "git diff --check ha rilevato problemi."
+    }
+
+    Write-Host ""
+    Write-Host "PATCH RECORD DI LEGA v31: OK"
+    Write-Host ("Backup: " + $Backup)
 
 ## tools\Audit-RecordsNext2Js.js
 
@@ -26664,234 +26924,6 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
             $Utf8NoBomCleanup
         )
     }
-
-## tools\Create-RecordsNext2WorkingCodeMd_BACKUP_20260807.ps1
-
-File: tools\Create-RecordsNext2WorkingCodeMd_BACKUP_20260807.ps1
-
-    [CmdletBinding()]
-    param(
-        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
-    )
-
-    Set-StrictMode -Version Latest
-    $ErrorActionPreference = "Stop"
-
-    $DocsDir = Join-Path $ProjectDir "docs"
-    $OutputFile = Join-Path $DocsDir "CODICE_FUNZIONANTE_RECORDSNEXT2.md"
-
-    if (-not (Test-Path -LiteralPath $ProjectDir)) {
-        throw "Directory progetto non trovata: $ProjectDir"
-    }
-
-    if (-not (Test-Path -LiteralPath $DocsDir)) {
-        New-Item -ItemType Directory -Path $DocsDir -Force | Out-Null
-    }
-
-    function Add-IndentedFileSection {
-        param(
-            [Parameter(Mandatory = $true)]
-            [System.Text.StringBuilder]$Builder,
-
-            [Parameter(Mandatory = $true)]
-            [string]$Title,
-
-            [Parameter(Mandatory = $true)]
-            [string]$RelativePath
-        )
-
-        $FullPath = Join-Path $ProjectDir $RelativePath
-
-        [void]$Builder.AppendLine("## " + $Title)
-        [void]$Builder.AppendLine("")
-
-        if (-not (Test-Path -LiteralPath $FullPath)) {
-            [void]$Builder.AppendLine("> File non presente: " + $RelativePath)
-            [void]$Builder.AppendLine("")
-            return
-        }
-
-        [void]$Builder.AppendLine("File: " + $RelativePath)
-        [void]$Builder.AppendLine("")
-
-        $Lines = Get-Content -LiteralPath $FullPath -Encoding UTF8
-
-        if ($Lines.Count -eq 0) {
-            [void]$Builder.AppendLine("    [file vuoto]")
-        }
-        else {
-            foreach ($Line in $Lines) {
-                [void]$Builder.AppendLine("    " + $Line)
-            }
-        }
-
-        [void]$Builder.AppendLine("")
-    }
-
-    $Builder = New-Object System.Text.StringBuilder
-    $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
-
-    [void]$Builder.AppendLine("# Codice funzionante RecordsNext 2.0")
-    [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("> Documento generato automaticamente.")
-    [void]$Builder.AppendLine("> Data generazione: " + $GeneratedAt)
-    [void]$Builder.AppendLine("> Directory progetto: " + $ProjectDir)
-    [void]$Builder.AppendLine("")
-
-    [void]$Builder.AppendLine("## Regole della bibbia")
-    [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("- Le decisioni progettuali consolidate sono separate dal codice implementato.")
-    [void]$Builder.AppendLine("- Un file incluso non e automaticamente dichiarato funzionante.")
-    [void]$Builder.AppendLine("- Lo stato implementato deve essere aggiornato soltanto dopo test.")
-    [void]$Builder.AppendLine("- Le questioni ancora aperte non devono essere presentate come funzionalita.")
-    [void]$Builder.AppendLine("")
-
-    [void]$Builder.AppendLine("## Stato sintetico")
-    [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("### Decisioni consolidate")
-    [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("- Progetto separato in D:\DEV_APPS\RecordsNext2.0.")
-    [void]$Builder.AppendLine("- Cinque famiglie: Classici, Serie, Riserve d'Ufficio, Modificatori, Soglie e Fortuna.")
-    [void]$Builder.AppendLine("- Fattore Campo incluso nei Modificatori.")
-    [void]$Builder.AppendLine("- Culometro opzionale e prodotto soltanto su richiesta.")
-    [void]$Builder.AppendLine("- Dipendenze gestite a livello di singolo figlio.")
-    [void]$Builder.AppendLine("- Associazioni canoniche per squadre e competizioni.")
-    [void]$Builder.AppendLine("- Link ai tabellini per i record riferiti a partite specifiche.")
-    [void]$Builder.AppendLine("- JS pubblici nella cartella js del sito.")
-    [void]$Builder.AppendLine("- Un solo HTML indice nella root del sito.")
-    [void]$Builder.AppendLine("- HTML statici senza dati incorporati: visualizzatori dei JS pubblici.")
-    [void]$Builder.AppendLine("- Viste HTML nella cartella RecordsNext e un solo indice nella root.")
-    [void]$Builder.AppendLine("- JS statici di rendering nella cartella js della skin: fcmRecordsNextFunzioni_common.js e fcmRecordsNextFunzioni_viewer.js.")
-    [void]$Builder.AppendLine("- Profili grafici iniziali: mauzstrom, fantablue2 e neutral.")
-    [void]$Builder.AppendLine("- Il profilo mauzstrom usa Trebuchet MS.")
-    [void]$Builder.AppendLine("- Nei nuovi nomi file RecordsNext si usa underscore, non trattino.")
-    [void]$Builder.AppendLine("")
-
-    [void]$Builder.AppendLine("### Implementato e verificato")
-    [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("- Base funzionante RecordsNext 1.0.2 importata nel progetto 2.0.")
-    [void]$Builder.AppendLine("- Accesso ai database FCM e FCA tramite UCanAccess.")
-    [void]$Builder.AppendLine("- Configurazione delle stagioni gestite e manuali.")
-    [void]$Builder.AppendLine("- Importazione, normalizzazione e consolidamento storico delle stagioni gestite.")
-    [void]$Builder.AppendLine("- Modello modulare con famiglie, figli, dipendenze, planner e preflight.")
-    [void]$Builder.AppendLine("- GUI RecordsNext 2.0 con configurazione granulare delle famiglie.")
-    [void]$Builder.AppendLine("- Configurazione gerarchica dei Modificatori per tipo e statistica.")
-    [void]$Builder.AppendLine("- Nomi configurabili per MODM1PERS, MODM2PERS e MODM3PERS.")
-    [void]$Builder.AppendLine("- Modificatori standard FCM distinti dai modificatori personalizzati.")
-    [void]$Builder.AppendLine("- Generazione diretta di fcmRecordsNext_Modifiers.js dagli archivi season_records.")
-    [void]$Builder.AppendLine("- Statistiche Massimo, Totale, Media e Utilizzi per i modificatori selezionati.")
-    [void]$Builder.AppendLine("- Esportazione verificata del MODDIFESA FCM della stagione 2006_2007.")
-    [void]$Builder.AppendLine("- Metadati availableSections e generatedSections distinti.")
-    [void]$Builder.AppendLine("- Test automatici: 38 eseguiti, 0 failure, 0 errori.")
-    [void]$Builder.AppendLine("- Verifica reale del JS Modificatori completata con tutte le sezioni selezionate presenti.")
-    [void]$Builder.AppendLine("")
-
-    [void]$Builder.AppendLine("### Non ancora implementato o da completare")
-    [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("- Elaboratore nativo completo della famiglia Serie.")
-    [void]$Builder.AppendLine("- Elaboratore nativo completo della famiglia Soglie e Fortuna.")
-    [void]$Builder.AppendLine("- Culometro definitivo e relativo contratto dati pubblico.")
-    [void]$Builder.AppendLine("- Contratto JavaScript pubblico definitivo di tutte le famiglie.")
-    [void]$Builder.AppendLine("- Visualizzatori HTML 2.0 definitivi.")
-    [void]$Builder.AppendLine("- JS statici definitivi dei visualizzatori.")
-    [void]$Builder.AppendLine("- Installer definitivo dei visualizzatori e dei profili CSS.")
-    [void]$Builder.AppendLine("")
-
-    [void]$Builder.AppendLine("### Non ancora implementato")
-    [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("- Lettura FCM e FCA.")
-    [void]$Builder.AppendLine("- Modello dati.")
-    [void]$Builder.AppendLine("- Elaboratori delle famiglie.")
-    [void]$Builder.AppendLine("- Esportatori JS.")
-    [void]$Builder.AppendLine("- Consolidamento GUI 2.0.")
-    [void]$Builder.AppendLine("- Installer.")
-    [void]$Builder.AppendLine("- Viste HTML 2.0.")
-    [void]$Builder.AppendLine("")
-
-    Add-IndentedFileSection -Builder $Builder -Title "README" -RelativePath "README.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Architettura" -RelativePath "docs\ARCHITETTURA_RECORDSNEXT2.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Architettura visualizzatori HTML" -RelativePath "docs\ARCHITETTURA_VISUALIZZATORI_HTML.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Installazione visualizzatori HTML" -RelativePath "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Personalizzazione visualizzatori HTML" -RelativePath "docs\PERSONALIZZAZIONE_VISUALIZZATORI_HTML.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Catalogo record" -RelativePath "docs\CATALOGO_RECORD.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Dipendenze output" -RelativePath "docs\DIPENDENZE_OUTPUT.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Decisioni aperte" -RelativePath "docs\DECISIONI_APERTE.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Modello dati" -RelativePath "docs\MODELLO_DATI_RECORDSNEXT2.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Configurazione" -RelativePath "docs\CONFIGURAZIONE_RECORDSNEXT2.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Stato implementazione" -RelativePath "docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md"
-    Add-IndentedFileSection -Builder $Builder -Title "Changelog" -RelativePath "CHANGELOG.md"
-
-    $SourceExtensions = @(
-        ".java",
-        ".ps1",
-        ".json",
-        ".js",
-        ".html",
-        ".css",
-        ".xml",
-        ".properties"
-    )
-
-    $SourceRoots = @(
-        "src",
-        "config",
-        "tools"
-    )
-
-    [void]$Builder.AppendLine("## File reali del progetto")
-    [void]$Builder.AppendLine("")
-
-    $IncludedFiles = New-Object System.Collections.Generic.List[string]
-
-    foreach ($RelativeRoot in $SourceRoots) {
-        $FullRoot = Join-Path $ProjectDir $RelativeRoot
-
-        if (-not (Test-Path -LiteralPath $FullRoot)) {
-            continue
-        }
-
-        $Files = Get-ChildItem -LiteralPath $FullRoot -File -Recurse |
-            Where-Object { $SourceExtensions -contains $_.Extension.ToLowerInvariant() } |
-            Sort-Object FullName
-
-        foreach ($File in $Files) {
-            $RelativePath = $File.FullName.Substring($ProjectDir.Length).TrimStart("\")
-            [void]$IncludedFiles.Add($RelativePath)
-
-            Add-IndentedFileSection `
-                -Builder $Builder `
-                -Title $RelativePath `
-                -RelativePath $RelativePath
-        }
-    }
-
-    [void]$Builder.AppendLine("## Indice dei file inclusi")
-    [void]$Builder.AppendLine("")
-
-    if ($IncludedFiles.Count -eq 0) {
-        [void]$Builder.AppendLine("- Nessun file sorgente presente.")
-    }
-    else {
-        foreach ($RelativePath in $IncludedFiles) {
-            [void]$Builder.AppendLine("- " + $RelativePath)
-        }
-    }
-
-    [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("## Fine documento")
-
-    $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllText(
-        $OutputFile,
-        $Builder.ToString(),
-        $Utf8NoBom
-    )
-
-    Write-Host ""
-    Write-Host "Bibbia generata:" -ForegroundColor Green
-    Write-Host $OutputFile
-    Write-Host ""
-    Write-Host ("Dimensione: {0} byte" -f (Get-Item -LiteralPath $OutputFile).Length)
 
 ## tools\Initialize-RecordsNext2Project.ps1
 
@@ -28515,6 +28547,5751 @@ File: tools\Test_RecordsNext2_CheckboxViews_v15.ps1
     if ($errors.Count -gt 0) { exit 1 }
     Write-Host "CONTRATTO CHECKBOX -> VISTA: OK"
 
+## tools\Test_RecordsNext2_ClassiciSemantic_v19.ps1
+
+File: tools\Test_RecordsNext2_ClassiciSemantic_v19.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+
+    $reportsRoot = Join-Path $ProjectDir "data\reports"
+    $archiveRoot = Join-Path $ProjectDir "data_archive\stagioni"
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $outCsv = Join-Path $outDir "RecordsNext2_CLASSICI_SEMANTIC_AUDIT.csv"
+
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+    function Num([object]$Value) {
+        if ($null -eq $Value -or "$Value" -eq "") { return 0.0 }
+        return [double]$Value
+    }
+
+    function EqNum([double]$A, [double]$B) {
+        return [math]::Abs($A - $B) -lt 0.000001
+    }
+
+    function Valid-Match([object]$Row) {
+        if ($null -eq $Row) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idSquadra)) { return $false }
+        if ([string]$Row.idSquadra -eq "0") { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.squadra)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idIncontro)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.avversaria)) { return $false }
+        return $true
+    }
+
+    function Add-Problem {
+        param(
+            [System.Collections.Generic.List[object]]$List,
+            [string]$Season,
+            [string]$Competition,
+            [string]$Record,
+            [string]$Team,
+            [string]$Problem,
+            [object]$Expected,
+            [object]$Actual
+        )
+
+        $List.Add([pscustomobject]@{
+            Stagione = $Season
+            Competizione = $Competition
+            Record = $Record
+            Squadra = $Team
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+
+    $recordNames = [ordered]@{
+        puntiSquadraMin = "Minor punteggio"
+        partitePiuGolRegolamentari = "Più gol regolamentari"
+        partitePiuScartoRegolamentari = "Maggior scarto regolamentare"
+        mediaPuntiSquadre = "Media punti"
+        totalePuntiSquadre = "Somma punti"
+        puntiClassificaSquadre = "Punti classifica"
+        vittorieSquadre = "Vittorie"
+        pareggiSquadre = "Pareggi"
+        sconfitteSquadre = "Sconfitte"
+        golFattiSquadre = "Gol fatti"
+        golSubitiSquadre = "Gol subiti"
+    }
+
+    $checked = @{}
+    foreach ($key in $recordNames.Keys) { $checked[$key] = 0 }
+
+    $problems = New-Object 'System.Collections.Generic.List[object]'
+    $filesChecked = 0
+    $matchesChecked = 0
+    $teamsChecked = 0
+
+    $normalizedFiles = @(
+        Get-ChildItem `
+            -LiteralPath $reportsRoot `
+            -Recurse `
+            -File `
+            -Filter "season_normalized_*.json" `
+            -ErrorAction SilentlyContinue |
+        Sort-Object FullName
+    )
+
+    if ($normalizedFiles.Count -eq 0) {
+        throw "Nessun season_normalized_*.json trovato in $reportsRoot"
+    }
+
+    foreach ($normalizedFile in $normalizedFiles) {
+
+        $source = Get-Content -LiteralPath $normalizedFile.FullName -Raw | ConvertFrom-Json
+        $season = $normalizedFile.Directory.Name
+        $competitionId = [string]$source.meta.competizioneStoricaId
+
+        if ([string]::IsNullOrWhiteSpace($competitionId)) {
+            $competitionId = $normalizedFile.BaseName.Substring("season_normalized_".Length)
+        }
+
+        $competitionName = [string]$source.meta.competizioneNome
+        if ([string]::IsNullOrWhiteSpace($competitionName)) {
+            $competitionName = $competitionId
+        }
+
+        $recordFile = Join-Path `
+            (Join-Path $archiveRoot $season) `
+            ("season_records_" + $competitionId + ".json")
+
+        if (-not (Test-Path -LiteralPath $recordFile)) {
+            Add-Problem $problems $season $competitionName "(file)" "" `
+                "season_records mancante" $recordFile ""
+            continue
+        }
+
+        $actual = Get-Content -LiteralPath $recordFile -Raw | ConvertFrom-Json
+        $matches = @($source.partiteSquadra | Where-Object { Valid-Match $_ })
+
+        if ($matches.Count -eq 0) {
+            continue
+        }
+
+        $filesChecked++
+        $matchesChecked += $matches.Count
+
+        # Controlli generali sulle 11 sezioni.
+        foreach ($section in $recordNames.Keys) {
+            $rows = @($actual.records.$section)
+            $checked[$section]++
+
+            if ($rows.Count -eq 0) {
+                Add-Problem $problems $season $competitionName $recordNames[$section] "" `
+                    "Sezione vuota" "almeno 1 riga" "0 righe"
+                continue
+            }
+
+            foreach ($row in $rows) {
+                if ([string]::IsNullOrWhiteSpace([string]$row.squadra)) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] "" `
+                        "Squadra vuota" "nome squadra" ""
+                }
+                if ($null -ne $row.idSquadra -and [string]$row.idSquadra -eq "0") {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] "" `
+                        "idSquadra tecnico" "idSquadra != 0" "0"
+                }
+                if ($row.stagione -and [string]$row.stagione -ne $season) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] ([string]$row.squadra) `
+                        "Stagione errata" $season $row.stagione
+                }
+                if ($row.competizioneNome -and [string]$row.competizioneNome -ne $competitionName) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] ([string]$row.squadra) `
+                        "Competizione errata" $competitionName $row.competizioneNome
+                }
+            }
+        }
+
+        # Record di singola partita.
+        $expectedMin = ($matches | Measure-Object -Property puntiFatti -Minimum).Minimum
+        $actualMinRows = @($actual.records.puntiSquadraMin)
+        if ($actualMinRows.Count -gt 0 -and -not (EqNum (Num $expectedMin) (Num $actualMinRows[0].valore))) {
+            Add-Problem $problems $season $competitionName "Minor punteggio" ([string]$actualMinRows[0].squadra) `
+                "Valore errato" $expectedMin $actualMinRows[0].valore
+        }
+
+        $byMatch = @{}
+        foreach ($row in $matches) {
+            $id = [string]$row.idIncontro
+            if (-not $byMatch.ContainsKey($id)) { $byMatch[$id] = $row }
+        }
+
+        $expectedMostGoals = 0.0
+        $expectedLargestMargin = 0.0
+
+        foreach ($row in $byMatch.Values) {
+            $regFor = Num $row.golRegolamentariFatti
+            $regAgainst = Num $row.golRegolamentariSubiti
+            $totalReg = $regFor + $regAgainst
+            $margin = [math]::Abs($regFor - $regAgainst)
+
+            if ($totalReg -gt $expectedMostGoals) { $expectedMostGoals = $totalReg }
+            if ($margin -gt $expectedLargestMargin) { $expectedLargestMargin = $margin }
+        }
+
+        $actualGoalsRows = @($actual.records.partitePiuGolRegolamentari)
+        if ($actualGoalsRows.Count -gt 0 -and -not (EqNum $expectedMostGoals (Num $actualGoalsRows[0].valore))) {
+            Add-Problem $problems $season $competitionName "Più gol regolamentari" ([string]$actualGoalsRows[0].squadra) `
+                "Valore errato" $expectedMostGoals $actualGoalsRows[0].valore
+        }
+
+        $actualMarginRows = @($actual.records.partitePiuScartoRegolamentari)
+        if ($actualMarginRows.Count -gt 0 -and -not (EqNum $expectedLargestMargin (Num $actualMarginRows[0].valore))) {
+            Add-Problem $problems $season $competitionName "Maggior scarto regolamentare" ([string]$actualMarginRows[0].squadra) `
+                "Valore errato" $expectedLargestMargin $actualMarginRows[0].valore
+        }
+
+        # Aggregati per squadra.
+        $groups = $matches | Group-Object -Property idSquadra
+
+        foreach ($group in $groups) {
+            $teamMatches = @($group.Group)
+            if ($teamMatches.Count -eq 0) { continue }
+
+            $teamsChecked++
+            $teamId = [string]$teamMatches[0].idSquadra
+            $teamName = [string]$teamMatches[0].squadra
+
+            $sumPoints = ($teamMatches | Measure-Object -Property puntiFatti -Sum).Sum
+            $avgPoints = $sumPoints / $teamMatches.Count
+            $wins = @($teamMatches | Where-Object { [string]$_.esito -eq "V" }).Count
+            $draws = @($teamMatches | Where-Object { [string]$_.esito -eq "P" }).Count
+            $losses = @($teamMatches | Where-Object { [string]$_.esito -eq "S" }).Count
+            $standings = ($wins * 3) + $draws
+            $goalsFor = ($teamMatches | Measure-Object -Property golFatti -Sum).Sum
+            $goalsAgainst = ($teamMatches | Measure-Object -Property golSubiti -Sum).Sum
+
+            $expectedBySection = [ordered]@{
+                mediaPuntiSquadre = $avgPoints
+                totalePuntiSquadre = $sumPoints
+                puntiClassificaSquadre = $standings
+                vittorieSquadre = $wins
+                pareggiSquadre = $draws
+                sconfitteSquadre = $losses
+                golFattiSquadre = $goalsFor
+                golSubitiSquadre = $goalsAgainst
+            }
+
+            foreach ($section in $expectedBySection.Keys) {
+                $actualRow = @($actual.records.$section | Where-Object {
+                    [string]$_.idSquadra -eq $teamId
+                } | Select-Object -First 1)
+
+                if ($actualRow.Count -eq 0) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] $teamName `
+                        "Squadra assente dal record" $expectedBySection[$section] "(assente)"
+                    continue
+                }
+
+                $actualValue = Num $actualRow[0].valore
+                $expectedValue = Num $expectedBySection[$section]
+
+                if (-not (EqNum $expectedValue $actualValue)) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] $teamName `
+                        "Valore errato" $expectedValue $actualValue
+                }
+
+                if ([int]$actualRow[0].partite -ne $teamMatches.Count) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] $teamName `
+                        "Numero partite errato" $teamMatches.Count $actualRow[0].partite
+                }
+            }
+        }
+    }
+
+    $problems |
+        Export-Csv `
+            -LiteralPath $outCsv `
+            -NoTypeInformation `
+            -Encoding UTF8
+
+    $summary = foreach ($key in $recordNames.Keys) {
+        $recordProblems = @($problems | Where-Object Record -eq $recordNames[$key])
+        [pscustomobject]@{
+            Record = $recordNames[$key]
+            CompetizioniControllate = $checked[$key]
+            Problemi = $recordProblems.Count
+            Esito = if ($recordProblems.Count -eq 0) { "OK" } else { "ERRORE" }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "=== AUDIT SEMANTICO CLASSICI ==="
+    $summary | Format-Table -AutoSize
+
+    Write-Host ""
+    Write-Host "File competizione controllati : $filesChecked"
+    Write-Host "Righe partita valide          : $matchesChecked"
+    Write-Host "Aggregati squadra controllati : $teamsChecked"
+    Write-Host "Problemi totali               : $($problems.Count)"
+    Write-Host "Dettaglio CSV                  : $outCsv"
+
+    if ($problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "AUDIT SEMANTICO CLASSICI: OK"
+
+## tools\Test_RecordsNext2_ClassiciSemantic_v20.ps1
+
+File: tools\Test_RecordsNext2_ClassiciSemantic_v20.ps1
+
+    param(
+
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+
+    )
+
+
+
+    $ErrorActionPreference = "Stop"
+
+    Set-Location $ProjectDir
+
+
+
+    $reportsRoot = Join-Path $ProjectDir "data\reports"
+
+    $archiveRoot = Join-Path $ProjectDir "data\records-archive\stagioni"
+
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+
+    $outCsv = Join-Path $outDir "RecordsNext2_CLASSICI_SEMANTIC_AUDIT.csv"
+
+
+
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+
+
+    function Num([object]$Value) {
+
+        if ($null -eq $Value -or "$Value" -eq "") { return 0.0 }
+
+        return [double]$Value
+
+    }
+
+
+
+    function EqNum([double]$A, [double]$B) {
+
+        return [math]::Abs($A - $B) -lt 0.000001
+
+    }
+
+
+
+    function Valid-Match([object]$Row) {
+
+        if ($null -eq $Row) { return $false }
+
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idSquadra)) { return $false }
+
+        if ([string]$Row.idSquadra -eq "0") { return $false }
+
+        if ([string]::IsNullOrWhiteSpace([string]$Row.squadra)) { return $false }
+
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idIncontro)) { return $false }
+
+        if ([string]::IsNullOrWhiteSpace([string]$Row.avversaria)) { return $false }
+
+        return $true
+
+    }
+
+
+
+    function Add-Problem {
+
+        param(
+
+            [System.Collections.Generic.List[object]]$List,
+
+            [string]$Season,
+
+            [string]$Competition,
+
+            [string]$Record,
+
+            [string]$Team,
+
+            [string]$Problem,
+
+            [object]$Expected,
+
+            [object]$Actual
+
+        )
+
+
+
+        $List.Add([pscustomobject]@{
+
+            Stagione = $Season
+
+            Competizione = $Competition
+
+            Record = $Record
+
+            Squadra = $Team
+
+            Problema = $Problem
+
+            Atteso = $Expected
+
+            Reale = $Actual
+
+        })
+
+    }
+
+
+
+    $recordNames = [ordered]@{
+
+        puntiSquadraMin = "Minor punteggio"
+
+        partitePiuGolRegolamentari = "Più gol regolamentari"
+
+        partitePiuScartoRegolamentari = "Maggior scarto regolamentare"
+
+        mediaPuntiSquadre = "Media punti"
+
+        totalePuntiSquadre = "Somma punti"
+
+        puntiClassificaSquadre = "Punti classifica"
+
+        vittorieSquadre = "Vittorie"
+
+        pareggiSquadre = "Pareggi"
+
+        sconfitteSquadre = "Sconfitte"
+
+        golFattiSquadre = "Gol fatti"
+
+        golSubitiSquadre = "Gol subiti"
+
+    }
+
+
+
+    $checked = @{}
+
+    foreach ($key in $recordNames.Keys) { $checked[$key] = 0 }
+
+
+
+    $problems = New-Object 'System.Collections.Generic.List[object]'
+
+    $filesChecked = 0
+
+    $matchesChecked = 0
+
+    $teamsChecked = 0
+
+
+
+    $normalizedFiles = @(
+
+        Get-ChildItem `
+
+            -LiteralPath $reportsRoot `
+
+            -Recurse `
+
+            -File `
+
+            -Filter "season_normalized_*.json" `
+
+            -ErrorAction SilentlyContinue |
+
+        Sort-Object FullName
+
+    )
+
+
+
+    if ($normalizedFiles.Count -eq 0) {
+
+        throw "Nessun season_normalized_*.json trovato in $reportsRoot"
+
+    }
+
+
+
+    foreach ($normalizedFile in $normalizedFiles) {
+
+
+
+        $source = Get-Content -LiteralPath $normalizedFile.FullName -Raw | ConvertFrom-Json
+
+        $season = $normalizedFile.Directory.Name
+
+        $competitionId = [string]$source.meta.competizioneStoricaId
+
+
+
+        if ([string]::IsNullOrWhiteSpace($competitionId)) {
+
+            $competitionId = $normalizedFile.BaseName.Substring("season_normalized_".Length)
+
+        }
+
+
+
+        $competitionName = [string]$source.meta.competizioneNome
+
+        if ([string]::IsNullOrWhiteSpace($competitionName)) {
+
+            $competitionName = $competitionId
+
+        }
+
+
+
+        $recordFile = Join-Path `
+
+            (Join-Path $archiveRoot $season) `
+
+            ("season_records_" + $competitionId + ".json")
+
+
+
+        if (-not (Test-Path -LiteralPath $recordFile)) {
+
+            Add-Problem $problems $season $competitionName "(file)" "" `
+
+                "season_records mancante" $recordFile ""
+
+            continue
+
+        }
+
+
+
+        $actual = Get-Content -LiteralPath $recordFile -Raw | ConvertFrom-Json
+
+        $matches = @($source.partiteSquadra | Where-Object { Valid-Match $_ })
+
+
+
+        if ($matches.Count -eq 0) {
+
+            continue
+
+        }
+
+
+
+        $filesChecked++
+
+        $matchesChecked += $matches.Count
+
+
+
+        # Controlli generali sulle 11 sezioni.
+
+        foreach ($section in $recordNames.Keys) {
+
+            $rows = @($actual.records.$section)
+
+            $checked[$section]++
+
+
+
+            if ($rows.Count -eq 0) {
+
+                Add-Problem $problems $season $competitionName $recordNames[$section] "" `
+
+                    "Sezione vuota" "almeno 1 riga" "0 righe"
+
+                continue
+
+            }
+
+
+
+            foreach ($row in $rows) {
+
+                if ([string]::IsNullOrWhiteSpace([string]$row.squadra)) {
+
+                    Add-Problem $problems $season $competitionName $recordNames[$section] "" `
+
+                        "Squadra vuota" "nome squadra" ""
+
+                }
+
+                if ($null -ne $row.idSquadra -and [string]$row.idSquadra -eq "0") {
+
+                    Add-Problem $problems $season $competitionName $recordNames[$section] "" `
+
+                        "idSquadra tecnico" "idSquadra != 0" "0"
+
+                }
+
+                if ($row.stagione -and [string]$row.stagione -ne $season) {
+
+                    Add-Problem $problems $season $competitionName $recordNames[$section] ([string]$row.squadra) `
+
+                        "Stagione errata" $season $row.stagione
+
+                }
+
+                if ($row.competizioneNome -and [string]$row.competizioneNome -ne $competitionName) {
+
+                    Add-Problem $problems $season $competitionName $recordNames[$section] ([string]$row.squadra) `
+
+                        "Competizione errata" $competitionName $row.competizioneNome
+
+                }
+
+            }
+
+        }
+
+
+
+        # Record di singola partita.
+
+        $expectedMin = ($matches | Measure-Object -Property puntiFatti -Minimum).Minimum
+
+        $actualMinRows = @($actual.records.puntiSquadraMin)
+
+        if ($actualMinRows.Count -gt 0 -and -not (EqNum (Num $expectedMin) (Num $actualMinRows[0].valore))) {
+
+            Add-Problem $problems $season $competitionName "Minor punteggio" ([string]$actualMinRows[0].squadra) `
+
+                "Valore errato" $expectedMin $actualMinRows[0].valore
+
+        }
+
+
+
+        $byMatch = @{}
+
+        foreach ($row in $matches) {
+
+            $id = [string]$row.idIncontro
+
+            if (-not $byMatch.ContainsKey($id)) { $byMatch[$id] = $row }
+
+        }
+
+
+
+        $expectedMostGoals = 0.0
+
+        $expectedLargestMargin = 0.0
+
+
+
+        foreach ($row in $byMatch.Values) {
+
+            $regFor = Num $row.golRegolamentariFatti
+
+            $regAgainst = Num $row.golRegolamentariSubiti
+
+            $totalReg = $regFor + $regAgainst
+
+            $margin = [math]::Abs($regFor - $regAgainst)
+
+
+
+            if ($totalReg -gt $expectedMostGoals) { $expectedMostGoals = $totalReg }
+
+            if ($margin -gt $expectedLargestMargin) { $expectedLargestMargin = $margin }
+
+        }
+
+
+
+        $actualGoalsRows = @($actual.records.partitePiuGolRegolamentari)
+
+        if ($actualGoalsRows.Count -gt 0 -and -not (EqNum $expectedMostGoals (Num $actualGoalsRows[0].valore))) {
+
+            Add-Problem $problems $season $competitionName "Più gol regolamentari" ([string]$actualGoalsRows[0].squadra) `
+
+                "Valore errato" $expectedMostGoals $actualGoalsRows[0].valore
+
+        }
+
+
+
+        $actualMarginRows = @($actual.records.partitePiuScartoRegolamentari)
+
+        if ($actualMarginRows.Count -gt 0 -and -not (EqNum $expectedLargestMargin (Num $actualMarginRows[0].valore))) {
+
+            Add-Problem $problems $season $competitionName "Maggior scarto regolamentare" ([string]$actualMarginRows[0].squadra) `
+
+                "Valore errato" $expectedLargestMargin $actualMarginRows[0].valore
+
+        }
+
+
+
+        # Aggregati per squadra.
+
+        $groups = $matches | Group-Object -Property idSquadra
+
+
+
+        foreach ($group in $groups) {
+
+            $teamMatches = @($group.Group)
+
+            if ($teamMatches.Count -eq 0) { continue }
+
+
+
+            $teamsChecked++
+
+            $teamId = [string]$teamMatches[0].idSquadra
+
+            $teamName = [string]$teamMatches[0].squadra
+
+
+
+            $sumPoints = ($teamMatches | Measure-Object -Property puntiFatti -Sum).Sum
+
+            $avgPoints = $sumPoints / $teamMatches.Count
+
+            $wins = @($teamMatches | Where-Object { [string]$_.esito -eq "V" }).Count
+
+            $draws = @($teamMatches | Where-Object { [string]$_.esito -eq "P" }).Count
+
+            $losses = @($teamMatches | Where-Object { [string]$_.esito -eq "S" }).Count
+
+            $standings = ($wins * 3) + $draws
+
+            $goalsFor = ($teamMatches | Measure-Object -Property golFatti -Sum).Sum
+
+            $goalsAgainst = ($teamMatches | Measure-Object -Property golSubiti -Sum).Sum
+
+
+
+            $expectedBySection = [ordered]@{
+
+                mediaPuntiSquadre = $avgPoints
+
+                totalePuntiSquadre = $sumPoints
+
+                puntiClassificaSquadre = $standings
+
+                vittorieSquadre = $wins
+
+                pareggiSquadre = $draws
+
+                sconfitteSquadre = $losses
+
+                golFattiSquadre = $goalsFor
+
+                golSubitiSquadre = $goalsAgainst
+
+            }
+
+
+
+            foreach ($section in $expectedBySection.Keys) {
+
+                $actualRow = @($actual.records.$section | Where-Object {
+
+                    [string]$_.idSquadra -eq $teamId
+
+                } | Select-Object -First 1)
+
+
+
+                if ($actualRow.Count -eq 0) {
+
+                    Add-Problem $problems $season $competitionName $recordNames[$section] $teamName `
+
+                        "Squadra assente dal record" $expectedBySection[$section] "(assente)"
+
+                    continue
+
+                }
+
+
+
+                $actualValue = Num $actualRow[0].valore
+
+                $expectedValue = Num $expectedBySection[$section]
+
+
+
+                if (-not (EqNum $expectedValue $actualValue)) {
+
+                    Add-Problem $problems $season $competitionName $recordNames[$section] $teamName `
+
+                        "Valore errato" $expectedValue $actualValue
+
+                }
+
+
+
+                if ([int]$actualRow[0].partite -ne $teamMatches.Count) {
+
+                    Add-Problem $problems $season $competitionName $recordNames[$section] $teamName `
+
+                        "Numero partite errato" $teamMatches.Count $actualRow[0].partite
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+
+    $problems |
+
+        Export-Csv `
+
+            -LiteralPath $outCsv `
+
+            -NoTypeInformation `
+
+            -Encoding UTF8
+
+
+
+    $summary = foreach ($key in $recordNames.Keys) {
+
+        $recordProblems = @($problems | Where-Object Record -eq $recordNames[$key])
+
+        [pscustomobject]@{
+
+            Record = $recordNames[$key]
+
+            CompetizioniControllate = $checked[$key]
+
+            Problemi = $recordProblems.Count
+
+            Esito = if ($recordProblems.Count -eq 0) { "OK" } else { "ERRORE" }
+
+        }
+
+    }
+
+
+
+    Write-Host ""
+
+    Write-Host "=== AUDIT SEMANTICO CLASSICI ==="
+
+    $summary | Format-Table -AutoSize
+
+
+
+    Write-Host ""
+
+    Write-Host "File competizione controllati : $filesChecked"
+
+    Write-Host "Righe partita valide          : $matchesChecked"
+
+    Write-Host "Aggregati squadra controllati : $teamsChecked"
+
+    Write-Host "Problemi totali               : $($problems.Count)"
+
+    Write-Host "Dettaglio CSV                  : $outCsv"
+
+
+
+    if ($problems.Count -gt 0) {
+
+        Write-Host ""
+
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+
+        $problems | Select-Object -First 25 | Format-Table -AutoSize
+
+        exit 1
+
+    }
+
+
+
+    Write-Host ""
+
+    Write-Host "AUDIT SEMANTICO CLASSICI: OK"
+
+
+## tools\Test_RecordsNext2_ClassiciSemantic_v21.ps1
+
+File: tools\Test_RecordsNext2_ClassiciSemantic_v21.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+    $reportsRoot = Join-Path $ProjectDir "data\reports"
+    $archiveRoot = Join-Path $ProjectDir "data\records-archive\stagioni"
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $outCsv = Join-Path $outDir "RecordsNext2_CLASSICI_SEMANTIC_AUDIT.csv"
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+    function Num([object]$Value) {
+        if ($null -eq $Value -or "$Value" -eq "") { return 0.0 }
+        return [double]$Value
+    }
+    function EqNum([double]$A, [double]$B) {
+        return [math]::Abs($A - $B) -lt 0.000001
+    }
+    function Valid-Match([object]$Row) {
+        if ($null -eq $Row) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idSquadra)) { return $false }
+        if ([string]$Row.idSquadra -eq "0") { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.squadra)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idIncontro)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.avversaria)) { return $false }
+        return $true
+    }
+    function Add-Problem {
+        param(
+            [System.Collections.Generic.List[object]]$List,
+            [string]$Season,
+            [string]$Competition,
+            [string]$Record,
+            [string]$Team,
+            [string]$Problem,
+            [object]$Expected,
+            [object]$Actual
+        )
+        $List.Add([pscustomobject]@{
+            Stagione = $Season
+            Competizione = $Competition
+            Record = $Record
+            Squadra = $Team
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+    $recordNames = [ordered]@{
+        puntiSquadraMin = "Minor punteggio"
+        partitePiuGolRegolamentari = "Più gol regolamentari"
+        partitePiuScartoRegolamentari = "Maggior scarto regolamentare"
+        mediaPuntiSquadre = "Media punti"
+        totalePuntiSquadre = "Somma punti"
+        puntiClassificaSquadre = "Punti classifica"
+        vittorieSquadre = "Vittorie"
+        pareggiSquadre = "Pareggi"
+        sconfitteSquadre = "Sconfitte"
+        golFattiSquadre = "Gol fatti"
+        golSubitiSquadre = "Gol subiti"
+    }
+    $checked = @{}
+    foreach ($key in $recordNames.Keys) { $checked[$key] = 0 }
+    $problems = New-Object 'System.Collections.Generic.List[object]'
+    $filesChecked = 0
+    $matchesChecked = 0
+    $teamsChecked = 0
+    $normalizedFiles = @(
+        Get-ChildItem `
+            -LiteralPath $reportsRoot `
+            -Recurse `
+            -File `
+            -Filter "season_normalized_*.json" `
+            -ErrorAction SilentlyContinue |
+        Sort-Object FullName
+    )
+    if ($normalizedFiles.Count -eq 0) {
+        throw "Nessun season_normalized_*.json trovato in $reportsRoot"
+    }
+    foreach ($normalizedFile in $normalizedFiles) {
+        $source = Get-Content -LiteralPath $normalizedFile.FullName -Raw | ConvertFrom-Json
+        $season = $normalizedFile.Directory.Name
+        $competitionId = [string]$source.meta.competizioneStoricaId
+        if ([string]::IsNullOrWhiteSpace($competitionId)) {
+            $competitionId = $normalizedFile.BaseName.Substring("season_normalized_".Length)
+        }
+        $competitionName = [string]$source.meta.competizioneNome
+        if ([string]::IsNullOrWhiteSpace($competitionName)) {
+            $competitionName = $competitionId
+        }
+        $recordFile = Join-Path `
+            (Join-Path $archiveRoot $season) `
+            ("season_records_" + $competitionId + ".json")
+        if (-not (Test-Path -LiteralPath $recordFile)) {
+            Add-Problem $problems $season $competitionName "(file)" "" `
+                "season_records mancante" $recordFile ""
+            continue
+        }
+        $actual = Get-Content -LiteralPath $recordFile -Raw | ConvertFrom-Json
+        $matches = @($source.partiteSquadra | Where-Object { Valid-Match $_ })
+        if ($matches.Count -eq 0) {
+            continue
+        }
+        $filesChecked++
+        $matchesChecked += $matches.Count
+        # Controlli generali sulle 11 sezioni.
+        foreach ($section in $recordNames.Keys) {
+            $rows = @($actual.records.$section)
+            $checked[$section]++
+            if ($rows.Count -eq 0) {
+                Add-Problem $problems $season $competitionName $recordNames[$section] "" `
+                    "Sezione vuota" "almeno 1 riga" "0 righe"
+                continue
+            }
+            foreach ($row in $rows) {
+                if ([string]::IsNullOrWhiteSpace([string]$row.squadra)) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] "" `
+                        "Squadra vuota" "nome squadra" ""
+                }
+                if ($null -ne $row.idSquadra -and [string]$row.idSquadra -eq "0") {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] "" `
+                        "idSquadra tecnico" "idSquadra != 0" "0"
+                }
+                if ($row.stagione -and [string]$row.stagione -ne $season) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] ([string]$row.squadra) `
+                        "Stagione errata" $season $row.stagione
+                }
+                if ($row.competizioneNome -and [string]$row.competizioneNome -ne $competitionName) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] ([string]$row.squadra) `
+                        "Competizione errata" $competitionName $row.competizioneNome
+                }
+            }
+        }
+        # Record di singola partita.
+        $expectedMin = ($matches | Measure-Object -Property puntiFatti -Minimum).Minimum
+        $actualMinRows = @($actual.records.puntiSquadraMin)
+        if ($actualMinRows.Count -gt 0 -and -not (EqNum (Num $expectedMin) (Num $actualMinRows[0].valore))) {
+            Add-Problem $problems $season $competitionName "Minor punteggio" ([string]$actualMinRows[0].squadra) `
+                "Valore errato" $expectedMin $actualMinRows[0].valore
+        }
+        $byMatch = @{}
+        foreach ($row in $matches) {
+            $id = [string]$row.idIncontro
+            if (-not $byMatch.ContainsKey($id)) { $byMatch[$id] = $row }
+        }
+        $expectedMostGoals = 0.0
+        $expectedLargestMargin = 0.0
+        foreach ($row in $byMatch.Values) {
+            $regFor = Num $row.golRegolamentariFatti
+            $regAgainst = Num $row.golRegolamentariSubiti
+            $totalReg = $regFor + $regAgainst
+            $margin = [math]::Abs($regFor - $regAgainst)
+            if ($totalReg -gt $expectedMostGoals) { $expectedMostGoals = $totalReg }
+            if ($margin -gt $expectedLargestMargin) { $expectedLargestMargin = $margin }
+        }
+        $actualGoalsRows = @($actual.records.partitePiuGolRegolamentari)
+        if ($actualGoalsRows.Count -gt 0 -and -not (EqNum $expectedMostGoals (Num $actualGoalsRows[0].valore))) {
+            Add-Problem $problems $season $competitionName "Più gol regolamentari" ([string]$actualGoalsRows[0].squadra) `
+                "Valore errato" $expectedMostGoals $actualGoalsRows[0].valore
+        }
+        $actualMarginRows = @($actual.records.partitePiuScartoRegolamentari)
+        if ($actualMarginRows.Count -gt 0 -and -not (EqNum $expectedLargestMargin (Num $actualMarginRows[0].valore))) {
+            Add-Problem $problems $season $competitionName "Maggior scarto regolamentare" ([string]$actualMarginRows[0].squadra) `
+                "Valore errato" $expectedLargestMargin $actualMarginRows[0].valore
+        }
+        # Aggregati per squadra.
+        $groups = $matches | Group-Object -Property idSquadra
+        foreach ($group in $groups) {
+            $teamMatches = @($group.Group)
+            if ($teamMatches.Count -eq 0) { continue }
+            $teamsChecked++
+            $teamId = [string]$teamMatches[0].idSquadra
+            $teamName = [string]$teamMatches[0].squadra
+            $sumPoints = ($teamMatches | Measure-Object -Property puntiFatti -Sum).Sum
+            $avgPoints = $sumPoints / $teamMatches.Count
+            $wins = @($teamMatches | Where-Object { [string]$_.esito -eq "V" }).Count
+            $draws = @($teamMatches | Where-Object { [string]$_.esito -eq "P" }).Count
+            $losses = @($teamMatches | Where-Object { [string]$_.esito -eq "S" }).Count
+            $standings = ($wins * 3) + $draws
+            $goalsFor = ($teamMatches | Measure-Object -Property golFatti -Sum).Sum
+            $goalsAgainst = ($teamMatches | Measure-Object -Property golSubiti -Sum).Sum
+            $expectedBySection = [ordered]@{
+                mediaPuntiSquadre = $avgPoints
+                totalePuntiSquadre = $sumPoints
+                puntiClassificaSquadre = $standings
+                vittorieSquadre = $wins
+                pareggiSquadre = $draws
+                sconfitteSquadre = $losses
+                golFattiSquadre = $goalsFor
+                golSubitiSquadre = $goalsAgainst
+            }
+            foreach ($section in $expectedBySection.Keys) {
+                $actualRow = @($actual.records.$section | Where-Object {
+                    [string]$_.idSquadra -eq $teamId
+                } | Select-Object -First 1)
+                if ($actualRow.Count -eq 0) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] $teamName `
+                        "Squadra assente dal record" $expectedBySection[$section] "(assente)"
+                    continue
+                }
+                $actualValue = Num $actualRow[0].valore
+                $expectedValue = Num $expectedBySection[$section]
+                if (-not (EqNum $expectedValue $actualValue)) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] $teamName `
+                        "Valore errato" $expectedValue $actualValue
+                }
+                if ([int]$actualRow[0].partite -ne $teamMatches.Count) {
+                    Add-Problem $problems $season $competitionName $recordNames[$section] $teamName `
+                        "Numero partite errato" $teamMatches.Count $actualRow[0].partite
+                }
+            }
+        }
+    }
+    $problems |
+        Export-Csv `
+            -LiteralPath $outCsv `
+            -NoTypeInformation `
+            -Encoding UTF8
+    $summary = foreach ($key in $recordNames.Keys) {
+        $recordProblems = @($problems | Where-Object Record -eq $recordNames[$key])
+        [pscustomobject]@{
+            Record = $recordNames[$key]
+            CompetizioniControllate = $checked[$key]
+            Problemi = $recordProblems.Count
+            Esito = if ($recordProblems.Count -eq 0) { "OK" } else { "ERRORE" }
+        }
+    }
+    Write-Host ""
+    Write-Host "=== AUDIT SEMANTICO CLASSICI ==="
+    $summary | Format-Table -AutoSize
+    Write-Host ""
+    Write-Host "File competizione controllati : $filesChecked"
+    Write-Host "Righe partita valide          : $matchesChecked"
+    Write-Host "Aggregati squadra controllati : $teamsChecked"
+    Write-Host "Problemi totali               : $($problems.Count)"
+    Write-Host "Dettaglio CSV                  : $outCsv"
+    if ($problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+    Write-Host ""
+    Write-Host "AUDIT SEMANTICO CLASSICI: OK"
+
+## tools\Test_RecordsNext2_FinalSemantic_v31.ps1
+
+File: tools\Test_RecordsNext2_FinalSemantic_v31.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+
+    $StagingRoot = Join-Path $ProjectDir "data\site-export-staging"
+    $OutDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $OutCsv = Join-Path $OutDir "RecordsNext2_CULOMETRO_LEAGUE_v31.csv"
+
+    New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
+    $Problems = New-Object System.Collections.ArrayList
+
+    function Add-Problem(
+        [string]$Section,
+        [string]$Key,
+        [string]$Problem,
+        [object]$Expected,
+        [object]$Actual
+    ) {
+        [void]$Problems.Add([pscustomobject]@{
+            Sezione = $Section
+            Chiave = $Key
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+
+    function Num([object]$Value) {
+        if ($null -eq $Value -or [string]::IsNullOrWhiteSpace([string]$Value)) {
+            return 0.0
+        }
+        return [double]([string]$Value).Replace(",", ".")
+    }
+
+    function Same([object]$A, [object]$B, [double]$Tolerance = 0.000001) {
+        return [math]::Abs((Num $A) - (Num $B)) -le $Tolerance
+    }
+
+    function Prop([object]$Object, [string]$Name) {
+        if ($null -eq $Object) {
+            return $null
+        }
+        $property = $Object.PSObject.Properties[$Name]
+        if ($null -eq $property) {
+            return $null
+        }
+        return $property.Value
+    }
+
+    function Parse-Js([string]$Path, [string]$Prefix) {
+        if (-not (Test-Path -LiteralPath $Path)) {
+            throw "File non trovato: $Path"
+        }
+
+        $text = [System.IO.File]::ReadAllText($Path).Trim()
+
+        if (-not $text.StartsWith($Prefix)) {
+            throw "Prefisso inatteso in $Path"
+        }
+
+        $json = $text.Substring($Prefix.Length).Trim()
+        if ($json.EndsWith(";")) {
+            $json = $json.Substring(0, $json.Length - 1)
+        }
+
+        return $json | ConvertFrom-Json
+    }
+
+    function Event-Key([object]$Event) {
+        return ([string]$Event.seasonId + "|" + [string]$Event.competitionId + "|" + [string]$Event.matchId + "|" + [string]$Event.teamId + "|" + [string]$Event.eventType)
+    }
+
+    function Team-Key([object]$Event) {
+        return ([string]$Event.seasonId + "|" + [string]$Event.teamId)
+    }
+
+    function Competition-Team-Key([object]$Event) {
+        return ([string]$Event.seasonId + "|" + [string]$Event.competitionId + "|" + [string]$Event.teamId)
+    }
+
+    $Manifest = Get-ChildItem -Path $StagingRoot -Recurse -File -Filter "fcmRecordsNext_Manifest.js" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if ($null -eq $Manifest) {
+        throw "Manifest non trovato."
+    }
+
+    $Dir = $Manifest.Directory.FullName
+    $Culometro = Parse-Js (Join-Path $Dir "fcmRecordsNext_Culometro.js") "window.fcmRecordsNextCulometro = "
+    $Thresholds = Parse-Js (Join-Path $Dir "fcmRecordsNext_ThresholdsLuck.js") "window.fcmRecordsNextThresholdsLuck = "
+    $Classics = Parse-Js (Join-Path $Dir "fcmRecordsNext_Classics.js") "window.fcmRecordsNextClassics = "
+
+    $events = @($Culometro.events | Where-Object { $null -ne $_ })
+    $ranking = @($Culometro.ranking | Where-Object { $null -ne $_ })
+    $competitionRanking = @($Culometro.competitionRanking | Where-Object { $null -ne $_ })
+
+    $secondaryWeight = Num $Culometro.configuration.secondaryWeight
+    $minimumMatches = [int](Num $Culometro.configuration.minimumMatches)
+    $kScale = Num $Culometro.configuration.kScale
+
+    # 1. Ogni contributo deve essere matematicamente corretto.
+    foreach ($event in $events) {
+        $direction = if ([string]$event.direction -eq "FAVOURABLE") { 1.0 } elseif ([string]$event.direction -eq "UNFAVOURABLE") { -1.0 } else { 0.0 }
+        $expected = (Num $event.componentWeight) * $direction * (Num $event.rarityMultiplier) * (Num $event.overlapMultiplier)
+
+        if (-not (Same $expected $event.contribution 0.0000015)) {
+            Add-Problem "Culometro.events" (Event-Key $event) "Contributo errato" $expected $event.contribution
+        }
+
+        $expectedOverlap = switch ([string]$event.level) {
+            "PRIMARY" { 1.0 }
+            "SECONDARY" { $secondaryWeight }
+            "TAG" { 0.0 }
+            default { -999.0 }
+        }
+
+        if ($expectedOverlap -eq -999.0) {
+            Add-Problem "Culometro.events" (Event-Key $event) "Livello sconosciuto" "PRIMARY/SECONDARY/TAG" $event.level
+        }
+        elseif (-not (Same $expectedOverlap $event.overlapMultiplier)) {
+            Add-Problem "Culometro.events" (Event-Key $event) "Overlap errato" $expectedOverlap $event.overlapMultiplier
+        }
+    }
+
+    # 2. Ogni performance deve avere un PRIMARY, al massimo un SECONDARY, gli altri TAG.
+    foreach ($group in @($events | Group-Object { [string]$_.seasonId + "|" + [string]$_.matchId + "|" + [string]$_.teamId })) {
+        $rows = @($group.Group)
+        $primary = @($rows | Where-Object { [string]$_.level -eq "PRIMARY" }).Count
+        $secondary = @($rows | Where-Object { [string]$_.level -eq "SECONDARY" }).Count
+
+        if ($primary -ne 1) {
+            Add-Problem "Culometro.overlap" $group.Name "Numero PRIMARY errato" 1 $primary
+        }
+
+        $expectedSecondary = if ($rows.Count -gt 1) { 1 } else { 0 }
+        if ($secondary -ne $expectedSecondary) {
+            Add-Problem "Culometro.overlap" $group.Name "Numero SECONDARY errato" $expectedSecondary $secondary
+        }
+    }
+
+    # 3. Ranking generale ricostruito dagli eventi.
+    $teamExpected = @{}
+    foreach ($group in @($events | Group-Object { Team-Key $_ })) {
+        $rows = @($group.Group)
+        $sum = 0.0
+        foreach ($row in $rows) {
+            $sum += Num $row.contribution
+        }
+
+        $teamExpected[$group.Name] = [pscustomobject]@{
+            total = $sum
+            matches = $rows.Count
+            primary = @($rows | Where-Object { [string]$_.level -eq "PRIMARY" }).Count
+            secondary = @($rows | Where-Object { [string]$_.level -eq "SECONDARY" }).Count
+            perMatch = if ($rows.Count -eq 0) { 0.0 } else { $sum / $rows.Count }
+        }
+    }
+
+    $mean = 0.0
+    if ($teamExpected.Count -gt 0) {
+        $mean = (@($teamExpected.Values | ForEach-Object { $_.perMatch }) | Measure-Object -Average).Average
+    }
+
+    if (-not (Same $mean $Culometro.metadata.historicalMeanPerMatch 0.0000015)) {
+        Add-Problem "Culometro.metadata" "historicalMeanPerMatch" "Media storica errata" $mean $Culometro.metadata.historicalMeanPerMatch
+    }
+
+    $rankingMap = @{}
+    foreach ($row in $ranking) {
+        $rankingMap[[string]$row.seasonId + "|" + [string]$row.teamId] = $row
+    }
+
+    foreach ($key in @($teamExpected.Keys)) {
+        if (-not $rankingMap.ContainsKey($key)) {
+            Add-Problem "Culometro.ranking" $key "Squadra attesa assente" "presente" "assente"
+            continue
+        }
+
+        $expected = $teamExpected[$key]
+        $actual = $rankingMap[$key]
+
+        if (-not (Same $expected.total $actual.totalContribution 0.0000015)) {
+            Add-Problem "Culometro.ranking" $key "totalContribution errato" $expected.total $actual.totalContribution
+        }
+
+        if ([int]$expected.matches -ne [int](Num $actual.matches)) {
+            Add-Problem "Culometro.ranking" $key "matches errato" $expected.matches $actual.matches
+        }
+
+        if ([int]$expected.primary -ne [int](Num $actual.primaryEvents)) {
+            Add-Problem "Culometro.ranking" $key "primaryEvents errato" $expected.primary $actual.primaryEvents
+        }
+
+        if ([int]$expected.secondary -ne [int](Num $actual.secondaryEvents)) {
+            Add-Problem "Culometro.ranking" $key "secondaryEvents errato" $expected.secondary $actual.secondaryEvents
+        }
+
+        if (-not (Same $expected.perMatch $actual.perMatch 0.0000015)) {
+            Add-Problem "Culometro.ranking" $key "perMatch errato" $expected.perMatch $actual.perMatch
+        }
+
+        $reliability = [math]::Min(1.0, $expected.matches / [double]$minimumMatches)
+        if (-not (Same $reliability $actual.reliability 0.0000015)) {
+            Add-Problem "Culometro.ranking" $key "reliability errata" $reliability $actual.reliability
+        }
+
+        $centered = $expected.perMatch - $mean
+        $raw = 50.0 + 50.0 * [math]::Tanh($centered / $kScale)
+        $index = 50.0 + ($raw - 50.0) * $reliability
+        $index = [math]::Max(0.0, [math]::Min(100.0, $index))
+        $roundedIndex = [math]::Round($index, 2, [System.MidpointRounding]::AwayFromZero)
+
+        if (-not (Same $roundedIndex $actual.index 0.0000015)) {
+            Add-Problem "Culometro.ranking" $key "Indice errato" $roundedIndex $actual.index
+        }
+
+        $label = $null
+        foreach ($band in @($Culometro.configuration.labels)) {
+            if ($index -ge (Num $band.min)) {
+                $label = [string]$band.label
+                break
+            }
+        }
+
+        if ([string]$label -ne [string]$actual.label) {
+            Add-Problem "Culometro.ranking" $key "Etichetta errata" $label $actual.label
+        }
+    }
+
+    # 4. Ranking per competizione: aggregazione separata.
+    $competitionExpected = @{}
+    foreach ($group in @($events | Group-Object { Competition-Team-Key $_ })) {
+        $rows = @($group.Group)
+        $sum = 0.0
+        foreach ($row in $rows) {
+            $sum += Num $row.contribution
+        }
+
+        $competitionExpected[$group.Name] = [pscustomobject]@{
+            total = $sum
+            matches = $rows.Count
+            perMatch = if ($rows.Count -eq 0) { 0.0 } else { $sum / $rows.Count }
+        }
+    }
+
+    $competitionMean = 0.0
+    if ($competitionExpected.Count -gt 0) {
+        $competitionMean = (@($competitionExpected.Values | ForEach-Object { $_.perMatch }) | Measure-Object -Average).Average
+    }
+
+    $competitionMap = @{}
+    foreach ($row in $competitionRanking) {
+        $competitionMap[[string]$row.seasonId + "|" + [string]$row.competitionId + "|" + [string]$row.teamId] = $row
+    }
+
+    foreach ($key in @($competitionExpected.Keys)) {
+        if (-not $competitionMap.ContainsKey($key)) {
+            Add-Problem "Culometro.competitionRanking" $key "Squadra/competizione attesa assente" "presente" "assente"
+            continue
+        }
+
+        $expected = $competitionExpected[$key]
+        $actual = $competitionMap[$key]
+
+        if (-not (Same $expected.total $actual.totalContribution 0.0000015)) {
+            Add-Problem "Culometro.competitionRanking" $key "totalContribution errato" $expected.total $actual.totalContribution
+        }
+
+        $reliability = [math]::Min(1.0, $expected.matches / [double]$minimumMatches)
+        $centered = $expected.perMatch - $competitionMean
+        $raw = 50.0 + 50.0 * [math]::Tanh($centered / $kScale)
+        $index = 50.0 + ($raw - 50.0) * $reliability
+        $index = [math]::Max(0.0, [math]::Min(100.0, $index))
+        $roundedIndex = [math]::Round($index, 2, [System.MidpointRounding]::AwayFromZero)
+
+        if (-not (Same $roundedIndex $actual.index 0.0000015)) {
+            Add-Problem "Culometro.competitionRanking" $key "Indice errato" $roundedIndex $actual.index
+        }
+    }
+
+    # 5. Il numero di eventi soglia di input deve coincidere con il metadata.
+    $thresholdCount = @($Thresholds.events | Where-Object { $null -ne $_ }).Count
+    if ($thresholdCount -ne [int](Num $Culometro.metadata.thresholdEventCount)) {
+        Add-Problem "Culometro.metadata" "thresholdEventCount" "Conteggio eventi soglia errato" $thresholdCount $Culometro.metadata.thresholdEventCount
+    }
+
+    # 6. Record di lega: il solo record Classici con direzione minima deve essere puntiSquadraMin.
+    $minRows = @()
+    foreach ($aggregate in @($Classics.seasonAggregates)) {
+        $rows = @(Prop $aggregate.data.records "puntiSquadraMin" | Where-Object { $null -ne $_ })
+        foreach ($row in $rows) {
+            $minRows += $row
+        }
+    }
+
+    if ($minRows.Count -eq 0) {
+        Add-Problem "RecordDiLega" "puntiSquadraMin" "Nessun dato disponibile" "> 0" 0
+    }
+    else {
+        $expectedAbsoluteMin = (@($minRows | ForEach-Object { Num $_.valore }) | Measure-Object -Minimum).Minimum
+        $wrongAbsoluteMax = (@($minRows | ForEach-Object { Num $_.valore }) | Measure-Object -Maximum).Maximum
+
+        if ($expectedAbsoluteMin -eq $wrongAbsoluteMax) {
+            Add-Problem "RecordDiLega" "puntiSquadraMin" "Dataset non discriminante per test min/max" "min diverso da max" $expectedAbsoluteMin
+        }
+    }
+
+    $Viewer = Join-Path $ProjectDir "release\visualizzatori\js\fcmRecordsNextFunzioni_viewer.js"
+    $viewerText = [System.IO.File]::ReadAllText($Viewer)
+
+    $viewerChecks = @(
+        "function leagueRecordDirection(view)",
+        "id === 'puntiSquadraMin'",
+        "var direction = leagueRecordDirection(entry.view);",
+        "direction === 'min' ? a.score - b.score : b.score - a.score"
+    )
+
+    foreach ($check in $viewerChecks) {
+        if (-not $viewerText.Contains($check)) {
+            Add-Problem "RecordDiLega" "viewer" ("Patch direzione mancante: " + $check) "presente" "assente"
+        }
+    }
+
+    $Problems | Export-Csv -LiteralPath $OutCsv -NoTypeInformation -Encoding UTF8
+
+    $summary = @(
+        [pscustomobject]@{ Blocco="Culometro - contributi"; Problemi=@($Problems | Where-Object { $_.Sezione -eq "Culometro.events" }).Count },
+        [pscustomobject]@{ Blocco="Culometro - overlap"; Problemi=@($Problems | Where-Object { $_.Sezione -eq "Culometro.overlap" }).Count },
+        [pscustomobject]@{ Blocco="Culometro - ranking"; Problemi=@($Problems | Where-Object { $_.Sezione -eq "Culometro.ranking" }).Count },
+        [pscustomobject]@{ Blocco="Culometro - ranking competizione"; Problemi=@($Problems | Where-Object { $_.Sezione -eq "Culometro.competitionRanking" }).Count },
+        [pscustomobject]@{ Blocco="Culometro - metadata"; Problemi=@($Problems | Where-Object { $_.Sezione -eq "Culometro.metadata" }).Count },
+        [pscustomobject]@{ Blocco="Record di lega"; Problemi=@($Problems | Where-Object { $_.Sezione -eq "RecordDiLega" }).Count }
+    )
+
+    foreach ($row in $summary) {
+        $row | Add-Member -NotePropertyName Esito -NotePropertyValue $(if ($row.Problemi -eq 0) { "OK" } else { "ERRORE" })
+    }
+
+    Write-Host ""
+    Write-Host "=== AUDIT FINALE CULOMETRO + RECORD DI LEGA v31 ==="
+    $summary | Format-Table -AutoSize
+    Write-Host ""
+    Write-Host ("Eventi Culometro             : " + $events.Count)
+    Write-Host ("Ranking Culometro            : " + $ranking.Count)
+    Write-Host ("Ranking per competizione     : " + $competitionRanking.Count)
+    Write-Host ("Righe puntiSquadraMin        : " + $minRows.Count)
+    Write-Host ("Problemi totali              : " + $Problems.Count)
+    Write-Host ("Dettaglio CSV                 : " + $OutCsv)
+
+    if ($Problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $Problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "AUDIT FINALE CULOMETRO + RECORD DI LEGA: OK"
+
+## tools\Test_RecordsNext2_ModifiersSemantic_v27.ps1
+
+File: tools\Test_RecordsNext2_ModifiersSemantic_v27.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+
+    $reportsRoot = Join-Path $ProjectDir "data\reports"
+    $stagingRoot = Join-Path $ProjectDir "data\site-export-staging"
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $outCsv = Join-Path $outDir "RecordsNext2_MODIFICATORI_SEMANTIC_AUDIT.csv"
+
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+    $Problems = New-Object System.Collections.ArrayList
+
+    function Num([object]$Value) {
+        if ($null -eq $Value -or [string]::IsNullOrWhiteSpace([string]$Value)) {
+            return 0.0
+        }
+        return [double]$Value
+    }
+
+    function Same-Number([object]$A, [object]$B) {
+        return [math]::Abs((Num $A) - (Num $B)) -le 0.000001
+    }
+
+    function Add-Problem(
+        [string]$Season,
+        [string]$Competition,
+        [string]$Section,
+        [string]$Key,
+        [string]$Problem,
+        [object]$Expected,
+        [object]$Actual
+    ) {
+        [void]$Problems.Add([pscustomobject]@{
+            Stagione = $Season
+            Competizione = $Competition
+            Sezione = $Section
+            Chiave = $Key
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+
+    function Property-Value([object]$Object, [string]$Name) {
+        if ($null -eq $Object) {
+            return $null
+        }
+        $property = $Object.PSObject.Properties[$Name]
+        if ($null -eq $property) {
+            return $null
+        }
+        return $property.Value
+    }
+
+    function Modifier-Key([object]$Row) {
+        return ([string]$Row.idIncontro + "|" + [string]$Row.idSquadra + "|" + [string]$Row.valore)
+    }
+
+    function Team-Key([object]$Row) {
+        return [string]$Row.idSquadra
+    }
+
+    function Impact-Key([object]$Row) {
+        return ([string]$Row.idIncontro + "|" + [string]$Row.idSquadra)
+    }
+
+    function Compare-Text(
+        [string]$Season,
+        [string]$Competition,
+        [string]$Section,
+        [string]$Key,
+        [string]$Field,
+        [object]$Expected,
+        [object]$Actual
+    ) {
+        if ([string]$Expected -ne [string]$Actual) {
+            Add-Problem $Season $Competition $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
+        }
+    }
+
+    function Compare-Number(
+        [string]$Season,
+        [string]$Competition,
+        [string]$Section,
+        [string]$Key,
+        [string]$Field,
+        [object]$Expected,
+        [object]$Actual
+    ) {
+        if (-not (Same-Number $Expected $Actual)) {
+            Add-Problem $Season $Competition $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
+        }
+    }
+
+    function Make-Map([object[]]$Rows, [scriptblock]$KeySelector) {
+        $map = @{}
+        foreach ($row in @($Rows)) {
+            if ($null -eq $row) {
+                continue
+            }
+            $key = [string](& $KeySelector $row)
+            if ([string]::IsNullOrWhiteSpace($key)) {
+                continue
+            }
+            $map[$key] = $row
+        }
+        return $map
+    }
+
+    function Standings-Points([int]$GoalsFor, [int]$GoalsAgainst) {
+        if ($GoalsFor -gt $GoalsAgainst) {
+            return 3
+        }
+        if ($GoalsFor -eq $GoalsAgainst) {
+            return 1
+        }
+        return 0
+    }
+
+    function Goals-For-Score([double]$Score, [object[]]$Bands) {
+        $goals = 0
+        foreach ($band in @($Bands | Sort-Object { Num $_.min })) {
+            if (($Score + 0.000001) -ge (Num $band.min)) {
+                $candidate = [int](Num $band.gol)
+                if ($candidate -gt $goals) {
+                    $goals = $candidate
+                }
+            }
+        }
+        return $goals
+    }
+
+    function Build-ModifierTotalsByMatchTeam([object[]]$Modifiers) {
+        $totals = @{}
+        foreach ($modifier in @($Modifiers)) {
+            $key = [string]$modifier.idIncontro + "|" + [string]$modifier.idSquadra
+            if (-not $totals.ContainsKey($key)) {
+                $totals[$key] = 0.0
+            }
+            $totals[$key] = (Num $totals[$key]) + (Num $modifier.valore)
+        }
+        return $totals
+    }
+
+    function Build-HomeImpacts([object[]]$Matches, [object[]]$Modifiers, [object[]]$Bands) {
+        $modifierTotals = Build-ModifierTotalsByMatchTeam $Modifiers
+        $impacts = @()
+
+        foreach ($group in @($Matches | Group-Object idIncontro)) {
+            $homeRowsTmp = @($group.Group | Where-Object { [string]$_.lato -eq "casa" } | Select-Object -First 1)
+            $awayRowsTmp = @($group.Group | Where-Object { [string]$_.lato -eq "fuori" } | Select-Object -First 1)
+
+            if ($homeRowsTmp.Count -eq 0 -or $awayRowsTmp.Count -eq 0) {
+                continue
+            }
+
+            $homeRow = $homeRowsTmp[0]
+            $awayRow = $awayRowsTmp[0]
+            $key = [string]$homeRow.idIncontro + "|" + [string]$homeRow.idSquadra
+            $modifierTotal = 0.0
+            if ($modifierTotals.ContainsKey($key)) {
+                $modifierTotal = Num $modifierTotals[$key]
+            }
+
+            $bonus = (Num $homeRow.puntiFatti) - (Num $homeRow.parzialeFatto) - $modifierTotal
+            if ([math]::Abs($bonus) -lt 0.000001) {
+                $bonus = 0.0
+            }
+            if ($bonus -le 0) {
+                continue
+            }
+
+            $scoreWithout = (Num $homeRow.puntiFatti) - $bonus
+            $goalsWithout = Goals-For-Score $scoreWithout $Bands
+            $homeGoals = [int](Num $homeRow.golFatti)
+            $awayGoals = [int](Num $homeRow.golSubiti)
+            $actualPoints = Standings-Points $homeGoals $awayGoals
+            $pointsWithout = Standings-Points $goalsWithout $awayGoals
+            $delta = $actualPoints - $pointsWithout
+
+            if ($delta -lt 0) {
+                $delta = 0
+            }
+
+            $impacts += [pscustomobject]@{
+                idIncontro = [string]$homeRow.idIncontro
+                idSquadra = [string]$homeRow.idSquadra
+                squadra = [string]$homeRow.squadra
+                idAvversaria = [string]$awayRow.idSquadra
+                avversaria = [string]$awayRow.squadra
+                bonus = $bonus
+                puntiDelta = $delta
+                home = $homeRow
+                away = $awayRow
+            }
+        }
+
+        return $impacts
+    }
+
+    function Audit-ModifierSection(
+        [string]$Season,
+        [string]$Competition,
+        [string]$Section,
+        [string]$Mode,
+        [string]$Type,
+        [object[]]$Modifiers,
+        [object[]]$ActualRows
+    ) {
+        $selected = @($Modifiers | Where-Object { [string]$_.tipo -eq $Type })
+        $actual = @($ActualRows)
+
+        if ($Mode -eq "max") {
+            $expected = @($selected | Sort-Object @{Expression={ Num $_.valore }; Descending=$true}, @{Expression={ [string]$_.squadra }; Descending=$false} | Select-Object -First 20)
+            $expectedMap = Make-Map $expected { param($r) Modifier-Key $r }
+            $actualMap = Make-Map $actual { param($r) Modifier-Key $r }
+
+            if ($expectedMap.Count -ne $actualMap.Count) {
+                Add-Problem $Season $Competition $Section "(conteggio)" "Numero righe errato" $expectedMap.Count $actualMap.Count
+            }
+
+            foreach ($key in @($expectedMap.Keys)) {
+                if (-not $actualMap.ContainsKey($key)) {
+                    Add-Problem $Season $Competition $Section $key "Record massimo atteso assente" "presente" "assente"
+                }
+            }
+
+            foreach ($key in @($actualMap.Keys)) {
+                if (-not $expectedMap.ContainsKey($key)) {
+                    Add-Problem $Season $Competition $Section $key "Record massimo esportato non atteso" "assente" "presente"
+                }
+            }
+            return
+        }
+
+        $expectedGroups = @($selected | Group-Object idSquadra)
+        $actualMap = Make-Map $actual { param($r) Team-Key $r }
+
+        if ($expectedGroups.Count -ne $actualMap.Count) {
+            Add-Problem $Season $Competition $Section "(conteggio)" "Numero squadre errato" $expectedGroups.Count $actualMap.Count
+        }
+
+        foreach ($group in $expectedGroups) {
+            $rows = @($group.Group)
+            if ($rows.Count -eq 0) {
+                continue
+            }
+
+            $teamId = [string]$group.Name
+            if (-not $actualMap.ContainsKey($teamId)) {
+                Add-Problem $Season $Competition $Section $teamId "Squadra attesa assente" "presente" "assente"
+                continue
+            }
+
+            $actualRow = $actualMap[$teamId]
+            $sum = 0.0
+            foreach ($row in $rows) {
+                $sum += Num $row.valore
+            }
+
+            if ($Mode -eq "total") {
+                Compare-Number $Season $Competition $Section $teamId "valore" $sum $actualRow.valore
+            }
+            elseif ($Mode -eq "average") {
+                $average = $sum / $rows.Count
+                Compare-Number $Season $Competition $Section $teamId "valore" $average $actualRow.valore
+                Compare-Number $Season $Competition $Section $teamId "utilizzi" $rows.Count $actualRow.utilizzi
+            }
+            elseif ($Mode -eq "uses") {
+                Compare-Number $Season $Competition $Section $teamId "valore" $rows.Count $actualRow.valore
+            }
+
+            $details = @(Property-Value $actualRow "dettagli")
+            if ($details.Count -ne $rows.Count) {
+                Add-Problem $Season $Competition $Section $teamId "Numero dettagli errato" $rows.Count $details.Count
+            }
+        }
+    }
+
+    $manifest = Get-ChildItem -Path $stagingRoot -Recurse -File -Filter "fcmRecordsNext_Manifest.js" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if ($null -eq $manifest) {
+        throw "fcmRecordsNext_Manifest.js non trovato in $stagingRoot"
+    }
+
+    $modifiersJs = Join-Path $manifest.Directory.FullName "fcmRecordsNext_Modifiers.js"
+    if (-not (Test-Path -LiteralPath $modifiersJs)) {
+        throw "fcmRecordsNext_Modifiers.js non trovato: $modifiersJs"
+    }
+
+    $js = [System.IO.File]::ReadAllText($modifiersJs)
+    $eq = $js.IndexOf("=")
+    if ($eq -lt 0) {
+        throw "Formato fcmRecordsNext_Modifiers.js inatteso."
+    }
+    $json = $js.Substring($eq + 1).Trim()
+    if ($json.EndsWith(";")) {
+        $json = $json.Substring(0, $json.Length - 1)
+    }
+    $root = $json | ConvertFrom-Json
+
+    $normalizedIndex = @{}
+    $normalizedFiles = @(Get-ChildItem -Path $reportsRoot -Recurse -File -Filter "season_normalized_*.json" -ErrorAction SilentlyContinue)
+    foreach ($file in $normalizedFiles) {
+        $source = [System.IO.File]::ReadAllText($file.FullName) | ConvertFrom-Json
+        $season = [string](Property-Value $source.meta "stagione")
+        if ([string]::IsNullOrWhiteSpace($season)) {
+            $season = [string]$file.Directory.Name
+        }
+
+        $competitionId = [string](Property-Value $source.meta "competizioneStoricaId")
+        if ([string]::IsNullOrWhiteSpace($competitionId)) {
+            $competitionId = $file.BaseName.Substring("season_normalized_".Length)
+        }
+
+        $normalizedIndex[$season + "|" + $competitionId] = $source
+    }
+
+    $definitions = @(
+        [pscustomobject]@{ Section="modDifesaMax"; Type="modDifesa"; Mode="max" },
+        [pscustomobject]@{ Section="modDifesaTotaleSquadre"; Type="modDifesa"; Mode="total" },
+        [pscustomobject]@{ Section="modDifesaMediaSquadre"; Type="modDifesa"; Mode="average" },
+        [pscustomobject]@{ Section="modDifesaUtilizziSquadre"; Type="modDifesa"; Mode="uses" },
+        [pscustomobject]@{ Section="capitanoTotaleSquadre"; Type="capitano"; Mode="total" },
+        [pscustomobject]@{ Section="capitanoUtilizziSquadre"; Type="capitano"; Mode="uses" },
+        [pscustomobject]@{ Section="modDifesaFcmMax"; Type="fcmDifesa"; Mode="max" },
+        [pscustomobject]@{ Section="modDifesaFcmTotaleSquadre"; Type="fcmDifesa"; Mode="total" },
+        [pscustomobject]@{ Section="modDifesaFcmMediaSquadre"; Type="fcmDifesa"; Mode="average" },
+        [pscustomobject]@{ Section="modDifesaFcmUtilizziSquadre"; Type="fcmDifesa"; Mode="uses" }
+    )
+
+    $sectionChecks = [ordered]@{}
+    foreach ($definition in $definitions) {
+        $sectionChecks[$definition.Section] = 0
+    }
+    $sectionChecks["fattoreCampoDecisivo"] = 0
+    $sectionChecks["fattoreCampoTotaleSquadre"] = 0
+    $sectionChecks["fattoreCampoPuntiGuadagnatiSquadre"] = 0
+    $sectionChecks["fattoreCampoPuntiPersiSquadre"] = 0
+
+    $competitionCount = 0
+    $modifierRows = 0
+    $homeMatchRows = 0
+
+    foreach ($entry in @($root.seasonAggregates)) {
+        $season = [string]$entry.stagione
+        $competitionId = [string]$entry.competizioneId
+        $competitionName = [string]$entry.competizioneNome
+        $sourceKey = $season + "|" + $competitionId
+
+        if (-not $normalizedIndex.ContainsKey($sourceKey)) {
+            Add-Problem $season $competitionName "(source)" $sourceKey "Normalizzato non trovato" "presente" "assente"
+            continue
+        }
+
+        $source = $normalizedIndex[$sourceKey]
+        $records = $entry.data.records
+        $modifiers = @($source.modificatoriB2Dettaglio)
+        $matches = @($source.partiteSquadra | Where-Object {
+            -not [string]::IsNullOrWhiteSpace([string]$_.idSquadra) -and
+            [string]$_.idSquadra -ne "0" -and
+            -not [string]::IsNullOrWhiteSpace([string]$_.squadra) -and
+            -not [string]::IsNullOrWhiteSpace([string]$_.idIncontro) -and
+            -not [string]::IsNullOrWhiteSpace([string]$_.avversaria)
+        })
+        $bands = @($source.fasceGolDettaglio)
+
+        $competitionCount++
+        $modifierRows += $modifiers.Count
+        $homeMatchRows += @($matches | Where-Object { [string]$_.lato -eq "casa" }).Count
+
+        foreach ($definition in $definitions) {
+            $section = $definition.Section
+            $sectionChecks[$section] = [int]$sectionChecks[$section] + 1
+            $actualRows = @(Property-Value $records $section)
+            Audit-ModifierSection $season $competitionName $section $definition.Mode $definition.Type $modifiers $actualRows
+        }
+
+        $impacts = @(Build-HomeImpacts $matches $modifiers $bands)
+        $decisiveExpected = @($impacts | Where-Object { [int]$_.puntiDelta -gt 0 })
+
+        $section = "fattoreCampoDecisivo"
+        $sectionChecks[$section] = [int]$sectionChecks[$section] + 1
+        $actualDecisive = @(Property-Value $records $section)
+        $expectedDecisiveMap = Make-Map $decisiveExpected { param($r) Impact-Key $r }
+        $actualDecisiveMap = Make-Map $actualDecisive { param($r) Impact-Key $r }
+
+        if ($expectedDecisiveMap.Count -ne $actualDecisiveMap.Count) {
+            Add-Problem $season $competitionName $section "(conteggio)" "Numero partite decisive errato" $expectedDecisiveMap.Count $actualDecisiveMap.Count
+        }
+
+        foreach ($key in @($expectedDecisiveMap.Keys)) {
+            if (-not $actualDecisiveMap.ContainsKey($key)) {
+                Add-Problem $season $competitionName $section $key "Partita decisiva attesa assente" "presente" "assente"
+                continue
+            }
+            $expectedRow = $expectedDecisiveMap[$key]
+            $actualRow = $actualDecisiveMap[$key]
+            Compare-Number $season $competitionName $section $key "valore" $expectedRow.bonus $actualRow.valore
+            Compare-Number $season $competitionName $section $key "puntiClassificaGuadagnati" $expectedRow.puntiDelta $actualRow.puntiClassificaGuadagnati
+            Compare-Text $season $competitionName $section $key "squadra" $expectedRow.squadra $actualRow.squadra
+            Compare-Text $season $competitionName $section $key "avversaria" $expectedRow.avversaria $actualRow.avversaria
+        }
+
+        $section = "fattoreCampoTotaleSquadre"
+        $sectionChecks[$section] = [int]$sectionChecks[$section] + 1
+        $homeRows = @($matches | Where-Object { [string]$_.lato -eq "casa" })
+        $actualTotals = @(Property-Value $records $section)
+        $actualTotalsMap = Make-Map $actualTotals { param($r) Team-Key $r }
+
+        foreach ($group in @($homeRows | Group-Object idSquadra)) {
+            $teamRows = @($group.Group)
+            $teamId = [string]$group.Name
+            if (-not $actualTotalsMap.ContainsKey($teamId)) {
+                Add-Problem $season $competitionName $section $teamId "Squadra casa attesa assente" "presente" "assente"
+                continue
+            }
+
+            $modifierTotals = Build-ModifierTotalsByMatchTeam $modifiers
+            $expectedTotal = 0.0
+            foreach ($match in $teamRows) {
+                $key = [string]$match.idIncontro + "|" + [string]$match.idSquadra
+                $modifierTotal = 0.0
+                if ($modifierTotals.ContainsKey($key)) {
+                    $modifierTotal = Num $modifierTotals[$key]
+                }
+                $bonus = (Num $match.puntiFatti) - (Num $match.parzialeFatto) - $modifierTotal
+                if ([math]::Abs($bonus) -lt 0.000001) {
+                    $bonus = 0.0
+                }
+                $expectedTotal += $bonus
+            }
+
+            $actualRow = $actualTotalsMap[$teamId]
+            Compare-Number $season $competitionName $section $teamId "valore" $expectedTotal $actualRow.valore
+            Compare-Number $season $competitionName $section $teamId "presenzeCasa" $teamRows.Count $actualRow.presenzeCasa
+            $details = @(Property-Value $actualRow "dettagli")
+            if ($details.Count -ne $teamRows.Count) {
+                Add-Problem $season $competitionName $section $teamId "Numero dettagli casa errato" $teamRows.Count $details.Count
+            }
+        }
+
+        foreach ($impactDefinition in @(
+            [pscustomobject]@{ Section="fattoreCampoPuntiGuadagnatiSquadre"; TeamField="idSquadra"; TeamName="squadra" },
+            [pscustomobject]@{ Section="fattoreCampoPuntiPersiSquadre"; TeamField="idAvversaria"; TeamName="avversaria" }
+        )) {
+            $section = $impactDefinition.Section
+            $sectionChecks[$section] = [int]$sectionChecks[$section] + 1
+            $actualRows = @(Property-Value $records $section)
+            $actualMap = Make-Map $actualRows { param($r) Team-Key $r }
+
+            $expectedGroups = @($decisiveExpected | Group-Object { [string](Property-Value $_ $impactDefinition.TeamField) })
+
+            if ($expectedGroups.Count -ne $actualMap.Count) {
+                Add-Problem $season $competitionName $section "(conteggio)" "Numero squadre errato" $expectedGroups.Count $actualMap.Count
+            }
+
+            foreach ($group in $expectedGroups) {
+                $teamId = [string]$group.Name
+                if (-not $actualMap.ContainsKey($teamId)) {
+                    Add-Problem $season $competitionName $section $teamId "Squadra attesa assente" "presente" "assente"
+                    continue
+                }
+
+                $sum = 0
+                foreach ($impact in @($group.Group)) {
+                    $sum += [int]$impact.puntiDelta
+                }
+
+                $actualRow = $actualMap[$teamId]
+                Compare-Number $season $competitionName $section $teamId "valore" $sum $actualRow.valore
+                $details = @(Property-Value $actualRow "dettagli")
+                if ($details.Count -ne @($group.Group).Count) {
+                    Add-Problem $season $competitionName $section $teamId "Numero dettagli decisivi errato" @($group.Group).Count $details.Count
+                }
+            }
+        }
+    }
+
+    $Problems | Export-Csv -LiteralPath $outCsv -NoTypeInformation -Encoding UTF8
+
+    $summary = @()
+    foreach ($sectionName in @($sectionChecks.Keys | ForEach-Object { [string]$_ })) {
+        $count = @($Problems | Where-Object { [string]$_.Sezione -eq $sectionName }).Count
+        $summary += [pscustomobject]@{
+            Record = $sectionName
+            CompetizioniControllate = $sectionChecks[$sectionName]
+            Problemi = $count
+            Esito = if ($count -eq 0) { "OK" } else { "ERRORE" }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "=== AUDIT SEMANTICO MODIFICATORI + FATTORE CAMPO v27 ==="
+    $summary | Format-Table -AutoSize
+    Write-Host ""
+    Write-Host ("Competizioni controllate     : " + $competitionCount)
+    Write-Host ("Righe modificatori sorgente  : " + $modifierRows)
+    Write-Host ("Righe squadra in casa        : " + $homeMatchRows)
+    Write-Host ("Problemi totali              : " + $Problems.Count)
+    Write-Host ("Dettaglio CSV                 : " + $outCsv)
+
+    if ($Problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $Problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "AUDIT SEMANTICO MODIFICATORI + FATTORE CAMPO: OK"
+
+## tools\Test_RecordsNext2_ModifiersSemantic_v28.ps1
+
+File: tools\Test_RecordsNext2_ModifiersSemantic_v28.ps1
+
+    param(
+
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+
+    )
+
+
+
+    $ErrorActionPreference = "Stop"
+
+    Set-Location $ProjectDir
+
+
+
+    $reportsRoot = Join-Path $ProjectDir "data\reports"
+
+    $stagingRoot = Join-Path $ProjectDir "data\site-export-staging"
+
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+
+    $outCsv = Join-Path $outDir "RecordsNext2_MODIFICATORI_SEMANTIC_AUDIT.csv"
+
+
+
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+
+
+    $Problems = New-Object System.Collections.ArrayList
+
+
+
+    function Num([object]$Value) {
+
+        if ($null -eq $Value -or [string]::IsNullOrWhiteSpace([string]$Value)) {
+
+            return 0.0
+
+        }
+
+        return [double]$Value
+
+    }
+
+
+
+    function Same-Number([object]$A, [object]$B) {
+
+        return [math]::Abs((Num $A) - (Num $B)) -le 0.000001
+
+    }
+
+
+
+    function Add-Problem(
+
+        [string]$Season,
+
+        [string]$Competition,
+
+        [string]$Section,
+
+        [string]$Key,
+
+        [string]$Problem,
+
+        [object]$Expected,
+
+        [object]$Actual
+
+    ) {
+
+        [void]$Problems.Add([pscustomobject]@{
+
+            Stagione = $Season
+
+            Competizione = $Competition
+
+            Sezione = $Section
+
+            Chiave = $Key
+
+            Problema = $Problem
+
+            Atteso = $Expected
+
+            Reale = $Actual
+
+        })
+
+    }
+
+
+
+    function Property-Value([object]$Object, [string]$Name) {
+
+        if ($null -eq $Object) {
+
+            return $null
+
+        }
+
+        $property = $Object.PSObject.Properties[$Name]
+
+        if ($null -eq $property) {
+
+            return $null
+
+        }
+
+        return $property.Value
+
+    }
+
+
+
+    function Modifier-Key([object]$Row) {
+
+        return ([string]$Row.idIncontro + "|" + [string]$Row.idSquadra + "|" + [string]$Row.valore)
+
+    }
+
+
+
+    function Team-Key([object]$Row) {
+
+        return [string]$Row.idSquadra
+
+    }
+
+
+
+    function Impact-Key([object]$Row) {
+
+        return ([string]$Row.idIncontro + "|" + [string]$Row.idSquadra)
+
+    }
+
+
+
+    function Compare-Text(
+
+        [string]$Season,
+
+        [string]$Competition,
+
+        [string]$Section,
+
+        [string]$Key,
+
+        [string]$Field,
+
+        [object]$Expected,
+
+        [object]$Actual
+
+    ) {
+
+        if ([string]$Expected -ne [string]$Actual) {
+
+            Add-Problem $Season $Competition $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
+
+        }
+
+    }
+
+
+
+    function Compare-Number(
+
+        [string]$Season,
+
+        [string]$Competition,
+
+        [string]$Section,
+
+        [string]$Key,
+
+        [string]$Field,
+
+        [object]$Expected,
+
+        [object]$Actual
+
+    ) {
+
+        if (-not (Same-Number $Expected $Actual)) {
+
+            Add-Problem $Season $Competition $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
+
+        }
+
+    }
+
+
+
+    function Make-Map([object[]]$Rows, [scriptblock]$KeySelector) {
+
+        $map = @{}
+
+        foreach ($row in @($Rows)) {
+
+            if ($null -eq $row) {
+
+                continue
+
+            }
+
+            $key = [string](& $KeySelector $row)
+
+            if ([string]::IsNullOrWhiteSpace($key)) {
+
+                continue
+
+            }
+
+            $map[$key] = $row
+
+        }
+
+        return $map
+
+    }
+
+
+
+    function Standings-Points([int]$GoalsFor, [int]$GoalsAgainst) {
+
+        if ($GoalsFor -gt $GoalsAgainst) {
+
+            return 3
+
+        }
+
+        if ($GoalsFor -eq $GoalsAgainst) {
+
+            return 1
+
+        }
+
+        return 0
+
+    }
+
+
+
+    function Goals-For-Score([double]$Score, [object[]]$Bands) {
+
+        $goals = 0
+
+        foreach ($band in @($Bands | Sort-Object { Num $_.min })) {
+
+            if (($Score + 0.000001) -ge (Num $band.min)) {
+
+                $candidate = [int](Num $band.gol)
+
+                if ($candidate -gt $goals) {
+
+                    $goals = $candidate
+
+                }
+
+            }
+
+        }
+
+        return $goals
+
+    }
+
+
+
+    function Build-ModifierTotalsByMatchTeam([object[]]$Modifiers) {
+
+        $totals = @{}
+
+        foreach ($modifier in @($Modifiers)) {
+
+            $key = [string]$modifier.idIncontro + "|" + [string]$modifier.idSquadra
+
+            if (-not $totals.ContainsKey($key)) {
+
+                $totals[$key] = 0.0
+
+            }
+
+            $totals[$key] = (Num $totals[$key]) + (Num $modifier.valore)
+
+        }
+
+        return $totals
+
+    }
+
+
+
+    function Build-HomeImpacts([object[]]$Matches, [object[]]$Modifiers, [object[]]$Bands) {
+
+        $modifierTotals = Build-ModifierTotalsByMatchTeam $Modifiers
+
+        $impacts = @()
+
+
+
+        foreach ($group in @($Matches | Group-Object idIncontro)) {
+
+            $homeRowsTmp = @($group.Group | Where-Object { [string]$_.lato -eq "casa" } | Select-Object -First 1)
+
+            $awayRowsTmp = @($group.Group | Where-Object { [string]$_.lato -eq "fuori" } | Select-Object -First 1)
+
+
+
+            if ($homeRowsTmp.Count -eq 0 -or $awayRowsTmp.Count -eq 0) {
+
+                continue
+
+            }
+
+
+
+            $homeRow = $homeRowsTmp[0]
+
+            $awayRow = $awayRowsTmp[0]
+
+            $key = [string]$homeRow.idIncontro + "|" + [string]$homeRow.idSquadra
+
+            $modifierTotal = 0.0
+
+            if ($modifierTotals.ContainsKey($key)) {
+
+                $modifierTotal = Num $modifierTotals[$key]
+
+            }
+
+
+
+            $bonus = (Num $homeRow.puntiFatti) - (Num $homeRow.parzialeFatto) - $modifierTotal
+
+            if ([math]::Abs($bonus) -lt 0.000001) {
+
+                $bonus = 0.0
+
+            }
+
+            if ($bonus -le 0) {
+
+                continue
+
+            }
+
+
+
+            $scoreWithout = (Num $homeRow.puntiFatti) - $bonus
+
+            $goalsWithout = Goals-For-Score $scoreWithout $Bands
+
+            $homeGoals = [int](Num $homeRow.golFatti)
+
+            $awayGoals = [int](Num $homeRow.golSubiti)
+
+            $actualPoints = Standings-Points $homeGoals $awayGoals
+
+            $pointsWithout = Standings-Points $goalsWithout $awayGoals
+
+            $delta = $actualPoints - $pointsWithout
+
+
+
+            if ($delta -lt 0) {
+
+                $delta = 0
+
+            }
+
+
+
+            $impacts += [pscustomobject]@{
+
+                idIncontro = [string]$homeRow.idIncontro
+
+                idSquadra = [string]$homeRow.idSquadra
+
+                squadra = [string]$homeRow.squadra
+
+                idAvversaria = [string]$awayRow.idSquadra
+
+                avversaria = [string]$awayRow.squadra
+
+                bonus = $bonus
+
+                puntiDelta = $delta
+
+                home = $homeRow
+
+                away = $awayRow
+
+            }
+
+        }
+
+
+
+        return $impacts
+
+    }
+
+
+
+    function Audit-ModifierSection(
+
+        [string]$Season,
+
+        [string]$Competition,
+
+        [string]$Section,
+
+        [string]$Mode,
+
+        [string]$Type,
+
+        [object[]]$Modifiers,
+
+        [object[]]$ActualRows
+
+    ) {
+
+        $selected = @($Modifiers | Where-Object { [string]$_.tipo -eq $Type })
+
+        $actual = @($ActualRows | Where-Object { $null -ne $_ })
+
+
+
+        if ($Mode -eq "max") {
+            $expected = @(
+                $selected |
+                Sort-Object @{Expression={ Num $_.valore }; Descending=$true} |
+                Select-Object -First 20
+            )
+
+            if ($expected.Count -ne $actual.Count) {
+                Add-Problem $Season $Competition $Section "(conteggio)" "Numero righe errato" $expected.Count $actual.Count
+            }
+
+            $sourceMap = Make-Map $selected { param($r) Modifier-Key $r }
+
+            foreach ($row in $actual) {
+                $key = Modifier-Key $row
+                if (-not $sourceMap.ContainsKey($key)) {
+                    Add-Problem $Season $Competition $Section $key "Record massimo esportato non presente nella sorgente" "presente" "assente"
+                }
+            }
+
+            $expectedValues = @(
+                $expected |
+                ForEach-Object { Num $_.valore } |
+                Sort-Object -Descending
+            )
+
+            $actualValues = @(
+                $actual |
+                ForEach-Object { Num $_.valore } |
+                Sort-Object -Descending
+            )
+
+            $limit = [math]::Min($expectedValues.Count, $actualValues.Count)
+
+            for ($i = 0; $i -lt $limit; $i++) {
+                if (-not (Same-Number $expectedValues[$i] $actualValues[$i])) {
+                    Add-Problem `
+                        $Season `
+                        $Competition `
+                        $Section `
+                        ("posizione " + ($i + 1)) `
+                        "Valore Top 20 errato" `
+                        $expectedValues[$i] `
+                        $actualValues[$i]
+                }
+            }
+
+            return
+        }
+
+
+
+        $expectedGroups = @($selected | Group-Object idSquadra)
+
+        $actualMap = Make-Map $actual { param($r) Team-Key $r }
+
+
+
+        if ($expectedGroups.Count -ne $actualMap.Count) {
+
+            Add-Problem $Season $Competition $Section "(conteggio)" "Numero squadre errato" $expectedGroups.Count $actualMap.Count
+
+        }
+
+
+
+        foreach ($group in $expectedGroups) {
+
+            $rows = @($group.Group)
+
+            if ($rows.Count -eq 0) {
+
+                continue
+
+            }
+
+
+
+            $teamId = [string]$group.Name
+
+            if (-not $actualMap.ContainsKey($teamId)) {
+
+                Add-Problem $Season $Competition $Section $teamId "Squadra attesa assente" "presente" "assente"
+
+                continue
+
+            }
+
+
+
+            $actualRow = $actualMap[$teamId]
+
+            $sum = 0.0
+
+            foreach ($row in $rows) {
+
+                $sum += Num $row.valore
+
+            }
+
+
+
+            if ($Mode -eq "total") {
+
+                Compare-Number $Season $Competition $Section $teamId "valore" $sum $actualRow.valore
+
+            }
+
+            elseif ($Mode -eq "average") {
+
+                $average = $sum / $rows.Count
+
+                Compare-Number $Season $Competition $Section $teamId "valore" $average $actualRow.valore
+
+                Compare-Number $Season $Competition $Section $teamId "utilizzi" $rows.Count $actualRow.utilizzi
+
+            }
+
+            elseif ($Mode -eq "uses") {
+
+                Compare-Number $Season $Competition $Section $teamId "valore" $rows.Count $actualRow.valore
+
+            }
+
+
+
+            $details = @(Property-Value $actualRow "dettagli")
+
+            if ($details.Count -ne $rows.Count) {
+
+                Add-Problem $Season $Competition $Section $teamId "Numero dettagli errato" $rows.Count $details.Count
+
+            }
+
+        }
+
+    }
+
+
+
+    $manifest = Get-ChildItem -Path $stagingRoot -Recurse -File -Filter "fcmRecordsNext_Manifest.js" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    if ($null -eq $manifest) {
+
+        throw "fcmRecordsNext_Manifest.js non trovato in $stagingRoot"
+
+    }
+
+
+
+    $modifiersJs = Join-Path $manifest.Directory.FullName "fcmRecordsNext_Modifiers.js"
+
+    if (-not (Test-Path -LiteralPath $modifiersJs)) {
+
+        throw "fcmRecordsNext_Modifiers.js non trovato: $modifiersJs"
+
+    }
+
+
+
+    $js = [System.IO.File]::ReadAllText($modifiersJs)
+
+    $eq = $js.IndexOf("=")
+
+    if ($eq -lt 0) {
+
+        throw "Formato fcmRecordsNext_Modifiers.js inatteso."
+
+    }
+
+    $json = $js.Substring($eq + 1).Trim()
+
+    if ($json.EndsWith(";")) {
+
+        $json = $json.Substring(0, $json.Length - 1)
+
+    }
+
+    $root = $json | ConvertFrom-Json
+
+
+
+    $normalizedIndex = @{}
+
+    $normalizedFiles = @(Get-ChildItem -Path $reportsRoot -Recurse -File -Filter "season_normalized_*.json" -ErrorAction SilentlyContinue)
+
+    foreach ($file in $normalizedFiles) {
+
+        $source = [System.IO.File]::ReadAllText($file.FullName) | ConvertFrom-Json
+
+        $season = [string](Property-Value $source.meta "stagione")
+
+        if ([string]::IsNullOrWhiteSpace($season)) {
+
+            $season = [string]$file.Directory.Name
+
+        }
+
+
+
+        $competitionId = [string](Property-Value $source.meta "competizioneStoricaId")
+
+        if ([string]::IsNullOrWhiteSpace($competitionId)) {
+
+            $competitionId = $file.BaseName.Substring("season_normalized_".Length)
+
+        }
+
+
+
+        $normalizedIndex[$season + "|" + $competitionId] = $source
+
+    }
+
+
+
+    $definitions = @(
+
+        [pscustomobject]@{ Section="modDifesaMax"; Type="modDifesa"; Mode="max" },
+
+        [pscustomobject]@{ Section="modDifesaTotaleSquadre"; Type="modDifesa"; Mode="total" },
+
+        [pscustomobject]@{ Section="modDifesaMediaSquadre"; Type="modDifesa"; Mode="average" },
+
+        [pscustomobject]@{ Section="modDifesaUtilizziSquadre"; Type="modDifesa"; Mode="uses" },
+
+        [pscustomobject]@{ Section="capitanoTotaleSquadre"; Type="capitano"; Mode="total" },
+
+        [pscustomobject]@{ Section="capitanoUtilizziSquadre"; Type="capitano"; Mode="uses" },
+
+        [pscustomobject]@{ Section="modDifesaFcmMax"; Type="fcmDifesa"; Mode="max" },
+
+        [pscustomobject]@{ Section="modDifesaFcmTotaleSquadre"; Type="fcmDifesa"; Mode="total" },
+
+        [pscustomobject]@{ Section="modDifesaFcmMediaSquadre"; Type="fcmDifesa"; Mode="average" },
+
+        [pscustomobject]@{ Section="modDifesaFcmUtilizziSquadre"; Type="fcmDifesa"; Mode="uses" }
+
+    )
+
+
+
+    $sectionChecks = [ordered]@{}
+
+    foreach ($definition in $definitions) {
+
+        $sectionChecks[$definition.Section] = 0
+
+    }
+
+    $sectionChecks["fattoreCampoDecisivo"] = 0
+
+    $sectionChecks["fattoreCampoTotaleSquadre"] = 0
+
+    $sectionChecks["fattoreCampoPuntiGuadagnatiSquadre"] = 0
+
+    $sectionChecks["fattoreCampoPuntiPersiSquadre"] = 0
+
+
+
+    $competitionCount = 0
+
+    $modifierRows = 0
+
+    $homeMatchRows = 0
+
+
+
+    foreach ($entry in @($root.seasonAggregates)) {
+
+        $season = [string]$entry.stagione
+
+        $competitionId = [string]$entry.competizioneId
+
+        $competitionName = [string]$entry.competizioneNome
+
+        $sourceKey = $season + "|" + $competitionId
+
+
+
+        if (-not $normalizedIndex.ContainsKey($sourceKey)) {
+
+            Add-Problem $season $competitionName "(source)" $sourceKey "Normalizzato non trovato" "presente" "assente"
+
+            continue
+
+        }
+
+
+
+        $source = $normalizedIndex[$sourceKey]
+
+        $records = $entry.data.records
+
+        $modifiers = @($source.modificatoriB2Dettaglio)
+
+        $matches = @($source.partiteSquadra | Where-Object {
+
+            -not [string]::IsNullOrWhiteSpace([string]$_.idSquadra) -and
+
+            [string]$_.idSquadra -ne "0" -and
+
+            -not [string]::IsNullOrWhiteSpace([string]$_.squadra) -and
+
+            -not [string]::IsNullOrWhiteSpace([string]$_.idIncontro) -and
+
+            -not [string]::IsNullOrWhiteSpace([string]$_.avversaria)
+
+        })
+
+        $bands = @($source.fasceGolDettaglio)
+
+
+
+        $competitionCount++
+
+        $modifierRows += $modifiers.Count
+
+        $homeMatchRows += @($matches | Where-Object { [string]$_.lato -eq "casa" }).Count
+
+
+
+        foreach ($definition in $definitions) {
+
+            $section = $definition.Section
+
+            $sectionChecks[$section] = [int]$sectionChecks[$section] + 1
+
+            $actualRows = @(Property-Value $records $section)
+
+            Audit-ModifierSection $season $competitionName $section $definition.Mode $definition.Type $modifiers $actualRows
+
+        }
+
+
+
+        $impacts = @(Build-HomeImpacts $matches $modifiers $bands)
+
+        $decisiveExpected = @($impacts | Where-Object { [int]$_.puntiDelta -gt 0 })
+
+
+
+        $section = "fattoreCampoDecisivo"
+
+        $sectionChecks[$section] = [int]$sectionChecks[$section] + 1
+
+        $actualDecisive = @(Property-Value $records $section)
+
+        $expectedDecisiveMap = Make-Map $decisiveExpected { param($r) Impact-Key $r }
+
+        $actualDecisiveMap = Make-Map $actualDecisive { param($r) Impact-Key $r }
+
+
+
+        if ($expectedDecisiveMap.Count -ne $actualDecisiveMap.Count) {
+
+            Add-Problem $season $competitionName $section "(conteggio)" "Numero partite decisive errato" $expectedDecisiveMap.Count $actualDecisiveMap.Count
+
+        }
+
+
+
+        foreach ($key in @($expectedDecisiveMap.Keys)) {
+
+            if (-not $actualDecisiveMap.ContainsKey($key)) {
+
+                Add-Problem $season $competitionName $section $key "Partita decisiva attesa assente" "presente" "assente"
+
+                continue
+
+            }
+
+            $expectedRow = $expectedDecisiveMap[$key]
+
+            $actualRow = $actualDecisiveMap[$key]
+
+            Compare-Number $season $competitionName $section $key "valore" $expectedRow.bonus $actualRow.valore
+
+            Compare-Number $season $competitionName $section $key "puntiClassificaGuadagnati" $expectedRow.puntiDelta $actualRow.puntiClassificaGuadagnati
+
+            Compare-Text $season $competitionName $section $key "squadra" $expectedRow.squadra $actualRow.squadra
+
+            Compare-Text $season $competitionName $section $key "avversaria" $expectedRow.avversaria $actualRow.avversaria
+
+        }
+
+
+
+        $section = "fattoreCampoTotaleSquadre"
+
+        $sectionChecks[$section] = [int]$sectionChecks[$section] + 1
+
+        $homeRows = @($matches | Where-Object { [string]$_.lato -eq "casa" })
+
+        $actualTotals = @(Property-Value $records $section)
+
+        $actualTotalsMap = Make-Map $actualTotals { param($r) Team-Key $r }
+
+
+
+        foreach ($group in @($homeRows | Group-Object idSquadra)) {
+
+            $teamRows = @($group.Group)
+
+            $teamId = [string]$group.Name
+
+            if (-not $actualTotalsMap.ContainsKey($teamId)) {
+
+                Add-Problem $season $competitionName $section $teamId "Squadra casa attesa assente" "presente" "assente"
+
+                continue
+
+            }
+
+
+
+            $modifierTotals = Build-ModifierTotalsByMatchTeam $modifiers
+
+            $expectedTotal = 0.0
+
+            foreach ($match in $teamRows) {
+
+                $key = [string]$match.idIncontro + "|" + [string]$match.idSquadra
+
+                $modifierTotal = 0.0
+
+                if ($modifierTotals.ContainsKey($key)) {
+
+                    $modifierTotal = Num $modifierTotals[$key]
+
+                }
+
+                $bonus = (Num $match.puntiFatti) - (Num $match.parzialeFatto) - $modifierTotal
+
+                if ([math]::Abs($bonus) -lt 0.000001) {
+
+                    $bonus = 0.0
+
+                }
+
+                $expectedTotal += $bonus
+
+            }
+
+
+
+            $actualRow = $actualTotalsMap[$teamId]
+
+            Compare-Number $season $competitionName $section $teamId "valore" $expectedTotal $actualRow.valore
+
+            Compare-Number $season $competitionName $section $teamId "presenzeCasa" $teamRows.Count $actualRow.presenzeCasa
+
+            $details = @(Property-Value $actualRow "dettagli")
+
+            if ($details.Count -ne $teamRows.Count) {
+
+                Add-Problem $season $competitionName $section $teamId "Numero dettagli casa errato" $teamRows.Count $details.Count
+
+            }
+
+        }
+
+
+
+        foreach ($impactDefinition in @(
+
+            [pscustomobject]@{ Section="fattoreCampoPuntiGuadagnatiSquadre"; TeamField="idSquadra"; TeamName="squadra" },
+
+            [pscustomobject]@{ Section="fattoreCampoPuntiPersiSquadre"; TeamField="idAvversaria"; TeamName="avversaria" }
+
+        )) {
+
+            $section = $impactDefinition.Section
+
+            $sectionChecks[$section] = [int]$sectionChecks[$section] + 1
+
+            $actualRows = @(Property-Value $records $section)
+
+            $actualMap = Make-Map $actualRows { param($r) Team-Key $r }
+
+
+
+            $expectedGroups = @($decisiveExpected | Group-Object { [string](Property-Value $_ $impactDefinition.TeamField) })
+
+
+
+            if ($expectedGroups.Count -ne $actualMap.Count) {
+
+                Add-Problem $season $competitionName $section "(conteggio)" "Numero squadre errato" $expectedGroups.Count $actualMap.Count
+
+            }
+
+
+
+            foreach ($group in $expectedGroups) {
+
+                $teamId = [string]$group.Name
+
+                if (-not $actualMap.ContainsKey($teamId)) {
+
+                    Add-Problem $season $competitionName $section $teamId "Squadra attesa assente" "presente" "assente"
+
+                    continue
+
+                }
+
+
+
+                $sum = 0
+
+                foreach ($impact in @($group.Group)) {
+
+                    $sum += [int]$impact.puntiDelta
+
+                }
+
+
+
+                $actualRow = $actualMap[$teamId]
+
+                Compare-Number $season $competitionName $section $teamId "valore" $sum $actualRow.valore
+
+                $details = @(Property-Value $actualRow "dettagli")
+
+                if ($details.Count -ne @($group.Group).Count) {
+
+                    Add-Problem $season $competitionName $section $teamId "Numero dettagli decisivi errato" @($group.Group).Count $details.Count
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+
+    $Problems | Export-Csv -LiteralPath $outCsv -NoTypeInformation -Encoding UTF8
+
+
+
+    $summary = @()
+
+    foreach ($sectionName in @($sectionChecks.Keys | ForEach-Object { [string]$_ })) {
+
+        $count = @($Problems | Where-Object { [string]$_.Sezione -eq $sectionName }).Count
+
+        $summary += [pscustomobject]@{
+
+            Record = $sectionName
+
+            CompetizioniControllate = $sectionChecks[$sectionName]
+
+            Problemi = $count
+
+            Esito = if ($count -eq 0) { "OK" } else { "ERRORE" }
+
+        }
+
+    }
+
+
+
+    Write-Host ""
+
+    Write-Host "=== AUDIT SEMANTICO MODIFICATORI + FATTORE CAMPO v28 ==="
+
+    $summary | Format-Table -AutoSize
+
+    Write-Host ""
+
+    Write-Host ("Competizioni controllate     : " + $competitionCount)
+
+    Write-Host ("Righe modificatori sorgente  : " + $modifierRows)
+
+    Write-Host ("Righe squadra in casa        : " + $homeMatchRows)
+
+    Write-Host ("Problemi totali              : " + $Problems.Count)
+
+    Write-Host ("Dettaglio CSV                 : " + $outCsv)
+
+
+
+    if ($Problems.Count -gt 0) {
+
+        Write-Host ""
+
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+
+        $Problems | Select-Object -First 25 | Format-Table -AutoSize
+
+        exit 1
+
+    }
+
+
+
+    Write-Host ""
+
+    Write-Host "AUDIT SEMANTICO MODIFICATORI + FATTORE CAMPO: OK"
+
+
+## tools\Test_RecordsNext2_RUSemantic_v26.ps1
+
+File: tools\Test_RecordsNext2_RUSemantic_v26.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $outCsv = Join-Path $outDir "RecordsNext2_RU_SEMANTIC_AUDIT.csv"
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+    function Num([object]$Value) {
+        if ($null -eq $Value -or "$Value" -eq "") { return 0.0 }
+        return [double]$Value
+    }
+
+    function EqNum([double]$A, [double]$B, [double]$Tolerance = 0.0050001) {
+        return [math]::Abs($A - $B) -le $Tolerance
+    }
+
+    function Key-MatchTeam([object]$Row) {
+        return ([string]$Row.idIncontro + "|" + [string]$Row.idSquadra)
+    }
+
+    function Key-Match([object]$Row) {
+        return [string]$Row.idIncontro
+    }
+
+    function Add-Problem {
+        param(
+            [System.Collections.Generic.List[object]]$List,
+            [string]$Season,
+            [string]$Section,
+            [string]$Key,
+            [string]$Problem,
+            [object]$Expected,
+            [object]$Actual
+        )
+
+        $List.Add([pscustomobject]@{
+            Stagione = $Season
+            Sezione = $Section
+            Chiave = $Key
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+
+    function To-Map {
+        param(
+            [object[]]$Rows,
+            [scriptblock]$KeySelector
+        )
+
+        $map = @{}
+        foreach ($row in @($Rows)) {
+            $key = & $KeySelector $row
+            if (-not [string]::IsNullOrWhiteSpace([string]$key)) {
+                $map[[string]$key] = $row
+            }
+        }
+        return $map
+    }
+
+    function Check-EqualNumber {
+        param(
+            [System.Collections.Generic.List[object]]$Problems,
+            [string]$Season,
+            [string]$Section,
+            [string]$Key,
+            [string]$Field,
+            [object]$Expected,
+            [object]$Actual
+        )
+
+        if (-not (EqNum (Num $Expected) (Num $Actual))) {
+            Add-Problem $Problems $Season $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
+        }
+    }
+
+    function Check-EqualText {
+        param(
+            [System.Collections.Generic.List[object]]$Problems,
+            [string]$Season,
+            [string]$Section,
+            [string]$Key,
+            [string]$Field,
+            [object]$Expected,
+            [object]$Actual
+        )
+
+        if ([string]$Expected -ne [string]$Actual) {
+            Add-Problem $Problems $Season $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
+        }
+    }
+
+    $manifest = Get-ChildItem -Path (Join-Path $ProjectDir "data\site-export-staging") -Recurse -File -Filter "fcmRecordsNext_Manifest.js" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    if (-not $manifest) {
+        throw "Manifest JS non trovato."
+    }
+
+    $ruPath = Join-Path $manifest.Directory.FullName "fcmRecordsNext_RU.js"
+
+    if (-not (Test-Path -LiteralPath $ruPath)) {
+        throw "fcmRecordsNext_RU.js non trovato: $ruPath"
+    }
+
+    $js = [System.IO.File]::ReadAllText($ruPath)
+    $eq = $js.IndexOf("=")
+
+    if ($eq -lt 0) {
+        throw "Formato JS RU inatteso."
+    }
+
+    $json = $js.Substring($eq + 1).Trim()
+    if ($json.EndsWith(";")) {
+        $json = $json.Substring(0, $json.Length - 1)
+    }
+
+    $root = $json | ConvertFrom-Json
+    $problems = New-Object 'System.Collections.Generic.List[object]'
+
+    $checks = [ordered]@{
+        "partiteConPiuRU" = 0
+        "partiteConRU" = 0
+        "partiteControRU" = 0
+        "ruDecisiva" = 0
+        "bilancioRUDecisiva" = 0
+        "ruDecisivaContro" = 0
+        "bilancioRUDecisivaContro" = 0
+        "bilancioConRU" = 0
+        "bilancioControRU" = 0
+        "mediaPuntiConRU" = 0
+        "mediaPuntiControRU" = 0
+        "tipoRUUsata" = 0
+    }
+
+    $seasonCount = 0
+    $detailRows = 0
+    $teamMatchRows = 0
+
+    foreach ($seasonAggregate in @($root.seasonAggregates)) {
+        $season = [string]$seasonAggregate.stagione
+        $data = $seasonAggregate.data
+        $views = $data.views
+        $detail = $data.dettaglio
+
+        $seasonCount++
+
+        $ruDetail = @($detail.ruDettaglio)
+        $ruTeamMatch = @($detail.ruTeamMatch)
+        $partiteConRU = @($views.partiteConRU)
+        $partiteControRU = @($views.partiteControRU)
+        $partiteConPiuRU = @($views.partiteConPiuRU)
+        $ruDecisiva = @($views.ruDecisiva)
+        $ruDecisivaContro = @($views.ruDecisivaContro)
+        $bilancioRUDecisiva = @($views.bilancioRUDecisiva)
+        $bilancioRUDecisivaContro = @($views.bilancioRUDecisivaContro)
+        $bilancioConRU = @($views.bilancioConRU)
+        $bilancioControRU = @($views.bilancioControRU)
+        $mediaPuntiConRU = @($views.mediaPuntiConRU)
+        $mediaPuntiControRU = @($views.mediaPuntiControRU)
+        $tipoRUUsata = @($views.tipoRUUsata)
+
+        $detailRows += $ruDetail.Count
+        $teamMatchRows += $ruTeamMatch.Count
+
+        $checkNames = @($checks.Keys | ForEach-Object { $_ })
+        foreach ($name in $checkNames) {
+            $checks[$name]++
+        }
+
+        # 1) ruTeamMatch deve essere la stessa vista di partiteConRU.
+        $teamMap = To-Map $ruTeamMatch { param($r) Key-MatchTeam $r }
+        $withMap = To-Map $partiteConRU { param($r) Key-MatchTeam $r }
+
+        if ($teamMap.Count -ne $withMap.Count) {
+            Add-Problem $problems $season "partiteConRU" "(conteggio)" "Numero righe diverso da ruTeamMatch" $teamMap.Count $withMap.Count
+        }
+
+        foreach ($key in $teamMap.Keys) {
+            if (-not $withMap.ContainsKey($key)) {
+                Add-Problem $problems $season "partiteConRU" $key "Riga ruTeamMatch assente dalla vista" "presente" "assente"
+                continue
+            }
+
+            $expected = $teamMap[$key]
+            $actual = $withMap[$key]
+
+            foreach ($field in @("competizione","squadra","avversaria","tipiRU","dettaglioRU","esito")) {
+                Check-EqualText $problems $season "partiteConRU" $key $field $expected.$field $actual.$field
+            }
+
+            foreach ($field in @("numeroRU","valoreRUTotale","puntiSquadra","puntiAvversaria","golSquadra","golAvversaria")) {
+                Check-EqualNumber $problems $season "partiteConRU" $key $field $expected.$field $actual.$field
+            }
+        }
+
+        # 2) Ricostruisce ruTeamMatch direttamente da ruDettaglio.
+        $detailGroups = $ruDetail | Group-Object { Key-MatchTeam $_ }
+
+        foreach ($group in $detailGroups) {
+            $rows = @($group.Group)
+            $first = $rows[0]
+            $key = [string]$group.Name
+
+            if (-not $teamMap.ContainsKey($key)) {
+                Add-Problem $problems $season "ruTeamMatch" $key "Aggregato mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $teamMap[$key]
+            $expectedCount = $rows.Count
+            $expectedValue = ($rows | Measure-Object -Property valoreRU -Sum).Sum
+            $expectedTypes = @($rows | ForEach-Object { ([string]$_.tipoRU).Trim() } | Where-Object { $_ } | Sort-Object -Unique) -join ","
+
+            Check-EqualNumber $problems $season "ruTeamMatch" $key "numeroRU" $expectedCount $actual.numeroRU
+            Check-EqualNumber $problems $season "ruTeamMatch" $key "valoreRUTotale" $expectedValue $actual.valoreRUTotale
+
+            $actualTypes = @(([string]$actual.tipiRU) -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ } | Sort-Object -Unique) -join ","
+            Check-EqualText $problems $season "ruTeamMatch" $key "tipiRU" $expectedTypes $actualTypes
+            Check-EqualText $problems $season "ruTeamMatch" $key "competizione" $first.competizione $actual.competizione
+            Check-EqualText $problems $season "ruTeamMatch" $key "squadra" $first.squadra $actual.squadra
+            Check-EqualText $problems $season "ruTeamMatch" $key "avversaria" $first.avversaria $actual.avversaria
+        }
+
+        # 3) partiteConPiuRU: una riga per incontro, somma di tutte le RU della gara.
+        $matchGroups = $ruDetail | Group-Object idIncontro
+        $mostMap = To-Map $partiteConPiuRU { param($r) Key-Match $r }
+
+        if ($matchGroups.Count -ne $mostMap.Count) {
+            Add-Problem $problems $season "partiteConPiuRU" "(conteggio)" "Numero incontri diverso" $matchGroups.Count $mostMap.Count
+        }
+
+        foreach ($group in $matchGroups) {
+            $rows = @($group.Group)
+            $key = [string]$group.Name
+
+            if (-not $mostMap.ContainsKey($key)) {
+                Add-Problem $problems $season "partiteConPiuRU" $key "Incontro RU mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $mostMap[$key]
+            $expectedCount = $rows.Count
+            $expectedValue = ($rows | Measure-Object -Property valoreRU -Sum).Sum
+
+            Check-EqualNumber $problems $season "partiteConPiuRU" $key "numeroRU" $expectedCount $actual.numeroRU
+            Check-EqualNumber $problems $season "partiteConPiuRU" $key "valoreRUTotale" $expectedValue $actual.valoreRUTotale
+        }
+
+        # 4) partiteControRU deve essere l'inversione di ogni partita con RU.
+        $againstMap = To-Map $partiteControRU { param($r) Key-MatchTeam $r }
+
+        if ($againstMap.Count -ne $partiteConRU.Count) {
+            Add-Problem $problems $season "partiteControRU" "(conteggio)" "Numero righe diverso da partiteConRU" $partiteConRU.Count $againstMap.Count
+        }
+
+        foreach ($with in $partiteConRU) {
+            $key = [string]$with.idIncontro + "|" + [string]$with.idAvversaria
+
+            if (-not $againstMap.ContainsKey($key)) {
+                Add-Problem $problems $season "partiteControRU" $key "Vista contro RU mancante" "presente" "assente"
+                continue
+            }
+
+            $against = $againstMap[$key]
+            Check-EqualText $problems $season "partiteControRU" $key "avversariaConRU" $with.squadra $against.avversariaConRU
+            Check-EqualNumber $problems $season "partiteControRU" $key "numeroRUAvversaria" $with.numeroRU $against.numeroRUAvversaria
+            Check-EqualNumber $problems $season "partiteControRU" $key "valoreRUAvversaria" $with.valoreRUTotale $against.valoreRUAvversaria
+            Check-EqualText $problems $season "partiteControRU" $key "tipiRUAvversaria" $with.tipiRU $against.tipiRUAvversaria
+            Check-EqualText $problems $season "partiteControRU" $key "competizione" $with.competizione $against.competizione
+        }
+
+        # 5) Bilanci con RU e contro RU, ricostruiti dalle rispettive viste gara.
+        foreach ($pair in @(
+            [pscustomobject]@{ Rows=$partiteConRU; Balance=$bilancioConRU; CountField="partiteConRU"; Section="bilancioConRU" },
+            [pscustomobject]@{ Rows=$partiteControRU; Balance=$bilancioControRU; CountField="partiteControRU"; Section="bilancioControRU" }
+        )) {
+            $balanceMap = To-Map $pair.Balance { param($r) [string]$r.idSquadra }
+
+            foreach ($group in ($pair.Rows | Group-Object idSquadra)) {
+                $rows = @($group.Group)
+                $key = [string]$group.Name
+
+                if (-not $balanceMap.ContainsKey($key)) {
+                    Add-Problem $problems $season $pair.Section $key "Squadra mancante" "presente" "assente"
+                    continue
+                }
+
+                $actual = $balanceMap[$key]
+                $wins = @($rows | Where-Object { [string]$_.esito -eq "V" }).Count
+                $draws = @($rows | Where-Object { [string]$_.esito -eq "N" }).Count
+                $losses = @($rows | Where-Object { [string]$_.esito -eq "P" }).Count
+                $count = $rows.Count
+                $avgPts = (($rows | Measure-Object -Property puntiSquadra -Sum).Sum) / $count
+                $avgOppPts = (($rows | Measure-Object -Property puntiAvversaria -Sum).Sum) / $count
+                $avgGoals = (($rows | Measure-Object -Property golSquadra -Sum).Sum) / $count
+                $avgOppGoals = (($rows | Measure-Object -Property golAvversaria -Sum).Sum) / $count
+
+                Check-EqualNumber $problems $season $pair.Section $key $pair.CountField $count $actual.($pair.CountField)
+                Check-EqualNumber $problems $season $pair.Section $key "V" $wins $actual.V
+                Check-EqualNumber $problems $season $pair.Section $key "N" $draws $actual.N
+                Check-EqualNumber $problems $season $pair.Section $key "P" $losses $actual.P
+                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiSquadra" $avgPts $actual.mediaPuntiSquadra
+                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiAvversaria" $avgOppPts $actual.mediaPuntiAvversaria
+                Check-EqualNumber $problems $season $pair.Section $key "mediaGolSquadra" $avgGoals $actual.mediaGolSquadra
+                Check-EqualNumber $problems $season $pair.Section $key "mediaGolAvversaria" $avgOppGoals $actual.mediaGolAvversaria
+            }
+        }
+
+        # 6) Media punti deve essere una proiezione coerente dei bilanci.
+        foreach ($pair in @(
+            [pscustomobject]@{ Balance=$bilancioConRU; Media=$mediaPuntiConRU; CountField="partiteConRU"; Section="mediaPuntiConRU" },
+            [pscustomobject]@{ Balance=$bilancioControRU; Media=$mediaPuntiControRU; CountField="partiteControRU"; Section="mediaPuntiControRU" }
+        )) {
+            $mediaMap = To-Map $pair.Media { param($r) [string]$r.idSquadra }
+
+            foreach ($balance in $pair.Balance) {
+                $key = [string]$balance.idSquadra
+
+                if (-not $mediaMap.ContainsKey($key)) {
+                    Add-Problem $problems $season $pair.Section $key "Squadra mancante" "presente" "assente"
+                    continue
+                }
+
+                $actual = $mediaMap[$key]
+                Check-EqualNumber $problems $season $pair.Section $key $pair.CountField $balance.($pair.CountField) $actual.($pair.CountField)
+                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiSquadra" $balance.mediaPuntiSquadra $actual.mediaPuntiSquadra
+                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiAvversaria" $balance.mediaPuntiAvversaria $actual.mediaPuntiAvversaria
+                Check-EqualNumber $problems $season $pair.Section $key "differenzaMedia" ((Num $balance.mediaPuntiSquadra) - (Num $balance.mediaPuntiAvversaria)) $actual.differenzaMedia
+            }
+        }
+
+        # 7) Tipo RU usata: conteggi e valori direttamente da ruDettaglio.
+        $typeMap = To-Map $tipoRUUsata { param($r) [string]$r.idSquadra }
+
+        foreach ($group in ($ruDetail | Group-Object idSquadra)) {
+            $rows = @($group.Group)
+            $key = [string]$group.Name
+
+            if (-not $typeMap.ContainsKey($key)) {
+                Add-Problem $problems $season "tipoRUUsata" $key "Squadra mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $typeMap[$key]
+            $totalValue = 0.0
+
+            foreach ($type in @("PU","DU","CU","AU")) {
+                $typed = @($rows | Where-Object { [string]$_.tipoRU -eq $type })
+                $count = $typed.Count
+                $value = if ($count -gt 0) { ($typed | Measure-Object -Property valoreRU -Sum).Sum } else { 0 }
+                $totalValue += Num $value
+
+                Check-EqualNumber $problems $season "tipoRUUsata" $key $type $count $actual.$type
+                Check-EqualNumber $problems $season "tipoRUUsata" $key ("valore" + $type) $value $actual.("valore" + $type)
+            }
+
+            Check-EqualNumber $problems $season "tipoRUUsata" $key "totaleRU" $rows.Count $actual.totaleRU
+            Check-EqualNumber $problems $season "tipoRUUsata" $key "valoreTotale" $totalValue $actual.valoreTotale
+        }
+
+        # 8) Decisività: coerenza interna dell'effetto e dei punti di classifica.
+        foreach ($row in $ruDecisiva) {
+            $key = Key-MatchTeam $row
+            $expectedPoints = switch ([string]$row.effetto) {
+                "Da sconfitta a pareggio" { 1 }
+                "Da pareggio a vittoria" { 2 }
+                "Da sconfitta a vittoria" { 3 }
+                default { -1 }
+            }
+
+            if ($expectedPoints -lt 0) {
+                Add-Problem $problems $season "ruDecisiva" $key "Effetto sconosciuto" "effetto noto" $row.effetto
+            }
+            else {
+                Check-EqualNumber $problems $season "ruDecisiva" $key "puntiClassificaGuadagnati" $expectedPoints $row.puntiClassificaGuadagnati
+            }
+        }
+
+        foreach ($row in $ruDecisivaContro) {
+            $key = Key-MatchTeam $row
+            $expectedPoints = switch ([string]$row.danno) {
+                "Da vittoria a pareggio" { 2 }
+                "Da pareggio a sconfitta" { 1 }
+                "Da vittoria a sconfitta" { 3 }
+                default { -1 }
+            }
+
+            if ($expectedPoints -lt 0) {
+                Add-Problem $problems $season "ruDecisivaContro" $key "Danno sconosciuto" "danno noto" $row.danno
+            }
+            else {
+                Check-EqualNumber $problems $season "ruDecisivaContro" $key "puntiClassificaPersi" $expectedPoints $row.puntiClassificaPersi
+            }
+        }
+
+        # 9) Bilanci decisività derivati dalle righe decisive.
+        $decBalanceMap = To-Map $bilancioRUDecisiva { param($r) [string]$r.idSquadra }
+
+        foreach ($group in ($ruDecisiva | Group-Object idSquadra)) {
+            $rows = @($group.Group)
+            $key = [string]$group.Name
+
+            if (-not $decBalanceMap.ContainsKey($key)) {
+                Add-Problem $problems $season "bilancioRUDecisiva" $key "Squadra mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $decBalanceMap[$key]
+            $wins = @($rows | Where-Object { [string]$_.effetto -in @("Da pareggio a vittoria","Da sconfitta a vittoria") }).Count
+            $draws = @($rows | Where-Object { [string]$_.effetto -eq "Da sconfitta a pareggio" }).Count
+            $points = ($rows | Measure-Object -Property puntiClassificaGuadagnati -Sum).Sum
+
+            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "partiteRUDecisiva" $rows.Count $actual.partiteRUDecisiva
+            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "vittorieGrazieRU" $wins $actual.vittorieGrazieRU
+            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "pareggiGrazieRU" $draws $actual.pareggiGrazieRU
+            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "puntiClassificaGuadagnati" $points $actual.puntiClassificaGuadagnati
+        }
+
+        $decAgainstBalanceMap = To-Map $bilancioRUDecisivaContro { param($r) [string]$r.idSquadra }
+
+        foreach ($group in ($ruDecisivaContro | Group-Object idSquadra)) {
+            $rows = @($group.Group)
+            $key = [string]$group.Name
+
+            if (-not $decAgainstBalanceMap.ContainsKey($key)) {
+                Add-Problem $problems $season "bilancioRUDecisivaContro" $key "Squadra mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $decAgainstBalanceMap[$key]
+            $winsLost = @($rows | Where-Object { [string]$_.danno -in @("Da vittoria a pareggio","Da vittoria a sconfitta") }).Count
+            $drawsLost = @($rows | Where-Object { [string]$_.danno -eq "Da pareggio a sconfitta" }).Count
+            $points = ($rows | Measure-Object -Property puntiClassificaPersi -Sum).Sum
+
+            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "partiteControRUDecisiva" $rows.Count $actual.partiteControRUDecisiva
+            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "vittoriePerse" $winsLost $actual.vittoriePerse
+            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "pareggiDiventatiSconfitte" $drawsLost $actual.pareggiDiventatiSconfitte
+            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "puntiClassificaPersi" $points $actual.puntiClassificaPersi
+        }
+
+        # 10) Competizione deve essere presente su tutte le viste gara/dettaglio.
+        foreach ($pair in @(
+            [pscustomobject]@{ Name="partiteConPiuRU"; Rows=$partiteConPiuRU },
+            [pscustomobject]@{ Name="partiteConRU"; Rows=$partiteConRU },
+            [pscustomobject]@{ Name="partiteControRU"; Rows=$partiteControRU },
+            [pscustomobject]@{ Name="ruDecisiva"; Rows=$ruDecisiva },
+            [pscustomobject]@{ Name="ruDecisivaContro"; Rows=$ruDecisivaContro },
+            [pscustomobject]@{ Name="ruDettaglio"; Rows=$ruDetail },
+            [pscustomobject]@{ Name="ruTeamMatch"; Rows=$ruTeamMatch }
+        )) {
+            foreach ($row in $pair.Rows) {
+                if ([string]::IsNullOrWhiteSpace([string]$row.competizione)) {
+                    Add-Problem $problems $season $pair.Name (Key-MatchTeam $row) "Competizione mancante" "nome competizione" ""
+                }
+            }
+        }
+    }
+
+    $problems | Export-Csv -LiteralPath $outCsv -NoTypeInformation -Encoding UTF8
+
+    $summary = $checkNames = @($checks.Keys | ForEach-Object { $_ })
+        foreach ($name in $checkNames) {
+        $count = @($problems | Where-Object Sezione -eq $name).Count
+        [pscustomobject]@{
+            Record = $name
+            StagioniControllate = $checks[$name]
+            Problemi = $count
+            Esito = if ($count -eq 0) { "OK" } else { "ERRORE" }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "=== AUDIT SEMANTICO RU v26 ==="
+    $summary | Format-Table -AutoSize
+
+    Write-Host ""
+    Write-Host "Stagioni controllate          : $seasonCount"
+    Write-Host "Righe RU dettaglio            : $detailRows"
+    Write-Host "Partite-squadra con RU        : $teamMatchRows"
+    Write-Host "Problemi totali               : $($problems.Count)"
+    Write-Host "Dettaglio CSV                  : $outCsv"
+
+    if ($problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "AUDIT SEMANTICO RU: OK"
+
+## tools\Test_RecordsNext2_RUSemantic_v26_BACKUP.ps1
+
+File: tools\Test_RecordsNext2_RUSemantic_v26_BACKUP.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $outCsv = Join-Path $outDir "RecordsNext2_RU_SEMANTIC_AUDIT.csv"
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+    function Num([object]$Value) {
+        if ($null -eq $Value -or "$Value" -eq "") { return 0.0 }
+        return [double]$Value
+    }
+
+    function EqNum([double]$A, [double]$B, [double]$Tolerance = 0.000001) {
+        return [math]::Abs($A - $B) -le $Tolerance
+    }
+
+    function Key-MatchTeam([object]$Row) {
+        return ([string]$Row.idIncontro + "|" + [string]$Row.idSquadra)
+    }
+
+    function Key-Match([object]$Row) {
+        return [string]$Row.idIncontro
+    }
+
+    function Add-Problem {
+        param(
+            [System.Collections.Generic.List[object]]$List,
+            [string]$Season,
+            [string]$Section,
+            [string]$Key,
+            [string]$Problem,
+            [object]$Expected,
+            [object]$Actual
+        )
+
+        $List.Add([pscustomobject]@{
+            Stagione = $Season
+            Sezione = $Section
+            Chiave = $Key
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+
+    function To-Map {
+        param(
+            [object[]]$Rows,
+            [scriptblock]$KeySelector
+        )
+
+        $map = @{}
+        foreach ($row in @($Rows)) {
+            $key = & $KeySelector $row
+            if (-not [string]::IsNullOrWhiteSpace([string]$key)) {
+                $map[[string]$key] = $row
+            }
+        }
+        return $map
+    }
+
+    function Check-EqualNumber {
+        param(
+            [System.Collections.Generic.List[object]]$Problems,
+            [string]$Season,
+            [string]$Section,
+            [string]$Key,
+            [string]$Field,
+            [object]$Expected,
+            [object]$Actual
+        )
+
+        if (-not (EqNum (Num $Expected) (Num $Actual))) {
+            Add-Problem $Problems $Season $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
+        }
+    }
+
+    function Check-EqualText {
+        param(
+            [System.Collections.Generic.List[object]]$Problems,
+            [string]$Season,
+            [string]$Section,
+            [string]$Key,
+            [string]$Field,
+            [object]$Expected,
+            [object]$Actual
+        )
+
+        if ([string]$Expected -ne [string]$Actual) {
+            Add-Problem $Problems $Season $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
+        }
+    }
+
+    $manifest = Get-ChildItem -Path (Join-Path $ProjectDir "data\site-export-staging") -Recurse -File -Filter "fcmRecordsNext_Manifest.js" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    if (-not $manifest) {
+        throw "Manifest JS non trovato."
+    }
+
+    $ruPath = Join-Path $manifest.Directory.FullName "fcmRecordsNext_RU.js"
+
+    if (-not (Test-Path -LiteralPath $ruPath)) {
+        throw "fcmRecordsNext_RU.js non trovato: $ruPath"
+    }
+
+    $js = [System.IO.File]::ReadAllText($ruPath)
+    $eq = $js.IndexOf("=")
+
+    if ($eq -lt 0) {
+        throw "Formato JS RU inatteso."
+    }
+
+    $json = $js.Substring($eq + 1).Trim()
+    if ($json.EndsWith(";")) {
+        $json = $json.Substring(0, $json.Length - 1)
+    }
+
+    $root = $json | ConvertFrom-Json
+    $problems = New-Object 'System.Collections.Generic.List[object]'
+
+    $checks = [ordered]@{
+        "partiteConPiuRU" = 0
+        "partiteConRU" = 0
+        "partiteControRU" = 0
+        "ruDecisiva" = 0
+        "bilancioRUDecisiva" = 0
+        "ruDecisivaContro" = 0
+        "bilancioRUDecisivaContro" = 0
+        "bilancioConRU" = 0
+        "bilancioControRU" = 0
+        "mediaPuntiConRU" = 0
+        "mediaPuntiControRU" = 0
+        "tipoRUUsata" = 0
+    }
+
+    $seasonCount = 0
+    $detailRows = 0
+    $teamMatchRows = 0
+
+    foreach ($seasonAggregate in @($root.seasonAggregates)) {
+        $season = [string]$seasonAggregate.stagione
+        $data = $seasonAggregate.data
+        $views = $data.views
+        $detail = $data.dettaglio
+
+        $seasonCount++
+
+        $ruDetail = @($detail.ruDettaglio)
+        $ruTeamMatch = @($detail.ruTeamMatch)
+        $partiteConRU = @($views.partiteConRU)
+        $partiteControRU = @($views.partiteControRU)
+        $partiteConPiuRU = @($views.partiteConPiuRU)
+        $ruDecisiva = @($views.ruDecisiva)
+        $ruDecisivaContro = @($views.ruDecisivaContro)
+        $bilancioRUDecisiva = @($views.bilancioRUDecisiva)
+        $bilancioRUDecisivaContro = @($views.bilancioRUDecisivaContro)
+        $bilancioConRU = @($views.bilancioConRU)
+        $bilancioControRU = @($views.bilancioControRU)
+        $mediaPuntiConRU = @($views.mediaPuntiConRU)
+        $mediaPuntiControRU = @($views.mediaPuntiControRU)
+        $tipoRUUsata = @($views.tipoRUUsata)
+
+        $detailRows += $ruDetail.Count
+        $teamMatchRows += $ruTeamMatch.Count
+
+        $checkNames = @($checks.Keys | ForEach-Object { $_ })
+        foreach ($name in $checkNames) {
+            $checks[$name]++
+        }
+
+        # 1) ruTeamMatch deve essere la stessa vista di partiteConRU.
+        $teamMap = To-Map $ruTeamMatch { param($r) Key-MatchTeam $r }
+        $withMap = To-Map $partiteConRU { param($r) Key-MatchTeam $r }
+
+        if ($teamMap.Count -ne $withMap.Count) {
+            Add-Problem $problems $season "partiteConRU" "(conteggio)" "Numero righe diverso da ruTeamMatch" $teamMap.Count $withMap.Count
+        }
+
+        foreach ($key in $teamMap.Keys) {
+            if (-not $withMap.ContainsKey($key)) {
+                Add-Problem $problems $season "partiteConRU" $key "Riga ruTeamMatch assente dalla vista" "presente" "assente"
+                continue
+            }
+
+            $expected = $teamMap[$key]
+            $actual = $withMap[$key]
+
+            foreach ($field in @("competizione","squadra","avversaria","tipiRU","dettaglioRU","esito")) {
+                Check-EqualText $problems $season "partiteConRU" $key $field $expected.$field $actual.$field
+            }
+
+            foreach ($field in @("numeroRU","valoreRUTotale","puntiSquadra","puntiAvversaria","golSquadra","golAvversaria")) {
+                Check-EqualNumber $problems $season "partiteConRU" $key $field $expected.$field $actual.$field
+            }
+        }
+
+        # 2) Ricostruisce ruTeamMatch direttamente da ruDettaglio.
+        $detailGroups = $ruDetail | Group-Object { Key-MatchTeam $_ }
+
+        foreach ($group in $detailGroups) {
+            $rows = @($group.Group)
+            $first = $rows[0]
+            $key = [string]$group.Name
+
+            if (-not $teamMap.ContainsKey($key)) {
+                Add-Problem $problems $season "ruTeamMatch" $key "Aggregato mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $teamMap[$key]
+            $expectedCount = $rows.Count
+            $expectedValue = ($rows | Measure-Object -Property valoreRU -Sum).Sum
+            $expectedTypes = @($rows | ForEach-Object { [string]$_.tipoRU } | Sort-Object -Unique) -join ","
+
+            Check-EqualNumber $problems $season "ruTeamMatch" $key "numeroRU" $expectedCount $actual.numeroRU
+            Check-EqualNumber $problems $season "ruTeamMatch" $key "valoreRUTotale" $expectedValue $actual.valoreRUTotale
+
+            $actualTypes = @(([string]$actual.tipiRU) -split "," | Where-Object { $_ } | Sort-Object -Unique) -join ","
+            Check-EqualText $problems $season "ruTeamMatch" $key "tipiRU" $expectedTypes $actualTypes
+            Check-EqualText $problems $season "ruTeamMatch" $key "competizione" $first.competizione $actual.competizione
+            Check-EqualText $problems $season "ruTeamMatch" $key "squadra" $first.squadra $actual.squadra
+            Check-EqualText $problems $season "ruTeamMatch" $key "avversaria" $first.avversaria $actual.avversaria
+        }
+
+        # 3) partiteConPiuRU: una riga per incontro, somma di tutte le RU della gara.
+        $matchGroups = $ruDetail | Group-Object idIncontro
+        $mostMap = To-Map $partiteConPiuRU { param($r) Key-Match $r }
+
+        if ($matchGroups.Count -ne $mostMap.Count) {
+            Add-Problem $problems $season "partiteConPiuRU" "(conteggio)" "Numero incontri diverso" $matchGroups.Count $mostMap.Count
+        }
+
+        foreach ($group in $matchGroups) {
+            $rows = @($group.Group)
+            $key = [string]$group.Name
+
+            if (-not $mostMap.ContainsKey($key)) {
+                Add-Problem $problems $season "partiteConPiuRU" $key "Incontro RU mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $mostMap[$key]
+            $expectedCount = $rows.Count
+            $expectedValue = ($rows | Measure-Object -Property valoreRU -Sum).Sum
+
+            Check-EqualNumber $problems $season "partiteConPiuRU" $key "numeroRU" $expectedCount $actual.numeroRU
+            Check-EqualNumber $problems $season "partiteConPiuRU" $key "valoreRUTotale" $expectedValue $actual.valoreRUTotale
+        }
+
+        # 4) partiteControRU deve essere l'inversione di ogni partita con RU.
+        $againstMap = To-Map $partiteControRU { param($r) Key-MatchTeam $r }
+
+        if ($againstMap.Count -ne $partiteConRU.Count) {
+            Add-Problem $problems $season "partiteControRU" "(conteggio)" "Numero righe diverso da partiteConRU" $partiteConRU.Count $againstMap.Count
+        }
+
+        foreach ($with in $partiteConRU) {
+            $key = [string]$with.idIncontro + "|" + [string]$with.idAvversaria
+
+            if (-not $againstMap.ContainsKey($key)) {
+                Add-Problem $problems $season "partiteControRU" $key "Vista contro RU mancante" "presente" "assente"
+                continue
+            }
+
+            $against = $againstMap[$key]
+            Check-EqualText $problems $season "partiteControRU" $key "avversariaConRU" $with.squadra $against.avversariaConRU
+            Check-EqualNumber $problems $season "partiteControRU" $key "numeroRUAvversaria" $with.numeroRU $against.numeroRUAvversaria
+            Check-EqualNumber $problems $season "partiteControRU" $key "valoreRUAvversaria" $with.valoreRUTotale $against.valoreRUAvversaria
+            Check-EqualText $problems $season "partiteControRU" $key "tipiRUAvversaria" $with.tipiRU $against.tipiRUAvversaria
+            Check-EqualText $problems $season "partiteControRU" $key "competizione" $with.competizione $against.competizione
+        }
+
+        # 5) Bilanci con RU e contro RU, ricostruiti dalle rispettive viste gara.
+        foreach ($pair in @(
+            [pscustomobject]@{ Rows=$partiteConRU; Balance=$bilancioConRU; CountField="partiteConRU"; Section="bilancioConRU" },
+            [pscustomobject]@{ Rows=$partiteControRU; Balance=$bilancioControRU; CountField="partiteControRU"; Section="bilancioControRU" }
+        )) {
+            $balanceMap = To-Map $pair.Balance { param($r) [string]$r.idSquadra }
+
+            foreach ($group in ($pair.Rows | Group-Object idSquadra)) {
+                $rows = @($group.Group)
+                $key = [string]$group.Name
+
+                if (-not $balanceMap.ContainsKey($key)) {
+                    Add-Problem $problems $season $pair.Section $key "Squadra mancante" "presente" "assente"
+                    continue
+                }
+
+                $actual = $balanceMap[$key]
+                $wins = @($rows | Where-Object { [string]$_.esito -eq "V" }).Count
+                $draws = @($rows | Where-Object { [string]$_.esito -eq "N" }).Count
+                $losses = @($rows | Where-Object { [string]$_.esito -eq "P" }).Count
+                $count = $rows.Count
+                $avgPts = (($rows | Measure-Object -Property puntiSquadra -Sum).Sum) / $count
+                $avgOppPts = (($rows | Measure-Object -Property puntiAvversaria -Sum).Sum) / $count
+                $avgGoals = (($rows | Measure-Object -Property golSquadra -Sum).Sum) / $count
+                $avgOppGoals = (($rows | Measure-Object -Property golAvversaria -Sum).Sum) / $count
+
+                Check-EqualNumber $problems $season $pair.Section $key $pair.CountField $count $actual.($pair.CountField)
+                Check-EqualNumber $problems $season $pair.Section $key "V" $wins $actual.V
+                Check-EqualNumber $problems $season $pair.Section $key "N" $draws $actual.N
+                Check-EqualNumber $problems $season $pair.Section $key "P" $losses $actual.P
+                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiSquadra" $avgPts $actual.mediaPuntiSquadra
+                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiAvversaria" $avgOppPts $actual.mediaPuntiAvversaria
+                Check-EqualNumber $problems $season $pair.Section $key "mediaGolSquadra" $avgGoals $actual.mediaGolSquadra
+                Check-EqualNumber $problems $season $pair.Section $key "mediaGolAvversaria" $avgOppGoals $actual.mediaGolAvversaria
+            }
+        }
+
+        # 6) Media punti deve essere una proiezione coerente dei bilanci.
+        foreach ($pair in @(
+            [pscustomobject]@{ Balance=$bilancioConRU; Media=$mediaPuntiConRU; CountField="partiteConRU"; Section="mediaPuntiConRU" },
+            [pscustomobject]@{ Balance=$bilancioControRU; Media=$mediaPuntiControRU; CountField="partiteControRU"; Section="mediaPuntiControRU" }
+        )) {
+            $mediaMap = To-Map $pair.Media { param($r) [string]$r.idSquadra }
+
+            foreach ($balance in $pair.Balance) {
+                $key = [string]$balance.idSquadra
+
+                if (-not $mediaMap.ContainsKey($key)) {
+                    Add-Problem $problems $season $pair.Section $key "Squadra mancante" "presente" "assente"
+                    continue
+                }
+
+                $actual = $mediaMap[$key]
+                Check-EqualNumber $problems $season $pair.Section $key $pair.CountField $balance.($pair.CountField) $actual.($pair.CountField)
+                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiSquadra" $balance.mediaPuntiSquadra $actual.mediaPuntiSquadra
+                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiAvversaria" $balance.mediaPuntiAvversaria $actual.mediaPuntiAvversaria
+                Check-EqualNumber $problems $season $pair.Section $key "differenzaMedia" ((Num $balance.mediaPuntiSquadra) - (Num $balance.mediaPuntiAvversaria)) $actual.differenzaMedia
+            }
+        }
+
+        # 7) Tipo RU usata: conteggi e valori direttamente da ruDettaglio.
+        $typeMap = To-Map $tipoRUUsata { param($r) [string]$r.idSquadra }
+
+        foreach ($group in ($ruDetail | Group-Object idSquadra)) {
+            $rows = @($group.Group)
+            $key = [string]$group.Name
+
+            if (-not $typeMap.ContainsKey($key)) {
+                Add-Problem $problems $season "tipoRUUsata" $key "Squadra mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $typeMap[$key]
+            $totalValue = 0.0
+
+            foreach ($type in @("PU","DU","CU","AU")) {
+                $typed = @($rows | Where-Object { [string]$_.tipoRU -eq $type })
+                $count = $typed.Count
+                $value = if ($count -gt 0) { ($typed | Measure-Object -Property valoreRU -Sum).Sum } else { 0 }
+                $totalValue += Num $value
+
+                Check-EqualNumber $problems $season "tipoRUUsata" $key $type $count $actual.$type
+                Check-EqualNumber $problems $season "tipoRUUsata" $key ("valore" + $type) $value $actual.("valore" + $type)
+            }
+
+            Check-EqualNumber $problems $season "tipoRUUsata" $key "totaleRU" $rows.Count $actual.totaleRU
+            Check-EqualNumber $problems $season "tipoRUUsata" $key "valoreTotale" $totalValue $actual.valoreTotale
+        }
+
+        # 8) Decisività: coerenza interna dell'effetto e dei punti di classifica.
+        foreach ($row in $ruDecisiva) {
+            $key = Key-MatchTeam $row
+            $expectedPoints = switch ([string]$row.effetto) {
+                "Da sconfitta a pareggio" { 1 }
+                "Da pareggio a vittoria" { 2 }
+                "Da sconfitta a vittoria" { 3 }
+                default { -1 }
+            }
+
+            if ($expectedPoints -lt 0) {
+                Add-Problem $problems $season "ruDecisiva" $key "Effetto sconosciuto" "effetto noto" $row.effetto
+            }
+            else {
+                Check-EqualNumber $problems $season "ruDecisiva" $key "puntiClassificaGuadagnati" $expectedPoints $row.puntiClassificaGuadagnati
+            }
+        }
+
+        foreach ($row in $ruDecisivaContro) {
+            $key = Key-MatchTeam $row
+            $expectedPoints = switch ([string]$row.danno) {
+                "Da vittoria a pareggio" { 2 }
+                "Da pareggio a sconfitta" { 1 }
+                "Da vittoria a sconfitta" { 3 }
+                default { -1 }
+            }
+
+            if ($expectedPoints -lt 0) {
+                Add-Problem $problems $season "ruDecisivaContro" $key "Danno sconosciuto" "danno noto" $row.danno
+            }
+            else {
+                Check-EqualNumber $problems $season "ruDecisivaContro" $key "puntiClassificaPersi" $expectedPoints $row.puntiClassificaPersi
+            }
+        }
+
+        # 9) Bilanci decisività derivati dalle righe decisive.
+        $decBalanceMap = To-Map $bilancioRUDecisiva { param($r) [string]$r.idSquadra }
+
+        foreach ($group in ($ruDecisiva | Group-Object idSquadra)) {
+            $rows = @($group.Group)
+            $key = [string]$group.Name
+
+            if (-not $decBalanceMap.ContainsKey($key)) {
+                Add-Problem $problems $season "bilancioRUDecisiva" $key "Squadra mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $decBalanceMap[$key]
+            $wins = @($rows | Where-Object { [string]$_.effetto -in @("Da pareggio a vittoria","Da sconfitta a vittoria") }).Count
+            $draws = @($rows | Where-Object { [string]$_.effetto -eq "Da sconfitta a pareggio" }).Count
+            $points = ($rows | Measure-Object -Property puntiClassificaGuadagnati -Sum).Sum
+
+            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "partiteRUDecisiva" $rows.Count $actual.partiteRUDecisiva
+            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "vittorieGrazieRU" $wins $actual.vittorieGrazieRU
+            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "pareggiGrazieRU" $draws $actual.pareggiGrazieRU
+            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "puntiClassificaGuadagnati" $points $actual.puntiClassificaGuadagnati
+        }
+
+        $decAgainstBalanceMap = To-Map $bilancioRUDecisivaContro { param($r) [string]$r.idSquadra }
+
+        foreach ($group in ($ruDecisivaContro | Group-Object idSquadra)) {
+            $rows = @($group.Group)
+            $key = [string]$group.Name
+
+            if (-not $decAgainstBalanceMap.ContainsKey($key)) {
+                Add-Problem $problems $season "bilancioRUDecisivaContro" $key "Squadra mancante" "presente" "assente"
+                continue
+            }
+
+            $actual = $decAgainstBalanceMap[$key]
+            $winsLost = @($rows | Where-Object { [string]$_.danno -in @("Da vittoria a pareggio","Da vittoria a sconfitta") }).Count
+            $drawsLost = @($rows | Where-Object { [string]$_.danno -eq "Da pareggio a sconfitta" }).Count
+            $points = ($rows | Measure-Object -Property puntiClassificaPersi -Sum).Sum
+
+            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "partiteControRUDecisiva" $rows.Count $actual.partiteControRUDecisiva
+            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "vittoriePerse" $winsLost $actual.vittoriePerse
+            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "pareggiDiventatiSconfitte" $drawsLost $actual.pareggiDiventatiSconfitte
+            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "puntiClassificaPersi" $points $actual.puntiClassificaPersi
+        }
+
+        # 10) Competizione deve essere presente su tutte le viste gara/dettaglio.
+        foreach ($pair in @(
+            [pscustomobject]@{ Name="partiteConPiuRU"; Rows=$partiteConPiuRU },
+            [pscustomobject]@{ Name="partiteConRU"; Rows=$partiteConRU },
+            [pscustomobject]@{ Name="partiteControRU"; Rows=$partiteControRU },
+            [pscustomobject]@{ Name="ruDecisiva"; Rows=$ruDecisiva },
+            [pscustomobject]@{ Name="ruDecisivaContro"; Rows=$ruDecisivaContro },
+            [pscustomobject]@{ Name="ruDettaglio"; Rows=$ruDetail },
+            [pscustomobject]@{ Name="ruTeamMatch"; Rows=$ruTeamMatch }
+        )) {
+            foreach ($row in $pair.Rows) {
+                if ([string]::IsNullOrWhiteSpace([string]$row.competizione)) {
+                    Add-Problem $problems $season $pair.Name (Key-MatchTeam $row) "Competizione mancante" "nome competizione" ""
+                }
+            }
+        }
+    }
+
+    $problems | Export-Csv -LiteralPath $outCsv -NoTypeInformation -Encoding UTF8
+
+    $summary = $checkNames = @($checks.Keys | ForEach-Object { $_ })
+        foreach ($name in $checkNames) {
+        $count = @($problems | Where-Object Sezione -eq $name).Count
+        [pscustomobject]@{
+            Record = $name
+            StagioniControllate = $checks[$name]
+            Problemi = $count
+            Esito = if ($count -eq 0) { "OK" } else { "ERRORE" }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "=== AUDIT SEMANTICO RU v26 ==="
+    $summary | Format-Table -AutoSize
+
+    Write-Host ""
+    Write-Host "Stagioni controllate          : $seasonCount"
+    Write-Host "Righe RU dettaglio            : $detailRows"
+    Write-Host "Partite-squadra con RU        : $teamMatchRows"
+    Write-Host "Problemi totali               : $($problems.Count)"
+    Write-Host "Dettaglio CSV                  : $outCsv"
+
+    if ($problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "AUDIT SEMANTICO RU: OK"
+
+## tools\Test_RecordsNext2_SerieSemantic_v22.ps1
+
+File: tools\Test_RecordsNext2_SerieSemantic_v22.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+
+    $reportsRoot = Join-Path $ProjectDir "data\reports"
+    $archiveRoot = Join-Path $ProjectDir "data\records-archive\stagioni"
+    $configPath = Join-Path $ProjectDir "config\processing.json"
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $outCsv = Join-Path $outDir "RecordsNext2_SERIE_SEMANTIC_AUDIT.csv"
+
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+    function Num([object]$Value) {
+        if ($null -eq $Value -or "$Value" -eq "") { return 0.0 }
+        return [double]$Value
+    }
+
+    function Valid-Match([object]$Row) {
+        if ($null -eq $Row) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idSquadra)) { return $false }
+        if ([string]$Row.idSquadra -eq "0") { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.squadra)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idIncontro)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.avversaria)) { return $false }
+        return $true
+    }
+
+    function Order-Value([object]$Row) {
+        if ($null -ne $Row.ordineGiornata -and "$($Row.ordineGiornata)" -ne "") {
+            return Num $Row.ordineGiornata
+        }
+        return Num $Row.giornataDiA
+    }
+
+    function Add-Problem {
+        param(
+            [System.Collections.Generic.List[object]]$List,
+            [string]$Season,
+            [string]$Competition,
+            [string]$Record,
+            [string]$Team,
+            [string]$Problem,
+            [object]$Expected,
+            [object]$Actual
+        )
+        $List.Add([pscustomobject]@{
+            Stagione = $Season
+            Competizione = $Competition
+            Record = $Record
+            Squadra = $Team
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+
+    function New-SeriesRow {
+        param(
+            [object[]]$Rows
+        )
+        if ($Rows.Count -eq 0) { return $null }
+        $first = $Rows[0]
+        $last = $Rows[$Rows.Count - 1]
+        return [pscustomobject]@{
+            idSquadra = [string]$first.idSquadra
+            squadra = [string]$first.squadra
+            valore = $Rows.Count
+            daGiornataDiA = $first.giornataDiA
+            aGiornataDiA = $last.giornataDiA
+            daOrdine = Order-Value $first
+            aOrdine = Order-Value $last
+        }
+    }
+
+    function Get-ResultRuns {
+        param(
+            [object[]]$Matches,
+            [string]$ResultCode,
+            [bool]$MustMatch
+        )
+        $runs = New-Object 'System.Collections.Generic.List[object]'
+        $groups = $Matches | Group-Object -Property idSquadra
+        foreach ($group in $groups) {
+            $teamMatches = @($group.Group | Sort-Object @{Expression={ Order-Value $_ }}, @{Expression={ [string]$_.idIncontro }})
+            $current = New-Object 'System.Collections.Generic.List[object]'
+            foreach ($match in $teamMatches) {
+                $matchesResult = ([string]$match.esito -eq $ResultCode)
+                $belongs = if ($MustMatch) { $matchesResult } else { -not $matchesResult }
+                if ($belongs) {
+                    $current.Add($match)
+                } else {
+                    if ($current.Count -gt 0) {
+                        $runs.Add((New-SeriesRow -Rows $current.ToArray()))
+                        $current = New-Object 'System.Collections.Generic.List[object]'
+                    }
+                }
+            }
+            if ($current.Count -gt 0) {
+                $runs.Add((New-SeriesRow -Rows $current.ToArray()))
+            }
+        }
+        return @($runs | Sort-Object @{Expression={ [int]$_.valore }; Descending=$true}, @{Expression={ [string]$_.squadra }})
+    }
+
+    function Get-UnbeatenRuns {
+        param([object[]]$Matches)
+        return Get-ResultRuns -Matches $Matches -ResultCode "S" -MustMatch $false
+    }
+
+    function Get-BestEventSeriesByTeam {
+        param(
+            [object[]]$Matches,
+            [object[]]$Events
+        )
+        $eventKeys = @{}
+        foreach ($event in $Events) {
+            $eventKeys[([string]$event.idSquadra + "|" + [string]$event.idIncontro)] = $true
+        }
+
+        $result = New-Object 'System.Collections.Generic.List[object]'
+        $groups = $Matches | Group-Object -Property idSquadra
+
+        foreach ($group in $groups) {
+            $teamMatches = @($group.Group | Sort-Object @{Expression={ Order-Value $_ }}, @{Expression={ [string]$_.idIncontro }})
+            $best = @()
+            $current = New-Object 'System.Collections.Generic.List[object]'
+
+            foreach ($match in $teamMatches) {
+                $key = [string]$match.idSquadra + "|" + [string]$match.idIncontro
+                if ($eventKeys.ContainsKey($key)) {
+                    $current.Add($match)
+                } else {
+                    if ($current.Count -gt $best.Count) { $best = $current.ToArray() }
+                    $current = New-Object 'System.Collections.Generic.List[object]'
+                }
+            }
+
+            if ($current.Count -gt $best.Count) { $best = $current.ToArray() }
+            if ($best.Count -gt 0) { $result.Add((New-SeriesRow -Rows $best)) }
+        }
+
+        return @($result | Sort-Object @{Expression={ [int]$_.valore }; Descending=$true}, @{Expression={ [string]$_.squadra }})
+    }
+
+    function Compare-TopRuns {
+        param(
+            [System.Collections.Generic.List[object]]$Problems,
+            [string]$Season,
+            [string]$Competition,
+            [string]$RecordName,
+            [object[]]$Expected,
+            [object[]]$Actual,
+            [int]$Limit = 20
+        )
+
+        $expectedRows = @($Expected | Select-Object -First $Limit)
+        $actualRows = @($Actual)
+
+        if ($actualRows.Count -ne $expectedRows.Count) {
+            Add-Problem $Problems $Season $Competition $RecordName "" "Numero righe diverso" $expectedRows.Count $actualRows.Count
+        }
+
+        $count = [math]::Min($expectedRows.Count, $actualRows.Count)
+        for ($i = 0; $i -lt $count; $i++) {
+            $e = $expectedRows[$i]
+            $a = $actualRows[$i]
+
+            if ([string]$a.squadra -ne [string]$e.squadra -or [int](Num $a.valore) -ne [int]$e.valore) {
+                Add-Problem $Problems $Season $Competition $RecordName ([string]$a.squadra) "Classifica serie diversa" ($e.squadra + " = " + $e.valore) ($a.squadra + " = " + $a.valore)
+                continue
+            }
+
+            if ($null -ne $a.daGiornataDiA -and [string]$a.daGiornataDiA -ne [string]$e.daGiornataDiA) {
+                Add-Problem $Problems $Season $Competition $RecordName ([string]$a.squadra) "Inizio serie errato" $e.daGiornataDiA $a.daGiornataDiA
+            }
+
+            if ($null -ne $a.aGiornataDiA -and [string]$a.aGiornataDiA -ne [string]$e.aGiornataDiA) {
+                Add-Problem $Problems $Season $Competition $RecordName ([string]$a.squadra) "Fine serie errata" $e.aGiornataDiA $a.aGiornataDiA
+            }
+        }
+    }
+
+    $config = Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
+
+    $seriesDefinitions = @(
+        [pscustomobject]@{ Key="wins"; Section="serieVittorie"; Name="Vittorie consecutive"; Result="V"; MustMatch=$true; Type="result" },
+        [pscustomobject]@{ Key="draws"; Section="seriePareggi"; Name="Pareggi consecutivi"; Result="P"; MustMatch=$true; Type="result" },
+        [pscustomobject]@{ Key="losses"; Section="serieSconfitte"; Name="Sconfitte consecutive"; Result="S"; MustMatch=$true; Type="result" },
+        [pscustomobject]@{ Key="unbeaten"; Section="serieSenzaSconfitte"; Name="Senza sconfitte"; Result="S"; MustMatch=$false; Type="result" },
+        [pscustomobject]@{ Key="winless"; Section="serieSenzaVittorie"; Name="Senza vittorie"; Result="V"; MustMatch=$false; Type="result" },
+        [pscustomobject]@{ Key="clean-sheets"; Section="cleanSheetPortiereSerieSquadre"; Name="Clean sheet consecutivi"; Type="clean" }
+    )
+
+    $modifierDefinitions = @(
+        [pscustomobject]@{ Config="modm1pers.series"; TypeName="modDifesa"; Section="modDifesaSerieSquadre"; Name="Serie Modificatore Difesa" },
+        [pscustomobject]@{ Config="modm2pers.series"; TypeName="capitano"; Section="capitanoSerieSquadre"; Name="Serie Capitano" },
+        [pscustomobject]@{ Config="modm3pers.series"; TypeName="personalizzato3"; Section="modPersonalizzato3SerieSquadre"; Name="Serie Modificatore personale 3" },
+        [pscustomobject]@{ Config="modportiere.series"; TypeName="fcmPortiere"; Section="modPortiereFcmSerieSquadre"; Name="Serie Modificatore Portiere FCM" },
+        [pscustomobject]@{ Config="moddifesa.series"; TypeName="fcmDifesa"; Section="modDifesaFcmSerieSquadre"; Name="Serie Modificatore Difesa FCM" },
+        [pscustomobject]@{ Config="modcentrocampo.series"; TypeName="fcmCentrocampo"; Section="modCentrocampoFcmSerieSquadre"; Name="Serie Modificatore Centrocampo FCM" },
+        [pscustomobject]@{ Config="modattacco.series"; TypeName="fcmAttacco"; Section="modAttaccoFcmSerieSquadre"; Name="Serie Modificatore Attacco FCM" },
+        [pscustomobject]@{ Config="modmodulo.series"; TypeName="fcmModulo"; Section="modModuloFcmSerieSquadre"; Name="Serie Modificatore Modulo FCM" }
+    )
+
+    $problems = New-Object 'System.Collections.Generic.List[object]'
+    $checks = @{}
+    foreach ($def in $seriesDefinitions) { $checks[$def.Name] = 0 }
+    foreach ($def in $modifierDefinitions) {
+        if ([bool]$config.processing.families.modifiers.children.($def.Config)) { $checks[$def.Name] = 0 }
+    }
+
+    $filesChecked = 0
+    $matchesChecked = 0
+    $teamsChecked = 0
+
+    $normalizedFiles = @(Get-ChildItem -LiteralPath $reportsRoot -Recurse -File -Filter "season_normalized_*.json" -ErrorAction SilentlyContinue | Sort-Object FullName)
+    if ($normalizedFiles.Count -eq 0) { throw "Nessun season_normalized_*.json trovato in $reportsRoot" }
+
+    foreach ($normalizedFile in $normalizedFiles) {
+        $source = Get-Content -LiteralPath $normalizedFile.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        $season = $normalizedFile.Directory.Name
+        $competitionId = [string]$source.meta.competizioneStoricaId
+        if ([string]::IsNullOrWhiteSpace($competitionId)) { $competitionId = $normalizedFile.BaseName.Substring("season_normalized_".Length) }
+        $competitionName = [string]$source.meta.competizioneNome
+        if ([string]::IsNullOrWhiteSpace($competitionName)) { $competitionName = $competitionId }
+
+        $recordFile = Join-Path (Join-Path $archiveRoot $season) ("season_records_" + $competitionId + ".json")
+        if (-not (Test-Path -LiteralPath $recordFile)) {
+            Add-Problem $problems $season $competitionName "(file)" "" "season_records mancante" $recordFile ""
+            continue
+        }
+
+        $actual = Get-Content -LiteralPath $recordFile -Raw -Encoding UTF8 | ConvertFrom-Json
+        $matches = @($source.partiteSquadra | Where-Object { Valid-Match $_ })
+        if ($matches.Count -eq 0) { continue }
+
+        $filesChecked++
+        $matchesChecked += $matches.Count
+        $teamsChecked += @($matches | Group-Object idSquadra).Count
+
+        foreach ($def in $seriesDefinitions) {
+            $selected = [bool]$config.processing.families.series.children.($def.Key)
+            if (-not $selected) { continue }
+
+            $checks[$def.Name]++
+
+            if ($def.Type -eq "result") {
+                $expected = Get-ResultRuns -Matches $matches -ResultCode $def.Result -MustMatch $def.MustMatch
+                $actualRows = @($actual.records.($def.Section))
+                Compare-TopRuns -Problems $problems -Season $season -Competition $competitionName -RecordName $def.Name -Expected $expected -Actual $actualRows -Limit 20
+            } elseif ($def.Type -eq "clean") {
+                $clean = @($source.cleanSheetB3Dettaglio)
+                $expected = Get-BestEventSeriesByTeam -Matches $matches -Events $clean
+                $actualRows = @($actual.records.($def.Section))
+                Compare-TopRuns -Problems $problems -Season $season -Competition $competitionName -RecordName $def.Name -Expected $expected -Actual $actualRows -Limit 99999
+            }
+        }
+
+        $modifiers = @($source.modificatoriB2Dettaglio)
+        foreach ($def in $modifierDefinitions) {
+            $selected = [bool]$config.processing.families.modifiers.children.($def.Config)
+            if (-not $selected) { continue }
+
+            $checks[$def.Name]++
+            $events = @($modifiers | Where-Object { [string]$_.tipo -eq $def.TypeName })
+            $expected = Get-BestEventSeriesByTeam -Matches $matches -Events $events
+            $actualRows = @($actual.records.($def.Section))
+            Compare-TopRuns -Problems $problems -Season $season -Competition $competitionName -RecordName $def.Name -Expected $expected -Actual $actualRows -Limit 99999
+        }
+    }
+
+    $problems | Export-Csv -LiteralPath $outCsv -NoTypeInformation -Encoding UTF8
+
+    $summary = foreach ($name in $checks.Keys | Sort-Object) {
+        $recordProblems = @($problems | Where-Object Record -eq $name)
+        [pscustomobject]@{
+            Record = $name
+            CompetizioniControllate = $checks[$name]
+            Problemi = $recordProblems.Count
+            Esito = if ($recordProblems.Count -eq 0) { "OK" } else { "ERRORE" }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "=== AUDIT SEMANTICO SERIE ==="
+    $summary | Format-Table -AutoSize
+    Write-Host ""
+    Write-Host "File competizione controllati : $filesChecked"
+    Write-Host "Righe partita valide          : $matchesChecked"
+    Write-Host "Squadre controllate           : $teamsChecked"
+    Write-Host "Problemi totali               : $($problems.Count)"
+    Write-Host "Dettaglio CSV                  : $outCsv"
+
+    if ($problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "AUDIT SEMANTICO SERIE: OK"
+
+## tools\Test_RecordsNext2_SerieSemantic_v23.ps1
+
+File: tools\Test_RecordsNext2_SerieSemantic_v23.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+
+    $reportsRoot = Join-Path $ProjectDir "data\reports"
+    $archiveRoot = Join-Path $ProjectDir "data\records-archive\stagioni"
+    $configPath = Join-Path $ProjectDir "config\processing.json"
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $outCsv = Join-Path $outDir "RecordsNext2_SERIE_SEMANTIC_AUDIT.csv"
+
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+    function Num([object]$Value) {
+        if ($null -eq $Value -or "$Value" -eq "") { return 0.0 }
+        return [double]$Value
+    }
+
+    function Valid-Match([object]$Row) {
+        if ($null -eq $Row) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idSquadra)) { return $false }
+        if ([string]$Row.idSquadra -eq "0") { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.squadra)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idIncontro)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.avversaria)) { return $false }
+        return $true
+    }
+
+    function Order-Value([object]$Row) {
+        if ($null -ne $Row.ordineGiornata -and "$($Row.ordineGiornata)" -ne "") {
+            return Num $Row.ordineGiornata
+        }
+        return Num $Row.giornataDiA
+    }
+
+    function Add-Problem {
+        param(
+            [System.Collections.Generic.List[object]]$List,
+            [string]$Season,
+            [string]$Competition,
+            [string]$Record,
+            [string]$Team,
+            [string]$Problem,
+            [object]$Expected,
+            [object]$Actual
+        )
+
+        $List.Add([pscustomobject]@{
+            Stagione = $Season
+            Competizione = $Competition
+            Record = $Record
+            Squadra = $Team
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+
+    function New-SeriesRow {
+        param([object[]]$Rows)
+
+        if ($null -eq $Rows -or $Rows.Count -eq 0) { return $null }
+
+        $first = $Rows[0]
+        $last = $Rows[$Rows.Count - 1]
+
+        return [pscustomobject]@{
+            idSquadra = [string]$first.idSquadra
+            squadra = [string]$first.squadra
+            valore = [int]$Rows.Count
+            daGiornataDiA = [string]$first.giornataDiA
+            aGiornataDiA = [string]$last.giornataDiA
+            daOrdine = [string](Order-Value $first)
+            aOrdine = [string](Order-Value $last)
+        }
+    }
+
+    function Get-ResultRuns {
+        param(
+            [object[]]$Matches,
+            [string]$ResultCode,
+            [bool]$MustMatch
+        )
+
+        $runs = New-Object 'System.Collections.Generic.List[object]'
+
+        foreach ($group in ($Matches | Group-Object -Property idSquadra)) {
+            $teamMatches = @(
+                $group.Group |
+                Sort-Object @{Expression={ Order-Value $_ }}, @{Expression={ [string]$_.idIncontro }}
+            )
+
+            $current = New-Object 'System.Collections.Generic.List[object]'
+
+            foreach ($match in $teamMatches) {
+                $matchesResult = ([string]$match.esito -eq $ResultCode)
+                $belongs = if ($MustMatch) { $matchesResult } else { -not $matchesResult }
+
+                if ($belongs) {
+                    $current.Add($match)
+                }
+                else {
+                    if ($current.Count -gt 0) {
+                        $runs.Add((New-SeriesRow -Rows $current.ToArray()))
+                        $current = New-Object 'System.Collections.Generic.List[object]'
+                    }
+                }
+            }
+
+            if ($current.Count -gt 0) {
+                $runs.Add((New-SeriesRow -Rows $current.ToArray()))
+            }
+        }
+
+        return $runs.ToArray()
+    }
+
+    function Get-BestEventSeriesByTeam {
+        param(
+            [object[]]$Matches,
+            [object[]]$Events
+        )
+
+        $eventKeys = @{}
+
+        foreach ($event in $Events) {
+            $eventKeys[([string]$event.idSquadra + "|" + [string]$event.idIncontro)] = $true
+        }
+
+        $result = New-Object 'System.Collections.Generic.List[object]'
+
+        foreach ($group in ($Matches | Group-Object -Property idSquadra)) {
+            $teamMatches = @(
+                $group.Group |
+                Sort-Object @{Expression={ Order-Value $_ }}, @{Expression={ [string]$_.idIncontro }}
+            )
+
+            $best = @()
+            $current = New-Object 'System.Collections.Generic.List[object]'
+
+            foreach ($match in $teamMatches) {
+                $key = [string]$match.idSquadra + "|" + [string]$match.idIncontro
+
+                if ($eventKeys.ContainsKey($key)) {
+                    $current.Add($match)
+                }
+                else {
+                    if ($current.Count -gt $best.Count) {
+                        $best = $current.ToArray()
+                    }
+
+                    $current = New-Object 'System.Collections.Generic.List[object]'
+                }
+            }
+
+            if ($current.Count -gt $best.Count) {
+                $best = $current.ToArray()
+            }
+
+            if ($best.Count -gt 0) {
+                $result.Add((New-SeriesRow -Rows $best))
+            }
+        }
+
+        return $result.ToArray()
+    }
+
+    function Series-Key {
+        param([object]$Row)
+
+        $team = [string]$Row.squadra
+        $value = [int](Num $Row.valore)
+
+        $fromOrder = ""
+        $toOrder = ""
+
+        if ($null -ne $Row.daOrdine -and "$($Row.daOrdine)" -ne "") {
+            $fromOrder = [string]$Row.daOrdine
+        }
+        elseif ($null -ne $Row.daGiornataDiA) {
+            $fromOrder = [string]$Row.daGiornataDiA
+        }
+
+        if ($null -ne $Row.aOrdine -and "$($Row.aOrdine)" -ne "") {
+            $toOrder = [string]$Row.aOrdine
+        }
+        elseif ($null -ne $Row.aGiornataDiA) {
+            $toOrder = [string]$Row.aGiornataDiA
+        }
+
+        return ($team + "|" + $value + "|" + $fromOrder + "|" + $toOrder)
+    }
+
+    function Normalize-ActualSeries {
+        param([object[]]$Rows)
+
+        $normalized = @()
+
+        foreach ($row in $Rows) {
+            $normalized += [pscustomobject]@{
+                idSquadra = [string]$row.idSquadra
+                squadra = [string]$row.squadra
+                valore = [int](Num $row.valore)
+                daGiornataDiA = [string]$row.daGiornataDiA
+                aGiornataDiA = [string]$row.aGiornataDiA
+                daOrdine = if ($null -ne $row.daOrdineGiornata) { [string]$row.daOrdineGiornata } else { "" }
+                aOrdine = if ($null -ne $row.aOrdineGiornata) { [string]$row.aOrdineGiornata } else { "" }
+            }
+        }
+
+        return $normalized
+    }
+
+    function Compare-SeriesSet {
+        param(
+            [System.Collections.Generic.List[object]]$Problems,
+            [string]$Season,
+            [string]$Competition,
+            [string]$RecordName,
+            [object[]]$Expected,
+            [object[]]$Actual,
+            [bool]$BestOnlyPerTeam = $false
+        )
+
+        $expectedRows = @($Expected)
+        $actualRows = @(Normalize-ActualSeries -Rows $Actual)
+
+        if ($BestOnlyPerTeam) {
+            $bestByTeam = @{}
+
+            foreach ($row in $expectedRows) {
+                $team = [string]$row.squadra
+
+                if (-not $bestByTeam.ContainsKey($team) -or [int]$row.valore -gt [int]$bestByTeam[$team].valore) {
+                    $bestByTeam[$team] = $row
+                }
+            }
+
+            $expectedRows = @($bestByTeam.Values)
+        }
+
+        $expectedKeys = @{}
+        foreach ($row in $expectedRows) {
+            $expectedKeys[(Series-Key $row)] = $row
+        }
+
+        $actualKeys = @{}
+        foreach ($row in $actualRows) {
+            $actualKeys[(Series-Key $row)] = $row
+        }
+
+        foreach ($key in $expectedKeys.Keys) {
+            if (-not $actualKeys.ContainsKey($key)) {
+                $row = $expectedKeys[$key]
+                Add-Problem `
+                    -List $Problems `
+                    -Season $Season `
+                    -Competition $Competition `
+                    -Record $RecordName `
+                    -Team ([string]$row.squadra) `
+                    -Problem "Serie attesa assente" `
+                    -Expected $key `
+                    -Actual "(assente)"
+            }
+        }
+
+        foreach ($key in $actualKeys.Keys) {
+            if (-not $expectedKeys.ContainsKey($key)) {
+                $row = $actualKeys[$key]
+                Add-Problem `
+                    -List $Problems `
+                    -Season $Season `
+                    -Competition $Competition `
+                    -Record $RecordName `
+                    -Team ([string]$row.squadra) `
+                    -Problem "Serie esportata non attesa" `
+                    -Expected "(assente)" `
+                    -Actual $key
+            }
+        }
+    }
+
+    $config = Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
+
+    $seriesDefinitions = @(
+        [pscustomobject]@{ Key="wins"; Section="serieVittorie"; Name="Vittorie consecutive"; Result="V"; MustMatch=$true; Type="result" },
+        [pscustomobject]@{ Key="draws"; Section="seriePareggi"; Name="Pareggi consecutivi"; Result="P"; MustMatch=$true; Type="result" },
+        [pscustomobject]@{ Key="losses"; Section="serieSconfitte"; Name="Sconfitte consecutive"; Result="S"; MustMatch=$true; Type="result" },
+        [pscustomobject]@{ Key="unbeaten"; Section="serieSenzaSconfitte"; Name="Senza sconfitte"; Result="S"; MustMatch=$false; Type="result" },
+        [pscustomobject]@{ Key="winless"; Section="serieSenzaVittorie"; Name="Senza vittorie"; Result="V"; MustMatch=$false; Type="result" },
+        [pscustomobject]@{ Key="clean-sheets"; Section="cleanSheetPortiereSerieSquadre"; Name="Clean sheet consecutivi"; Type="clean" }
+    )
+
+    $modifierDefinitions = @(
+        [pscustomobject]@{ Config="modm1pers.series"; TypeName="modDifesa"; Section="modDifesaSerieSquadre"; Name="Serie Modificatore Difesa" },
+        [pscustomobject]@{ Config="modm2pers.series"; TypeName="capitano"; Section="capitanoSerieSquadre"; Name="Serie Capitano" },
+        [pscustomobject]@{ Config="modm3pers.series"; TypeName="personalizzato3"; Section="modPersonalizzato3SerieSquadre"; Name="Serie Modificatore personale 3" },
+        [pscustomobject]@{ Config="modportiere.series"; TypeName="fcmPortiere"; Section="modPortiereFcmSerieSquadre"; Name="Serie Modificatore Portiere FCM" },
+        [pscustomobject]@{ Config="moddifesa.series"; TypeName="fcmDifesa"; Section="modDifesaFcmSerieSquadre"; Name="Serie Modificatore Difesa FCM" },
+        [pscustomobject]@{ Config="modcentrocampo.series"; TypeName="fcmCentrocampo"; Section="modCentrocampoFcmSerieSquadre"; Name="Serie Modificatore Centrocampo FCM" },
+        [pscustomobject]@{ Config="modattacco.series"; TypeName="fcmAttacco"; Section="modAttaccoFcmSerieSquadre"; Name="Serie Modificatore Attacco FCM" },
+        [pscustomobject]@{ Config="modmodulo.series"; TypeName="fcmModulo"; Section="modModuloFcmSerieSquadre"; Name="Serie Modificatore Modulo FCM" }
+    )
+
+    $problems = New-Object 'System.Collections.Generic.List[object]'
+    $checks = @{}
+
+    foreach ($def in $seriesDefinitions) {
+        if ([bool]$config.processing.families.series.children.($def.Key)) {
+            $checks[$def.Name] = 0
+        }
+    }
+
+    foreach ($def in $modifierDefinitions) {
+        if ([bool]$config.processing.families.modifiers.children.($def.Config)) {
+            $checks[$def.Name] = 0
+        }
+    }
+
+    $filesChecked = 0
+    $matchesChecked = 0
+    $teamsChecked = 0
+
+    $normalizedFiles = @(
+        Get-ChildItem `
+            -LiteralPath $reportsRoot `
+            -Recurse `
+            -File `
+            -Filter "season_normalized_*.json" `
+            -ErrorAction SilentlyContinue |
+        Sort-Object FullName
+    )
+
+    if ($normalizedFiles.Count -eq 0) {
+        throw "Nessun season_normalized_*.json trovato in $reportsRoot"
+    }
+
+    foreach ($normalizedFile in $normalizedFiles) {
+        $source = Get-Content -LiteralPath $normalizedFile.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        $season = $normalizedFile.Directory.Name
+
+        $competitionId = [string]$source.meta.competizioneStoricaId
+        if ([string]::IsNullOrWhiteSpace($competitionId)) {
+            $competitionId = $normalizedFile.BaseName.Substring("season_normalized_".Length)
+        }
+
+        $competitionName = [string]$source.meta.competizioneNome
+        if ([string]::IsNullOrWhiteSpace($competitionName)) {
+            $competitionName = $competitionId
+        }
+
+        $recordFile = Join-Path `
+            (Join-Path $archiveRoot $season) `
+            ("season_records_" + $competitionId + ".json")
+
+        if (-not (Test-Path -LiteralPath $recordFile)) {
+            Add-Problem `
+                -List $problems `
+                -Season $season `
+                -Competition $competitionName `
+                -Record "(file)" `
+                -Team "" `
+                -Problem "season_records mancante" `
+                -Expected $recordFile `
+                -Actual ""
+            continue
+        }
+
+        $actual = Get-Content -LiteralPath $recordFile -Raw -Encoding UTF8 | ConvertFrom-Json
+        $matches = @($source.partiteSquadra | Where-Object { Valid-Match $_ })
+
+        if ($matches.Count -eq 0) { continue }
+
+        $filesChecked++
+        $matchesChecked += $matches.Count
+        $teamsChecked += @($matches | Group-Object idSquadra).Count
+
+        foreach ($def in $seriesDefinitions) {
+            $selected = [bool]$config.processing.families.series.children.($def.Key)
+            if (-not $selected) { continue }
+
+            $checks[$def.Name]++
+
+            if ($def.Type -eq "result") {
+                $expected = Get-ResultRuns `
+                    -Matches $matches `
+                    -ResultCode $def.Result `
+                    -MustMatch $def.MustMatch
+
+                $actualRows = @($actual.records.($def.Section))
+
+                Compare-SeriesSet `
+                    -Problems $problems `
+                    -Season $season `
+                    -Competition $competitionName `
+                    -RecordName $def.Name `
+                    -Expected $expected `
+                    -Actual $actualRows `
+                    -BestOnlyPerTeam $false
+            }
+            elseif ($def.Type -eq "clean") {
+                $clean = @($source.cleanSheetB3Dettaglio)
+
+                $expected = Get-BestEventSeriesByTeam `
+                    -Matches $matches `
+                    -Events $clean
+
+                $actualRows = @($actual.records.($def.Section))
+
+                Compare-SeriesSet `
+                    -Problems $problems `
+                    -Season $season `
+                    -Competition $competitionName `
+                    -RecordName $def.Name `
+                    -Expected $expected `
+                    -Actual $actualRows `
+                    -BestOnlyPerTeam $true
+            }
+        }
+
+        $modifiers = @($source.modificatoriB2Dettaglio)
+
+        foreach ($def in $modifierDefinitions) {
+            $selected = [bool]$config.processing.families.modifiers.children.($def.Config)
+            if (-not $selected) { continue }
+
+            $checks[$def.Name]++
+
+            $events = @(
+                $modifiers |
+                Where-Object { [string]$_.tipo -eq $def.TypeName }
+            )
+
+            $expected = Get-BestEventSeriesByTeam `
+                -Matches $matches `
+                -Events $events
+
+            $actualRows = @($actual.records.($def.Section))
+
+            Compare-SeriesSet `
+                -Problems $problems `
+                -Season $season `
+                -Competition $competitionName `
+                -RecordName $def.Name `
+                -Expected $expected `
+                -Actual $actualRows `
+                -BestOnlyPerTeam $true
+        }
+    }
+
+    $problems |
+        Export-Csv `
+            -LiteralPath $outCsv `
+            -NoTypeInformation `
+            -Encoding UTF8
+
+    $summary = foreach ($name in ($checks.Keys | Sort-Object)) {
+        $recordProblems = @(
+            $problems |
+            Where-Object Record -eq $name
+        )
+
+        [pscustomobject]@{
+            Record = $name
+            CompetizioniControllate = $checks[$name]
+            Problemi = $recordProblems.Count
+            Esito = if ($recordProblems.Count -eq 0) { "OK" } else { "ERRORE" }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "=== AUDIT SEMANTICO SERIE v23 ==="
+    $summary | Format-Table -AutoSize
+
+    Write-Host ""
+    Write-Host "File competizione controllati : $filesChecked"
+    Write-Host "Righe partita valide          : $matchesChecked"
+    Write-Host "Squadre controllate           : $teamsChecked"
+    Write-Host "Problemi totali               : $($problems.Count)"
+    Write-Host "Dettaglio CSV                  : $outCsv"
+
+    if ($problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "AUDIT SEMANTICO SERIE: OK"
+
+## tools\Test_RecordsNext2_SerieSemantic_v24.ps1
+
+File: tools\Test_RecordsNext2_SerieSemantic_v24.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+    $reportsRoot = Join-Path $ProjectDir "data\reports"
+    $archiveRoot = Join-Path $ProjectDir "data\records-archive\stagioni"
+    $configPath = Join-Path $ProjectDir "config\processing.json"
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $outCsv = Join-Path $outDir "RecordsNext2_SERIE_SEMANTIC_AUDIT.csv"
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+    function Num([object]$Value) {
+        if ($null -eq $Value -or "$Value" -eq "") { return 0.0 }
+        return [double]$Value
+    }
+    function Valid-Match([object]$Row) {
+        if ($null -eq $Row) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idSquadra)) { return $false }
+        if ([string]$Row.idSquadra -eq "0") { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.squadra)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.idIncontro)) { return $false }
+        if ([string]::IsNullOrWhiteSpace([string]$Row.avversaria)) { return $false }
+        return $true
+    }
+    function Order-Value([object]$Row) {
+        if ($null -ne $Row.ordineGiornata -and "$($Row.ordineGiornata)" -ne "") {
+            return Num $Row.ordineGiornata
+        }
+        return Num $Row.giornataDiA
+    }
+    function Add-Problem {
+        param(
+            [System.Collections.Generic.List[object]]$List,
+            [string]$Season,
+            [string]$Competition,
+            [string]$Record,
+            [string]$Team,
+            [string]$Problem,
+            [object]$Expected,
+            [object]$Actual
+        )
+        $List.Add([pscustomobject]@{
+            Stagione = $Season
+            Competizione = $Competition
+            Record = $Record
+            Squadra = $Team
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+    function New-SeriesRow {
+        param([object[]]$Rows)
+        if ($null -eq $Rows -or $Rows.Count -eq 0) { return $null }
+        $first = $Rows[0]
+        $last = $Rows[$Rows.Count - 1]
+        return [pscustomobject]@{
+            idSquadra = [string]$first.idSquadra
+            squadra = [string]$first.squadra
+            valore = [int]$Rows.Count
+            daGiornataDiA = [string]$first.giornataDiA
+            aGiornataDiA = [string]$last.giornataDiA
+            daOrdine = [string](Order-Value $first)
+            aOrdine = [string](Order-Value $last)
+        }
+    }
+    function Get-ResultRuns {
+        param(
+            [object[]]$Matches,
+            [string]$ResultCode,
+            [bool]$MustMatch
+        )
+        $runs = New-Object 'System.Collections.Generic.List[object]'
+        foreach ($group in ($Matches | Group-Object -Property idSquadra)) {
+            $teamMatches = @(
+                $group.Group |
+                Sort-Object @{Expression={ Order-Value $_ }}, @{Expression={ [string]$_.idIncontro }}
+            )
+            $current = New-Object 'System.Collections.Generic.List[object]'
+            foreach ($match in $teamMatches) {
+                $matchesResult = ([string]$match.esito -eq $ResultCode)
+                $belongs = if ($MustMatch) { $matchesResult } else { -not $matchesResult }
+                if ($belongs) {
+                    $current.Add($match)
+                }
+                else {
+                    if ($current.Count -gt 0) {
+                        $runs.Add((New-SeriesRow -Rows $current.ToArray()))
+                        $current = New-Object 'System.Collections.Generic.List[object]'
+                    }
+                }
+            }
+            if ($current.Count -gt 0) {
+                $runs.Add((New-SeriesRow -Rows $current.ToArray()))
+            }
+        }
+        return $runs.ToArray()
+    }
+    function Get-BestEventSeriesByTeam {
+        param(
+            [object[]]$Matches,
+            [object[]]$Events
+        )
+        $eventKeys = @{}
+        foreach ($event in $Events) {
+            $eventKeys[([string]$event.idSquadra + "|" + [string]$event.idIncontro)] = $true
+        }
+        $result = New-Object 'System.Collections.Generic.List[object]'
+        foreach ($group in ($Matches | Group-Object -Property idSquadra)) {
+            $teamMatches = @(
+                $group.Group |
+                Sort-Object @{Expression={ Order-Value $_ }}, @{Expression={ [string]$_.idIncontro }}
+            )
+            $best = @()
+            $current = New-Object 'System.Collections.Generic.List[object]'
+            foreach ($match in $teamMatches) {
+                $key = [string]$match.idSquadra + "|" + [string]$match.idIncontro
+                if ($eventKeys.ContainsKey($key)) {
+                    $current.Add($match)
+                }
+                else {
+                    if ($current.Count -gt $best.Count) {
+                        $best = $current.ToArray()
+                    }
+                    $current = New-Object 'System.Collections.Generic.List[object]'
+                }
+            }
+            if ($current.Count -gt $best.Count) {
+                $best = $current.ToArray()
+            }
+            if ($best.Count -gt 0) {
+                $result.Add((New-SeriesRow -Rows $best))
+            }
+        }
+        return $result.ToArray()
+    }
+    function Series-Key {
+        param([object]$Row)
+        $team = [string]$Row.squadra
+        $value = [int](Num $Row.valore)
+        $from = [string]$Row.daGiornataDiA
+        $to = [string]$Row.aGiornataDiA
+        return ($team + "|" + $value + "|" + $from + "|" + $to)
+    }
+    function Normalize-ActualSeries {
+        param([object[]]$Rows)
+        $normalized = @()
+        foreach ($row in $Rows) {
+            $normalized += [pscustomobject]@{
+                idSquadra = [string]$row.idSquadra
+                squadra = [string]$row.squadra
+                valore = [int](Num $row.valore)
+                daGiornataDiA = [string]$row.daGiornataDiA
+                aGiornataDiA = [string]$row.aGiornataDiA
+            }
+        }
+        return $normalized
+    }
+    function Compare-SeriesSet {
+        param(
+            [System.Collections.Generic.List[object]]$Problems,
+            [string]$Season,
+            [string]$Competition,
+            [string]$RecordName,
+            [object[]]$Expected,
+            [object[]]$Actual,
+            [bool]$BestOnlyPerTeam = $false
+        )
+        $expectedRows = @($Expected)
+        $actualRows = @(Normalize-ActualSeries -Rows $Actual)
+        if ($BestOnlyPerTeam) {
+            $bestByTeam = @{}
+            foreach ($row in $expectedRows) {
+                $team = [string]$row.squadra
+                if (-not $bestByTeam.ContainsKey($team) -or [int]$row.valore -gt [int]$bestByTeam[$team].valore) {
+                    $bestByTeam[$team] = $row
+                }
+            }
+            $expectedRows = @($bestByTeam.Values)
+            $expectedKeys = @{}
+            foreach ($row in $expectedRows) {
+                $expectedKeys[(Series-Key $row)] = $row
+            }
+            $actualKeys = @{}
+            foreach ($row in $actualRows) {
+                $actualKeys[(Series-Key $row)] = $row
+            }
+            foreach ($key in $expectedKeys.Keys) {
+                if (-not $actualKeys.ContainsKey($key)) {
+                    $row = $expectedKeys[$key]
+                    Add-Problem `
+                        -List $Problems `
+                        -Season $Season `
+                        -Competition $Competition `
+                        -Record $RecordName `
+                        -Team ([string]$row.squadra) `
+                        -Problem "Miglior serie attesa assente" `
+                        -Expected $key `
+                        -Actual "(assente)"
+                }
+            }
+            foreach ($key in $actualKeys.Keys) {
+                if (-not $expectedKeys.ContainsKey($key)) {
+                    $row = $actualKeys[$key]
+                    Add-Problem `
+                        -List $Problems `
+                        -Season $Season `
+                        -Competition $Competition `
+                        -Record $RecordName `
+                        -Team ([string]$row.squadra) `
+                        -Problem "Serie esportata non attesa" `
+                        -Expected "(assente)" `
+                        -Actual $key
+                }
+            }
+            return
+        }
+        # Le serie di risultato sono classifiche limitate dal builder.
+        # Non pretendiamo tutte le sequenze esistenti: verifichiamo che ogni riga
+        # esportata sia una sequenza reale e che il massimo reale sia presente.
+        $expectedKeys = @{}
+        foreach ($row in $expectedRows) {
+            $expectedKeys[(Series-Key $row)] = $row
+        }
+        foreach ($row in $actualRows) {
+            $key = Series-Key $row
+            if (-not $expectedKeys.ContainsKey($key)) {
+                Add-Problem `
+                    -List $Problems `
+                    -Season $Season `
+                    -Competition $Competition `
+                    -Record $RecordName `
+                    -Team ([string]$row.squadra) `
+                    -Problem "Serie esportata non reale" `
+                    -Expected "(sequenza reale)" `
+                    -Actual $key
+            }
+        }
+        if ($expectedRows.Count -gt 0) {
+            $trueMax = ($expectedRows | Measure-Object -Property valore -Maximum).Maximum
+            $exportedMax = if ($actualRows.Count -gt 0) {
+                ($actualRows | Measure-Object -Property valore -Maximum).Maximum
+            }
+            else {
+                0
+            }
+            if ([int]$trueMax -ne [int]$exportedMax) {
+                Add-Problem `
+                    -List $Problems `
+                    -Season $Season `
+                    -Competition $Competition `
+                    -Record $RecordName `
+                    -Team "" `
+                    -Problem "Massimo serie errato" `
+                    -Expected $trueMax `
+                    -Actual $exportedMax
+            }
+        }
+        elseif ($actualRows.Count -gt 0) {
+            Add-Problem `
+                -List $Problems `
+                -Season $Season `
+                -Competition $Competition `
+                -Record $RecordName `
+                -Team "" `
+                -Problem "Serie presenti senza sequenze reali" `
+                -Expected 0 `
+                -Actual $actualRows.Count
+        }
+    }
+    $config = Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $seriesDefinitions = @(
+        [pscustomobject]@{ Key="wins"; Section="serieVittorie"; Name="Vittorie consecutive"; Result="V"; MustMatch=$true; Type="result" },
+        [pscustomobject]@{ Key="draws"; Section="seriePareggi"; Name="Pareggi consecutivi"; Result="P"; MustMatch=$true; Type="result" },
+        [pscustomobject]@{ Key="losses"; Section="serieSconfitte"; Name="Sconfitte consecutive"; Result="S"; MustMatch=$true; Type="result" },
+        [pscustomobject]@{ Key="unbeaten"; Section="serieSenzaSconfitte"; Name="Senza sconfitte"; Result="S"; MustMatch=$false; Type="result" },
+        [pscustomobject]@{ Key="winless"; Section="serieSenzaVittorie"; Name="Senza vittorie"; Result="V"; MustMatch=$false; Type="result" },
+        [pscustomobject]@{ Key="clean-sheets"; Section="cleanSheetPortiereSerieSquadre"; Name="Clean sheet consecutivi"; Type="clean" }
+    )
+    $modifierDefinitions = @(
+        [pscustomobject]@{ Config="modm1pers.series"; TypeName="modDifesa"; Section="modDifesaSerieSquadre"; Name="Serie Modificatore Difesa" },
+        [pscustomobject]@{ Config="modm2pers.series"; TypeName="capitano"; Section="capitanoSerieSquadre"; Name="Serie Capitano" },
+        [pscustomobject]@{ Config="modm3pers.series"; TypeName="personalizzato3"; Section="modPersonalizzato3SerieSquadre"; Name="Serie Modificatore personale 3" },
+        [pscustomobject]@{ Config="modportiere.series"; TypeName="fcmPortiere"; Section="modPortiereFcmSerieSquadre"; Name="Serie Modificatore Portiere FCM" },
+        [pscustomobject]@{ Config="moddifesa.series"; TypeName="fcmDifesa"; Section="modDifesaFcmSerieSquadre"; Name="Serie Modificatore Difesa FCM" },
+        [pscustomobject]@{ Config="modcentrocampo.series"; TypeName="fcmCentrocampo"; Section="modCentrocampoFcmSerieSquadre"; Name="Serie Modificatore Centrocampo FCM" },
+        [pscustomobject]@{ Config="modattacco.series"; TypeName="fcmAttacco"; Section="modAttaccoFcmSerieSquadre"; Name="Serie Modificatore Attacco FCM" },
+        [pscustomobject]@{ Config="modmodulo.series"; TypeName="fcmModulo"; Section="modModuloFcmSerieSquadre"; Name="Serie Modificatore Modulo FCM" }
+    )
+    $problems = New-Object 'System.Collections.Generic.List[object]'
+    $checks = @{}
+    foreach ($def in $seriesDefinitions) {
+        if ([bool]$config.processing.families.series.children.($def.Key)) {
+            $checks[$def.Name] = 0
+        }
+    }
+    foreach ($def in $modifierDefinitions) {
+        if ([bool]$config.processing.families.modifiers.children.($def.Config)) {
+            $checks[$def.Name] = 0
+        }
+    }
+    $filesChecked = 0
+    $matchesChecked = 0
+    $teamsChecked = 0
+    $normalizedFiles = @(
+        Get-ChildItem `
+            -LiteralPath $reportsRoot `
+            -Recurse `
+            -File `
+            -Filter "season_normalized_*.json" `
+            -ErrorAction SilentlyContinue |
+        Sort-Object FullName
+    )
+    if ($normalizedFiles.Count -eq 0) {
+        throw "Nessun season_normalized_*.json trovato in $reportsRoot"
+    }
+    foreach ($normalizedFile in $normalizedFiles) {
+        $source = Get-Content -LiteralPath $normalizedFile.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        $season = $normalizedFile.Directory.Name
+        $competitionId = [string]$source.meta.competizioneStoricaId
+        if ([string]::IsNullOrWhiteSpace($competitionId)) {
+            $competitionId = $normalizedFile.BaseName.Substring("season_normalized_".Length)
+        }
+        $competitionName = [string]$source.meta.competizioneNome
+        if ([string]::IsNullOrWhiteSpace($competitionName)) {
+            $competitionName = $competitionId
+        }
+        $recordFile = Join-Path `
+            (Join-Path $archiveRoot $season) `
+            ("season_records_" + $competitionId + ".json")
+        if (-not (Test-Path -LiteralPath $recordFile)) {
+            Add-Problem `
+                -List $problems `
+                -Season $season `
+                -Competition $competitionName `
+                -Record "(file)" `
+                -Team "" `
+                -Problem "season_records mancante" `
+                -Expected $recordFile `
+                -Actual ""
+            continue
+        }
+        $actual = Get-Content -LiteralPath $recordFile -Raw -Encoding UTF8 | ConvertFrom-Json
+        $matches = @($source.partiteSquadra | Where-Object { Valid-Match $_ })
+        if ($matches.Count -eq 0) { continue }
+        $filesChecked++
+        $matchesChecked += $matches.Count
+        $teamsChecked += @($matches | Group-Object idSquadra).Count
+        foreach ($def in $seriesDefinitions) {
+            $selected = [bool]$config.processing.families.series.children.($def.Key)
+            if (-not $selected) { continue }
+            $checks[$def.Name]++
+            if ($def.Type -eq "result") {
+                $expected = Get-ResultRuns `
+                    -Matches $matches `
+                    -ResultCode $def.Result `
+                    -MustMatch $def.MustMatch
+                $actualRows = @($actual.records.($def.Section))
+                Compare-SeriesSet `
+                    -Problems $problems `
+                    -Season $season `
+                    -Competition $competitionName `
+                    -RecordName $def.Name `
+                    -Expected $expected `
+                    -Actual $actualRows `
+                    -BestOnlyPerTeam $false
+            }
+            elseif ($def.Type -eq "clean") {
+                $clean = @($source.cleanSheetB3Dettaglio)
+                $expected = Get-BestEventSeriesByTeam `
+                    -Matches $matches `
+                    -Events $clean
+                $actualRows = @($actual.records.($def.Section))
+                Compare-SeriesSet `
+                    -Problems $problems `
+                    -Season $season `
+                    -Competition $competitionName `
+                    -RecordName $def.Name `
+                    -Expected $expected `
+                    -Actual $actualRows `
+                    -BestOnlyPerTeam $true
+            }
+        }
+        $modifiers = @($source.modificatoriB2Dettaglio)
+        foreach ($def in $modifierDefinitions) {
+            $selected = [bool]$config.processing.families.modifiers.children.($def.Config)
+            if (-not $selected) { continue }
+            $checks[$def.Name]++
+            $events = @(
+                $modifiers |
+                Where-Object { [string]$_.tipo -eq $def.TypeName }
+            )
+            $expected = Get-BestEventSeriesByTeam `
+                -Matches $matches `
+                -Events $events
+            $actualRows = @($actual.records.($def.Section))
+            Compare-SeriesSet `
+                -Problems $problems `
+                -Season $season `
+                -Competition $competitionName `
+                -RecordName $def.Name `
+                -Expected $expected `
+                -Actual $actualRows `
+                -BestOnlyPerTeam $true
+        }
+    }
+    $problems |
+        Export-Csv `
+            -LiteralPath $outCsv `
+            -NoTypeInformation `
+            -Encoding UTF8
+    $summary = foreach ($name in ($checks.Keys | Sort-Object)) {
+        $recordProblems = @(
+            $problems |
+            Where-Object Record -eq $name
+        )
+        [pscustomobject]@{
+            Record = $name
+            CompetizioniControllate = $checks[$name]
+            Problemi = $recordProblems.Count
+            Esito = if ($recordProblems.Count -eq 0) { "OK" } else { "ERRORE" }
+        }
+    }
+    Write-Host ""
+    Write-Host "=== AUDIT SEMANTICO SERIE v24 ==="
+    $summary | Format-Table -AutoSize
+    Write-Host ""
+    Write-Host "File competizione controllati : $filesChecked"
+    Write-Host "Righe partita valide          : $matchesChecked"
+    Write-Host "Squadre controllate           : $teamsChecked"
+    Write-Host "Problemi totali               : $($problems.Count)"
+    Write-Host "Dettaglio CSV                  : $outCsv"
+    if ($problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+    Write-Host ""
+    Write-Host "AUDIT SEMANTICO SERIE: OK"
+
+## tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
+
+File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+
+    $reportsRoot = Join-Path $ProjectDir "data\reports"
+    $stagingRoot = Join-Path $ProjectDir "data\site-export-staging"
+    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
+    $outCsv = Join-Path $outDir "RecordsNext2_SOGLIE_SEMANTIC_AUDIT.csv"
+
+    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+    $Problems = New-Object System.Collections.ArrayList
+    $ExpectedEvents = New-Object System.Collections.ArrayList
+    $ExpectedAggregates = @{}
+
+    function Dec([object]$Value) {
+        if ($null -eq $Value) {
+            return [decimal]0
+        }
+        $text = [string]$Value
+        if ([string]::IsNullOrWhiteSpace($text)) {
+            return [decimal]0
+        }
+        $text = $text.Replace(",", ".")
+        return [decimal]::Parse($text, [System.Globalization.CultureInfo]::InvariantCulture)
+    }
+
+    function Same-Dec([object]$A, [object]$B) {
+        return [math]::Abs([double]((Dec $A) - (Dec $B))) -le 0.000001
+    }
+
+    function Add-Problem(
+        [string]$Section,
+        [string]$Key,
+        [string]$Problem,
+        [object]$Expected,
+        [object]$Actual
+    ) {
+        [void]$Problems.Add([pscustomobject]@{
+            Sezione = $Section
+            Chiave = $Key
+            Problema = $Problem
+            Atteso = $Expected
+            Reale = $Actual
+        })
+    }
+
+    function Property-Value([object]$Object, [string]$Name) {
+        if ($null -eq $Object) {
+            return $null
+        }
+        $property = $Object.PSObject.Properties[$Name]
+        if ($null -eq $property) {
+            return $null
+        }
+        return $property.Value
+    }
+
+    function Current-Band([object[]]$Bands, [decimal]$Score) {
+        foreach ($band in @($Bands)) {
+            $min = Dec $band.min
+            $max = Dec $band.max
+            if ($Score -ge $min -and $Score -le $max) {
+                return $band
+            }
+        }
+        return $null
+    }
+
+    function Next-Band-Min([object[]]$Bands, [decimal]$Score) {
+        $found = $false
+        $next = [decimal]0
+        foreach ($band in @($Bands)) {
+            $min = Dec $band.min
+            if ($min -gt $Score) {
+                if (-not $found -or $min -lt $next) {
+                    $next = $min
+                    $found = $true
+                }
+            }
+        }
+        if ($found) {
+            return $next
+        }
+        return $null
+    }
+
+    function Is-Win([string]$Result) {
+        return $Result -eq "V"
+    }
+
+    function Is-Draw([string]$Result) {
+        return $Result -eq "P"
+    }
+
+    function Is-Loss([string]$Result) {
+        return $Result -eq "S"
+    }
+
+    function Aggregate-Key([string]$Season, [string]$TeamId) {
+        return $Season + "|" + $TeamId
+    }
+
+    function Event-Key([object]$Event) {
+        return ([string]$Event.seasonId + "|" + [string]$Event.competitionId + "|" + [string]$Event.matchId + "|" + [string]$Event.teamId + "|" + [string]$Event.eventType)
+    }
+
+    function Add-Expected-Event(
+        [object]$Match,
+        [string]$Type,
+        [string]$Direction,
+        [object]$Distance,
+        [decimal]$BandSurplus
+    ) {
+        $event = [pscustomobject]@{
+            eventType = $Type
+            direction = $Direction
+            seasonId = [string]$Match.stagione
+            competitionId = [string]$Match.competizioneStoricaId
+            competitionName = [string]$Match.competizioneNome
+            matchId = [string]$Match.idIncontro
+            teamId = [string]$Match.idSquadra
+            team = [string]$Match.squadra
+            opponentId = [string]$Match.idAvversaria
+            opponent = [string]$Match.avversaria
+            scoreFor = $Match.puntiFatti
+            scoreAgainst = $Match.puntiSubiti
+            goalsFor = $Match.golFatti
+            goalsAgainst = $Match.golSubiti
+            result = [string]$Match.esito
+            distanceToNextThreshold = $Distance
+            unusedBandPoints = $BandSurplus
+        }
+
+        [void]$ExpectedEvents.Add($event)
+
+        $aggregateKey = Aggregate-Key ([string]$Match.stagione) ([string]$Match.idSquadra)
+        if (-not $ExpectedAggregates.ContainsKey($aggregateKey)) {
+            $ExpectedAggregates[$aggregateKey] = [ordered]@{
+                seasonId = [string]$Match.stagione
+                teamId = [string]$Match.idSquadra
+                team = [string]$Match.squadra
+                favourableEvents = 0
+                unfavourableEvents = 0
+                neutralEvents = 0
+                unusedBandPoints = [decimal]0
+                eventsByType = @{}
+            }
+        }
+
+        $aggregate = $ExpectedAggregates[$aggregateKey]
+
+        if ($Direction -eq "FAVOURABLE") {
+            $aggregate.favourableEvents = [int]$aggregate.favourableEvents + 1
+        }
+        elseif ($Direction -eq "UNFAVOURABLE") {
+            $aggregate.unfavourableEvents = [int]$aggregate.unfavourableEvents + 1
+        }
+        else {
+            $aggregate.neutralEvents = [int]$aggregate.neutralEvents + 1
+        }
+
+        if (-not $aggregate.eventsByType.ContainsKey($Type)) {
+            $aggregate.eventsByType[$Type] = 0
+        }
+        $aggregate.eventsByType[$Type] = [int]$aggregate.eventsByType[$Type] + 1
+
+        if ($Type -eq "UNUSED_BAND_POINTS") {
+            $aggregate.unusedBandPoints = (Dec $aggregate.unusedBandPoints) + $BandSurplus
+        }
+    }
+
+    $manifest = Get-ChildItem -Path $stagingRoot -Recurse -File -Filter "fcmRecordsNext_Manifest.js" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if ($null -eq $manifest) {
+        throw "fcmRecordsNext_Manifest.js non trovato in $stagingRoot"
+    }
+
+    $thresholdsJs = Join-Path $manifest.Directory.FullName "fcmRecordsNext_ThresholdsLuck.js"
+    if (-not (Test-Path -LiteralPath $thresholdsJs)) {
+        throw "fcmRecordsNext_ThresholdsLuck.js non trovato: $thresholdsJs"
+    }
+
+    $js = [System.IO.File]::ReadAllText($thresholdsJs)
+    $prefix = "window.fcmRecordsNextThresholdsLuck = "
+    if (-not $js.TrimStart().StartsWith($prefix)) {
+        throw "Formato fcmRecordsNext_ThresholdsLuck.js inatteso."
+    }
+
+    $trimmed = $js.Trim()
+    $json = $trimmed.Substring($prefix.Length)
+    if ($json.EndsWith(";")) {
+        $json = $json.Substring(0, $json.Length - 1)
+    }
+    $actualRoot = $json | ConvertFrom-Json
+    $actualEvents = @($actualRoot.events | Where-Object { $null -ne $_ })
+    $actualAggregates = @($actualRoot.seasonAggregates | Where-Object { $null -ne $_ })
+
+    $normalizedFiles = @(Get-ChildItem -Path $reportsRoot -Recurse -File -Filter "season_normalized_*.json" -ErrorAction SilentlyContinue | Sort-Object FullName)
+    if ($normalizedFiles.Count -eq 0) {
+        throw "Nessun season_normalized_*.json trovato in $reportsRoot"
+    }
+
+    $matchRows = 0
+
+    foreach ($file in $normalizedFiles) {
+        $root = [System.IO.File]::ReadAllText($file.FullName) | ConvertFrom-Json
+        $matches = @($root.partiteSquadra | Where-Object { $null -ne $_ })
+        $bands = @($root.fasceGolDettaglio | Where-Object { $null -ne $_ })
+        $matchRows += $matches.Count
+
+        foreach ($match in $matches) {
+            $score = Dec $match.puntiFatti
+            $scoreAgainst = Dec $match.puntiSubiti
+            $goalsFor = [int](Dec $match.golFatti)
+            $goalsAgainst = [int](Dec $match.golSubiti)
+            $result = ([string]$match.esito).Trim().ToUpperInvariant()
+
+            $current = Current-Band $bands $score
+            $nextMin = Next-Band-Min $bands $score
+
+            $distance = $null
+            if ($null -ne $nextMin) {
+                $distance = (Dec $nextMin) - $score
+            }
+
+            $bandSurplus = [decimal]0
+            if ($null -ne $current) {
+                $bandSurplus = $score - (Dec $current.min)
+            }
+
+            if ($null -ne $current -and $score -eq (Dec $current.min)) {
+                Add-Expected-Event $match "EXACT_THRESHOLD" "NEUTRAL" ([decimal]0) ([decimal]0)
+            }
+
+            if ((Is-Win $result) -and $null -ne $current -and $score -eq (Dec $current.min) -and $goalsFor -eq ($goalsAgainst + 1)) {
+                Add-Expected-Event $match "JUST_ENOUGH" "FAVOURABLE" ([decimal]0) ([decimal]0)
+            }
+
+            if ($null -ne $distance -and (Dec $distance) -eq [decimal]0.5) {
+                if ((Is-Draw $result) -and $goalsFor -eq $goalsAgainst) {
+                    Add-Expected-Event $match "MISSED_WIN_HALF_POINT" "UNFAVOURABLE" $distance $bandSurplus
+                }
+                elseif ((Is-Loss $result) -and ($goalsFor + 1) -eq $goalsAgainst) {
+                    Add-Expected-Event $match "LOSS_BY_A_WHISKER" "UNFAVOURABLE" $distance $bandSurplus
+                }
+            }
+
+            if ((Is-Draw $result) -and $goalsFor -eq $goalsAgainst) {
+                if ($score -lt $scoreAgainst) {
+                    Add-Expected-Event $match "MIRACLE_DRAW" "FAVOURABLE" $distance $bandSurplus
+                }
+                elseif ($score -gt $scoreAgainst) {
+                    Add-Expected-Event $match "TIGHT_DRAW" "UNFAVOURABLE" $distance $bandSurplus
+                }
+            }
+
+            if ((Is-Win $result) -and $goalsFor -eq ($goalsAgainst + 1)) {
+                Add-Expected-Event $match "ONE_GOAL_WIN" "FAVOURABLE" $distance $bandSurplus
+            }
+            elseif ((Is-Loss $result) -and ($goalsFor + 1) -eq $goalsAgainst) {
+                Add-Expected-Event $match "ONE_GOAL_LOSS" "UNFAVOURABLE" $distance $bandSurplus
+            }
+
+            if ($null -ne $current -and $bandSurplus -gt [decimal]0) {
+                Add-Expected-Event $match "UNUSED_BAND_POINTS" "NEUTRAL" $distance $bandSurplus
+            }
+        }
+    }
+
+    $expectedEventMap = @{}
+    foreach ($event in @($ExpectedEvents)) {
+        $expectedEventMap[(Event-Key $event)] = $event
+    }
+
+    $actualEventMap = @{}
+    foreach ($event in $actualEvents) {
+        $actualEventMap[(Event-Key $event)] = $event
+    }
+
+    if ($expectedEventMap.Count -ne $actualEventMap.Count) {
+        Add-Problem "events" "(conteggio)" "Numero eventi errato" $expectedEventMap.Count $actualEventMap.Count
+    }
+
+    foreach ($key in @($expectedEventMap.Keys)) {
+        if (-not $actualEventMap.ContainsKey($key)) {
+            Add-Problem "events" $key "Evento atteso assente" "presente" "assente"
+            continue
+        }
+
+        $expected = $expectedEventMap[$key]
+        $actual = $actualEventMap[$key]
+
+        foreach ($field in @("direction","competitionName","team","opponent","result")) {
+            if ([string](Property-Value $expected $field) -ne [string](Property-Value $actual $field)) {
+                Add-Problem "events" $key ("Campo " + $field + " errato") (Property-Value $expected $field) (Property-Value $actual $field)
+            }
+        }
+
+        foreach ($field in @("scoreFor","scoreAgainst","goalsFor","goalsAgainst","unusedBandPoints")) {
+            if (-not (Same-Dec (Property-Value $expected $field) (Property-Value $actual $field))) {
+                Add-Problem "events" $key ("Campo " + $field + " errato") (Property-Value $expected $field) (Property-Value $actual $field)
+            }
+        }
+
+        $expectedDistance = Property-Value $expected "distanceToNextThreshold"
+        $actualDistance = Property-Value $actual "distanceToNextThreshold"
+
+        if ($null -eq $expectedDistance -and $null -ne $actualDistance) {
+            Add-Problem "events" $key "distanceToNextThreshold errata" "(null)" $actualDistance
+        }
+        elseif ($null -ne $expectedDistance -and $null -eq $actualDistance) {
+            Add-Problem "events" $key "distanceToNextThreshold errata" $expectedDistance "(null)"
+        }
+        elseif ($null -ne $expectedDistance -and $null -ne $actualDistance -and -not (Same-Dec $expectedDistance $actualDistance)) {
+            Add-Problem "events" $key "distanceToNextThreshold errata" $expectedDistance $actualDistance
+        }
+    }
+
+    foreach ($key in @($actualEventMap.Keys)) {
+        if (-not $expectedEventMap.ContainsKey($key)) {
+            Add-Problem "events" $key "Evento esportato non atteso" "assente" "presente"
+        }
+    }
+
+    $actualAggregateMap = @{}
+    foreach ($aggregate in $actualAggregates) {
+        $key = Aggregate-Key ([string]$aggregate.seasonId) ([string]$aggregate.teamId)
+        $actualAggregateMap[$key] = $aggregate
+    }
+
+    if ($ExpectedAggregates.Count -ne $actualAggregateMap.Count) {
+        Add-Problem "seasonAggregates" "(conteggio)" "Numero aggregati squadra errato" $ExpectedAggregates.Count $actualAggregateMap.Count
+    }
+
+    foreach ($key in @($ExpectedAggregates.Keys)) {
+        if (-not $actualAggregateMap.ContainsKey($key)) {
+            Add-Problem "seasonAggregates" $key "Aggregato atteso assente" "presente" "assente"
+            continue
+        }
+
+        $expected = $ExpectedAggregates[$key]
+        $actual = $actualAggregateMap[$key]
+
+        foreach ($field in @("team","favourableEvents","unfavourableEvents","neutralEvents")) {
+            if ([string]$expected[$field] -ne [string](Property-Value $actual $field)) {
+                Add-Problem "seasonAggregates" $key ("Campo " + $field + " errato") $expected[$field] (Property-Value $actual $field)
+            }
+        }
+
+        $expectedBalance = [int]$expected.favourableEvents - [int]$expected.unfavourableEvents
+        if ([int](Dec $actual.luckBalance) -ne $expectedBalance) {
+            Add-Problem "seasonAggregates" $key "Campo luckBalance errato" $expectedBalance $actual.luckBalance
+        }
+
+        if (-not (Same-Dec $expected.unusedBandPoints $actual.unusedBandPoints)) {
+            Add-Problem "seasonAggregates" $key "Campo unusedBandPoints errato" $expected.unusedBandPoints $actual.unusedBandPoints
+        }
+
+        $actualByType = Property-Value $actual "eventsByType"
+        foreach ($type in @($expected.eventsByType.Keys)) {
+            $actualValue = Property-Value $actualByType $type
+            if ([int](Dec $actualValue) -ne [int]$expected.eventsByType[$type]) {
+                Add-Problem "seasonAggregates" ($key + "|" + $type) "Conteggio tipo evento errato" $expected.eventsByType[$type] $actualValue
+            }
+        }
+
+        foreach ($property in @($actualByType.PSObject.Properties)) {
+            if (-not $expected.eventsByType.ContainsKey([string]$property.Name)) {
+                Add-Problem "seasonAggregates" ($key + "|" + [string]$property.Name) "Tipo evento aggregato non atteso" 0 $property.Value
+            }
+        }
+    }
+
+    foreach ($key in @($actualAggregateMap.Keys)) {
+        if (-not $ExpectedAggregates.ContainsKey($key)) {
+            Add-Problem "seasonAggregates" $key "Aggregato esportato non atteso" "assente" "presente"
+        }
+    }
+
+    $typeNames = @(
+        "EXACT_THRESHOLD",
+        "JUST_ENOUGH",
+        "MISSED_WIN_HALF_POINT",
+        "LOSS_BY_A_WHISKER",
+        "MIRACLE_DRAW",
+        "TIGHT_DRAW",
+        "ONE_GOAL_WIN",
+        "ONE_GOAL_LOSS",
+        "UNUSED_BAND_POINTS"
+    )
+
+    $summary = @()
+    foreach ($type in $typeNames) {
+        $expectedCount = @($ExpectedEvents | Where-Object { [string]$_.eventType -eq $type }).Count
+        $actualCount = @($actualEvents | Where-Object { [string]$_.eventType -eq $type }).Count
+        $problemCount = @($Problems | Where-Object { [string]$_.Chiave -like ("*|" + $type) }).Count
+
+        $summary += [pscustomobject]@{
+            Evento = $type
+            Attesi = $expectedCount
+            Reali = $actualCount
+            Problemi = $problemCount
+            Esito = if ($expectedCount -eq $actualCount -and $problemCount -eq 0) { "OK" } else { "ERRORE" }
+        }
+    }
+
+    $Problems | Export-Csv -LiteralPath $outCsv -NoTypeInformation -Encoding UTF8
+
+    Write-Host ""
+    Write-Host "=== AUDIT SEMANTICO SOGLIE / FORTUNA v29 ==="
+    $summary | Format-Table -AutoSize
+    Write-Host ""
+    Write-Host ("File normalizzati            : " + $normalizedFiles.Count)
+    Write-Host ("Righe partita analizzate     : " + $matchRows)
+    Write-Host ("Eventi attesi                : " + $ExpectedEvents.Count)
+    Write-Host ("Eventi esportati             : " + $actualEvents.Count)
+    Write-Host ("Aggregati squadra attesi     : " + $ExpectedAggregates.Count)
+    Write-Host ("Aggregati squadra esportati  : " + $actualAggregates.Count)
+    Write-Host ("Problemi totali              : " + $Problems.Count)
+    Write-Host ("Dettaglio CSV                 : " + $outCsv)
+
+    if ($Problems.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PRIMI 25 PROBLEMI ==="
+        $Problems | Select-Object -First 25 | Format-Table -AutoSize
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "AUDIT SEMANTICO SOGLIE / FORTUNA: OK"
+
 ## Indice dei file inclusi
 
 - src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporter.java
@@ -28584,6 +34361,7 @@ File: tools\Test_RecordsNext2_CheckboxViews_v15.ps1
 - src\main\java\it\alterlega\recordsnext\SerieARoundProbe.java
 - src\main\java\it\alterlega\recordsnext\SqliteAudit.java
 - src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\app\classics\ClassicsInvalidTeamRowsTest.java
 - src\test\java\it\alterlega\recordsnext\app\classics\ClassicsTwentyOneContractTest.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTest.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterGranularTest.java
@@ -28614,10 +34392,10 @@ File: tools\Test_RecordsNext2_CheckboxViews_v15.ps1
 - config\recordsnext-gui.properties
 - config\seasons.json
 - config\teams.json
+- tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
 - tools\Audit-RecordsNext2Js.js
 - tools\Create-RecordsNext2RealJsZip.ps1
 - tools\Create-RecordsNext2WorkingCodeMd.ps1
-- tools\Create-RecordsNext2WorkingCodeMd_BACKUP_20260807.ps1
 - tools\Initialize-RecordsNext2Project.ps1
 - tools\Install-RecordsNextVisualizzatori_v1.ps1
 - tools\Install-RecordsNextVisualizzatori_v2.ps1
@@ -28629,5 +34407,17 @@ File: tools\Test_RecordsNext2_CheckboxViews_v15.ps1
 - tools\Test_RecordsNext2_CheckboxViews_v13.ps1
 - tools\Test_RecordsNext2_CheckboxViews_v14.ps1
 - tools\Test_RecordsNext2_CheckboxViews_v15.ps1
+- tools\Test_RecordsNext2_ClassiciSemantic_v19.ps1
+- tools\Test_RecordsNext2_ClassiciSemantic_v20.ps1
+- tools\Test_RecordsNext2_ClassiciSemantic_v21.ps1
+- tools\Test_RecordsNext2_FinalSemantic_v31.ps1
+- tools\Test_RecordsNext2_ModifiersSemantic_v27.ps1
+- tools\Test_RecordsNext2_ModifiersSemantic_v28.ps1
+- tools\Test_RecordsNext2_RUSemantic_v26.ps1
+- tools\Test_RecordsNext2_RUSemantic_v26_BACKUP.ps1
+- tools\Test_RecordsNext2_SerieSemantic_v22.ps1
+- tools\Test_RecordsNext2_SerieSemantic_v23.ps1
+- tools\Test_RecordsNext2_SerieSemantic_v24.ps1
+- tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 
 ## Fine documento

@@ -14,7 +14,7 @@ class CulometroConfigLoaderTest {
         CulometroConfig c = CulometroConfigLoader.load(ok);
 
         assertTrue(c.enabled());
-        assertEquals(20, c.minimumMatches());
+        assertEquals(14, c.minimumMatches());
         assertEquals("GOLIARDICO", c.labelConfiguration().preset());
         assertFalse(c.labelConfiguration().customized());
         assertEquals("GOLIARDICO_DEFAULT", c.labelConfiguration().resetSource());

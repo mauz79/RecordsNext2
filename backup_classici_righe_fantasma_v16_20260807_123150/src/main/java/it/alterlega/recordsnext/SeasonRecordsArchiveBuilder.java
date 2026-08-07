@@ -84,7 +84,7 @@ public final class SeasonRecordsArchiveBuilder {
     }
 
     private static Map<String, Object> buildCompetition(Map<String, Object> source, Map<String, Object> sourceMeta) {
-        List<Map<String, Object>> matches = validTeamMatches(rows(source.get("partiteSquadra")));
+        List<Map<String, Object>> matches = rows(source.get("partiteSquadra"));
         List<Map<String, Object>> expulsions = rows(source.get("espulsioniDettaglio"));
         List<Map<String, Object>> events = rows(source.get("eventiSquadraDettaglio"));
         List<Map<String, Object>> modifiers = rows(source.get("modificatoriB2Dettaglio"));
@@ -987,7 +987,7 @@ public final class SeasonRecordsArchiveBuilder {
 
         for (List<Map<String, Object>> teamMatches : byTeam.values()) {
             teamMatches.sort(Comparator
-                    .comparingDouble((Map<String, Object> r) -> number(r.get("ordineGiornata")))
+                    .comparingDouble((Map<String, Object> r) -> number(r.get("giornataDiA")))
                     .thenComparing(r -> string(r.get("idIncontro"))));
 
             List<Map<String, Object>> best = new ArrayList<>();
@@ -1052,24 +1052,6 @@ public final class SeasonRecordsArchiveBuilder {
     private static void sortValueTeam(List<Map<String, Object>> out) {
         out.sort(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("valore"))).reversed()
                 .thenComparing(r -> string(r.get("squadra"))));
-    }
-
-    /**
-     * Scarta righe tecniche/non disputate presenti in partiteSquadra.
-     * Una riga valida deve identificare una vera squadra, un vero incontro
-     * e un avversario leggibile. Le righe con idSquadra=0 o nomi vuoti
-     * non devono mai entrare nei record Classici/Serie.
-     */
-    private static List<Map<String, Object>> validTeamMatches(List<Map<String, Object>> matches) {
-        List<Map<String, Object>> valid = new ArrayList<>();
-        for (Map<String, Object> row : matches) {
-            if (longNumber(row.get("idSquadra")) == 0L) continue;
-            if (string(row.get("squadra")).isBlank()) continue;
-            if (string(row.get("idIncontro")).isBlank()) continue;
-            if (string(row.get("avversaria")).isBlank()) continue;
-            valid.add(row);
-        }
-        return valid;
     }
 
     private static Map<String, List<Map<String, Object>>> group(List<Map<String, Object>> rows, String field) {

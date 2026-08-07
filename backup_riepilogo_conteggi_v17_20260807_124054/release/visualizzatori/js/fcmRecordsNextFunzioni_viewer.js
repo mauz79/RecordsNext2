@@ -231,105 +231,45 @@
     return result;
   }
 
-  function leagueDisplayRow(row, extra) {
-    var source = copyRow(row, extra || {});
-    var season = C.firstExisting(source, ['stagione','seasonId'], '');
-    var competitionId = C.firstExisting(source, ['competizioneId','competitionId','competizioneStoricaId'], '');
-    var competitionName = C.firstExisting(source, ['competizioneNome','competitionName','competizione'], '');
-    var teamName = C.firstExisting(source, ['squadraNome','squadra','team'], '');
-    var opponentName = C.firstExisting(source, ['avversariaNome','avversaria','opponent','opponentName'], '');
-
-    source.stagione = season;
-    source.competizioneNome = competitionNameFromCore(season, competitionId || competitionName, competitionName);
-    if (teamName) source.squadra = teamName;
-    if (opponentName) source.avversaria = opponentName;
-
-    delete source.seasonId;
-    delete source.competitionId;
-    delete source.competizioneId;
-    delete source.competitionName;
-    delete source.competizioneStoricaId;
-    delete source.team;
-    delete source.teamId;
-    delete source.squadraId;
-    delete source.recordId;
-    delete source.familyId;
-    delete source.schemaVersion;
-    delete source.outputStatus;
-
-    return source;
-  }
-
-  function leagueRecordDirection(view) {
-    var id = String(view && view.id || '');
-    var label = String(view && view.label || '').toLowerCase();
-
-    if (id === 'puntiSquadraMin') return 'min';
-    if (label.indexOf('minor ') === 0) return 'min';
-    if (label.indexOf('minimo ') === 0) return 'min';
-    if (label.indexOf('piu basso') === 0) return 'min';
-    if (label.indexOf('più basso') === 0) return 'min';
-
-    return 'max';
-  }
-
   function leagueRecordViews() {
-    var views = [];
-
+    var rows = [];
     allGeneratedViews().forEach(function (entry) {
       var candidates = entry.view.rows.map(function (row) {
-        return { row: leagueDisplayRow(row), score: numericValue(row) };
-      }).filter(function (item) {
-        return item.score !== null;
-      });
-
+        return { row: row, score: numericValue(row) };
+      }).filter(function (item) { return item.score !== null; });
       if (!candidates.length) return;
+      candidates.sort(function (a, b) { return b.score - a.score; });
 
-      var direction = leagueRecordDirection(entry.view);
-
-      candidates.sort(function (a, b) {
-        return direction === 'min' ? a.score - b.score : b.score - a.score;
-      });
-
-      var rows = [];
       var bySeasonCompetition = {};
-
       candidates.forEach(function (item) {
-        var season = C.firstExisting(item.row, ['stagione'], '');
-        var competition = C.firstExisting(item.row, ['competizioneNome'], 'Tutte le competizioni');
+        var season = C.firstExisting(item.row, ['stagione','seasonId'], '');
+        var competition = C.firstExisting(item.row, ['competizioneNome','competitionName','competizione','competizioneId'], 'Tutte le competizioni');
         var key = season + '|' + competition;
         if (!bySeasonCompetition[key]) bySeasonCompetition[key] = item;
       });
 
-      Object.keys(bySeasonCompetition).sort().forEach(function (key) {
+      Object.keys(bySeasonCompetition).forEach(function (key) {
         var item = bySeasonCompetition[key];
-        rows.push(leagueDisplayRow(item.row, {
-          ambito: 'Migliore della stagione',
+        rows.push(copyRow(item.row, {
           famiglia: entry.familyLabel,
           record: entry.view.label,
+          ambito: 'Migliore della stagione',
           valoreRecord: item.score
         }));
       });
 
       var best = candidates[0];
-      rows.push(leagueDisplayRow(best.row, {
-        ambito: 'Migliore assoluto',
+      rows.push(copyRow(best.row, {
         famiglia: entry.familyLabel,
         record: entry.view.label,
+        ambito: 'Migliore assoluto',
         valoreRecord: best.score
       }));
-
-      views.push({
-        id: entry.familyId + '.' + entry.view.id,
-        label: entry.familyLabel + ' — ' + entry.view.label,
-        rows: rows,
-        order: views.length + 1
-      });
     });
-
-    return views.sort(function (a, b) {
-      return a.label.localeCompare(b.label, 'it');
+    rows.sort(function (a, b) {
+      return String(a.famiglia).localeCompare(String(b.famiglia), 'it') || String(a.record).localeCompare(String(b.record), 'it') || Number(b.valoreRecord || 0) - Number(a.valoreRecord || 0);
     });
+    return [{ id: 'recordDiLega', label: 'Record di lega', rows: rows, order: 10 }];
   }
 
   function directViews(data) {
@@ -342,19 +282,12 @@
       absoluteOccurrences: 'Occorrenze assolute',
       configuration: 'Configurazione'
     };
-    var order = ['ranking', 'competitionRanking', 'events', 'seasonAggregates', 'globalAggregates', 'absoluteOccurrences', 'configuration'];
+    var order = ['ranking', 'events', 'seasonAggregates', 'globalAggregates', 'absoluteOccurrences', 'configuration'];
     var views = [];
     order.forEach(function (key, index) {
       var value = data[key];
       var rows = [];
-      if (Array.isArray(value)) {
-        rows = value.map(function (row) {
-          return enrichCompetition(copyRow(row, {
-            stagione: row.seasonId || row.stagione || '',
-            squadra: row.team || row.squadra || ''
-          }));
-        });
-      }
+      if (Array.isArray(value)) rows = value;
       else if (value && typeof value === 'object') {
         rows = Object.keys(value).map(function (name) {
           return copyRow(value[name], { parametro: name });
@@ -377,47 +310,25 @@
 
   function preferredColumns(rows) {
     var priority = [
-      'ambito','famiglia','record','stagione','competizioneNome',
-      'squadra','avversaria','giocatore','tipoEvento',
-      'valoreRecord','valore','value','occorrenze',
-      'eventiFavorevoli','eventiSfavorevoli','saldoFortunaSfortuna',
-      'puntiSprecati','partite','giornata','giornataDiA',
-      'risultato','punteggio','dettaglioRU','detail',
+      'position','rank','ambito','famiglia','record','stagione','seasonId','competizioneNome','competitionName','competizioneId','competizione','girone',
+      'recordId','nome','eventType','direction','label','squadra','team','opponent','avversaria',
+      'valoreRecord','valore','value','occorrenze','eventiFavorevoli','eventiSfavorevoli','saldoFortunaSfortuna','puntiSprecati','index','perMatch','matches','partite','giornata','round','giornataDiA','serieARound',
+      'risultato','result','punteggio','scoreFor','scoreAgainst','detail','dettaglioRU',
       'urlTabellino','scorecardUrl','matchUrl'
     ];
-
-    var hidden = {
-      seasonId: true,
-      competitionId: true,
-      competizioneId: true,
-      competitionName: true,
-      competizioneStoricaId: true,
-      recordId: true,
-      familyId: true,
-      team: true,
-      teamId: true,
-      squadraId: true,
-      schemaVersion: true,
-      outputStatus: true
-    };
-
     var keys = [];
     rows.slice(0, 250).forEach(function (row) {
       Object.keys(C.flattenObject(row)).forEach(function (key) {
-        var root = key.split('.')[0];
-        if (hidden[root]) return;
         if (keys.indexOf(key) < 0) keys.push(key);
       });
     });
-
     keys.sort(function (a, b) {
       var ai = priority.indexOf(a), bi = priority.indexOf(b);
       if (ai < 0) ai = 999;
       if (bi < 0) bi = 999;
       return ai - bi || a.localeCompare(b, 'it');
     });
-
-    return keys.slice(0, 14);
+    return keys.slice(0, 16);
   }
 
   function matchUrl(row) {
@@ -582,7 +493,7 @@
 
   function initFamilyPage() {
     state.familyId = doc.body.getAttribute('data-family') || '';
-    state.data = state.familyId === 'league' ? { schemaVersion: '2.0', familyId: 'league', metadata: {}, outputStatus: [{ status: 'GENERATED_COMPLETE', detail: 'Record di lega ricavati dalle viste generate' }] } : familyData(state.familyId);
+    state.data = state.familyId === 'league' ? { schemaVersion: '2.0', familyId: 'league', metadata: {}, outputStatus: [] } : familyData(state.familyId);
     var missing = doc.getElementById('rn-missing');
     var app = doc.getElementById('rn-app');
     if (!state.data) {
@@ -625,18 +536,6 @@
     return '';
   }
 
-  function indexFamilyCount(id, data) {
-    if (!data && id !== 'league') return { count: 0, label: 'viste' };
-
-    if (id === 'league') {
-      return { count: leagueRecordViews().length, label: 'record' };
-    }
-
-    var views = buildViews(id, data);
-    var label = (id === 'classics' || id === 'series' || id === 'modifiers') ? 'record' : 'viste';
-    return { count: views.length, label: label };
-  }
-
   function initIndex() {
     var m = manifest();
     var generated = manifestGeneratedAt(m);
@@ -646,17 +545,12 @@
       var data = familyData(id);
       var available = !!data;
       var status = data && data.outputStatus && data.outputStatus[0] ? data.outputStatus[0].status : manifestFamilyStatus(m, id);
-      card.classList.toggle('is-disabled', !available && id !== 'league');
+      card.classList.toggle('is-disabled', !available);
       var badge = card.querySelector('.rn-availability');
-      var countInfo = available || id === 'league' ? indexFamilyCount(id, data) : { count: 0, label: 'viste' };
-      var countText = countInfo.count + ' ' + countInfo.label;
-      badge.textContent = !available && id !== 'league'
-        ? 'Non generato'
-        : ((status && status.indexOf('PARTIAL') >= 0 ? 'Parziale' : 'Disponibile') + ' · ' + countText);
-      badge.className = 'rn-availability ' + (!available && id !== 'league' ? 'is-off' : (status && status.indexOf('PARTIAL') >= 0 ? 'is-warning' : 'is-ok'));
+      badge.textContent = !available ? 'Non generato' : (status && status.indexOf('PARTIAL') >= 0 ? 'Parziale' : 'Disponibile');
+      badge.className = 'rn-availability ' + (!available ? 'is-off' : (status && status.indexOf('PARTIAL') >= 0 ? 'is-warning' : 'is-ok'));
       var link = card.querySelector('a');
-      if (!available && id !== 'league') link.setAttribute('aria-disabled', 'true');
-      else link.removeAttribute('aria-disabled');
+      if (!available) link.setAttribute('aria-disabled', 'true');
     });
   }
 

@@ -987,7 +987,7 @@ public final class SeasonRecordsArchiveBuilder {
 
         for (List<Map<String, Object>> teamMatches : byTeam.values()) {
             teamMatches.sort(Comparator
-                    .comparingDouble((Map<String, Object> r) -> number(r.get("ordineGiornata")))
+                    .comparingDouble((Map<String, Object> r) -> number(r.get("giornataDiA")))
                     .thenComparing(r -> string(r.get("idIncontro"))));
 
             List<Map<String, Object>> best = new ArrayList<>();

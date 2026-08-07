@@ -1,19 +1,19 @@
 {
   "schemaVersion": "2.0",
   "enabled": true,
-  "minimumMatches": 20,
-  "normalization": { "mode": "PER_MATCH", "centerOnHistoricalMean": true, "kScale": 4.15 },
+  "minimumMatches": 14,
+  "normalization": { "mode": "PER_MATCH", "centerOnHistoricalMean": true, "kScale": 3.5 },
   "overlap": { "strategy": "PRIMARY_PLUS_SECONDARY", "secondaryWeight": 0.2, "tagWeight": 0.0, "maxSecondary": 1, "maxTags": 2 },
-  "rarity": { "enabled": true, "profile": "NORMAL", "maximumMultiplier": 5.25, "minimumHistoricalOccurrences": 3 },
+  "rarity": { "enabled": true, "profile": "NORMAL", "maximumMultiplier": 6.5, "minimumHistoricalOccurrences": 3 },
   "components": [
-    { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
     { "componentId": "MISSED_WIN_HALF_POINT", "enabled": true, "weight": 1.35, "allowedRange": { "min": 0.75, "max": 2.5 } },
     { "componentId": "ONE_GOAL_WIN", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
     { "componentId": "RU_DECISIVE", "enabled": true, "weight": 1.4, "allowedRange": { "min": 0.75, "max": 2.5 } },
     { "componentId": "ONE_GOAL_LOSS", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
     { "componentId": "TIGHT_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
+    { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } },
     { "componentId": "LOSS_BY_A_WHISKER", "enabled": true, "weight": 1.45, "allowedRange": { "min": 0.75, "max": 2.5 } },
-    { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } }
+    { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } }
   ],
   "labels": {
     "preset": "GOLIARDICO",
@@ -33,15 +33,6 @@
       { "min": 0, "label": "Vai a farti una vasca a Lourdes" }
     ],
     "presetDefaults": {
-      "NEUTRAL_DEFAULT": [
-        { "min": 90, "label": "Fortuna eccezionale" },
-        { "min": 75, "label": "Molto fortunato" },
-        { "min": 60, "label": "Piuttosto fortunato" },
-        { "min": 45, "label": "In equilibrio" },
-        { "min": 30, "label": "Piuttosto sfortunato" },
-        { "min": 15, "label": "Molto sfortunato" },
-        { "min": 0, "label": "Sfortuna eccezionale" }
-      ],
       "GOLIARDICO_DEFAULT": [
         { "min": 90, "label": "Co' 'sso culo puoi andare a cazzi" },
         { "min": 85, "label": "Protetto dagli dei" },
@@ -54,6 +45,15 @@
         { "min": 16, "label": "Sfiga cieca" },
         { "min": 11, "label": "Raccoglitore di cetrioli" },
         { "min": 0, "label": "Vai a farti una vasca a Lourdes" }
+      ],
+      "NEUTRAL_DEFAULT": [
+        { "min": 90, "label": "Fortuna eccezionale" },
+        { "min": 75, "label": "Molto fortunato" },
+        { "min": 60, "label": "Piuttosto fortunato" },
+        { "min": 45, "label": "In equilibrio" },
+        { "min": 30, "label": "Piuttosto sfortunato" },
+        { "min": 15, "label": "Molto sfortunato" },
+        { "min": 0, "label": "Sfortuna eccezionale" }
       ]
     }
   }

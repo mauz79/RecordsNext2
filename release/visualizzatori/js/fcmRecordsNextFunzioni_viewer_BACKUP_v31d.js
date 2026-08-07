@@ -260,19 +260,6 @@
     return source;
   }
 
-  function leagueRecordDirection(view) {
-    var id = String(view && view.id || '');
-    var label = String(view && view.label || '').toLowerCase();
-
-    if (id === 'puntiSquadraMin') return 'min';
-    if (label.indexOf('minor ') === 0) return 'min';
-    if (label.indexOf('minimo ') === 0) return 'min';
-    if (label.indexOf('piu basso') === 0) return 'min';
-    if (label.indexOf('più basso') === 0) return 'min';
-
-    return 'max';
-  }
-
   function leagueRecordViews() {
     var views = [];
 
@@ -285,10 +272,8 @@
 
       if (!candidates.length) return;
 
-      var direction = leagueRecordDirection(entry.view);
-
       candidates.sort(function (a, b) {
-        return direction === 'min' ? a.score - b.score : b.score - a.score;
+        return b.score - a.score;
       });
 
       var rows = [];
@@ -342,19 +327,12 @@
       absoluteOccurrences: 'Occorrenze assolute',
       configuration: 'Configurazione'
     };
-    var order = ['ranking', 'competitionRanking', 'events', 'seasonAggregates', 'globalAggregates', 'absoluteOccurrences', 'configuration'];
+    var order = ['ranking', 'events', 'seasonAggregates', 'globalAggregates', 'absoluteOccurrences', 'configuration'];
     var views = [];
     order.forEach(function (key, index) {
       var value = data[key];
       var rows = [];
-      if (Array.isArray(value)) {
-        rows = value.map(function (row) {
-          return enrichCompetition(copyRow(row, {
-            stagione: row.seasonId || row.stagione || '',
-            squadra: row.team || row.squadra || ''
-          }));
-        });
-      }
+      if (Array.isArray(value)) rows = value;
       else if (value && typeof value === 'object') {
         rows = Object.keys(value).map(function (name) {
           return copyRow(value[name], { parametro: name });
@@ -629,7 +607,14 @@
     if (!data && id !== 'league') return { count: 0, label: 'viste' };
 
     if (id === 'league') {
-      return { count: leagueRecordViews().length, label: 'record' };
+      var leagueRows = leagueRecordViews()[0].rows || [];
+      var unique = {};
+      leagueRows.forEach(function (row) {
+        var family = String(row.famiglia || '');
+        var record = String(row.record || '');
+        if (record) unique[family + '|' + record] = true;
+      });
+      return { count: Object.keys(unique).length, label: 'record' };
     }
 
     var views = buildViews(id, data);

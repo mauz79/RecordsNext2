@@ -186,36 +186,15 @@ public final class RecordsNext2Dashboard {
     }
 
     private JPanel buildHeader() {
-        JPanel header = new JPanel(new GridBagLayout());
+        JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
-        header.setPreferredSize(new Dimension(0, 42));
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridy = 0;
-        c.fill = GridBagConstraints.HORIZONTAL;
-
-        JPanel leftSpacer = new JPanel();
-        leftSpacer.setOpaque(false);
-        leftSpacer.setPreferredSize(new Dimension(180, 1));
-        c.gridx = 0;
-        c.weightx = 0.0;
-        header.add(leftSpacer, c);
-
-        JLabel title = new JLabel("RecordsNext 2.0", SwingConstants.CENTER);
+        JLabel title = new JLabel("RecordsNext 2.0");
         title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
         title.setForeground(RED);
-        c.gridx = 1;
-        c.weightx = 1.0;
-        header.add(title, c);
-
+        header.add(title, BorderLayout.WEST);
         status.setFont(new Font("Segoe UI", Font.BOLD, 12));
         status.setForeground(new Color(35, 105, 62));
-        status.setHorizontalAlignment(SwingConstants.RIGHT);
-        status.setPreferredSize(new Dimension(180, 24));
-        c.gridx = 2;
-        c.weightx = 0.0;
-        header.add(status, c);
-
+        header.add(status, BorderLayout.EAST);
         return header;
     }
 
@@ -781,27 +760,16 @@ public final class RecordsNext2Dashboard {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(false);
         wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
-        wrapper.setPreferredSize(new Dimension(0, 72));
-
-        JPanel leftSpacer = new JPanel();
-        leftSpacer.setOpaque(false);
-        leftSpacer.setPreferredSize(new Dimension(150, 36));
-        wrapper.add(leftSpacer, BorderLayout.WEST);
-
-        JPanel labels = sectionTitle(title, subtitle, SwingConstants.CENTER);
+        JPanel labels = sectionTitle(title, subtitle, SwingConstants.LEFT);
         wrapper.add(labels, BorderLayout.CENTER);
-
-        JPanel holder = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        holder.setOpaque(false);
-        holder.setPreferredSize(new Dimension(150, 36));
-
         if (back) {
             JButton button = new JButton("← Dashboard");
             button.addActionListener(e -> showPage("dashboard"));
+            JPanel holder = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+            holder.setOpaque(false);
             holder.add(button);
+            wrapper.add(holder, BorderLayout.EAST);
         }
-
-        wrapper.add(holder, BorderLayout.EAST);
         return wrapper;
     }
 
