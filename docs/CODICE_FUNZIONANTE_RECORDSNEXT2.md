@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-07 17:57:20 +02:00
+> Data generazione: 2026-08-07 18:17:09 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
