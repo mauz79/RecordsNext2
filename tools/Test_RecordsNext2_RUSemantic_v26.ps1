@@ -463,16 +463,18 @@ foreach ($seasonAggregate in @($root.seasonAggregates)) {
 
 $problems | Export-Csv -LiteralPath $outCsv -NoTypeInformation -Encoding UTF8
 
-$summary = $checkNames = @($checks.Keys | ForEach-Object { $_ })
+$checkNames = @($checks.Keys)
+$summary = @(
     foreach ($name in $checkNames) {
-    $count = @($problems | Where-Object Sezione -eq $name).Count
-    [pscustomobject]@{
-        Record = $name
-        StagioniControllate = $checks[$name]
-        Problemi = $count
-        Esito = if ($count -eq 0) { "OK" } else { "ERRORE" }
+        $count = @($problems | Where-Object Sezione -eq $name).Count
+        [pscustomobject]@{
+            Record = $name
+            StagioniControllate = $checks[$name]
+            Problemi = $count
+            Esito = if ($count -eq 0) { "OK" } else { "ERRORE" }
+        }
     }
-}
+)
 
 Write-Host ""
 Write-Host "=== AUDIT SEMANTICO RU v26 ==="
