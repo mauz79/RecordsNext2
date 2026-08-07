@@ -221,3 +221,26 @@ Write-Host "Bibbia generata:" -ForegroundColor Green
 Write-Host $OutputFile
 Write-Host ""
 Write-Host ("Dimensione: {0} byte" -f (Get-Item -LiteralPath $OutputFile).Length)
+# Pulizia finale del Markdown generato:
+# rimuove spazi e TAB a fine riga senza modificare il contenuto utile.
+if (Test-Path -LiteralPath $OutputFile) {
+
+    $Utf8NoBomCleanup = New-Object System.Text.UTF8Encoding($false)
+
+    $MarkdownCleanup = [System.IO.File]::ReadAllText(
+        $OutputFile
+    )
+
+    $MarkdownCleanup = [System.Text.RegularExpressions.Regex]::Replace(
+        $MarkdownCleanup,
+        "[ `t]+(?=`r?$)",
+        "",
+        [System.Text.RegularExpressions.RegexOptions]::Multiline
+    )
+
+    [System.IO.File]::WriteAllText(
+        $OutputFile,
+        $MarkdownCleanup,
+        $Utf8NoBomCleanup
+    )
+}
