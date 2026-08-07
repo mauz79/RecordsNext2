@@ -64,6 +64,8 @@ class ModifiersFamilyJsExporterTest {
         assertTrue(js.startsWith("window.fcmRecordsNextModifiers = "));
         assertTrue(js.contains("2006_2007"));
         assertTrue(js.contains("2025_2026"));
+        assertTrue(js.contains("\"competizioneId\":\"serie_a\""));
+        assertTrue(js.contains("\"competizioneNome\":\"Serie A\""));
         assertTrue(js.contains("modDifesaFcmMax"));
         assertTrue(js.contains("modDifesaFcmTotaleSquadre"));
         assertTrue(js.contains("modDifesaFcmMediaSquadre"));

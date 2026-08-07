@@ -146,6 +146,8 @@ public final class ModifiersFamilyJsExporter {
                 Map<String, Object> filteredEntry = new LinkedHashMap<>();
                 filteredEntry.put("stagione", season);
                 filteredEntry.put("id", competitionId);
+                filteredEntry.put("competizioneId", competitionId);
+                filteredEntry.put("competizioneNome", competitionName(selected, competitionId));
                 filteredEntry.put("file", fileName);
                 filteredEntry.put("data", filteredData);
                 filteredEntries.add(filteredEntry);
@@ -239,6 +241,48 @@ public final class ModifiersFamilyJsExporter {
         item.put("defaultName", defaultName);
         item.put("configuredName", configuredName == null ? "" : configuredName);
         return item;
+    }
+
+    private static String competitionName(Map<String, Object> selected, String fallback) {
+        for (Object sectionValue : selected.values()) {
+            if (!(sectionValue instanceof List<?> rows)) continue;
+            for (Object rowValue : rows) {
+                if (!(rowValue instanceof Map<?, ?> row)) continue;
+                Object value = row.get("competizioneNome");
+                if (value != null && !String.valueOf(value).isBlank()) {
+                    return String.valueOf(value);
+                }
+            }
+        }
+        return displayCompetitionName(fallback);
+    }
+
+    private static String displayCompetitionName(String competitionId) {
+        if (competitionId == null || competitionId.isBlank()) return "";
+        return switch (competitionId) {
+            case "serie_a" -> "Serie A";
+            case "serie_b" -> "Serie B";
+            case "serie_c" -> "Serie C";
+            case "coppa_tra_le_coppe" -> "Coppa tra le Coppe";
+            case "europa_pipps" -> "Europa Pipps";
+            case "coppa_lega_serie_a" -> "Coppa di Lega Serie A";
+            case "coppa_lega_serie_b" -> "Coppa di Lega Serie B";
+            case "coppa_lega_serie_c" -> "Coppa di Lega Serie C";
+            case "supercoppa_serie_a" -> "Supercoppa Serie A";
+            case "supercoppa_serie_b" -> "Supercoppa Serie B";
+            case "supercoppa_serie_c" -> "Supercoppa Serie C";
+            default -> {
+                String[] parts = competitionId.split("_");
+                StringBuilder result = new StringBuilder();
+                for (String part : parts) {
+                    if (part.isBlank()) continue;
+                    if (!result.isEmpty()) result.append(' ');
+                    result.append(Character.toUpperCase(part.charAt(0)));
+                    if (part.length() > 1) result.append(part.substring(1));
+                }
+                yield result.toString();
+            }
+        };
     }
 
     private static Map<String, Object> stringMap(Map<?, ?> raw) {

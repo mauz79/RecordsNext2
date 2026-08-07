@@ -15,7 +15,7 @@ class CulometroFamilyJsExporterTest {
             String source=Files.readString(Path.of("config/culometro.json")).replace("\"enabled\": false","\"enabled\": true"); Files.writeString(config,source);
             Path out=dir.resolve(CulometroFamilyJsExporter.FILE_NAME);
             CulometroFamilyJsExporter.ExportResult result=CulometroFamilyJsExporter.export(thresholds,dir.resolve("missing-ru.js"),config,out);
-            String js=Files.readString(out); assertTrue(js.startsWith(CulometroFamilyJsExporter.GLOBAL_NAME)); assertTrue(js.contains("\"ranking\"")); assertTrue(js.contains("Fortuna eccezionale")); assertEquals(2,result.teamCount());
+            String js=Files.readString(out); assertTrue(js.startsWith(CulometroFamilyJsExporter.GLOBAL_NAME)); assertTrue(js.contains("\"ranking\"")); assertTrue(js.contains("\"competitionRanking\"")); assertTrue(js.contains("\"competitionId\":\"serie_a\"")); assertTrue(js.contains("\"competitionName\":\"Serie A\"")); assertTrue(js.contains("Fortuna eccezionale")); assertEquals(2,result.teamCount());
         } finally { try(var s=Files.walk(dir)){for(Path p:s.sorted((a,b)->b.compareTo(a)).toList())Files.deleteIfExists(p);} }
     }
 }

@@ -157,10 +157,6 @@ public final class Records2026ClassicJsExporter {
                 "recordId", "nome", "stagione", "competizioneStoricaId", "competizioneNome", "valore",
                 "squadra", "avversaria", "idIncontro", "giornata", "giornataDiA", "urlTabellino",
                 "risultato", "punteggio"));
-        fields.put("serieSenzaSconfitte", orderedSet(
-                "recordId", "nome", "stagione", "competizioneStoricaId", "competizioneNome", "valore",
-                "squadra", "idSquadra", "daGiornata", "aGiornata", "daGiornataDiA", "aGiornataDiA",
-                "vittorie", "pareggi", "dettagliCount"));
         fields.put("espulsioniSquadre", compactTeamFields());
         fields.put("espulsioniGiocatori", orderedSet(
                 "recordId", "nome", "valore", "idGiocatore", "giocatore", "dettagliCount"));
@@ -170,17 +166,8 @@ public final class Records2026ClassicJsExporter {
         fields.put("rigoriSbagliatiSquadre", compactTeamFields());
         fields.put("rigoriParatiSquadre", compactTeamFields());
         fields.put("golRigoreSquadre", compactTeamFields());
-        fields.put("modDifesaMax", orderedSet(
-                "recordId", "nome", "valore", "idSquadra", "squadra", "avversaria", "idIncontro", "giornataDiA"));
-        fields.put("modDifesaTotaleSquadre", compactTeamFields());
-        fields.put("capitanoVolteSquadre", compactTeamFields());
-        fields.put("capitanoTotaleSquadre", compactTeamFields());
-        fields.put("capitanoSerieSquadre", orderedSet(
-                "recordId", "nome", "valore", "idSquadra", "squadra", "daGiornataDiA", "aGiornataDiA", "dettagliCount"));
         fields.put("cleanSheetPortiereVolteSquadre", compactTeamFields());
         fields.put("cleanSheetPortiereTotaleSquadre", compactTeamFields());
-        fields.put("cleanSheetPortiereSerieSquadre", orderedSet(
-                "recordId", "nome", "valore", "idSquadra", "squadra", "daGiornataDiA", "aGiornataDiA", "dettagliCount"));
         return fields;
     }
 

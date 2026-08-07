@@ -6,6 +6,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,13 +26,34 @@ class SeriesFamilyJsExporterTest {
               "serieSconfitte":[{"recordId":"s","valore":3,"squadra":"A"}],
               "serieSenzaSconfitte":[{"recordId":"i","valore":10,"squadra":"A"}],
               "serieSenzaVittorie":[{"recordId":"n","valore":5,"squadra":"A"}],
-              "capitanoSerieSquadre":[{"recordId":"c","valore":3,"squadra":"A"}],
-              "cleanSheetPortiereSerieSquadre":[{"recordId":"g","valore":4,"squadra":"A"}]
+              "cleanSheetPortiereSerieSquadre":[{"recordId":"g","valore":4,"squadra":"A"}],
+              "modDifesaSerieSquadre":[{"recordId":"m1","valore":3,"squadra":"A"}],
+              "capitanoSerieSquadre":[{"recordId":"m2","valore":6,"squadra":"A"}],
+              "modDifesaFcmSerieSquadre":[{"recordId":"mfcm","valore":5,"squadra":"A"}]
             }}
             """, StandardCharsets.UTF_8);
 
         Path output = temp.resolve("fcmRecordsNext_Series.js");
-        SeriesFamilyJsExporter.export(temp.resolve("archive"), output);
+        SeriesFamilyJsExporter.export(
+                temp.resolve("archive"),
+                output,
+                Map.of(
+                        "series.wins", true,
+                        "series.draws", true,
+                        "series.losses", true,
+                        "series.unbeaten", true,
+                        "series.winless", true,
+                        "series.clean-sheets", true,
+                        "modifiers.modm1pers.series", true,
+                        "modifiers.modm2pers.series", false,
+                        "modifiers.moddifesa.series", true
+                ),
+                Map.of(
+                        "MODM1PERS", "Difesa configurato",
+                        "MODM2PERS", "Capitano configurato",
+                        "MODM3PERS", ""
+                )
+        );
         String js = Files.readString(output, StandardCharsets.UTF_8);
 
         assertTrue(js.startsWith("window.fcmRecordsNextSeries = "));
@@ -40,8 +62,15 @@ class SeriesFamilyJsExporterTest {
         assertTrue(js.contains("serieSconfitte"));
         assertTrue(js.contains("serieSenzaSconfitte"));
         assertTrue(js.contains("serieSenzaVittorie"));
-        assertTrue(js.contains("capitanoSerieSquadre"));
+        assertFalse(js.contains("\"capitanoSerieSquadre\":["));
         assertTrue(js.contains("cleanSheetPortiereSerieSquadre"));
+        assertTrue(js.contains("modDifesaSerieSquadre"));
+        assertTrue(js.contains("modDifesaFcmSerieSquadre"));
+        assertTrue(js.contains("Maggior serie Difesa configurato"));
+        assertTrue(js.contains("Maggior serie Modificatore Difesa FCM"));
+        assertTrue(js.contains("\"competizioneId\":\"serie_a\""));
+        assertTrue(js.contains("\"competizioneNome\":\"Serie A\""));
+        assertTrue(js.contains("\"generatedSections\""));
         assertFalse(js.contains("puntiSquadraMax"));
         assertTrue(js.contains("GENERATED_COMPLETE"));
         assertFalse(js.contains("GENERATED_PARTIAL"));

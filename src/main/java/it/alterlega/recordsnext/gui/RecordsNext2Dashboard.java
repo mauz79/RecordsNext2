@@ -327,8 +327,7 @@ public final class RecordsNext2Dashboard {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Classici", familySelectionPanel("classics", "Classici",
                 ProcessingConfigWriter.CLASSICS, CLASSIC_LABELS));
-        tabs.addTab("Serie", familySelectionPanel("series", "Serie",
-                ProcessingConfigWriter.SERIES, SERIES_LABELS));
+        tabs.addTab("Serie", seriesSelectionPanel());
         tabs.addTab("RU", familySelectionPanel("ru", "Riserve d'Ufficio",
                 ProcessingConfigWriter.RU, RU_LABELS));
         tabs.addTab("Modificatori", modifiersSelectionPanel());
@@ -341,6 +340,16 @@ public final class RecordsNext2Dashboard {
         bottom.add(save);
         page.add(bottom, BorderLayout.SOUTH);
         return page;
+    }
+
+    private JPanel seriesSelectionPanel() {
+        JPanel panel = familySelectionPanel("series", "Serie",
+                ProcessingConfigWriter.SERIES, SERIES_LABELS);
+        JLabel note = new JLabel("<html><b>Serie dei modificatori:</b> si selezionano nella card Modificatori, accanto a Massimo, Totale, Media e Utilizzi.</html>");
+        note.setForeground(MUTED);
+        note.setBorder(new EmptyBorder(4, 12, 4, 12));
+        panel.add(note, BorderLayout.SOUTH);
+        return panel;
     }
 
     private JPanel modifiersSelectionPanel() {
@@ -412,9 +421,15 @@ public final class RecordsNext2Dashboard {
             JLabel label = new JLabel(fixedName + " (" + sourceField + ")");
             label.setPreferredSize(new Dimension(245, 24));
             row.add(label);
-            for (String stat : new String[] {"max", "total", "average", "uses"}) {
+            for (String stat : new String[] {"max", "total", "average", "uses", "series"}) {
                 String id = "modifiers." + sourceField.toLowerCase() + "." + stat;
-                String text = switch (stat) { case "max" -> "Massimo"; case "total" -> "Totale"; case "average" -> "Media"; default -> "Utilizzi"; };
+                String text = switch (stat) {
+                    case "max" -> "Massimo";
+                    case "total" -> "Totale";
+                    case "average" -> "Media";
+                    case "uses" -> "Utilizzi";
+                    default -> "Serie";
+                };
                 JCheckBox check = new JCheckBox(text);
                 check.setToolTipText(id);
                 check.addActionListener(e -> updateFamilySummary("modifiers", ProcessingConfigWriter.MODIFIERS));
@@ -723,6 +738,12 @@ public final class RecordsNext2Dashboard {
 
         JButton save = new JButton("Salva");
         save.addActionListener(e -> saveState());
+        JButton terminate = new JButton("Termina");
+        terminate.addActionListener(e -> {
+            saveQuietly();
+            frame.dispose();
+            System.exit(0);
+        });
         run.setBackground(BLUE);
         run.setForeground(Color.WHITE);
         run.addActionListener(e -> runPipeline());
@@ -730,6 +751,7 @@ public final class RecordsNext2Dashboard {
         actions.setOpaque(false);
         actions.add(save);
         actions.add(run);
+        actions.add(terminate);
         bar.add(actions, BorderLayout.EAST);
         return bar;
     }
@@ -1062,8 +1084,7 @@ public final class RecordsNext2Dashboard {
             "series.wins", "Vittorie consecutive",
             "series.draws", "Pareggi consecutivi",
             "series.losses", "Sconfitte consecutive",
-            "series.clean-sheets", "Clean sheet consecutivi",
-            "series.captain-bonus", "Bonus Capitano consecutivo"
+            "series.clean-sheets", "Clean sheet consecutivi"
     );
 
     private static final Map<String, String> RU_LABELS = labels(

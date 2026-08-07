@@ -25,6 +25,76 @@
       .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
   }
 
+
+  var ITALIAN_LABELS = {
+
+    recordDiLega: 'Record di lega',
+    partita: 'Partita',
+    squadraNome: 'Squadra',
+    avversariaNome: 'Avversaria',
+    stagione: 'Stagione',
+    competizioneNome: 'Competizione',
+    ambito: 'Ambito',
+    famiglia: 'Famiglia',
+    record: 'Record',
+    valoreRecord: 'Valore',
+    valore: 'Valore',
+    occorrenze: 'Occorrenze',
+    eventiFavorevoli: 'Eventi favorevoli',
+    eventiSfavorevoli: 'Eventi sfavorevoli',
+    eventiNeutrali: 'Eventi neutrali',
+    saldoFortunaSfortuna: 'Saldo fortuna/sfortuna',
+    puntiSprecati: 'Punti sprecati',
+    giornata: 'Giornata',
+    risultato: 'Risultato',
+    dettaglio: 'Dettaglio',
+    dettaglioRU: 'Dettaglio Riserve d’Ufficio',
+    tabellino: 'Tabellino',
+    classics: 'Record classici',
+    series: 'Serie',
+    ru: "Riserve d'Ufficio",
+    modifiers: 'Modificatori e Fattore Campo',
+    thresholdsLuck: 'Soglie e Fortuna',
+    culometro: 'Culometro',
+    league: 'Record di lega',
+
+    partiteConPiuRU: 'Partite con più Riserve d’Ufficio',
+    partiteConRU: 'Partite con Riserve d’Ufficio',
+    partiteControRU: 'Partite contro Riserve d’Ufficio',
+    ruDecisiva: 'Riserve d’Ufficio decisive',
+    ruDecisivaContro: 'Riserve d’Ufficio decisive contro',
+    bilancioRUDecisiva: 'Bilancio Riserve d’Ufficio decisive',
+    bilancioRUDecisivaContro: 'Bilancio Riserve d’Ufficio decisive contro',
+    bilancioConRU: 'Bilancio con Riserve d’Ufficio',
+    bilancioControRU: 'Bilancio contro Riserve d’Ufficio',
+    mediaPuntiConRU: 'Media punti con Riserve d’Ufficio',
+    mediaPuntiControRU: 'Media punti contro Riserve d’Ufficio',
+    tipoRUUsata: 'Tipi di Riserve d’Ufficio utilizzate',
+    curiosita: 'Curiosità',
+
+    EXACT_THRESHOLD: 'Soglia precisa',
+    JUST_ENOUGH: 'Giusto giusto',
+    MISSED_WIN_HALF_POINT: 'Vittoria mancata per mezzo punto',
+    LOSS_BY_A_WHISKER: 'Sconfitta per un soffio',
+    MIRACLE_DRAW: 'Pareggio miracolato',
+    TIGHT_DRAW: 'Pareggio stretto',
+    ONE_GOAL_WIN: 'Vittoria di misura',
+    ONE_GOAL_LOSS: 'Sconfitta di misura',
+    UNUSED_BAND_POINTS: 'Punti sprecati nella fascia',
+
+    FAVOURABLE: 'Favorevole',
+    UNFAVOURABLE: 'Sfavorevole',
+    NEUTRAL: 'Neutro',
+    GENERATED_COMPLETE: 'Generato completamente',
+    GENERATED_PARTIAL: 'Generato parzialmente',
+    SKIPPED_REQUIRED_DEPENDENCY: 'Saltato per dipendenza mancante'
+  };
+
+  function italianLabel(value) {
+    var key = text(value);
+    return ITALIAN_LABELS[key] || humanize(key);
+  }
+
   function formatValue(value) {
     if (value === null || value === undefined || value === '') return '—';
     if (typeof value === 'number') {
@@ -96,6 +166,7 @@
     text: text,
     escapeHtml: escapeHtml,
     humanize: humanize,
+    italianLabel: italianLabel,
     formatValue: formatValue,
     getPath: getPath,
     firstExisting: firstExisting,

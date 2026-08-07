@@ -51,15 +51,75 @@
       if (!records || typeof records !== 'object') return;
       Object.keys(records).forEach(function (recordId) {
         var rows = C.asArray(records[recordId]).map(function (row) {
+          var competitionId = aggregate.competizioneId || aggregate.id || '';
+          var competitionName = aggregate.competizioneNome || aggregate.competitionName || aggregate.competizione || competitionId;
           return copyRow(row, {
             stagione: aggregate.stagione || aggregate.seasonId || '',
-            competizioneId: aggregate.id || ''
+            competizioneId: competitionId,
+            competizioneNome: competitionName
           });
         });
         addView(map, recordId, C.humanize(recordId), rows, 10);
       });
     });
     return Object.keys(map).map(function (key) { return map[key]; });
+  }
+
+
+  function competitionNameFromCore(seasonId, competitionId, fallback) {
+    if (fallback && String(fallback).trim()) return fallback;
+    var source = String(competitionId || '').trim();
+    if (!source) return '';
+
+    var rows = C.asArray(core().seasonCompetitions);
+    for (var i = 0; i < rows.length; i += 1) {
+      var row = rows[i] || {};
+      if (seasonId && String(row.seasonId || '') !== String(seasonId)) continue;
+
+      var candidates = [
+        row.sourceCompetitionId,
+        row.competitionSeasonId,
+        row.canonicalCompetitionId,
+        row.normalizedName,
+        row.sourceName,
+        row.canonicalName
+      ].map(function (value) { return String(value === undefined || value === null ? '' : value); });
+
+      if (candidates.indexOf(source) >= 0) {
+        return row.canonicalName || row.sourceName || source;
+      }
+    }
+
+    var normalized = source.toLowerCase().replace(/[_-]+/g, ' ').trim();
+    for (var j = 0; j < rows.length; j += 1) {
+      var candidate = rows[j] || {};
+      var names = [candidate.normalizedName, candidate.sourceName, candidate.canonicalName]
+        .map(function (value) { return String(value || '').toLowerCase().replace(/[_-]+/g, ' ').trim(); });
+      if (names.indexOf(normalized) >= 0) {
+        return candidate.canonicalName || candidate.sourceName || source;
+      }
+    }
+    return C.humanize(source);
+  }
+
+  function enrichCompetition(row) {
+    var season = C.firstExisting(row || {}, ['stagione','seasonId'], '');
+    var id = C.firstExisting(row || {}, ['competizioneId','competitionId','competizioneStoricaId','competizione'], '');
+    var name = C.firstExisting(row || {}, ['competizioneNome','competitionName'], '');
+    return copyRow(row, {
+      stagione: season,
+      competizioneId: id,
+      competizioneNome: competitionNameFromCore(season, id, name)
+    });
+  }
+
+  function normalizeCompetition(row, aggregate) {
+    var id = C.firstExisting(row || {}, ['competizioneId','competitionId','competizioneStoricaId'], '');
+    var name = C.firstExisting(row || {}, ['competizioneNome','competitionName','competizione'], '');
+    if (!id) id = C.firstExisting(aggregate || {}, ['competizioneId','competitionId','id'], '');
+    if (!name) name = C.firstExisting(aggregate || {}, ['competizioneNome','competitionName','competizione'], '');
+    if (!name && id) name = C.italianLabel(id);
+    return { competizioneId: id, competizioneNome: name };
   }
 
   function ruViews(data) {
@@ -71,23 +131,151 @@
         if (!source || typeof source !== 'object') return;
         Object.keys(source).forEach(function (viewId) {
           var rows = C.asArray(source[viewId]).map(function (row) {
-            return copyRow(row, { stagione: aggregate.stagione || '' });
+            var competition = normalizeCompetition(row, aggregate);
+            return copyRow(row, {
+              stagione: aggregate.stagione || aggregate.seasonId || '',
+              competizioneId: competition.competizioneId,
+              competizioneNome: competition.competizioneNome
+            });
           });
-          addView(map, group + '.' + viewId, C.humanize(viewId), rows, group === 'views' ? 10 : 30);
+          addView(map, group + '.' + viewId, C.italianLabel(viewId), rows, group === 'views' ? 10 : 30);
         });
       });
       if (Array.isArray(payload.curiosita) && payload.curiosita.length) {
         addView(map, 'curiosita', 'Curiosità', payload.curiosita.map(function (row) {
-          return copyRow(row, { stagione: aggregate.stagione || '' });
+          var competition = normalizeCompetition(row, aggregate);
+          return copyRow(row, {
+            stagione: aggregate.stagione || aggregate.seasonId || '',
+            competizioneId: competition.competizioneId,
+            competizioneNome: competition.competizioneNome
+          });
         }), 40);
       }
     });
     return Object.keys(map).map(function (key) { return map[key]; });
   }
 
+  function thresholdViews(data) {
+    var views = [];
+    var seasonRows = C.asArray(data.seasonAggregates).map(function (row) {
+      return enrichCompetition(copyRow(row, {
+        stagione: row.seasonId || row.stagione || '',
+        squadra: row.team || row.squadra || ''
+      }));
+    });
+    if (seasonRows.length) views.push({ id: 'classificaStagionale', label: 'Classifica per stagione e squadra', rows: seasonRows, order: 10 });
+
+    var totals = {};
+    seasonRows.forEach(function (row) {
+      var key = row.teamId || row.squadra || row.team || '';
+      if (!key) return;
+      if (!totals[key]) totals[key] = { squadra: row.squadra || row.team || '', eventiFavorevoli: 0, eventiSfavorevoli: 0, eventiNeutrali: 0, saldoFortunaSfortuna: 0, puntiSprecati: 0, stagioni: 0 };
+      totals[key].eventiFavorevoli += Number(row.favourableEvents || 0);
+      totals[key].eventiSfavorevoli += Number(row.unfavourableEvents || 0);
+      totals[key].eventiNeutrali += Number(row.neutralEvents || 0);
+      totals[key].saldoFortunaSfortuna += Number(row.luckBalance || 0);
+      totals[key].puntiSprecati += Number(row.unusedBandPoints || 0);
+      totals[key].stagioni += 1;
+    });
+    var storico = Object.keys(totals).map(function (key) { return totals[key]; });
+    storico.sort(function (a, b) { return b.saldoFortunaSfortuna - a.saldoFortunaSfortuna || b.eventiFavorevoli - a.eventiFavorevoli; });
+    if (storico.length) views.push({ id: 'classificaStorica', label: 'Classifica storica per squadra', rows: storico, order: 20 });
+
+    var byType = {};
+    C.asArray(data.events).forEach(function (event) {
+      var key = event.eventType || 'ALTRO';
+      if (!byType[key]) byType[key] = { tipoEvento: C.italianLabel(key), occorrenze: 0, favorevoli: 0, sfavorevoli: 0, neutrali: 0 };
+      byType[key].occorrenze += 1;
+      if (event.direction === 'FAVOURABLE') byType[key].favorevoli += 1;
+      else if (event.direction === 'UNFAVOURABLE') byType[key].sfavorevoli += 1;
+      else byType[key].neutrali += 1;
+    });
+    var tipi = Object.keys(byType).map(function (key) { return byType[key]; });
+    tipi.sort(function (a, b) { return b.occorrenze - a.occorrenze; });
+    if (tipi.length) views.push({ id: 'tipiEvento', label: 'Riepilogo dei tipi di evento', rows: tipi, order: 30 });
+
+    var eventi = C.asArray(data.events).map(function (row) {
+      return copyRow(row, {
+        stagione: row.seasonId || row.stagione || '',
+        competizioneId: row.competitionId || row.competizioneId || '',
+        competizioneNome: row.competitionName || row.competizioneNome || row.competizione || '',
+        squadra: row.team || row.squadra || ''
+      });
+    });
+    if (eventi.length) views.push({ id: 'dettaglioEventi', label: 'Dettaglio degli eventi', rows: eventi, order: 40 });
+    return views;
+  }
+
+  function numericValue(row) {
+    var keys = ['valore','value','totale','total','occorrenze','matches','partite','serie','lunghezza','puntiClassificaGuadagnati','puntiClassificaPersi','numeroRU','valoreRUTotale','index','score'];
+    for (var i = 0; i < keys.length; i += 1) {
+      var value = C.getPath(row, keys[i]);
+      if (value !== undefined && value !== null && value !== '' && !isNaN(Number(value))) return Number(value);
+    }
+    return null;
+  }
+
+  function allGeneratedViews() {
+    var families = ['classics','series','ru','modifiers','thresholdsLuck','culometro'];
+    var result = [];
+    families.forEach(function (familyId) {
+      var data = familyData(familyId);
+      if (!data) return;
+      var views;
+      if (familyId === 'classics' || familyId === 'series' || familyId === 'modifiers') views = nestedRecordViews(data);
+      else if (familyId === 'ru') views = ruViews(data);
+      else if (familyId === 'thresholdsLuck') views = thresholdViews(data);
+      else views = directViews(data);
+      views.forEach(function (view) { result.push({ familyId: familyId, familyLabel: C.italianLabel(familyId), view: view }); });
+    });
+    return result;
+  }
+
+  function leagueRecordViews() {
+    var rows = [];
+    allGeneratedViews().forEach(function (entry) {
+      var candidates = entry.view.rows.map(function (row) {
+        return { row: row, score: numericValue(row) };
+      }).filter(function (item) { return item.score !== null; });
+      if (!candidates.length) return;
+      candidates.sort(function (a, b) { return b.score - a.score; });
+
+      var bySeasonCompetition = {};
+      candidates.forEach(function (item) {
+        var season = C.firstExisting(item.row, ['stagione','seasonId'], '');
+        var competition = C.firstExisting(item.row, ['competizioneNome','competitionName','competizione','competizioneId'], 'Tutte le competizioni');
+        var key = season + '|' + competition;
+        if (!bySeasonCompetition[key]) bySeasonCompetition[key] = item;
+      });
+
+      Object.keys(bySeasonCompetition).forEach(function (key) {
+        var item = bySeasonCompetition[key];
+        rows.push(copyRow(item.row, {
+          famiglia: entry.familyLabel,
+          record: entry.view.label,
+          ambito: 'Migliore della stagione',
+          valoreRecord: item.score
+        }));
+      });
+
+      var best = candidates[0];
+      rows.push(copyRow(best.row, {
+        famiglia: entry.familyLabel,
+        record: entry.view.label,
+        ambito: 'Migliore assoluto',
+        valoreRecord: best.score
+      }));
+    });
+    rows.sort(function (a, b) {
+      return String(a.famiglia).localeCompare(String(b.famiglia), 'it') || String(a.record).localeCompare(String(b.record), 'it') || Number(b.valoreRecord || 0) - Number(a.valoreRecord || 0);
+    });
+    return [{ id: 'recordDiLega', label: 'Record di lega', rows: rows, order: 10 }];
+  }
+
   function directViews(data) {
     var labels = {
-      ranking: 'Classifica',
+      ranking: 'Classifica generale',
+      competitionRanking: 'Classifica per competizione',
       events: 'Eventi',
       seasonAggregates: 'Riepilogo per stagione e squadra',
       globalAggregates: 'Riepilogo globale',
@@ -114,15 +302,17 @@
     var views;
     if (id === 'classics' || id === 'series' || id === 'modifiers') views = nestedRecordViews(data);
     else if (id === 'ru') views = ruViews(data);
+    else if (id === 'thresholdsLuck') views = thresholdViews(data);
+    else if (id === 'league') views = leagueRecordViews();
     else views = directViews(data);
     return views.sort(function (a, b) { return a.order - b.order || a.label.localeCompare(b.label, 'it'); });
   }
 
   function preferredColumns(rows) {
     var priority = [
-      'position','rank','stagione','seasonId','competizioneNome','competitionName','competizione','girone',
+      'position','rank','ambito','famiglia','record','stagione','seasonId','competizioneNome','competitionName','competizioneId','competizione','girone',
       'recordId','nome','eventType','direction','label','squadra','team','opponent','avversaria',
-      'valore','value','index','perMatch','matches','partite','giornata','round','giornataDiA','serieARound',
+      'valoreRecord','valore','value','occorrenze','eventiFavorevoli','eventiSfavorevoli','saldoFortunaSfortuna','puntiSprecati','index','perMatch','matches','partite','giornata','round','giornataDiA','serieARound',
       'risultato','result','punteggio','scoreFor','scoreAgainst','detail','dettaglioRU',
       'urlTabellino','scorecardUrl','matchUrl'
     ];
@@ -190,7 +380,7 @@
     var seasons = {}, competitions = {};
     rows.forEach(function (row) {
       var s = C.firstExisting(row, ['stagione','seasonId'], '');
-      var c = C.firstExisting(row, ['competizioneNome','competitionName','competizione','girone'], '');
+      var c = C.firstExisting(row, ['competizioneNome','competitionName','competizione','girone','competizioneId'], '');
       if (s) seasons[s] = true;
       if (c) competitions[c] = true;
     });
@@ -200,17 +390,42 @@
     competition.innerHTML = '<option value="">Tutte le competizioni</option>' + Object.keys(competitions).sort(function(a,b){return a.localeCompare(b,'it');}).map(function (c) {
       return '<option value="' + C.escapeHtml(c) + '">' + C.escapeHtml(c) + '</option>';
     }).join('');
+    competition.disabled = Object.keys(competitions).length === 0;
+
+    var eventLabel = doc.getElementById('rn-event-type-label');
+    var eventSelect = doc.getElementById('rn-event-type');
+    if (eventLabel && eventSelect) {
+      var eventTypes = {};
+      rows.forEach(function (row) {
+        var eventType = C.firstExisting(row, ['eventType','tipoEvento'], '');
+        if (eventType) eventTypes[eventType] = true;
+      });
+      var eventKeys = Object.keys(eventTypes).sort(function (a, b) {
+        var al = C.italianLabel ? C.italianLabel(a) : C.humanize(a);
+        var bl = C.italianLabel ? C.italianLabel(b) : C.humanize(b);
+        return al.localeCompare(bl, 'it');
+      });
+      eventSelect.innerHTML = '<option value="">Tutti gli eventi</option>' + eventKeys.map(function (eventType) {
+        var label = C.italianLabel ? C.italianLabel(eventType) : C.humanize(eventType);
+        return '<option value="' + C.escapeHtml(eventType) + '">' + C.escapeHtml(label) + '</option>';
+      }).join('');
+      eventLabel.hidden = eventKeys.length === 0;
+      eventSelect.disabled = eventKeys.length === 0;
+    }
   }
 
   function applyFilter() {
     var q = (doc.getElementById('rn-search').value || '').trim().toLowerCase();
     var season = doc.getElementById('rn-season') ? doc.getElementById('rn-season').value : '';
     var competition = doc.getElementById('rn-competition') ? doc.getElementById('rn-competition').value : '';
+    var eventType = doc.getElementById('rn-event-type') ? doc.getElementById('rn-event-type').value : '';
     state.filtered = state.rows.filter(function (row) {
       var rowSeason = C.firstExisting(row, ['stagione','seasonId'], '');
-      var rowCompetition = C.firstExisting(row, ['competizioneNome','competitionName','competizione','girone'], '');
+      var rowCompetition = C.firstExisting(row, ['competizioneNome','competitionName','competizione','girone','competizioneId'], '');
       if (season && rowSeason !== season) return false;
       if (competition && rowCompetition !== competition) return false;
+      var rowEventType = C.firstExisting(row, ['eventType','tipoEvento'], '');
+      if (eventType && rowEventType !== eventType) return false;
       return !q || JSON.stringify(row).toLowerCase().indexOf(q) >= 0;
     });
     doc.getElementById('rn-count').textContent = state.filtered.length + ' righe';
@@ -278,7 +493,7 @@
 
   function initFamilyPage() {
     state.familyId = doc.body.getAttribute('data-family') || '';
-    state.data = familyData(state.familyId);
+    state.data = state.familyId === 'league' ? { schemaVersion: '2.0', familyId: 'league', metadata: {}, outputStatus: [] } : familyData(state.familyId);
     var missing = doc.getElementById('rn-missing');
     var app = doc.getElementById('rn-app');
     if (!state.data) {
@@ -303,6 +518,8 @@
     doc.getElementById('rn-search').addEventListener('input', applyFilter);
     doc.getElementById('rn-season').addEventListener('change', applyFilter);
     doc.getElementById('rn-competition').addEventListener('change', applyFilter);
+    var eventTypeSelect = doc.getElementById('rn-event-type');
+    if (eventTypeSelect) eventTypeSelect.addEventListener('change', applyFilter);
     doc.getElementById('rn-export').addEventListener('click', function () {
       C.downloadCsv('recordsnext_' + state.familyId + '_' + state.section.replace(/\./g, '_') + '.csv', state.filtered);
     });

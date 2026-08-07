@@ -67,6 +67,7 @@ public final class CulometroFamilyJsExporter {
 
         List<Map<String,Object>> scoredEvents = new ArrayList<>();
         Map<String,TeamAggregate> teamAggregates = new LinkedHashMap<>();
+        Map<String,TeamAggregate> competitionAggregates = new LinkedHashMap<>();
         for (List<Event> group : grouped.values()) {
             group.sort(Comparator.comparing((Event e) -> e.weight().abs()).reversed().thenComparing(Event::type));
             for (int index = 0; index < group.size(); index++) {
@@ -85,7 +86,8 @@ public final class CulometroFamilyJsExporter {
                 out.put("overlapMultiplier", overlap);
                 out.put("contribution", contribution);
                 scoredEvents.add(out);
-                teamAggregates.computeIfAbsent(event.teamKey(), ignored -> new TeamAggregate(event)).add(contribution, level);
+                teamAggregates.computeIfAbsent(event.teamKey(), ignored -> new TeamAggregate(event, false)).add(contribution, level);
+                competitionAggregates.computeIfAbsent(event.competitionTeamKey(), ignored -> new TeamAggregate(event, true)).add(contribution, level);
             }
         }
 
@@ -93,6 +95,11 @@ public final class CulometroFamilyJsExporter {
         List<Map<String,Object>> ranking = new ArrayList<>();
         for (TeamAggregate aggregate : teamAggregates.values()) ranking.add(aggregate.finish(rawMean, config));
         ranking.sort(Comparator.comparingDouble(value -> -number(value.get("index")).doubleValue()));
+
+        double competitionMean = competitionAggregates.values().stream().mapToDouble(TeamAggregate::perMatch).average().orElse(0.0);
+        List<Map<String,Object>> competitionRanking = new ArrayList<>();
+        for (TeamAggregate aggregate : competitionAggregates.values()) competitionRanking.add(aggregate.finish(competitionMean, config));
+        competitionRanking.sort(Comparator.comparingDouble(value -> -number(value.get("index")).doubleValue()));
 
         Map<String,Object> root = new LinkedHashMap<>();
         root.put("schemaVersion", "2.0");
@@ -119,6 +126,7 @@ public final class CulometroFamilyJsExporter {
         ));
         root.put("events", scoredEvents);
         root.put("ranking", ranking);
+        root.put("competitionRanking", competitionRanking);
         root.put("outputStatus", List.of(Map.of("status", "GENERATED_COMPLETE", "detail", "Culometro configurabile con pesi vincolati, rarita, affidabilita, etichette editabili e RU prudenziale")));
 
         Path parent = outputFile.toAbsolutePath().normalize().getParent();
@@ -129,6 +137,24 @@ public final class CulometroFamilyJsExporter {
         return new ExportResult(scoredEvents.size(), ranking.size(), outputFile);
     }
 
+
+    private static String displayCompetitionName(String competitionId) {
+        if (competitionId == null || competitionId.isBlank()) return "";
+        return switch (competitionId) {
+            case "serie_a" -> "Serie A";
+            case "serie_b" -> "Serie B";
+            case "serie_c" -> "Serie C";
+            case "coppa_tra_le_coppe" -> "Coppa tra le Coppe";
+            case "europa_pipps" -> "Europa Pipps";
+            case "coppa_lega_serie_a" -> "Coppa di Lega Serie A";
+            case "coppa_lega_serie_b" -> "Coppa di Lega Serie B";
+            case "coppa_lega_serie_c" -> "Coppa di Lega Serie C";
+            case "supercoppa_serie_a" -> "Supercoppa Serie A";
+            case "supercoppa_serie_b" -> "Supercoppa Serie B";
+            case "supercoppa_serie_c" -> "Supercoppa Serie C";
+            default -> competitionId.replace('_', ' ');
+        };
+    }
     private static BigDecimal rarityMultiplier(int occurrences, int denominator, CulometroConfig config) {
         int safeOccurrences = Math.max(occurrences, config.minimumHistoricalOccurrences());
         double frequency = (double) safeOccurrences / denominator;
@@ -172,15 +198,16 @@ public final class CulometroFamilyJsExporter {
         }
         String performanceKey(){return seasonId+"|"+matchId+"|"+teamId;}
         String teamKey(){return seasonId+"|"+teamId;}
-        Map<String,Object> toMap(){Map<String,Object>m=new LinkedHashMap<>();m.put("eventType",type);m.put("direction",direction>0?"FAVOURABLE":"UNFAVOURABLE");m.put("seasonId",seasonId);m.put("competitionId",competitionId);m.put("matchId",matchId);m.put("teamId",teamId);m.put("team",team);m.put("opponent",opponent);m.put("scorecardUrl",url);m.put("detail",detail);m.put("componentWeight",weight);return m;}
+        String competitionTeamKey(){return seasonId+"|"+competitionId+"|"+teamId;}
+        Map<String,Object> toMap(){Map<String,Object>m=new LinkedHashMap<>();m.put("eventType",type);m.put("direction",direction>0?"FAVOURABLE":"UNFAVOURABLE");m.put("seasonId",seasonId);m.put("competitionId",competitionId);m.put("competitionName",displayCompetitionName(competitionId));m.put("matchId",matchId);m.put("teamId",teamId);m.put("team",team);m.put("opponent",opponent);m.put("scorecardUrl",url);m.put("detail",detail);m.put("componentWeight",weight);return m;}
     }
 
     private static final class TeamAggregate {
-        final String seasonId,teamId,team; BigDecimal total=BigDecimal.ZERO; int matches,primary,secondary;
-        TeamAggregate(Event e){seasonId=e.seasonId();teamId=e.teamId();team=e.team();}
+        final String seasonId,competitionId,competitionName,teamId,team; BigDecimal total=BigDecimal.ZERO; int matches,primary,secondary;
+        TeamAggregate(Event e, boolean byCompetition){seasonId=e.seasonId();competitionId=byCompetition?e.competitionId():"";competitionName=byCompetition?displayCompetitionName(e.competitionId()):"";teamId=e.teamId();team=e.team();}
         void add(BigDecimal contribution,String level){total=total.add(contribution);matches++;if("PRIMARY".equals(level))primary++;else if("SECONDARY".equals(level))secondary++;}
         double perMatch(){return matches==0?0:total.doubleValue()/matches;}
-        Map<String,Object> finish(double mean,CulometroConfig c){double centered=perMatch()-mean;double raw=50.0+50.0*Math.tanh(centered/c.kScale().doubleValue());double reliability=Math.min(1.0,(double)matches/c.minimumMatches());double index=50.0+(raw-50.0)*reliability;index=Math.max(0,Math.min(100,index));Map<String,Object>m=new LinkedHashMap<>();m.put("seasonId",seasonId);m.put("teamId",teamId);m.put("team",team);m.put("matches",matches);m.put("primaryEvents",primary);m.put("secondaryEvents",secondary);m.put("totalContribution",total.setScale(6,RoundingMode.HALF_UP));m.put("perMatch",BigDecimal.valueOf(perMatch()).setScale(6,RoundingMode.HALF_UP));m.put("reliability",BigDecimal.valueOf(reliability).setScale(6,RoundingMode.HALF_UP));m.put("index",BigDecimal.valueOf(index).setScale(2,RoundingMode.HALF_UP));m.put("label",label(index,c.labels()));return m;}
+        Map<String,Object> finish(double mean,CulometroConfig c){double centered=perMatch()-mean;double raw=50.0+50.0*Math.tanh(centered/c.kScale().doubleValue());double reliability=Math.min(1.0,(double)matches/c.minimumMatches());double index=50.0+(raw-50.0)*reliability;index=Math.max(0,Math.min(100,index));Map<String,Object>m=new LinkedHashMap<>();m.put("seasonId",seasonId);if(!competitionId.isBlank()){m.put("competitionId",competitionId);m.put("competitionName",competitionName);}m.put("teamId",teamId);m.put("team",team);m.put("matches",matches);m.put("primaryEvents",primary);m.put("secondaryEvents",secondary);m.put("totalContribution",total.setScale(6,RoundingMode.HALF_UP));m.put("perMatch",BigDecimal.valueOf(perMatch()).setScale(6,RoundingMode.HALF_UP));m.put("reliability",BigDecimal.valueOf(reliability).setScale(6,RoundingMode.HALF_UP));m.put("index",BigDecimal.valueOf(index).setScale(2,RoundingMode.HALF_UP));m.put("label",label(index,c.labels()));return m;}
         private static String label(double index,List<CulometroConfig.LabelBand> bands){for(CulometroConfig.LabelBand b:bands)if(index>=b.min().doubleValue())return b.label();return bands.get(bands.size()-1).label();}
     }
 

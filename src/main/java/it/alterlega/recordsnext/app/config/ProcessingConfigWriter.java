@@ -239,7 +239,7 @@ public final class ProcessingConfigWriter {
 
     public static final String[] SERIES = {
             "series.unbeaten", "series.winless", "series.wins", "series.draws",
-            "series.losses", "series.clean-sheets", "series.captain-bonus"
+            "series.losses", "series.clean-sheets"
     };
 
     public static final String[] RU = {
@@ -249,14 +249,14 @@ public final class ProcessingConfigWriter {
     };
 
     public static final String[] MODIFIERS = {
-            "modifiers.modm1pers.max", "modifiers.modm1pers.total", "modifiers.modm1pers.average", "modifiers.modm1pers.uses",
-            "modifiers.modm2pers.max", "modifiers.modm2pers.total", "modifiers.modm2pers.average", "modifiers.modm2pers.uses",
-            "modifiers.modm3pers.max", "modifiers.modm3pers.total", "modifiers.modm3pers.average", "modifiers.modm3pers.uses",
-            "modifiers.modportiere.max", "modifiers.modportiere.total", "modifiers.modportiere.average", "modifiers.modportiere.uses",
-            "modifiers.moddifesa.max", "modifiers.moddifesa.total", "modifiers.moddifesa.average", "modifiers.moddifesa.uses",
-            "modifiers.modcentrocampo.max", "modifiers.modcentrocampo.total", "modifiers.modcentrocampo.average", "modifiers.modcentrocampo.uses",
-            "modifiers.modattacco.max", "modifiers.modattacco.total", "modifiers.modattacco.average", "modifiers.modattacco.uses",
-            "modifiers.modmodulo.max", "modifiers.modmodulo.total", "modifiers.modmodulo.average", "modifiers.modmodulo.uses",
+            "modifiers.modm1pers.max", "modifiers.modm1pers.total", "modifiers.modm1pers.average", "modifiers.modm1pers.uses", "modifiers.modm1pers.series",
+            "modifiers.modm2pers.max", "modifiers.modm2pers.total", "modifiers.modm2pers.average", "modifiers.modm2pers.uses", "modifiers.modm2pers.series",
+            "modifiers.modm3pers.max", "modifiers.modm3pers.total", "modifiers.modm3pers.average", "modifiers.modm3pers.uses", "modifiers.modm3pers.series",
+            "modifiers.modportiere.max", "modifiers.modportiere.total", "modifiers.modportiere.average", "modifiers.modportiere.uses", "modifiers.modportiere.series",
+            "modifiers.moddifesa.max", "modifiers.moddifesa.total", "modifiers.moddifesa.average", "modifiers.moddifesa.uses", "modifiers.moddifesa.series",
+            "modifiers.modcentrocampo.max", "modifiers.modcentrocampo.total", "modifiers.modcentrocampo.average", "modifiers.modcentrocampo.uses", "modifiers.modcentrocampo.series",
+            "modifiers.modattacco.max", "modifiers.modattacco.total", "modifiers.modattacco.average", "modifiers.modattacco.uses", "modifiers.modattacco.series",
+            "modifiers.modmodulo.max", "modifiers.modmodulo.total", "modifiers.modmodulo.average", "modifiers.modmodulo.uses", "modifiers.modmodulo.series",
             "modifiers.home-field-deciding", "modifiers.home-field-points-gained", "modifiers.home-field-points-lost", "modifiers.home-field-balance"
     };
 

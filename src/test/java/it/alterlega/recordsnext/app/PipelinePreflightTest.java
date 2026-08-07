@@ -26,25 +26,9 @@ class PipelinePreflightTest {
     }
 
     @Test
-    void captainSeriesIsSkippedWithoutCaptainDependency() {
-        var selection = new ProcessingSelection(
-                Set.of(RecordFamily.SERIES),
-                Set.of("series.captain-bonus"),
-                false,
-                true,
-                false
-        );
-
-        var result = PipelinePreflight.evaluate(
-                ProcessingOptions.modular(selection)
-        );
-
-        assertEquals(1, result.selectedCount());
-        assertEquals(0, result.executableCount());
-        assertEquals(OutputStatus.SKIPPED_REQUIRED_DEPENDENCY,
-                result.relevantItems().getFirst().status());
-        assertTrue(result.relevantItems().getFirst()
-                .missingRequired().contains("modifier.captain"));
+    void legacyCaptainSeriesIsNotPartOfPreflightCatalog() {
+        assertFalse(CoreRecordCatalog.children().stream()
+                .anyMatch(item -> item.id().equals("series.captain-bonus")));
     }
 
     @Test

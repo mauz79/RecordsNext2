@@ -10,30 +10,11 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class ModularProcessingModelTest {
+
     @Test
-    void missingCaptainSkipsOnlyCaptainSeries() {
-        RecordChild child = CoreRecordCatalog.children().stream()
-                .filter(item -> item.id().equals("series.captain-bonus"))
-                .findFirst()
-                .orElseThrow();
-
-        ProcessingSelection selection = new ProcessingSelection(
-                EnumSet.of(RecordFamily.SERIES),
-                Set.of(),
-                false,
-                true,
-                false
-        );
-
-        DependencyEvaluation result = DependencyEvaluator.evaluate(
-                child,
-                selection,
-                Set.of("data.ordered-matches")
-        );
-
-        assertEquals(OutputStatus.SKIPPED_REQUIRED_DEPENDENCY, result.status());
-        assertEquals(Set.of("modifier.captain"), result.missingRequired());
-        assertFalse(result.canGenerate());
+    void legacyCaptainSeriesIsNotInCoreCatalog() {
+        assertFalse(CoreRecordCatalog.children().stream()
+                .anyMatch(item -> item.id().equals("series.captain-bonus")));
     }
 
     @Test

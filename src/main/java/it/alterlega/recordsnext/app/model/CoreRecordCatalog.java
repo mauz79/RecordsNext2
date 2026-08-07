@@ -25,16 +25,6 @@ public final class CoreRecordCatalog {
                         false
                 ),
                 new RecordChild(
-                        "series.captain-bonus",
-                        "Bonus Capitano consecutivo",
-                        RecordFamily.SERIES,
-                        Set.of(
-                                RecordDependency.required("data.ordered-matches", DependencyType.DATA),
-                                RecordDependency.required("modifier.captain", DependencyType.FAMILY_CHILD)
-                        ),
-                        false
-                ),
-                new RecordChild(
                         "ru.deciding",
                         "Riserve d'ufficio decisive",
                         RecordFamily.RU,

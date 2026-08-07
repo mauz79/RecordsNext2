@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClassicsFamilyJsExporterTest {
@@ -20,7 +21,11 @@ class ClassicsFamilyJsExporterTest {
         Files.createDirectories(season);
         Files.writeString(
                 season.resolve("season_records_serie_a.json"),
-                "{\"records\":{\"puntiSquadraMax\":[{"
+                "{\"records\":{"
+                        + "\"serieSenzaSconfitte\":[{\"recordId\":\"series.unbeaten\",\"valore\":10}],"
+                        + "\"modDifesaMax\":[{\"recordId\":\"modifier.custom.max\",\"valore\":6}],"
+                        + "\"capitanoTotaleSquadre\":[{\"recordId\":\"modifier.captain.total\",\"valore\":8}],"
+                        + "\"puntiSquadraMax\":[{"
                         + "\"recordId\":\"classics.highest-match-score\","
                         + "\"nome\":\"Maggior punteggio\","
                         + "\"valore\":99.5,"
@@ -37,6 +42,9 @@ class ClassicsFamilyJsExporterTest {
         assertTrue(js.contains("\"familyId\":\"classics\""));
         assertTrue(js.contains("\"seasonAggregates\":["));
         assertTrue(js.contains("classics.highest-match-score"));
+        assertFalse(js.contains("serieSenzaSconfitte"));
+        assertFalse(js.contains("modDifesaMax"));
+        assertFalse(js.contains("capitanoTotaleSquadre"));
         assertTrue(js.contains("GENERATED_COMPLETE"));
     }
 }

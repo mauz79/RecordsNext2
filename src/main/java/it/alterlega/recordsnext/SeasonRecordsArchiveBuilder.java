@@ -96,7 +96,7 @@ public final class SeasonRecordsArchiveBuilder {
         records.put("serieSenzaSconfitte", unbeatenSeries(matches));
         records.put("serieVittorie", resultSeries(matches, "V", true,
                 "serie_vittorie", "Vittorie consecutive"));
-        records.put("seriePareggi", resultSeries(matches, "N", true,
+        records.put("seriePareggi", resultSeries(matches, "P", true,
                 "serie_pareggi", "Pareggi consecutivi"));
         records.put("serieSconfitte", resultSeries(matches, "S", true,
                 "serie_sconfitte", "Sconfitte consecutive"));
@@ -146,7 +146,22 @@ public final class SeasonRecordsArchiveBuilder {
         records.put("cleanSheetPortiereVolteSquadre", cleanSheetCount(cleanSheets));
         records.put("cleanSheetPortiereTotaleSquadre", cleanSheetTotal(cleanSheets));
         records.put("cleanSheetPortiereSerieSquadre", cleanSheetSeries(matches, cleanSheets));
-        records.put("capitanoSerieSquadre", captainSeries(matches, modifiers));
+        records.put("modDifesaSerieSquadre", modifierSeries(matches, modifiers, "modDifesa",
+                "modDifesaSerieSquadre", "Maggior serie modificatore personale 1"));
+        records.put("capitanoSerieSquadre", modifierSeries(matches, modifiers, "capitano",
+                "capitanoSerieSquadre", "Maggior serie modificatore personale 2"));
+        records.put("modPersonalizzato3SerieSquadre", modifierSeries(matches, modifiers, "personalizzato3",
+                "modPersonalizzato3SerieSquadre", "Maggior serie modificatore personale 3"));
+        records.put("modPortiereFcmSerieSquadre", modifierSeries(matches, modifiers, "fcmPortiere",
+                "modPortiereFcmSerieSquadre", "Maggior serie Modificatore Portiere FCM"));
+        records.put("modDifesaFcmSerieSquadre", modifierSeries(matches, modifiers, "fcmDifesa",
+                "modDifesaFcmSerieSquadre", "Maggior serie Modificatore Difesa FCM"));
+        records.put("modCentrocampoFcmSerieSquadre", modifierSeries(matches, modifiers, "fcmCentrocampo",
+                "modCentrocampoFcmSerieSquadre", "Maggior serie Modificatore Centrocampo FCM"));
+        records.put("modAttaccoFcmSerieSquadre", modifierSeries(matches, modifiers, "fcmAttacco",
+                "modAttaccoFcmSerieSquadre", "Maggior serie Modificatore Attacco FCM"));
+        records.put("modModuloFcmSerieSquadre", modifierSeries(matches, modifiers, "fcmModulo",
+                "modModuloFcmSerieSquadre", "Maggior serie Modificatore Modulo FCM"));
         records.put("fattoreCampoDecisivo", homeFieldDecisive(matches, modifiers, goalBands));
         records.put("fattoreCampoTotaleSquadre", homeFieldTotals(matches, modifiers));
         records.put("fattoreCampoPuntiGuadagnatiSquadre", homeFieldStandingsImpact(matches, modifiers, goalBands, true));
@@ -531,13 +546,16 @@ public final class SeasonRecordsArchiveBuilder {
         return details;
     }
 
-    private static List<Object> captainSeries(List<Map<String, Object>> matches,
-                                               List<Map<String, Object>> modifiers) {
-        List<Map<String, Object>> captain = modifiers.stream()
-                .filter(r -> "capitano".equals(string(r.get("tipo"))))
+    private static List<Object> modifierSeries(
+            List<Map<String, Object>> matches,
+            List<Map<String, Object>> modifiers,
+            String type,
+            String recordId,
+            String name) {
+        List<Map<String, Object>> selected = modifiers.stream()
+                .filter(r -> type.equals(string(r.get("tipo"))))
                 .toList();
-        return eventSeries(matches, captain, "capitanoSerieSquadre",
-                "Maggior serie bonus capitano");
+        return eventSeries(matches, selected, recordId, name);
     }
 
 

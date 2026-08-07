@@ -10,8 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExecutionPlannerTest {
+
     @Test
-    void missingCaptainSkipsOnlyCaptainSeries() {
+    void legacyCaptainSeriesIsNotPlanned() {
         ProcessingSelection selection = new ProcessingSelection(
                 EnumSet.of(RecordFamily.CLASSICS, RecordFamily.SERIES),
                 Set.of(),
@@ -25,18 +26,10 @@ class ExecutionPlannerTest {
                 DependencyInventory.legacyCapabilities(false, true, true, false)
         );
 
-        ExecutionPlanItem captain = plan.items().stream()
-                .filter(item -> item.child().id().equals("series.captain-bonus"))
-                .findFirst()
-                .orElseThrow();
-
-        ExecutionPlanItem classic = plan.items().stream()
-                .filter(item -> item.child().id().equals("classics.highest-match-score"))
-                .findFirst()
-                .orElseThrow();
-
-        assertEquals(OutputStatus.SKIPPED_REQUIRED_DEPENDENCY, captain.status());
-        assertEquals(OutputStatus.GENERATED_COMPLETE, classic.status());
+        assertFalse(plan.items().stream()
+                .anyMatch(item -> item.child().id().equals("series.captain-bonus")));
+        assertTrue(plan.items().stream()
+                .anyMatch(item -> item.child().id().equals("classics.highest-match-score")));
     }
 
     @Test
@@ -97,6 +90,6 @@ class ExecutionPlannerTest {
                 DependencyInventory.legacyCapabilities(false, true, false, false)
         );
 
-        assertEquals(RecordFamily.values().length, plan.byFamily().size());
+        assertEquals(4, plan.byFamily().size());
     }
 }
