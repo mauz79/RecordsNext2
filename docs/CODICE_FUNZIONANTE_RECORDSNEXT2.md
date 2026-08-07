@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-07 11:03:30 +02:00
+> Data generazione: 2026-08-07 12:10:12 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -16239,6 +16239,17 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
                     "recordId", "nome", "stagione", "competizioneStoricaId", "competizioneNome", "valore",
                     "squadra", "avversaria", "idIncontro", "giornata", "giornataDiA", "urlTabellino",
                     "risultato", "punteggio"));
+            fields.put("puntiSquadraMin", matchFields());
+            fields.put("partitePiuGolRegolamentari", matchFields());
+            fields.put("partitePiuScartoRegolamentari", matchFields());
+            fields.put("mediaPuntiSquadre", aggregateTeamFields());
+            fields.put("totalePuntiSquadre", aggregateTeamFields());
+            fields.put("puntiClassificaSquadre", aggregateTeamFields());
+            fields.put("vittorieSquadre", aggregateTeamFields());
+            fields.put("pareggiSquadre", aggregateTeamFields());
+            fields.put("sconfitteSquadre", aggregateTeamFields());
+            fields.put("golFattiSquadre", aggregateTeamFields());
+            fields.put("golSubitiSquadre", aggregateTeamFields());
             fields.put("espulsioniSquadre", compactTeamFields());
             fields.put("espulsioniGiocatori", orderedSet(
                     "recordId", "nome", "valore", "idGiocatore", "giocatore", "dettagliCount"));
@@ -16255,6 +16266,22 @@ File: src\main\java\it\alterlega\recordsnext\Records2026ClassicJsExporter.java
     
         private static Set<String> compactTeamFields() {
             return orderedSet("recordId", "nome", "valore", "idSquadra", "squadra", "dettagliCount");
+        }
+    
+        private static Set<String> aggregateTeamFields() {
+            return orderedSet(
+                    "recordId", "nome", "stagione", "competizioneStoricaId", "competizioneNome",
+                    "valore", "idSquadra", "squadra", "partite"
+            );
+        }
+    
+        private static Set<String> matchFields() {
+            return orderedSet(
+                    "recordId", "nome", "stagione", "competizioneStoricaId", "competizioneNome",
+                    "valore", "squadra", "avversaria", "idIncontro", "giornata", "giornataDiA",
+                    "urlTabellino", "risultato", "punteggio", "risultatoRegolamentari",
+                    "fonteGolRegolamentari"
+            );
         }
     
         private static Set<String> orderedSet(String... values) {
@@ -22022,6 +22049,17 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
     
             Map<String, Object> records = new LinkedHashMap<>();
             records.put("puntiSquadraMax", pointsMax(matches));
+            records.put("puntiSquadraMin", pointsMin(matches));
+            records.put("partitePiuGolRegolamentari", matchesMostRegulationGoals(matches));
+            records.put("partitePiuScartoRegolamentari", matchesLargestRegulationMargin(matches));
+            records.put("mediaPuntiSquadre", aggregateMatchMetricByTeam(matches, "average-points", "Miglior media punti", "puntiFatti", AggregateMode.AVERAGE));
+            records.put("totalePuntiSquadre", aggregateMatchMetricByTeam(matches, "total-points", "Maggior somma punti", "puntiFatti", AggregateMode.SUM));
+            records.put("puntiClassificaSquadre", aggregateStandingsByTeam(matches));
+            records.put("vittorieSquadre", aggregateResultByTeam(matches, "V", "wins", "Maggior numero di vittorie"));
+            records.put("pareggiSquadre", aggregateResultByTeam(matches, "P", "draws", "Maggior numero di pareggi"));
+            records.put("sconfitteSquadre", aggregateResultByTeam(matches, "S", "losses", "Maggior numero di sconfitte"));
+            records.put("golFattiSquadre", aggregateMatchMetricByTeam(matches, "goals-for", "Maggior numero di gol fatti", "golFatti", AggregateMode.SUM));
+            records.put("golSubitiSquadre", aggregateMatchMetricByTeam(matches, "goals-against", "Maggior numero di gol subiti", "golSubiti", AggregateMode.SUM));
             records.put("serieSenzaSconfitte", unbeatenSeries(matches));
             records.put("serieVittorie", resultSeries(matches, "V", true,
                     "serie_vittorie", "Vittorie consecutive"));
@@ -22107,6 +22145,183 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
             result.put("meta", meta);
             result.put("records", records);
             return result;
+        }
+    
+        private enum AggregateMode { SUM, AVERAGE }
+    
+        private static List<Object> pointsMin(List<Map<String, Object>> matches) {
+            List<Map<String, Object>> sorted = new ArrayList<>(matches);
+            sorted.sort(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("puntiFatti")))
+                    .thenComparing(r -> string(r.get("idIncontro"))));
+            List<Object> out = new ArrayList<>();
+            for (int i = 0; i < Math.min(20, sorted.size()); i++) {
+                Map<String, Object> r = sorted.get(i);
+                out.add(ordered(
+                        "recordId", "lowest-match-score",
+                        "nome", "Minor punteggio in una partita",
+                        "stagione", r.get("stagione"),
+                        "competizioneStoricaId", r.get("competizioneStoricaId"),
+                        "competizioneNome", r.get("competizioneNome"),
+                        "valore", r.get("puntiFatti"),
+                        "squadra", r.get("squadra"),
+                        "avversaria", r.get("avversaria"),
+                        "idIncontro", r.get("idIncontro"),
+                        "giornata", r.get("giornata"),
+                        "giornataDiA", r.get("giornataDiA"),
+                        "urlTabellino", r.get("urlTabellino"),
+                        "risultato", r.get("risultato"),
+                        "punteggio", r.get("punteggio")
+                ));
+            }
+            return out;
+        }
+    
+        private static List<Object> matchesMostRegulationGoals(List<Map<String, Object>> matches) {
+            Map<String, Map<String, Object>> byMatch = new LinkedHashMap<>();
+            for (Map<String, Object> row : matches) {
+                String matchId = string(row.get("idIncontro"));
+                if (matchId.isBlank() || byMatch.containsKey(matchId)) continue;
+                double total = number(row.get("golRegolamentariFatti")) + number(row.get("golRegolamentariSubiti"));
+                Map<String, Object> out = ordered(
+                        "recordId", "most-regulation-goals",
+                        "nome", "Partita con più gol regolamentari",
+                        "stagione", row.get("stagione"),
+                        "competizioneStoricaId", row.get("competizioneStoricaId"),
+                        "competizioneNome", row.get("competizioneNome"),
+                        "valore", total,
+                        "squadra", row.get("squadra"),
+                        "avversaria", row.get("avversaria"),
+                        "idIncontro", row.get("idIncontro"),
+                        "giornata", row.get("giornata"),
+                        "giornataDiA", row.get("giornataDiA"),
+                        "urlTabellino", row.get("urlTabellino"),
+                        "risultato", row.get("risultato"),
+                        "punteggio", row.get("punteggio"),
+                        "risultatoRegolamentari", row.get("risultatoRegolamentari"),
+                        "fonteGolRegolamentari", row.get("fonteGolRegolamentari")
+                );
+                byMatch.put(matchId, out);
+            }
+            List<Map<String, Object>> sorted = new ArrayList<>(byMatch.values());
+            sorted.sort(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("valore"))).reversed()
+                    .thenComparing(r -> string(r.get("idIncontro"))));
+            return new ArrayList<>(sorted.subList(0, Math.min(20, sorted.size())));
+        }
+    
+        private static List<Object> matchesLargestRegulationMargin(List<Map<String, Object>> matches) {
+            Map<String, Map<String, Object>> byMatch = new LinkedHashMap<>();
+            for (Map<String, Object> row : matches) {
+                String matchId = string(row.get("idIncontro"));
+                if (matchId.isBlank() || byMatch.containsKey(matchId)) continue;
+                double margin = Math.abs(number(row.get("golRegolamentariFatti")) - number(row.get("golRegolamentariSubiti")));
+                Map<String, Object> out = ordered(
+                        "recordId", "largest-regulation-margin",
+                        "nome", "Maggior scarto regolamentare",
+                        "stagione", row.get("stagione"),
+                        "competizioneStoricaId", row.get("competizioneStoricaId"),
+                        "competizioneNome", row.get("competizioneNome"),
+                        "valore", margin,
+                        "squadra", row.get("squadra"),
+                        "avversaria", row.get("avversaria"),
+                        "idIncontro", row.get("idIncontro"),
+                        "giornata", row.get("giornata"),
+                        "giornataDiA", row.get("giornataDiA"),
+                        "urlTabellino", row.get("urlTabellino"),
+                        "risultato", row.get("risultato"),
+                        "punteggio", row.get("punteggio"),
+                        "risultatoRegolamentari", row.get("risultatoRegolamentari"),
+                        "fonteGolRegolamentari", row.get("fonteGolRegolamentari")
+                );
+                byMatch.put(matchId, out);
+            }
+            List<Map<String, Object>> sorted = new ArrayList<>(byMatch.values());
+            sorted.sort(Comparator.comparingDouble((Map<String, Object> r) -> number(r.get("valore"))).reversed()
+                    .thenComparing(r -> string(r.get("idIncontro"))));
+            return new ArrayList<>(sorted.subList(0, Math.min(20, sorted.size())));
+        }
+    
+        private static List<Object> aggregateMatchMetricByTeam(
+                List<Map<String, Object>> matches,
+                String recordId,
+                String name,
+                String field,
+                AggregateMode mode) {
+            Map<String, List<Map<String, Object>>> grouped = group(matches, "idSquadra");
+            List<Map<String, Object>> out = new ArrayList<>();
+            for (List<Map<String, Object>> teamMatches : grouped.values()) {
+                if (teamMatches.isEmpty()) continue;
+                double sum = teamMatches.stream().mapToDouble(r -> number(r.get(field))).sum();
+                double value = mode == AggregateMode.AVERAGE ? sum / teamMatches.size() : sum;
+                Map<String, Object> first = teamMatches.get(0);
+                out.add(ordered(
+                        "recordId", recordId,
+                        "nome", name,
+                        "stagione", first.get("stagione"),
+                        "competizioneStoricaId", first.get("competizioneStoricaId"),
+                        "competizioneNome", first.get("competizioneNome"),
+                        "valore", value,
+                        "idSquadra", first.get("idSquadra"),
+                        "squadra", first.get("squadra"),
+                        "partite", teamMatches.size()
+                ));
+            }
+            sortValueTeam(out);
+            return new ArrayList<>(out);
+        }
+    
+        private static List<Object> aggregateResultByTeam(
+                List<Map<String, Object>> matches,
+                String resultCode,
+                String recordId,
+                String name) {
+            Map<String, List<Map<String, Object>>> grouped = group(matches, "idSquadra");
+            List<Map<String, Object>> out = new ArrayList<>();
+            for (List<Map<String, Object>> teamMatches : grouped.values()) {
+                if (teamMatches.isEmpty()) continue;
+                long count = teamMatches.stream().filter(r -> resultCode.equals(string(r.get("esito")))).count();
+                Map<String, Object> first = teamMatches.get(0);
+                out.add(ordered(
+                        "recordId", recordId,
+                        "nome", name,
+                        "stagione", first.get("stagione"),
+                        "competizioneStoricaId", first.get("competizioneStoricaId"),
+                        "competizioneNome", first.get("competizioneNome"),
+                        "valore", count,
+                        "idSquadra", first.get("idSquadra"),
+                        "squadra", first.get("squadra"),
+                        "partite", teamMatches.size()
+                ));
+            }
+            sortValueTeam(out);
+            return new ArrayList<>(out);
+        }
+    
+        private static List<Object> aggregateStandingsByTeam(List<Map<String, Object>> matches) {
+            Map<String, List<Map<String, Object>>> grouped = group(matches, "idSquadra");
+            List<Map<String, Object>> out = new ArrayList<>();
+            for (List<Map<String, Object>> teamMatches : grouped.values()) {
+                if (teamMatches.isEmpty()) continue;
+                int points = 0;
+                for (Map<String, Object> row : teamMatches) {
+                    String result = string(row.get("esito"));
+                    if ("V".equals(result)) points += 3;
+                    else if ("P".equals(result)) points += 1;
+                }
+                Map<String, Object> first = teamMatches.get(0);
+                out.add(ordered(
+                        "recordId", "standings-points",
+                        "nome", "Maggior numero di punti in classifica",
+                        "stagione", first.get("stagione"),
+                        "competizioneStoricaId", first.get("competizioneStoricaId"),
+                        "competizioneNome", first.get("competizioneNome"),
+                        "valore", points,
+                        "idSquadra", first.get("idSquadra"),
+                        "squadra", first.get("squadra"),
+                        "partite", teamMatches.size()
+                ));
+            }
+            sortValueTeam(out);
+            return new ArrayList<>(out);
         }
     
         private static List<Object> pointsMax(List<Map<String, Object>> matches) {
@@ -24237,6 +24452,67 @@ File: src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExport
             assertFalse(js.contains("modDifesaMax"));
             assertFalse(js.contains("capitanoTotaleSquadre"));
             assertTrue(js.contains("GENERATED_COMPLETE"));
+        }
+    }
+
+## src\test\java\it\alterlega\recordsnext\app\classics\ClassicsTwentyOneContractTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\classics\ClassicsTwentyOneContractTest.java
+
+    package it.alterlega.recordsnext.app.classics;
+    
+    import it.alterlega.recordsnext.Records2026ClassicJsExporter;
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+    
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.util.List;
+    
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+    
+    class ClassicsTwentyOneContractTest {
+        @TempDir
+        Path temp;
+    
+        @Test
+        void exporterRecognizesAllTwentyOneClassicSections() throws Exception {
+            String[] sections = {
+                    "puntiSquadraMax", "puntiSquadraMin",
+                    "partitePiuGolRegolamentari", "partitePiuScartoRegolamentari",
+                    "mediaPuntiSquadre", "totalePuntiSquadre", "puntiClassificaSquadre",
+                    "vittorieSquadre", "pareggiSquadre", "sconfitteSquadre",
+                    "golFattiSquadre", "golSubitiSquadre",
+                    "ammonizioniSquadre", "espulsioniSquadre", "espulsioniGiocatori",
+                    "assistSquadre", "autogolSquadre", "golRigoreSquadre",
+                    "rigoriSbagliatiSquadre", "rigoriParatiSquadre",
+                    "cleanSheetPortiereVolteSquadre"
+            };
+    
+            Path archive = temp.resolve("archive");
+            Path season = archive.resolve("2025_2026");
+            Files.createDirectories(season);
+    
+            StringBuilder records = new StringBuilder();
+            for (int i = 0; i < sections.length; i++) {
+                if (i > 0) records.append(',');
+                records.append('"').append(sections[i]).append('"')
+                        .append(":[{\"recordId\":\"").append(sections[i])
+                        .append("\",\"nome\":\"Test\",\"valore\":1,\"squadra\":\"A\"}]");
+            }
+    
+            Files.writeString(
+                    season.resolve("season_records_serie_a.json"),
+                    "{\"records\":{" + records + "}}"
+            );
+    
+            Path output = temp.resolve("classic.js");
+            Records2026ClassicJsExporter.export(archive, output, List.of());
+            String js = Files.readString(output);
+    
+            for (String section : sections) {
+                assertTrue(js.contains("\"" + section + "\""), "Sezione Classici non esportata: " + section);
+            }
         }
     }
 
@@ -27296,6 +27572,698 @@ File: tools\Start-RecordsNext2-GUI-v7.ps1
         -cp $fullCp `
         it.alterlega.recordsnext.gui.RecordsNext2Dashboard
 
+## tools\Test_RecordsNext2_CheckboxViews_v13.ps1
+
+File: tools\Test_RecordsNext2_CheckboxViews_v13.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+    
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+    
+    $configPath = Join-Path $ProjectDir "config\processing.json"
+    $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+    
+    $manifest = Get-ChildItem `
+        -Path (Join-Path $ProjectDir "data\site-export-staging") `
+        -Recurse -File -Filter "fcmRecordsNext_Manifest.js" |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+    
+    if (-not $manifest) {
+        throw "Manifest JS non trovato."
+    }
+    
+    $jsDir = $manifest.Directory.FullName
+    
+    $classicsMap = [ordered]@{
+        "highest-match-score"       = "puntiSquadraMax"
+        "lowest-match-score"        = "puntiSquadraMin"
+        "most-regulation-goals"     = "partitePiuGolRegolamentari"
+        "largest-regulation-margin" = "partitePiuScartoRegolamentari"
+        "average-points"            = "mediaPuntiSquadre"
+        "total-points"              = "totalePuntiSquadre"
+        "standings-points"          = "puntiClassificaSquadre"
+        "wins"                      = "vittorieSquadre"
+        "draws"                     = "pareggiSquadre"
+        "losses"                    = "sconfitteSquadre"
+        "goals-for"                 = "golFattiSquadre"
+        "goals-against"             = "golSubitiSquadre"
+        "yellow-cards-team"         = "ammonizioniSquadre"
+        "red-cards-team"            = "espulsioniSquadre"
+        "red-cards-player"          = "espulsioniGiocatori"
+        "assists-team"              = "assistSquadre"
+        "own-goals-team"            = "autogolSquadre"
+        "penalties-scored"          = "golRigoreSquadre"
+        "penalties-missed"          = "rigoriSbagliatiSquadre"
+        "penalties-saved"           = "rigoriParatiSquadre"
+        "clean-sheets"              = "cleanSheetPortiereVolteSquadre"
+    }
+    
+    $seriesMap = [ordered]@{
+        "unbeaten"     = "serieSenzaSconfitte"
+        "winless"      = "serieSenzaVittorie"
+        "wins"         = "serieVittorie"
+        "draws"        = "seriePareggi"
+        "losses"       = "serieSconfitte"
+        "clean-sheets" = "cleanSheetPortiereSerieSquadre"
+    }
+    
+    $modifierSeriesMap = [ordered]@{
+        "modm1pers.series"      = "modDifesaSerieSquadre"
+        "modm2pers.series"      = "capitanoSerieSquadre"
+        "modm3pers.series"      = "modPersonalizzato3SerieSquadre"
+        "modportiere.series"    = "modPortiereFcmSerieSquadre"
+        "moddifesa.series"      = "modDifesaFcmSerieSquadre"
+        "modcentrocampo.series" = "modCentrocampoFcmSerieSquadre"
+        "modattacco.series"     = "modAttaccoFcmSerieSquadre"
+        "modmodulo.series"      = "modModuloFcmSerieSquadre"
+    }
+    
+    function Test-FamilyMap {
+        param(
+            [string]$Family,
+            [object]$Children,
+            [hashtable]$Map,
+            [string]$JsFile
+        )
+    
+        $text = Get-Content -LiteralPath $JsFile -Raw
+        $rows = foreach ($key in $Map.Keys) {
+            $selected = [bool]$Children.$key
+            $section = $Map[$key]
+            $present = $text.Contains('"' + $section + '":[')
+    
+            [pscustomobject]@{
+                Famiglia = $Family
+                Checkbox = $key
+                Selezionata = $selected
+                Sezione = $section
+                Presente = $present
+                Esito = if ($selected -eq $present) { "OK" } else { "ERRORE" }
+            }
+        }
+        return $rows
+    }
+    
+    $families = $config.processing.families
+    $rows = @()
+    
+    $rows += Test-FamilyMap `
+        -Family "Classici" `
+        -Children $families.classics.children `
+        -Map $classicsMap `
+        -JsFile (Join-Path $jsDir "fcmRecordsNext_Classics.js")
+    
+    $rows += Test-FamilyMap `
+        -Family "Serie" `
+        -Children $families.series.children `
+        -Map $seriesMap `
+        -JsFile (Join-Path $jsDir "fcmRecordsNext_Series.js")
+    
+    $rows += Test-FamilyMap `
+        -Family "Serie modificatori" `
+        -Children $families.modifiers.children `
+        -Map $modifierSeriesMap `
+        -JsFile (Join-Path $jsDir "fcmRecordsNext_Series.js")
+    
+    $rows | Format-Table -AutoSize
+    
+    $errors = @($rows | Where-Object Esito -eq "ERRORE")
+    Write-Host ""
+    Write-Host "Checkbox controllate : $($rows.Count)"
+    Write-Host "Errori               : $($errors.Count)"
+    
+    if ($errors.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== ERRORI CONTRATTO CHECKBOX -> VISTA ==="
+        $errors | Format-Table -AutoSize
+        exit 1
+    }
+    
+    Write-Host ""
+    Write-Host "CONTRATTO CHECKBOX -> VISTA: OK"
+
+## tools\Test_RecordsNext2_CheckboxViews_v14.ps1
+
+File: tools\Test_RecordsNext2_CheckboxViews_v14.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+    
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+    
+    $configPath = Join-Path $ProjectDir "config\processing.json"
+    if (-not (Test-Path -LiteralPath $configPath)) {
+        throw "Configurazione non trovata: $configPath"
+    }
+    $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+    $families = $config.processing.families
+    
+    $manifest = Get-ChildItem `
+        -Path (Join-Path $ProjectDir "data\site-export-staging") `
+        -Recurse -File -Filter "fcmRecordsNext_Manifest.js" `
+        -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+    
+    if (-not $manifest) {
+        throw "Manifest JS non trovato sotto data\site-export-staging."
+    }
+    $jsDir = $manifest.Directory.FullName
+    
+    function Read-Js([string]$Name) {
+        $path = Join-Path $jsDir $Name
+        if (-not (Test-Path -LiteralPath $path)) { return "" }
+        return Get-Content -LiteralPath $path -Raw
+    }
+    
+    $classicsJs = Read-Js "fcmRecordsNext_Classics.js"
+    $seriesJs = Read-Js "fcmRecordsNext_Series.js"
+    $ruJs = Read-Js "fcmRecordsNext_RU.js"
+    $modifiersJs = Read-Js "fcmRecordsNext_Modifiers.js"
+    $thresholdsJs = Read-Js "fcmRecordsNext_ThresholdsLuck.js"
+    $culometroJs = Read-Js "fcmRecordsNext_Culometro.js"
+    
+    $rows = New-Object System.Collections.Generic.List[object]
+    
+    function Add-Check {
+        param(
+            [string]$Family,
+            [string]$Checkbox,
+            [bool]$Selected,
+            [string]$Expected,
+            [bool]$Present,
+            [string]$Kind = "Sezione"
+        )
+        $ok = ($Selected -eq $Present)
+        $rows.Add([pscustomobject]@{
+            Famiglia = $Family
+            Checkbox = $Checkbox
+            Selezionata = $Selected
+            Tipo = $Kind
+            Atteso = $Expected
+            Presente = $Present
+            Esito = if ($ok) { "OK" } else { "ERRORE" }
+        })
+    }
+    
+    function Child-Selected($familyChildren, [string]$key) {
+        if ($null -eq $familyChildren) { return $false }
+        $property = $familyChildren.PSObject.Properties[$key]
+        if ($null -eq $property) { return $false }
+        return [bool]$property.Value
+    }
+    
+    # CLASSICI 21
+    $classicsMap = [ordered]@{
+        "highest-match-score"       = "puntiSquadraMax"
+        "lowest-match-score"        = "puntiSquadraMin"
+        "most-regulation-goals"     = "partitePiuGolRegolamentari"
+        "largest-regulation-margin" = "partitePiuScartoRegolamentari"
+        "average-points"            = "mediaPuntiSquadre"
+        "total-points"              = "totalePuntiSquadre"
+        "standings-points"          = "puntiClassificaSquadre"
+        "wins"                      = "vittorieSquadre"
+        "draws"                     = "pareggiSquadre"
+        "losses"                    = "sconfitteSquadre"
+        "goals-for"                 = "golFattiSquadre"
+        "goals-against"             = "golSubitiSquadre"
+        "yellow-cards-team"         = "ammonizioniSquadre"
+        "red-cards-team"            = "espulsioniSquadre"
+        "red-cards-player"          = "espulsioniGiocatori"
+        "assists-team"              = "assistSquadre"
+        "own-goals-team"            = "autogolSquadre"
+        "penalties-scored"          = "golRigoreSquadre"
+        "penalties-missed"          = "rigoriSbagliatiSquadre"
+        "penalties-saved"           = "rigoriParatiSquadre"
+        "clean-sheets"              = "cleanSheetPortiereVolteSquadre"
+    }
+    foreach ($key in $classicsMap.Keys) {
+        $section = $classicsMap[$key]
+        Add-Check "Classici" $key (Child-Selected $families.classics.children $key) $section ($classicsJs.Contains('"' + $section + '":['))
+    }
+    
+    # SERIE 6
+    $seriesMap = [ordered]@{
+        "wins" = "serieVittorie"
+        "draws" = "seriePareggi"
+        "losses" = "serieSconfitte"
+        "unbeaten" = "serieSenzaSconfitte"
+        "winless" = "serieSenzaVittorie"
+        "clean-sheets" = "cleanSheetPortiereSerieSquadre"
+    }
+    foreach ($key in $seriesMap.Keys) {
+        $section = $seriesMap[$key]
+        Add-Check "Serie" $key (Child-Selected $families.series.children $key) $section ($seriesJs.Contains('"' + $section + '":['))
+    }
+    
+    # SERIE MODIFICATORI 8
+    $modifierSeriesMap = [ordered]@{
+        "modm1pers.series" = "modDifesaSerieSquadre"
+        "modm2pers.series" = "capitanoSerieSquadre"
+        "modm3pers.series" = "modPersonalizzato3SerieSquadre"
+        "modportiere.series" = "modPortiereFcmSerieSquadre"
+        "moddifesa.series" = "modDifesaFcmSerieSquadre"
+        "modcentrocampo.series" = "modCentrocampoFcmSerieSquadre"
+        "modattacco.series" = "modAttaccoFcmSerieSquadre"
+        "modmodulo.series" = "modModuloFcmSerieSquadre"
+    }
+    foreach ($key in $modifierSeriesMap.Keys) {
+        $section = $modifierSeriesMap[$key]
+        Add-Check "Serie modificatori" $key (Child-Selected $families.modifiers.children $key) $section ($seriesJs.Contains('"' + $section + '":['))
+    }
+    
+    # MODIFICATORI: max/totale/media/utilizzi + Fattore Campo
+    $modifierPrefixes = [ordered]@{
+        "modm1pers" = "modDifesa"
+        "modm2pers" = "capitano"
+        "modm3pers" = "modPersonalizzato3"
+        "modportiere" = "modPortiereFcm"
+        "moddifesa" = "modDifesaFcm"
+        "modcentrocampo" = "modCentrocampoFcm"
+        "modattacco" = "modAttaccoFcm"
+        "modmodulo" = "modModuloFcm"
+    }
+    $modifierSuffix = [ordered]@{
+        "max" = "Max"
+        "total" = "TotaleSquadre"
+        "average" = "MediaSquadre"
+        "uses" = "UtilizziSquadre"
+    }
+    foreach ($mod in $modifierPrefixes.Keys) {
+        foreach ($metric in $modifierSuffix.Keys) {
+            $key = $mod + "." + $metric
+            $section = $modifierPrefixes[$mod] + $modifierSuffix[$metric]
+            Add-Check "Modificatori" $key (Child-Selected $families.modifiers.children $key) $section ($modifiersJs.Contains('"' + $section + '":['))
+        }
+    }
+    $homeFieldMap = [ordered]@{
+        "home-field-deciding" = "fattoreCampoDecisivo"
+        "home-field-points-gained" = "fattoreCampoPuntiGuadagnatiSquadre"
+        "home-field-points-lost" = "fattoreCampoPuntiPersiSquadre"
+        "home-field-balance" = "fattoreCampoTotaleSquadre"
+    }
+    foreach ($key in $homeFieldMap.Keys) {
+        $section = $homeFieldMap[$key]
+        Add-Check "Fattore Campo" $key (Child-Selected $families.modifiers.children $key) $section ($modifiersJs.Contains('"' + $section + '":['))
+    }
+    
+    # RU: una checkbox -> una vista canonica.
+    $ruMap = [ordered]@{
+        "max-in-match" = "partiteConPiuRU"
+        "matches-with" = "partiteConRU"
+        "matches-against" = "partiteControRU"
+        "deciding" = "ruDecisiva"
+        "deciding-against" = "ruDecisivaContro"
+        "balance" = "bilancioConRU"
+        "balance-against" = "bilancioControRU"
+        "average-points" = "mediaPuntiConRU"
+        "average-points-against" = "mediaPuntiControRU"
+        "role-distribution" = "tipoRUUsata"
+    }
+    foreach ($key in $ruMap.Keys) {
+        $section = $ruMap[$key]
+        Add-Check "RU" $key (Child-Selected $families.ru.children $key) $section ($ruJs.Contains('"' + $section + '":')) "Vista"
+    }
+    
+    # Evidenzia viste RU prodotte ma senza checkbox dedicata.
+    $ruExtra = @("bilancioRUDecisiva", "bilancioRUDecisivaContro")
+    foreach ($section in $ruExtra) {
+        if ($ruJs.Contains('"' + $section + '":')) {
+            $rows.Add([pscustomobject]@{
+                Famiglia = "RU"
+                Checkbox = "(nessuna)"
+                Selezionata = $false
+                Tipo = "Vista extra"
+                Atteso = $section
+                Presente = $true
+                Esito = "EXTRA"
+            })
+        }
+    }
+    
+    # SOGLIE/FORTUNA: tipo evento o aggregato corrispondente.
+    $thresholdEventMap = [ordered]@{
+        "surgical-win" = "ONE_GOAL_WIN"
+        "mocking-loss" = "ONE_GOAL_LOSS"
+        "miraculous-draw" = "MIRACLE_DRAW"
+        "narrow-draw" = "TIGHT_DRAW"
+        "missed-win-half-point" = "MISSED_WIN_HALF_POINT"
+        "loss-by-a-whisker" = "LOSS_BY_A_WHISKER"
+        "exact-threshold" = "EXACT_THRESHOLD"
+        "just-enough" = "JUST_ENOUGH"
+        "wasted-points" = "UNUSED_BAND_POINTS"
+    }
+    foreach ($key in $thresholdEventMap.Keys) {
+        $eventType = $thresholdEventMap[$key]
+        $selected = Child-Selected $families.thresholdsLuck.children $key
+        # implementedEventTypes e' il contratto: la vista deve poter esistere anche con 0 occorrenze.
+        $present = $thresholdsJs.Contains('"' + $eventType + '"')
+        Add-Check "Soglie/Fortuna" $key $selected $eventType $present "Tipo evento"
+    }
+    $luckMap = [ordered]@{
+        "favourable-events" = "favourableEvents"
+        "unfavourable-events" = "unfavourableEvents"
+        "balance" = "luckBalance"
+    }
+    foreach ($key in $luckMap.Keys) {
+        $field = $luckMap[$key]
+        Add-Check "Soglie/Fortuna" $key (Child-Selected $families.thresholdsLuck.children $key) $field ($thresholdsJs.Contains('"' + $field + '"')) "Aggregato"
+    }
+    
+    # CULOMETRO: unica checkbox dedicata in config/culometro.json.
+    $culometroConfigPath = Join-Path $ProjectDir "config\culometro.json"
+    if (Test-Path -LiteralPath $culometroConfigPath) {
+        $culoConfig = Get-Content -LiteralPath $culometroConfigPath -Raw | ConvertFrom-Json
+        $culoEnabled = [bool]$culoConfig.enabled
+        $culoPresent = -not [string]::IsNullOrWhiteSpace($culometroJs)
+        Add-Check "Culometro" "enabled" $culoEnabled "fcmRecordsNext_Culometro.js" $culoPresent "Famiglia"
+    }
+    
+    # Report di sintesi.
+    $reportDir = Join-Path $ProjectDir "reports\checkbox-view-audit"
+    New-Item -ItemType Directory -Path $reportDir -Force | Out-Null
+    $csvPath = Join-Path $reportDir "RecordsNext2_CHECKBOX_VIEW_AUDIT.csv"
+    $rows | Export-Csv -LiteralPath $csvPath -NoTypeInformation -Encoding UTF8
+    
+    $summary = $rows |
+        Group-Object Famiglia |
+        ForEach-Object {
+            $group = @($_.Group)
+            [pscustomobject]@{
+                Famiglia = $_.Name
+                Checkbox = @($group | Where-Object Checkbox -ne "(nessuna)").Count
+                Selezionate = @($group | Where-Object { $_.Checkbox -ne "(nessuna)" -and $_.Selezionata }).Count
+                Presenti = @($group | Where-Object { $_.Checkbox -ne "(nessuna)" -and $_.Presente }).Count
+                Errori = @($group | Where-Object Esito -eq "ERRORE").Count
+                Extra = @($group | Where-Object Esito -eq "EXTRA").Count
+            }
+        }
+    
+    Write-Host ""
+    Write-Host "=== CONTRATTO CHECKBOX -> VISTA ==="
+    $summary | Format-Table -AutoSize
+    
+    $errors = @($rows | Where-Object { $_.Esito -eq "ERRORE" -or $_.Esito -eq "EXTRA" })
+    if ($errors.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PROBLEMI ==="
+        $errors | Format-Table Famiglia, Checkbox, Selezionata, Tipo, Atteso, Presente, Esito -AutoSize
+    }
+    
+    Write-Host ""
+    Write-Host "Audit dettagliato: $csvPath"
+    Write-Host "Controlli totali : $($rows.Count)"
+    Write-Host "Problemi         : $($errors.Count)"
+    
+    if ($errors.Count -gt 0) { exit 1 }
+    Write-Host "CONTRATTO CHECKBOX -> VISTA: OK"
+
+## tools\Test_RecordsNext2_CheckboxViews_v15.ps1
+
+File: tools\Test_RecordsNext2_CheckboxViews_v15.ps1
+
+    param(
+        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
+    )
+    
+    $ErrorActionPreference = "Stop"
+    Set-Location $ProjectDir
+    
+    $configPath = Join-Path $ProjectDir "config\processing.json"
+    if (-not (Test-Path -LiteralPath $configPath)) {
+        throw "Configurazione non trovata: $configPath"
+    }
+    $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
+    $families = $config.processing.families
+    
+    $manifest = Get-ChildItem `
+        -Path (Join-Path $ProjectDir "data\site-export-staging") `
+        -Recurse -File -Filter "fcmRecordsNext_Manifest.js" `
+        -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+    
+    if (-not $manifest) {
+        throw "Manifest JS non trovato sotto data\site-export-staging."
+    }
+    $jsDir = $manifest.Directory.FullName
+    
+    function Read-Js([string]$Name) {
+        $path = Join-Path $jsDir $Name
+        if (-not (Test-Path -LiteralPath $path)) { return "" }
+        return Get-Content -LiteralPath $path -Raw
+    }
+    
+    $classicsJs = Read-Js "fcmRecordsNext_Classics.js"
+    $seriesJs = Read-Js "fcmRecordsNext_Series.js"
+    $ruJs = Read-Js "fcmRecordsNext_RU.js"
+    $modifiersJs = Read-Js "fcmRecordsNext_Modifiers.js"
+    $thresholdsJs = Read-Js "fcmRecordsNext_ThresholdsLuck.js"
+    $culometroJs = Read-Js "fcmRecordsNext_Culometro.js"
+    
+    $rows = New-Object System.Collections.Generic.List[object]
+    
+    function Add-Check {
+        param(
+            [string]$Family,
+            [string]$Checkbox,
+            [bool]$Selected,
+            [string]$Expected,
+            [bool]$Present,
+            [string]$Kind = "Sezione"
+        )
+        $ok = ($Selected -eq $Present)
+        $rows.Add([pscustomobject]@{
+            Famiglia = $Family
+            Checkbox = $Checkbox
+            Selezionata = $Selected
+            Tipo = $Kind
+            Atteso = $Expected
+            Presente = $Present
+            Esito = if ($ok) { "OK" } else { "ERRORE" }
+        })
+    }
+    
+    function Child-Selected($familyChildren, [string]$key) {
+        if ($null -eq $familyChildren) { return $false }
+        $property = $familyChildren.PSObject.Properties[$key]
+        if ($null -eq $property) { return $false }
+        return [bool]$property.Value
+    }
+    
+    # CLASSICI 21
+    $classicsMap = [ordered]@{
+        "highest-match-score"       = "puntiSquadraMax"
+        "lowest-match-score"        = "puntiSquadraMin"
+        "most-regulation-goals"     = "partitePiuGolRegolamentari"
+        "largest-regulation-margin" = "partitePiuScartoRegolamentari"
+        "average-points"            = "mediaPuntiSquadre"
+        "total-points"              = "totalePuntiSquadre"
+        "standings-points"          = "puntiClassificaSquadre"
+        "wins"                      = "vittorieSquadre"
+        "draws"                     = "pareggiSquadre"
+        "losses"                    = "sconfitteSquadre"
+        "goals-for"                 = "golFattiSquadre"
+        "goals-against"             = "golSubitiSquadre"
+        "yellow-cards-team"         = "ammonizioniSquadre"
+        "red-cards-team"            = "espulsioniSquadre"
+        "red-cards-player"          = "espulsioniGiocatori"
+        "assists-team"              = "assistSquadre"
+        "own-goals-team"            = "autogolSquadre"
+        "penalties-scored"          = "golRigoreSquadre"
+        "penalties-missed"          = "rigoriSbagliatiSquadre"
+        "penalties-saved"           = "rigoriParatiSquadre"
+        "clean-sheets"              = "cleanSheetPortiereVolteSquadre"
+    }
+    foreach ($key in $classicsMap.Keys) {
+        $section = $classicsMap[$key]
+        Add-Check "Classici" $key (Child-Selected $families.classics.children $key) $section ($classicsJs.Contains('"' + $section + '":['))
+    }
+    
+    # SERIE 6
+    $seriesMap = [ordered]@{
+        "wins" = "serieVittorie"
+        "draws" = "seriePareggi"
+        "losses" = "serieSconfitte"
+        "unbeaten" = "serieSenzaSconfitte"
+        "winless" = "serieSenzaVittorie"
+        "clean-sheets" = "cleanSheetPortiereSerieSquadre"
+    }
+    foreach ($key in $seriesMap.Keys) {
+        $section = $seriesMap[$key]
+        Add-Check "Serie" $key (Child-Selected $families.series.children $key) $section ($seriesJs.Contains('"' + $section + '":['))
+    }
+    
+    # SERIE MODIFICATORI 8
+    $modifierSeriesMap = [ordered]@{
+        "modm1pers.series" = "modDifesaSerieSquadre"
+        "modm2pers.series" = "capitanoSerieSquadre"
+        "modm3pers.series" = "modPersonalizzato3SerieSquadre"
+        "modportiere.series" = "modPortiereFcmSerieSquadre"
+        "moddifesa.series" = "modDifesaFcmSerieSquadre"
+        "modcentrocampo.series" = "modCentrocampoFcmSerieSquadre"
+        "modattacco.series" = "modAttaccoFcmSerieSquadre"
+        "modmodulo.series" = "modModuloFcmSerieSquadre"
+    }
+    foreach ($key in $modifierSeriesMap.Keys) {
+        $section = $modifierSeriesMap[$key]
+        Add-Check "Serie modificatori" $key (Child-Selected $families.modifiers.children $key) $section ($seriesJs.Contains('"' + $section + '":['))
+    }
+    
+    # MODIFICATORI: max/totale/media/utilizzi + Fattore Campo
+    $modifierPrefixes = [ordered]@{
+        "modm1pers" = "modDifesa"
+        "modm2pers" = "capitano"
+        "modm3pers" = "modPersonalizzato3"
+        "modportiere" = "modPortiereFcm"
+        "moddifesa" = "modDifesaFcm"
+        "modcentrocampo" = "modCentrocampoFcm"
+        "modattacco" = "modAttaccoFcm"
+        "modmodulo" = "modModuloFcm"
+    }
+    $modifierSuffix = [ordered]@{
+        "max" = "Max"
+        "total" = "TotaleSquadre"
+        "average" = "MediaSquadre"
+        "uses" = "UtilizziSquadre"
+    }
+    foreach ($mod in $modifierPrefixes.Keys) {
+        foreach ($metric in $modifierSuffix.Keys) {
+            $key = $mod + "." + $metric
+            $section = $modifierPrefixes[$mod] + $modifierSuffix[$metric]
+            Add-Check "Modificatori" $key (Child-Selected $families.modifiers.children $key) $section ($modifiersJs.Contains('"' + $section + '":['))
+        }
+    }
+    $homeFieldMap = [ordered]@{
+        "home-field-deciding" = "fattoreCampoDecisivo"
+        "home-field-points-gained" = "fattoreCampoPuntiGuadagnatiSquadre"
+        "home-field-points-lost" = "fattoreCampoPuntiPersiSquadre"
+        "home-field-balance" = "fattoreCampoTotaleSquadre"
+    }
+    foreach ($key in $homeFieldMap.Keys) {
+        $section = $homeFieldMap[$key]
+        Add-Check "Fattore Campo" $key (Child-Selected $families.modifiers.children $key) $section ($modifiersJs.Contains('"' + $section + '":['))
+    }
+    
+    # RU: una checkbox -> una vista canonica.
+    $ruMap = [ordered]@{
+        "max-in-match" = "partiteConPiuRU"
+        "matches-with" = "partiteConRU"
+        "matches-against" = "partiteControRU"
+        "deciding" = "ruDecisiva"
+        "deciding-against" = "ruDecisivaContro"
+        "balance" = "bilancioConRU"
+        "balance-against" = "bilancioControRU"
+        "average-points" = "mediaPuntiConRU"
+        "average-points-against" = "mediaPuntiControRU"
+        "role-distribution" = "tipoRUUsata"
+    }
+    foreach ($key in $ruMap.Keys) {
+        $section = $ruMap[$key]
+        Add-Check "RU" $key (Child-Selected $families.ru.children $key) $section ($ruJs.Contains('"' + $section + '":')) "Vista"
+    }
+    
+    # Viste RU derivate: sono ammesse senza checkbox propria.
+    # Derivano da dati gia' selezionati/configurati e restano visibili nel viewer.
+    $ruDerived = @("bilancioRUDecisiva", "bilancioRUDecisivaContro")
+    foreach ($section in $ruDerived) {
+        if ($ruJs.Contains('"' + $section + '":')) {
+            $rows.Add([pscustomobject]@{
+                Famiglia = "RU"
+                Checkbox = "(derivata)"
+                Selezionata = $false
+                Tipo = "Vista derivata"
+                Atteso = $section
+                Presente = $true
+                Esito = "DERIVATA"
+            })
+        }
+    }
+    
+    # SOGLIE/FORTUNA: tipo evento o aggregato corrispondente.
+    $thresholdEventMap = [ordered]@{
+        "surgical-win" = "ONE_GOAL_WIN"
+        "mocking-loss" = "ONE_GOAL_LOSS"
+        "miraculous-draw" = "MIRACLE_DRAW"
+        "narrow-draw" = "TIGHT_DRAW"
+        "missed-win-half-point" = "MISSED_WIN_HALF_POINT"
+        "loss-by-a-whisker" = "LOSS_BY_A_WHISKER"
+        "exact-threshold" = "EXACT_THRESHOLD"
+        "just-enough" = "JUST_ENOUGH"
+        "wasted-points" = "UNUSED_BAND_POINTS"
+    }
+    foreach ($key in $thresholdEventMap.Keys) {
+        $eventType = $thresholdEventMap[$key]
+        $selected = Child-Selected $families.thresholdsLuck.children $key
+        # implementedEventTypes e' il contratto: la vista deve poter esistere anche con 0 occorrenze.
+        $present = $thresholdsJs.Contains('"' + $eventType + '"')
+        Add-Check "Soglie/Fortuna" $key $selected $eventType $present "Tipo evento"
+    }
+    $luckMap = [ordered]@{
+        "favourable-events" = "favourableEvents"
+        "unfavourable-events" = "unfavourableEvents"
+        "balance" = "luckBalance"
+    }
+    foreach ($key in $luckMap.Keys) {
+        $field = $luckMap[$key]
+        Add-Check "Soglie/Fortuna" $key (Child-Selected $families.thresholdsLuck.children $key) $field ($thresholdsJs.Contains('"' + $field + '"')) "Aggregato"
+    }
+    
+    # CULOMETRO: unica checkbox dedicata in config/culometro.json.
+    $culometroConfigPath = Join-Path $ProjectDir "config\culometro.json"
+    if (Test-Path -LiteralPath $culometroConfigPath) {
+        $culoConfig = Get-Content -LiteralPath $culometroConfigPath -Raw | ConvertFrom-Json
+        $culoEnabled = [bool]$culoConfig.enabled
+        $culoPresent = -not [string]::IsNullOrWhiteSpace($culometroJs)
+        Add-Check "Culometro" "enabled" $culoEnabled "fcmRecordsNext_Culometro.js" $culoPresent "Famiglia"
+    }
+    
+    # Report di sintesi.
+    $reportDir = Join-Path $ProjectDir "reports\checkbox-view-audit"
+    New-Item -ItemType Directory -Path $reportDir -Force | Out-Null
+    $csvPath = Join-Path $reportDir "RecordsNext2_CHECKBOX_VIEW_AUDIT.csv"
+    $rows | Export-Csv -LiteralPath $csvPath -NoTypeInformation -Encoding UTF8
+    
+    $summary = $rows |
+        Group-Object Famiglia |
+        ForEach-Object {
+            $group = @($_.Group)
+            [pscustomobject]@{
+                Famiglia = $_.Name
+                Checkbox = @($group | Where-Object { $_.Checkbox -ne "(derivata)" }).Count
+                Selezionate = @($group | Where-Object { $_.Checkbox -ne "(derivata)" -and $_.Selezionata }).Count
+                Presenti = @($group | Where-Object { $_.Checkbox -ne "(derivata)" -and $_.Presente }).Count
+                Derivate = @($group | Where-Object Esito -eq "DERIVATA").Count
+                Errori = @($group | Where-Object Esito -eq "ERRORE").Count
+                Extra = @($group | Where-Object Esito -eq "EXTRA").Count
+            }
+        }
+    
+    Write-Host ""
+    Write-Host "=== CONTRATTO CHECKBOX -> VISTA ==="
+    $summary | Format-Table -AutoSize
+    
+    $errors = @($rows | Where-Object { $_.Esito -eq "ERRORE" -or $_.Esito -eq "EXTRA" })
+    if ($errors.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== PROBLEMI ==="
+        $errors | Format-Table Famiglia, Checkbox, Selezionata, Tipo, Atteso, Presente, Esito -AutoSize
+    }
+    
+    Write-Host ""
+    Write-Host "Audit dettagliato: $csvPath"
+    Write-Host "Controlli totali : $($rows.Count)"
+    Write-Host "Problemi         : $($errors.Count)"
+    
+    if ($errors.Count -gt 0) { exit 1 }
+    Write-Host "CONTRATTO CHECKBOX -> VISTA: OK"
+
 ## Indice dei file inclusi
 
 - src\main\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporter.java
@@ -27365,6 +28333,7 @@ File: tools\Start-RecordsNext2-GUI-v7.ps1
 - src\main\java\it\alterlega\recordsnext\SerieARoundProbe.java
 - src\main\java\it\alterlega\recordsnext\SqliteAudit.java
 - src\test\java\it\alterlega\recordsnext\app\classics\ClassicsFamilyJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\app\classics\ClassicsTwentyOneContractTest.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTest.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterGranularTest.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterTest.java
@@ -27405,5 +28374,8 @@ File: tools\Start-RecordsNext2-GUI-v7.ps1
 - tools\Run-RecordsNext2JsAudit_v2.ps1
 - tools\Run-RecordsNext2JsAudit_v3.ps1
 - tools\Start-RecordsNext2-GUI-v7.ps1
+- tools\Test_RecordsNext2_CheckboxViews_v13.ps1
+- tools\Test_RecordsNext2_CheckboxViews_v14.ps1
+- tools\Test_RecordsNext2_CheckboxViews_v15.ps1
 
 ## Fine documento

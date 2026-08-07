@@ -157,17 +157,6 @@ public final class Records2026ClassicJsExporter {
                 "recordId", "nome", "stagione", "competizioneStoricaId", "competizioneNome", "valore",
                 "squadra", "avversaria", "idIncontro", "giornata", "giornataDiA", "urlTabellino",
                 "risultato", "punteggio"));
-        fields.put("puntiSquadraMin", matchFields());
-        fields.put("partitePiuGolRegolamentari", matchFields());
-        fields.put("partitePiuScartoRegolamentari", matchFields());
-        fields.put("mediaPuntiSquadre", aggregateTeamFields());
-        fields.put("totalePuntiSquadre", aggregateTeamFields());
-        fields.put("puntiClassificaSquadre", aggregateTeamFields());
-        fields.put("vittorieSquadre", aggregateTeamFields());
-        fields.put("pareggiSquadre", aggregateTeamFields());
-        fields.put("sconfitteSquadre", aggregateTeamFields());
-        fields.put("golFattiSquadre", aggregateTeamFields());
-        fields.put("golSubitiSquadre", aggregateTeamFields());
         fields.put("espulsioniSquadre", compactTeamFields());
         fields.put("espulsioniGiocatori", orderedSet(
                 "recordId", "nome", "valore", "idGiocatore", "giocatore", "dettagliCount"));
@@ -184,22 +173,6 @@ public final class Records2026ClassicJsExporter {
 
     private static Set<String> compactTeamFields() {
         return orderedSet("recordId", "nome", "valore", "idSquadra", "squadra", "dettagliCount");
-    }
-
-    private static Set<String> aggregateTeamFields() {
-        return orderedSet(
-                "recordId", "nome", "stagione", "competizioneStoricaId", "competizioneNome",
-                "valore", "idSquadra", "squadra", "partite"
-        );
-    }
-
-    private static Set<String> matchFields() {
-        return orderedSet(
-                "recordId", "nome", "stagione", "competizioneStoricaId", "competizioneNome",
-                "valore", "squadra", "avversaria", "idIncontro", "giornata", "giornataDiA",
-                "urlTabellino", "risultato", "punteggio", "risultatoRegolamentari",
-                "fonteGolRegolamentari"
-        );
     }
 
     private static Set<String> orderedSet(String... values) {
