@@ -51,12 +51,13 @@
       if (!records || typeof records !== 'object') return;
       Object.keys(records).forEach(function (recordId) {
         var rows = C.asArray(records[recordId]).map(function (row) {
+          var seasonId = aggregate.stagione || aggregate.seasonId || '';
           var competitionId = aggregate.competizioneId || aggregate.id || '';
-          var competitionName = aggregate.competizioneNome || aggregate.competitionName || aggregate.competizione || competitionId;
+          var competitionName = aggregate.competizioneNome || aggregate.competitionName || aggregate.competizione || '';
           return copyRow(row, {
-            stagione: aggregate.stagione || aggregate.seasonId || '',
+            stagione: seasonId,
             competizioneId: competitionId,
-            competizioneNome: competitionName
+            competizioneNome: competitionNameFromCore(seasonId, competitionId, competitionName)
           });
         });
         addView(map, recordId, C.humanize(recordId), rows, 10);
