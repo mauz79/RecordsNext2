@@ -91,6 +91,20 @@ Il **Culometro** è opzionale e viene generato soltanto quando viene esplicitame
 
 La configurazione permette di scegliere un profilo semplice oppure intervenire sui parametri avanzati, sui pesi dei singoli fattori e sulle etichette.
 
+### Profilo semplice e slider principali
+
+![Culometro - profilo semplice](docs/screenshots/15_culometro_profilo_semplice.png)
+
+Gli slider mostrano il fondoscala e il valore selezionato, così è immediato capire quanto il parametro è vicino al minimo o al massimo ammesso.
+
+### Parametri avanzati
+
+![Culometro - parametri avanzati](docs/screenshots/16_culometro_avanzato.png)
+
+Anche i parametri avanzati mostrano minimo, massimo e valore corrente.
+
+### Pesi dei fattori
+
 ![Pesi Culometro](docs/screenshots/17_culometro_pesi_fattori.png)
 
 Il viewer dispone anche della vista **Eventi**, con filtro dedicato per il tipo di evento.

@@ -42,7 +42,9 @@ I controlli semplificati regolano in modo guidato:
 - numero di partite richieste per una piena affidabilità;
 - influenza della rarità.
 
-Per modificare direttamente i parametri numerici si usa la scheda **Avanzate**.
+Gli slider mostrano il **fondoscala minimo e massimo** e consentono di vedere immediatamente la posizione del valore corrente.
+
+Per modificare direttamente i parametri numerici si usa la scheda **Avanzata**.
 
 ## Parametri avanzati
 
@@ -50,13 +52,15 @@ Per modificare direttamente i parametri numerici si usa la scheda **Avanzate**.
 
 La configurazione attuale usa:
 
-| Parametro | Valore |
-|---|---:|
-| Partite minime affidabili | 14 |
-| Sensibilità della scala (`kScale`) | 3,5 |
-| Peso evento secondario | 0,2 |
-| Moltiplicatore massimo rarità | 6,5 |
-| Occorrenze storiche minime | 3 |
+| Parametro | Valore corrente | Fondoscala |
+|---|---:|---:|
+| Partite minime affidabili | 14 | 10–40 |
+| Sensibilità della scala (`kScale`) | 3,5 | 3,0–6,0 |
+| Peso evento secondario | 0,2 | 0,10–0,35 |
+| Moltiplicatore massimo rarità | 6,5 | 3,0–6,5 |
+| Occorrenze storiche minime | 3 | 1–20 |
+
+Nella GUI ogni slider mostra anche il valore corrente sulla destra, oltre al range ammesso.
 
 ### Partite minime affidabili
 
