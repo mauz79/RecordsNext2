@@ -6,14 +6,14 @@
   "overlap": { "strategy": "PRIMARY_PLUS_SECONDARY", "secondaryWeight": 0.2, "tagWeight": 0.0, "maxSecondary": 1, "maxTags": 2 },
   "rarity": { "enabled": true, "profile": "NORMAL", "maximumMultiplier": 6.5, "minimumHistoricalOccurrences": 3 },
   "components": [
-    { "componentId": "MISSED_WIN_HALF_POINT", "enabled": true, "weight": 1.35, "allowedRange": { "min": 0.75, "max": 2.5 } },
-    { "componentId": "ONE_GOAL_WIN", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
     { "componentId": "RU_DECISIVE", "enabled": true, "weight": 1.4, "allowedRange": { "min": 0.75, "max": 2.5 } },
-    { "componentId": "ONE_GOAL_LOSS", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
-    { "componentId": "TIGHT_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
-    { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } },
+    { "componentId": "ONE_GOAL_WIN", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
+    { "componentId": "MISSED_WIN_HALF_POINT", "enabled": true, "weight": 1.35, "allowedRange": { "min": 0.75, "max": 2.5 } },
+    { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
     { "componentId": "LOSS_BY_A_WHISKER", "enabled": true, "weight": 1.45, "allowedRange": { "min": 0.75, "max": 2.5 } },
-    { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } }
+    { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } },
+    { "componentId": "TIGHT_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
+    { "componentId": "ONE_GOAL_LOSS", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } }
   ],
   "labels": {
     "preset": "GOLIARDICO",

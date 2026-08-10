@@ -1,10 +1,10 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
     [string]$SkinDir,
 
-    [ValidateSet('mauzstrom','fantablue2','neutral')]
-    [string]$Profile = 'neutral',
+    [ValidateSet('mauzstrom','maelstrom','fantablue2','neutral')]
+    [string]$Profile = 'mauzstrom',
 
     [string]$PackageDir = (Join-Path $PSScriptRoot '..\release\visualizzatori')
 )

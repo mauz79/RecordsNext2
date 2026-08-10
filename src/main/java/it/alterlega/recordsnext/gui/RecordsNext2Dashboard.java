@@ -36,6 +36,7 @@ public final class RecordsNext2Dashboard {
     private final Path processingFile = root.resolve("config/processing.json");
     private final Path culometroFile = root.resolve("config/culometro.json");
     private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
+    private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
     private final JFrame frame = new JFrame("RecordsNext by mauz79 · 2.0");
     private final CardLayout pages = new CardLayout();
@@ -60,6 +61,7 @@ public final class RecordsNext2Dashboard {
     private final JLabel exampleViewsTarget = new JLabel("Non selezionata");
     private final JLabel exampleJsTarget = new JLabel("Non selezionata");
     private final JButton installExamples = new JButton("Installa esempi");
+    private final JComboBox<String> htmlProfile = new JComboBox<>(new String[] {"mauzstrom", "maelstrom", "fantablue2", "neutral"});
     private ProcessingConfigWriter.State state;
     private JPanel dashboardPage;
 
@@ -79,6 +81,7 @@ public final class RecordsNext2Dashboard {
         applyLookAndFeel();
         build();
         loadState();
+        refreshProcessingModeAvailability();
     }
 
     private void bootstrap() throws Exception {
@@ -635,7 +638,7 @@ public final class RecordsNext2Dashboard {
         JLabel title = new JLabel("Installa esempi nella skin");
         title.setFont(new Font("Segoe UI", Font.BOLD, 15));
         title.setForeground(NAVY);
-        JLabel subtitle = new JLabel("Seleziona la cartella della skin FCM. Nessun file viene copiato in questa versione.");
+        JLabel subtitle = new JLabel("Seleziona la cartella della skin FCM e il profilo grafico da installare.");
         subtitle.setForeground(MUTED);
         heading.add(title);
         heading.add(Box.createVerticalStrut(2));
@@ -666,6 +669,21 @@ public final class RecordsNext2Dashboard {
 
         c.gridx = 0;
         c.gridy++;
+        c.gridwidth = 1;
+        c.weightx = 0;
+        body.add(new JLabel("Profilo HTML:"), c);
+
+        htmlProfile.setSelectedItem("mauzstrom");
+        htmlProfile.setPreferredSize(new Dimension(180, 26));
+        c.gridx = 1;
+        c.gridwidth = 2;
+        c.weightx = 1;
+        body.add(htmlProfile, c);
+
+        c.gridx = 0;
+        c.gridy++;
+        c.gridwidth = 1;
+        c.weightx = 0;
         body.add(new JLabel("HTML indice:"), c);
         c.gridx = 1;
         c.gridwidth = 2;
@@ -692,7 +710,8 @@ public final class RecordsNext2Dashboard {
         JButton preview = new JButton("Anteprima destinazioni");
         preview.setEnabled(false);
         installExamples.setEnabled(false);
-        installExamples.setToolTipText("Disponibile quando sarà definito il pacchetto esempi definitivo");
+        installExamples.setToolTipText("Installa gli HTML RecordsNext e il profilo grafico selezionato");
+        installExamples.addActionListener(e -> installExampleViewers());
         JPanel exampleActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         exampleActions.setOpaque(false);
         exampleActions.add(preview);
@@ -722,8 +741,93 @@ public final class RecordsNext2Dashboard {
         exampleRootTarget.setText(siteRoot.toString());
         exampleViewsTarget.setText(siteRoot.resolve("RecordsNext").toString());
         exampleJsTarget.setText(siteRoot.resolve("js").toString());
-        status.setText("Destinazioni skin rilevate; installazione esempi non ancora attiva");
-        status.setForeground(new Color(145, 91, 18));
+        installExamples.setEnabled(true);
+        status.setText("Destinazioni skin rilevate");
+        status.setForeground(new Color(35, 105, 62));
+    }
+
+    private Path resolveViewerPackageDirectory() {
+        Path releasePackage = root.resolve("visualizzatori");
+        if (Files.isDirectory(releasePackage)) return releasePackage;
+
+        Path developmentPackage = root.resolve("release/visualizzatori");
+        if (Files.isDirectory(developmentPackage)) return developmentPackage;
+
+        throw new IllegalStateException("Pacchetto visualizzatori non trovato.");
+    }
+
+    private void installExampleViewers() {
+        String selectedSite = exampleSiteDirectory.getText().trim();
+        if (selectedSite.isEmpty()) {
+            JOptionPane.showMessageDialog(frame,
+                    "Selezionare prima la cartella della skin FCM.",
+                    "Installazione visualizzatori",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            Path siteRoot = Path.of(selectedSite).toAbsolutePath().normalize();
+            if (!Files.isDirectory(siteRoot)) {
+                throw new IllegalStateException("Cartella skin non trovata: " + siteRoot);
+            }
+
+            Path packageDir = resolveViewerPackageDirectory();
+            String profile = String.valueOf(htmlProfile.getSelectedItem());
+            Path profileCss = packageDir.resolve("profiles").resolve(profile).resolve("recordsnext.css");
+
+            if (!Files.isRegularFile(profileCss)) {
+                throw new IllegalStateException("Profilo CSS non trovato: " + profileCss);
+            }
+
+            Path siteJs = siteRoot.resolve("js");
+            Path siteViews = siteRoot.resolve("RecordsNext");
+            Files.createDirectories(siteJs);
+            Files.createDirectories(siteViews);
+
+            Files.copy(packageDir.resolve("recordsnext.html"),
+                    siteRoot.resolve("recordsnext.html"),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            try (java.util.stream.Stream<Path> stream = Files.list(packageDir.resolve("RecordsNext"))) {
+                for (Path source : stream.filter(Files::isRegularFile)
+                        .filter(path -> path.getFileName().toString().toLowerCase(java.util.Locale.ROOT).endsWith(".html"))
+                        .toList()) {
+                    Files.copy(source,
+                            siteViews.resolve(source.getFileName()),
+                            java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+
+            Files.copy(packageDir.resolve("js/fcmRecordsNextFunzioni_common.js"),
+                    siteJs.resolve("fcmRecordsNextFunzioni_common.js"),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(packageDir.resolve("js/fcmRecordsNextFunzioni_viewer.js"),
+                    siteJs.resolve("fcmRecordsNextFunzioni_viewer.js"),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(profileCss,
+                    siteViews.resolve("recordsnext.css"),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            status.setText("Visualizzatori installati · profilo " + profile);
+            status.setForeground(new Color(35, 105, 62));
+
+            JOptionPane.showMessageDialog(frame,
+                    "Visualizzatori RecordsNext installati.\n\n"
+                            + "Profilo: " + profile + "\n"
+                            + "Indice: " + siteRoot.resolve("recordsnext.html") + "\n"
+                            + "Viste: " + siteViews + "\n"
+                            + "JavaScript: " + siteJs,
+                    "Installazione visualizzatori",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            status.setText("Errore installazione visualizzatori");
+            status.setForeground(RED);
+            JOptionPane.showMessageDialog(frame,
+                    ex.getMessage(),
+                    "Installazione visualizzatori",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private JPanel buildLogPage() {
@@ -963,8 +1067,8 @@ public final class RecordsNext2Dashboard {
         loadChildren(ProcessingConfigWriter.THRESHOLDS, "thresholdsLuck");
         culometro.setSelected(state.culometro());
         publish.setSelected(state.publishToSite());
-        consolidated.setSelected(true);
-        full.setSelected(false);
+        // La disponibilita della modalita Consolidata viene aggiornata
+        // da refreshProcessingModeAvailability().
         modifierNameFields.forEach((sourceField, field) ->
                 field.setText(state.modifierName(sourceField)));
     }
@@ -977,6 +1081,21 @@ public final class RecordsNext2Dashboard {
             child.setEnabled(familyEnabled);
         }
         updateFamilySummary(familyId, ids);
+    }
+
+
+    private void refreshProcessingModeAvailability() {
+        boolean available = Files.isRegularFile(consolidationStateFile);
+        consolidated.setEnabled(available);
+        consolidated.setToolTipText(available
+                ? "Usa il consolidamento esistente e aggiorna la stagione corrente."
+                : "Disponibile dopo una prima elaborazione Completa riuscita.");
+        if (!available) {
+            consolidated.setSelected(false);
+            full.setSelected(true);
+        } else if (!consolidated.isSelected() && !full.isSelected()) {
+            consolidated.setSelected(true);
+        }
     }
 
     private void saveState() {
@@ -1065,6 +1184,7 @@ public final class RecordsNext2Dashboard {
                     status.setForeground(new Color(35, 105, 62));
                     progress.setValue(100);
                     phase.setText("Elaborazione completata");
+                    refreshProcessingModeAvailability();
                 } catch (Exception ex) {
                     Throwable cause = ex.getCause() == null ? ex : ex.getCause();
                     log.append("ERRORE: " + cause + System.lineSeparator());

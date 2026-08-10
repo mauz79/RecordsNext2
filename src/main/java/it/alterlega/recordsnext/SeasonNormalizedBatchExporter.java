@@ -47,10 +47,12 @@ public final class SeasonNormalizedBatchExporter {
         );
 
         if (competitions.isEmpty()) {
-            throw new IllegalStateException(
-                "Nessuna competizione trovata per la stagione "
+            System.out.println(
+                "Nessuna competizione testa-a-testa elaborabile per la stagione "
                     + seasonId
+                    + "; stagione saltata (le competizioni Gran Premio non vengono processate)."
             );
+            return;
         }
 
         int completed = 0;

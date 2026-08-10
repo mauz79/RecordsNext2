@@ -1,0 +1,371 @@
+/*
+ * RecordsNext 2.0 - profilo grafico maelstrom
+ * Adattamento della skin FCM Maelstrom fornita dall'utente.
+ * Visualizzatore puro: nessuna immagine o asset FCM richiesto.
+ */
+
+:root {
+    --rn-bg: #ccffff;
+    --rn-surface: #ffffff;
+    --rn-surface-soft: #e8ffff;
+    --rn-border: #003366;
+    --rn-text: #000000;
+    --rn-text-strong: #003366;
+    --rn-primary: #003366;
+    --rn-accent: #0066ff;
+    --rn-success: #00a800;
+    --rn-warning: #999900;
+    --rn-violet: #0359da;
+    --rn-gold: #b5b500;
+    --rn-radius: 0px;
+    --rn-shadow: none;
+    --rn-shell-width: 1180px;
+    --rn-shell-gutter: 8px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body.recordsnext-page,
+body.rn-page {
+    background: var(--rn-bg);
+    color: var(--rn-text);
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+body.recordsnext-page a,
+body.rn-page a {
+    color: #003366;
+    text-decoration: underline;
+}
+
+body.recordsnext-page a:hover,
+body.recordsnext-page a:focus,
+body.rn-page a:hover,
+body.rn-page a:focus {
+    color: #0066ff;
+}
+
+.rn-shell {
+    width: min(var(--rn-shell-width), calc(100vw - (var(--rn-shell-gutter) * 2)));
+    margin: 0 auto;
+    padding: 10px 0 22px;
+}
+
+.rn-header,
+.rn-toolbar,
+.rn-panel,
+.rn-empty-state,
+.rn-error-state,
+.rn-meta-grid > *,
+.rn-status,
+.rn-family-card {
+    background: var(--rn-surface);
+    border: 1px solid var(--rn-border);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.rn-header {
+    margin-bottom: 10px;
+    padding: 14px 16px;
+    border-top: 5px solid #003366;
+    background: linear-gradient(180deg, #ffffff 0%, #e8ffff 100%);
+}
+
+.rn-kicker {
+    color: #003366;
+    font-weight: bold;
+}
+
+.rn-header h1,
+.rn-title {
+    margin: 0;
+    color: #003366;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 26px;
+    line-height: 1.15;
+    font-weight: bold;
+}
+
+.rn-subtitle,
+.rn-header p {
+    color: #000000;
+}
+
+.rn-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.rn-navigation a,
+.rn-button,
+.rn-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 10px;
+    border: 1px solid #003366;
+    border-radius: 0;
+    background: #ffffff;
+    color: #003366;
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.rn-navigation a:hover,
+.rn-button:hover,
+.rn-tab:hover,
+.rn-tab.is-active {
+    background: #ccffff;
+    color: #003366;
+}
+
+.rn-button-primary {
+    background: #003366;
+    color: #ffffff;
+}
+
+.rn-toolbar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #e8ffff;
+}
+
+.rn-toolbar label,
+.rn-field {
+    color: #003366;
+    font-weight: bold;
+}
+
+.rn-toolbar select,
+.rn-toolbar input,
+.rn-field select,
+.rn-field input,
+.rn-field button {
+    width: 100%;
+    min-height: 32px;
+    padding: 0 8px;
+    border: 1px solid #003366;
+    border-radius: 0;
+    background: #ffffff;
+    color: #000000;
+    font: inherit;
+}
+
+.rn-panel {
+    overflow: hidden;
+}
+
+.rn-panel-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid #003366;
+    background: #003366;
+    color: #ffffff;
+}
+
+.rn-panel-title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.1;
+    font-weight: bold;
+}
+
+.rn-panel-description {
+    margin: 4px 0 0;
+    color: #ccffff;
+    font-size: 11px;
+}
+
+.rn-panel-body {
+    padding: 10px 12px 14px;
+}
+
+.rn-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.rn-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background: #ffffff;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid #003366;
+}
+
+.rn-table th,
+.rn-table td {
+    padding: 7px 8px;
+    border-right: 1px solid #003366;
+    border-bottom: 1px solid #003366;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.rn-table th {
+    color: #ffffff;
+    background: #003366;
+    font-size: 11px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.rn-table tbody tr:nth-child(even) {
+    background: #ccffff;
+}
+
+.rn-table tbody tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+.rn-table tbody tr:hover {
+    background: #b8ffff;
+}
+
+.rn-table .rn-number {
+    text-align: right;
+}
+
+.rn-table .rn-rank {
+    width: 56px;
+    text-align: center;
+    color: #003366;
+    font-weight: bold;
+}
+
+.rn-table .rn-team {
+    color: #003366;
+    font-weight: bold;
+}
+
+.rn-table .rn-competition {
+    color: #003366;
+    font-weight: bold;
+}
+
+.rn-table .rn-positive {
+    color: #336600;
+    font-weight: bold;
+}
+
+.rn-table .rn-negative {
+    color: #cc0000;
+    font-weight: bold;
+}
+
+.rn-match-link {
+    color: #003366;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.rn-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 0 7px;
+    border: 1px solid #003366;
+    border-radius: 0;
+    background: #ffffff;
+    color: #003366;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.rn-badge-success {
+    background: #00a800;
+    color: #ffffff;
+}
+
+.rn-badge-warning {
+    background: #b5b500;
+    color: #ffffff;
+}
+
+.rn-badge-danger {
+    background: #dd0000;
+    color: #ffffff;
+}
+
+.rn-empty-state,
+.rn-error-state {
+    padding: 18px;
+    text-align: center;
+}
+
+.rn-empty-state {
+    color: #003366;
+}
+
+.rn-error-state {
+    border-color: #cc0000;
+    background: #ffffff;
+    color: #cc0000;
+}
+
+.rn-meta-grid > * {
+    background: #ffffff;
+}
+
+.rn-status {
+    border-left: 5px solid #003366;
+}
+
+.rn-family-card {
+    background: #ffffff;
+}
+
+.rn-footer {
+    margin-top: 12px;
+    padding: 10px 4px;
+    color: #666666;
+    font-size: 10px;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    :root {
+        --rn-shell-gutter: 6px;
+    }
+
+    .rn-toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .rn-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .rn-header h1,
+    .rn-title {
+        font-size: 21px;
+    }
+
+    .rn-table th,
+    .rn-table td {
+        padding: 6px;
+    }
+}

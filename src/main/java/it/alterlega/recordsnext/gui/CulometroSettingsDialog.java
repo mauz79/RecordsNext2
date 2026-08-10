@@ -21,11 +21,17 @@ final class CulometroSettingsDialog extends JDialog {
     private CulometroConfig config;
 
     private final JCheckBox enabled = new JCheckBox("Genera il Culometro");
-    private final JSpinner minimumMatches = new JSpinner(new SpinnerNumberModel(20, 10, 40, 1));
-    private final JSpinner kScale = new JSpinner(new SpinnerNumberModel(4.15, 3.00, 6.00, 0.05));
-    private final JSpinner secondaryWeight = new JSpinner(new SpinnerNumberModel(0.20, 0.10, 0.35, 0.01));
-    private final JSpinner rarityMultiplier = new JSpinner(new SpinnerNumberModel(5.25, 3.00, 6.50, 0.05));
-    private final JSpinner minimumOccurrences = new JSpinner(new SpinnerNumberModel(3, 1, 20, 1));
+    private final JSlider minimumMatches = new JSlider(10, 40, 20);
+    private final JSlider kScale = new JSlider(300, 600, 415);
+    private final JSlider secondaryWeight = new JSlider(10, 35, 20);
+    private final JSlider rarityMultiplier = new JSlider(300, 650, 525);
+    private final JSlider minimumOccurrences = new JSlider(1, 20, 3);
+
+    private final JLabel minimumMatchesValue = new JLabel();
+    private final JLabel kScaleValue = new JLabel();
+    private final JLabel secondaryWeightValue = new JLabel();
+    private final JLabel rarityMultiplierValue = new JLabel();
+    private final JLabel minimumOccurrencesValue = new JLabel();
 
     private final JSlider simpleSensitivity = new JSlider(300, 600, 415);
     private final JSlider simpleReliability = new JSlider(10, 40, 20);
@@ -158,11 +164,17 @@ final class CulometroSettingsDialog extends JDialog {
         g.gridy = 0;
         g.anchor = GridBagConstraints.WEST;
         g.insets = new Insets(7, 7, 7, 16);
-        addRow(panel, g, "Partite minime affidabili", minimumMatches);
-        addRow(panel, g, "Sensibilità della scala", kScale);
-        addRow(panel, g, "Peso evento secondario", secondaryWeight);
-        addRow(panel, g, "Moltiplicatore massimo rarità", rarityMultiplier);
-        addRow(panel, g, "Occorrenze storiche minime", minimumOccurrences);
+        configureSlider(minimumMatches, 5, 1);
+        configureSlider(kScale, 50, 5);
+        configureSlider(secondaryWeight, 5, 1);
+        configureSlider(rarityMultiplier, 50, 5);
+        configureSlider(minimumOccurrences, 5, 1);
+
+        addAdvancedSliderRow(panel, g, "Partite minime affidabili", minimumMatches, minimumMatchesValue, 1);
+        addAdvancedSliderRow(panel, g, "Sensibilità della scala", kScale, kScaleValue, 100);
+        addAdvancedSliderRow(panel, g, "Peso evento secondario", secondaryWeight, secondaryWeightValue, 100);
+        addAdvancedSliderRow(panel, g, "Moltiplicatore massimo rarità", rarityMultiplier, rarityMultiplierValue, 100);
+        addAdvancedSliderRow(panel, g, "Occorrenze storiche minime", minimumOccurrences, minimumOccurrencesValue, 1);
         g.gridy++;
         g.weighty = 1;
         panel.add(Box.createVerticalGlue(), g);
@@ -209,6 +221,36 @@ final class CulometroSettingsDialog extends JDialog {
         slider.setMajorTickSpacing(major);
         slider.setMinorTickSpacing(minor);
         slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+    }
+
+
+    private static void addAdvancedSliderRow(JPanel panel, GridBagConstraints g, String label,
+                                             JSlider slider, JLabel value, int scale) {
+        JPanel control = new JPanel(new BorderLayout(8, 0));
+        control.setOpaque(false);
+        control.add(slider, BorderLayout.CENTER);
+
+        JPanel right = new JPanel(new BorderLayout(4, 0));
+        right.setOpaque(false);
+        JLabel range = new JLabel(formatSliderValue(slider.getMinimum(), scale)
+                + " - " + formatSliderValue(slider.getMaximum(), scale));
+        range.setForeground(new Color(96, 104, 120));
+        value.setPreferredSize(new Dimension(58, 24));
+        value.setHorizontalAlignment(SwingConstants.RIGHT);
+        value.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        right.add(range, BorderLayout.WEST);
+        right.add(value, BorderLayout.EAST);
+        control.add(right, BorderLayout.EAST);
+
+        addRow(panel, g, label, control);
+        slider.addChangeListener(e -> value.setText(formatSliderValue(slider.getValue(), scale)));
+        value.setText(formatSliderValue(slider.getValue(), scale));
+    }
+
+    private static String formatSliderValue(int value, int scale) {
+        if (scale == 1) return Integer.toString(value);
+        return String.format(java.util.Locale.ROOT, "%.2f", value / (double) scale);
     }
 
     private static void addSimpleRow(JPanel panel, GridBagConstraints g, String label,
@@ -254,10 +296,15 @@ final class CulometroSettingsDialog extends JDialog {
         synchronizing = true;
         enabled.setSelected(config.enabled());
         minimumMatches.setValue(config.minimumMatches());
-        kScale.setValue(config.kScale().doubleValue());
-        secondaryWeight.setValue(config.secondaryWeight().doubleValue());
-        rarityMultiplier.setValue(config.maximumRarityMultiplier().doubleValue());
+        kScale.setValue((int) Math.round(config.kScale().doubleValue() * 100));
+        secondaryWeight.setValue((int) Math.round(config.secondaryWeight().doubleValue() * 100));
+        rarityMultiplier.setValue((int) Math.round(config.maximumRarityMultiplier().doubleValue() * 100));
         minimumOccurrences.setValue(config.minimumHistoricalOccurrences());
+        minimumMatchesValue.setText(formatSliderValue(minimumMatches.getValue(), 1));
+        kScaleValue.setText(formatSliderValue(kScale.getValue(), 100));
+        secondaryWeightValue.setText(formatSliderValue(secondaryWeight.getValue(), 100));
+        rarityMultiplierValue.setText(formatSliderValue(rarityMultiplier.getValue(), 100));
+        minimumOccurrencesValue.setText(formatSliderValue(minimumOccurrences.getValue(), 1));
         preset.setSelectedItem(config.labelConfiguration().preset());
         componentModel.set(config.components());
         labelModel.set(config.labels());
@@ -293,12 +340,12 @@ final class CulometroSettingsDialog extends JDialog {
     private void syncSimpleToAdvanced() {
         if (synchronizing) return;
         synchronizing = true;
-        kScale.setValue(simpleSensitivity.getValue() / 100.0);
+        kScale.setValue(simpleSensitivity.getValue());
         minimumMatches.setValue(simpleReliability.getValue());
         rarityMultiplier.setValue(switch (String.valueOf(simpleRarity.getSelectedItem())) {
-            case "Bassa" -> 3.50;
-            case "Alta" -> 6.50;
-            default -> 5.25;
+            case "Bassa" -> 350;
+            case "Alta" -> 650;
+            default -> 525;
         });
         sensitivityValue.setText(String.format(java.util.Locale.ROOT, "%.2f", simpleSensitivity.getValue() / 100.0));
         reliabilityValue.setText(String.valueOf(simpleReliability.getValue()));
@@ -311,9 +358,9 @@ final class CulometroSettingsDialog extends JDialog {
     private void syncAdvancedToSimple() {
         if (synchronizing) return;
         synchronizing = true;
-        simpleSensitivity.setValue((int) Math.round(((Number) kScale.getValue()).doubleValue() * 100));
-        simpleReliability.setValue(((Number) minimumMatches.getValue()).intValue());
-        double rarity = ((Number) rarityMultiplier.getValue()).doubleValue();
+        simpleSensitivity.setValue(kScale.getValue());
+        simpleReliability.setValue(minimumMatches.getValue());
+        double rarity = rarityMultiplier.getValue() / 100.0;
         simpleRarity.setSelectedItem(rarity <= 4.0 ? "Bassa" : rarity >= 6.0 ? "Alta" : "Normale");
         sensitivityValue.setText(String.format(java.util.Locale.ROOT, "%.2f", simpleSensitivity.getValue() / 100.0));
         reliabilityValue.setText(String.valueOf(simpleReliability.getValue()));
@@ -344,9 +391,9 @@ final class CulometroSettingsDialog extends JDialog {
                     selectedPreset, customized, resetSource, activeBands,
                     config.labelConfiguration().presetDefaults());
             CulometroConfig updated = new CulometroConfig(
-                    enabled.isSelected(), ((Number) minimumMatches.getValue()).intValue(),
-                    decimal(kScale), decimal(secondaryWeight), decimal(rarityMultiplier),
-                    ((Number) minimumOccurrences.getValue()).intValue(), components, labels);
+                    enabled.isSelected(), minimumMatches.getValue(),
+                    decimal(kScale, 100), decimal(secondaryWeight, 100), decimal(rarityMultiplier, 100),
+                    minimumOccurrences.getValue(), components, labels);
             CulometroConfigWriter.save(configFile, updated);
             config = updated;
             saved = true;
@@ -356,8 +403,8 @@ final class CulometroSettingsDialog extends JDialog {
         }
     }
 
-    private static BigDecimal decimal(JSpinner spinner) {
-        return BigDecimal.valueOf(((Number) spinner.getValue()).doubleValue());
+    private static BigDecimal decimal(JSlider slider, int scale) {
+        return BigDecimal.valueOf(slider.getValue()).divide(BigDecimal.valueOf(scale));
     }
 
     private static final class ComponentTableModel extends AbstractTableModel {
