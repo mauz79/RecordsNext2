@@ -133,7 +133,7 @@
     "output": {
       "writeManifest": true,
       "writeCore": true,
-      "publishToSite": false
+      "publishToSite": true
     }
   }
 }
