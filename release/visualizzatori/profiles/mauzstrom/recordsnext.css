@@ -1,1 +1,301 @@
-:root{--rn-blue:#2323b3;--rn-cyan:#ccffff;--rn-white:#fff;--rn-border:#2323b3}*{box-sizing:border-box}body{margin:10px 3px;background:#fff;color:#000;font:12px "Trebuchet MS",Arial,Helvetica,sans-serif}.rn-shell{width:min(980px,calc(100vw - 12px));margin:0 auto}.rn-header{padding:16px;border:1px solid var(--rn-border);background:linear-gradient(#fff,var(--rn-cyan));color:var(--rn-blue)}h1,h2{color:var(--rn-blue)}.rn-kicker{font-weight:bold;color:var(--rn-blue)}.rn-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.rn-family-card,.rn-toolbar,.rn-meta-item,.rn-empty-state,.rn-status-row{border:1px solid var(--rn-border);background:#fff;padding:12px}.rn-family-card{display:flex;flex-direction:column;min-height:180px}.rn-family-card:nth-child(even),.rn-meta-item:nth-child(even){background:var(--rn-cyan)}.rn-family-card p{flex:1}.rn-availability{font-weight:bold;color:var(--rn-blue)}.rn-button{display:inline-block;padding:7px 12px;border:1px solid var(--rn-border);background:linear-gradient(#fff,var(--rn-cyan));color:var(--rn-blue);font-weight:bold;text-align:center;text-decoration:none}.rn-breadcrumb{margin:8px 0}.rn-breadcrumb a{color:var(--rn-blue)}.rn-meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:10px 0}.rn-meta-item span{display:block;font-size:10px}.rn-meta-item strong{color:var(--rn-blue)}.rn-toolbar{display:flex;gap:8px;align-items:end;margin-bottom:8px;background:linear-gradient(#fff,var(--rn-cyan))}.rn-toolbar label{display:flex;flex-direction:column;font-weight:bold}.rn-grow{flex:1}.rn-toolbar input,.rn-toolbar select{min-height:30px;border:1px solid var(--rn-border);font:inherit}.rn-table-wrap{overflow:auto;border:1px solid var(--rn-border)}.rn-table{width:100%;border-collapse:collapse}.rn-table th,.rn-table td{padding:5px;border:1px solid var(--rn-border)}.rn-table th{background:linear-gradient(#fff,var(--rn-cyan));color:var(--rn-blue);cursor:pointer}.rn-table tbody tr:nth-child(even){background:var(--rn-cyan)}.rn-match-link{color:var(--rn-blue);font-weight:bold}.rn-status{display:grid;gap:4px;margin-bottom:8px}.rn-status-row{display:flex;gap:8px}@media(max-width:700px){.rn-card-grid,.rn-meta-grid{grid-template-columns:1fr}.rn-toolbar{flex-direction:column;align-items:stretch}}
+/*
+ * RecordsNext 2.0 - profilo mauzstrom
+ * v50: adeguato alle schermate FCM fornite dall'utente.
+ * Fondo pagina/card bianco; tabelle a righe alternate bianco/ciano;
+ * blu scuro #003366, rosso scuro #990000/#CC0000, bianco.
+ */
+
+:root{
+  --rn-blue:#003366;
+  --rn-red:#990000;
+  --rn-red-value:#CC0000;
+  --rn-cyan:#CCFFFF;
+  --rn-white:#FFFFFF;
+  --rn-black:#000000;
+  --rn-green:#336600;
+  --rn-olive:#999900;
+  --rn-border:#003366;
+}
+
+*{box-sizing:border-box}
+
+html,body{min-height:100%;margin:0;padding:0}
+
+body,
+body.rn-page,
+body.recordsnext-page{
+  margin:10px 3px;
+  background:var(--rn-white);
+  color:var(--rn-black);
+  font-family:"Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
+  font-size:12px;
+  line-height:1.25;
+}
+
+a{color:var(--rn-blue);text-decoration:underline}
+a:visited{color:var(--rn-blue)}
+a:hover,a:focus{color:var(--rn-red)}
+
+.rn-shell{
+  width:min(980px,calc(100vw - 12px));
+  margin:0 auto;
+  padding:0;
+}
+
+/* Testata: blu scuro pieno, testo bianco come nelle schermate della skin. */
+.rn-header{
+  margin-bottom:10px;
+  padding:12px 14px;
+  border:1px solid var(--rn-border);
+  background:var(--rn-blue);
+  color:var(--rn-white);
+}
+
+.rn-header h1,
+.rn-header h2,
+.rn-title{
+  margin:.15em 0;
+  color:var(--rn-white);
+  font-family:"Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
+  font-weight:bold;
+}
+
+.rn-header h1,.rn-title{font-size:24px}
+.rn-header h2{font-size:14px}
+.rn-header p,.rn-kicker{color:var(--rn-white)}
+.rn-kicker{font-weight:bold}
+
+/* Card: sempre bianche. Nessuna alternanza cromatica tra card. */
+.rn-card-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+
+.rn-family-card,
+.rn-toolbar,
+.rn-meta-item,
+.rn-empty-state,
+.rn-error-state,
+.rn-status-row,
+.rn-panel{
+  border:1px solid var(--rn-border);
+  border-radius:0;
+  box-shadow:none;
+  background:var(--rn-white);
+}
+
+.rn-family-card{
+  display:flex;
+  flex-direction:column;
+  min-height:180px;
+  padding:10px;
+}
+
+.rn-family-card:nth-child(even),
+.rn-meta-item:nth-child(even){
+  background:var(--rn-white);
+}
+
+.rn-family-card h2,
+.rn-panel-title,
+.rn-meta-item strong,
+.rn-toolbar label,
+.rn-field,
+.rn-count{
+  color:var(--rn-blue);
+  font-weight:bold;
+}
+
+.rn-family-card p{flex:1;color:var(--rn-black)}
+
+.rn-availability{color:var(--rn-blue);font-weight:bold}
+.rn-availability.is-ok,.rn-positive{color:var(--rn-green);font-weight:bold}
+.rn-availability.is-off{color:#666666}
+.rn-negative{color:var(--rn-red-value);font-weight:bold}
+
+.rn-breadcrumb{margin:8px 0;color:var(--rn-black)}
+.rn-breadcrumb a{color:var(--rn-blue)}
+
+/* Bottoni sobri, coerenti con i controlli FCM. */
+.rn-button,
+.rn-navigation a,
+.rn-tab{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:28px;
+  padding:4px 10px;
+  border:1px solid var(--rn-border);
+  border-radius:0;
+  background:var(--rn-white);
+  color:var(--rn-blue);
+  font:inherit;
+  font-weight:bold;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.rn-button:hover,
+.rn-navigation a:hover,
+.rn-tab:hover,
+.rn-tab.is-active{
+  background:var(--rn-cyan);
+  color:var(--rn-blue);
+}
+
+.rn-button-primary{
+  background:var(--rn-blue);
+  color:var(--rn-white);
+}
+
+/* Metadati e filtri: bianchi, bordi blu. */
+.rn-meta-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:4px;
+  margin:10px 0;
+}
+
+.rn-meta-item{padding:8px}
+.rn-meta-item span{display:block;font-size:10px;color:var(--rn-black)}
+.rn-meta-item strong{display:block;margin-top:2px}
+
+.rn-toolbar{
+  display:flex;
+  gap:8px;
+  align-items:end;
+  margin-bottom:8px;
+  padding:8px;
+}
+
+.rn-toolbar label{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.rn-grow{flex:1}
+
+.rn-toolbar input,
+.rn-toolbar select,
+.rn-field input,
+.rn-field select{
+  min-height:28px;
+  padding:2px 5px;
+  border:1px solid var(--rn-border);
+  border-radius:0;
+  background:var(--rn-white);
+  color:var(--rn-black);
+  font:inherit;
+}
+
+/* Pannelli: titolo blu scuro pieno, come le intestazioni FCM. */
+.rn-panel{overflow:hidden}
+.rn-panel-header{
+  padding:5px 8px;
+  border-bottom:1px solid var(--rn-border);
+  background:var(--rn-blue);
+  color:var(--rn-white);
+}
+.rn-panel-header .rn-panel-title,
+.rn-panel-header h2,
+.rn-panel-header p{
+  color:var(--rn-white);
+}
+.rn-panel-body{padding:8px}
+
+/* Tabelle: alternanza bianco/ciano. È l'alternanza visibile nel ranking. */
+.rn-table-wrap{
+  width:100%;
+  overflow:auto;
+  border:1px solid var(--rn-border);
+  background:var(--rn-white);
+}
+
+.rn-table{
+  width:100%;
+  border-collapse:collapse;
+  border-spacing:0;
+  background:var(--rn-white);
+  color:var(--rn-black);
+  font-variant-numeric:tabular-nums;
+}
+
+.rn-table th,
+.rn-table td{
+  padding:4px 6px;
+  border:1px solid var(--rn-border);
+  text-align:left;
+  vertical-align:middle;
+}
+
+.rn-table th{
+  background:var(--rn-blue);
+  color:var(--rn-white);
+  font-size:11px;
+  font-weight:bold;
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+.rn-table tbody tr:nth-child(odd){background:var(--rn-white)}
+.rn-table tbody tr:nth-child(even){background:var(--rn-cyan)}
+.rn-table tbody tr:hover{background:#E6FFFF}
+
+/* Nomi e valori: uso esplicito dei colori storici della skin. */
+.rn-table .rn-team{
+  color:var(--rn-red);
+  font-weight:bold;
+}
+
+.rn-table .rn-competition{
+  color:var(--rn-blue);
+  font-weight:bold;
+}
+
+.rn-table .rn-rank{
+  color:var(--rn-black);
+  font-weight:bold;
+  text-align:center;
+}
+
+.rn-table .rn-score,
+.rn-table .rn-points,
+.rn-table .rn-value-emphasis{
+  color:var(--rn-red-value);
+  font-weight:bold;
+}
+
+.rn-table .rn-previous,
+.rn-table .rn-secondary{
+  color:var(--rn-olive);
+}
+
+.rn-table .rn-number{text-align:right}
+
+.rn-match-link{
+  color:var(--rn-red);
+  font-weight:bold;
+  text-decoration:underline;
+}
+
+.rn-status{display:grid;gap:4px;margin-bottom:8px}
+.rn-status-row{display:flex;gap:8px;padding:8px}
+.rn-empty-state,.rn-error-state{padding:14px;text-align:center}
+.rn-empty-state{color:var(--rn-blue)}
+.rn-error-state{color:var(--rn-red-value);border-color:var(--rn-red-value)}
+
+.rn-footer{
+  margin-top:10px;
+  color:#666666;
+  font-size:10px;
+  text-align:center;
+}
+
+@media(max-width:700px){
+  body,body.rn-page,body.recordsnext-page{margin:6px}
+  .rn-card-grid,.rn-meta-grid{grid-template-columns:1fr}
+  .rn-toolbar{flex-direction:column;align-items:stretch}
+}

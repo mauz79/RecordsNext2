@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.0
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-07 18:17:09 +02:00
+> Data generazione: 2026-08-10 15:56:38 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Regole della bibbia
@@ -73,69 +73,195 @@
 
 File: README.md
 
-    # RecordsNext 2.0
+    # RecordsNext 2.0.0
 
-    RecordsNext 2.0 e un nuovo progetto indipendente che genera viste dati modulari, complete e filtrabili, dalle quali ricavare record stagionali, assoluti, globali e personali.
+    **RecordsNext by mauz79** è un'applicazione per Fantacalcio Manager che legge gli archivi FCM/FCA, consolida i dati storici della lega e genera record e viste statistiche pubblicabili sul sito FCM.
 
-    ## Directory
+    La versione 2.0 introduce una GUI dedicata, configurazione guidata delle stagioni e delle associazioni storiche, famiglie di record elaborabili separatamente, output JavaScript modulari e visualizzatori HTML.
 
-    `D:\DEV_APPS\RecordsNext2.0`
+    ## Requisiti
 
-    ## Repository di riferimento
+    - Windows
+    - Java 21 o superiore
+    - Fantacalcio Manager e relativi file `.fcm` / `.fca`
+    - per la pubblicazione: cartella del sito FCM locale
 
-    - https://github.com/mauz79/RecordsNext
-    - https://github.com/mauz79/ConfrontiStorici-3.x-Plus
-    - https://github.com/mauz79/ConfrontiStorici34
+    La distribuzione include **UCanAccess 2.0.9.5** e le dipendenze necessarie alla lettura dei database FCM/FCA.
 
-    I download manuali vanno salvati in `D:\DEV_APPS\downloads`.
+    ## Avvio rapido
 
-    ## Famiglie iniziali
+    1. Estrarre l'intero archivio `RecordsNext_2.0.0.zip` in una cartella.
+    2. Avviare `RecordsNext.bat`.
+    3. Aprire **Configurazione stagioni**.
+    4. Configurare la lega e almeno una stagione gestita.
+    5. Salvare la configurazione.
+    6. Completare le associazioni storiche quando richiesto.
+    7. Configurare le famiglie di record.
+    8. Avviare l'elaborazione.
 
-    1. Classici
-    2. Serie
-    3. Riserve d'Ufficio
-    4. Modificatori
-    5. Soglie e Fortuna
+    `RecordsNext.bat`, `RecordsNext.jar` e la directory `runtime` devono restare nella struttura fornita dalla release.
 
-    Il Culometro e un easter egg opzionale, generato soltanto su richiesta esplicita e con configurazione dedicata.
+    ## Dashboard
 
-    ## Output previsti
+    ![Dashboard](docs/screenshots/01_dashboard.png)
 
-    - `fcmRecordsNext_Core.js`
-    - `fcmRecordsNext_Manifest.js`
-    - `fcmRecordsNext_Classics.js`
-    - `fcmRecordsNext_Series.js`
-    - `fcmRecordsNext_RU.js`
-    - `fcmRecordsNext_Modifiers.js`
-    - `fcmRecordsNext_ThresholdsLuck.js`
-    - `fcmRecordsNext_Culometro.js`
+    La Dashboard è il punto di ingresso principale. Mostra lo stato della configurazione e consente di accedere a configurazione stagioni, famiglie record, strumenti e diagnostica.
 
-    Tutti i JS pubblici andranno nella cartella `js` del sito FCM. Nella root ci sara un solo `recordsnext.html`; le pagine visualizzatore e il relativo CSS andranno nella cartella `RecordsNext`.
+    ## Configurazione stagioni
 
-    ## Visualizzatori HTML
+    ![Configurazione stagioni](docs/screenshots/02_configurazione_stagioni.png)
 
-    Gli HTML distribuiti con RecordsNext 2.0 non contengono dati incorporati. Sono visualizzatori statici e riutilizzabili dei file `fcmRecordsNext_*.js` prodotti dall'elaborazione.
+    Per la lega vengono definiti **Nome lega** e **ID lega**.
 
-    Separazione ufficiale:
+    Per ogni stagione gestita possono essere configurati file FCM/FCA, sito locale, sito online, DataA.js, tabellini e associazioni storiche.
 
-    - HTML: struttura e contenitori;
-    - CSS: profilo grafico;
-    - `fcmRecordsNextFunzioni_common.js` e `fcmRecordsNextFunzioni_viewer.js`: funzioni di lettura e rendering;
-    - `fcmRecordsNext_*.js`: dati e metadati generati.
+    ![Stagioni configurate](docs/screenshots/12_stagioni_configurate.png)
 
-    I due JS di visualizzazione vengono installati nella cartella `js` della skin, in modo che FCM li riporti nella cartella `js` del sito generato.
+    ### Aggiungere una stagione
 
-    Profili grafici iniziali:
+    ![Aggiunta stagione](docs/screenshots/03_aggiungi_stagione.png)
 
-    - `mauzstrom`, con font principale Trebuchet MS;
-    - `fantablue2`;
-    - `neutral`, moderno e autonomo, ispirato alla leggibilita della skin ReNewo senza dipendere dai suoi selettori.
+    Per una stagione gestita selezionare FCM e FCA. Quando disponibili, stagione e numero vengono letti dal file FCM.
 
-    Gli stessi HTML e gli stessi JS di rendering devono funzionare con tutti i profili. Cambia soltanto `RecordsNext\recordsnext.css`.
+    ![Aggiunta stagione compilata](docs/screenshots/04_aggiungi_stagione_compilata.png)
 
-    ## Bibbia
+    Le stagioni prive di FCM possono essere mantenute come **MANUALI**: servono alla successione storica ma non vengono elaborate come stagioni FCM.
 
-    La bibbia del progetto e `docs\CODICE_FUNZIONANTE_RECORDSNEXT2.md`. Deve distinguere decisioni consolidate, codice implementato e verificato, lavori in corso e questioni aperte.
+    ## Associazioni storiche
+
+    ### Squadre
+
+    ![Associazioni squadre](docs/screenshots/05_associazioni_squadre.png)
+
+    ### Competizioni
+
+    ![Associazioni competizioni](docs/screenshots/06_associazioni_competizioni.png)
+
+    Le associazioni permettono di collegare nomi stagionali differenti alla stessa identità storica/canonica.
+
+    ## Famiglie di record
+
+    ### Classici
+
+    ![Famiglia Classici](docs/screenshots/07_famiglia_classici.png)
+
+    ### Modificatori
+
+    ![Famiglia Modificatori](docs/screenshots/08_famiglia_modificatori.png)
+
+    Le famiglie disponibili comprendono:
+
+    - Classici
+    - Serie
+    - Riserve d'Ufficio
+    - Modificatori
+    - Soglie e Fortuna
+    - Culometro
+
+    ## Culometro
+
+    Il **Culometro** è opzionale e viene generato soltanto quando viene esplicitamente abilitato.
+
+    ![Generazione Culometro](docs/screenshots/14_culometro_generazione.png)
+
+    La configurazione permette di scegliere un profilo semplice oppure intervenire sui parametri avanzati, sui pesi dei singoli fattori e sulle etichette.
+
+    ### Profilo semplice e slider principali
+
+    ![Culometro - profilo semplice](docs/screenshots/15_culometro_profilo_semplice.png)
+
+    Gli slider mostrano il fondoscala e il valore selezionato, così è immediato capire quanto il parametro è vicino al minimo o al massimo ammesso.
+
+    ### Parametri avanzati
+
+    ![Culometro - parametri avanzati](docs/screenshots/16_culometro_avanzato.png)
+
+    Anche i parametri avanzati mostrano minimo, massimo e valore corrente.
+
+    ### Pesi dei fattori
+
+    ![Pesi Culometro](docs/screenshots/17_culometro_pesi_fattori.png)
+
+    Il viewer dispone anche della vista **Eventi**, con filtro dedicato per il tipo di evento.
+
+    ![Viewer Culometro](docs/screenshots/20_culometro_viewer_eventi.png)
+
+    La spiegazione completa di normalizzazione, rarità, sovrapposizioni, pesi, soglie ed etichette è in:
+
+    **[docs/CULOMETRO.md](docs/CULOMETRO.md)**
+
+    ## Modalità di elaborazione
+
+    ### Consolidata
+
+    È la modalità normale per l'aggiornamento durante la stagione.
+
+    ![Modalità consolidata](docs/screenshots/10_modalita_consolidata.png)
+
+    ### Completa
+
+    Rigenera i dati derivati di tutte le stagioni gestite usando la logica corrente. Le stagioni manuali non vengono elaborate come FCM.
+
+    ## Log e diagnostica
+
+    ![Log e diagnostica](docs/screenshots/11_log_diagnostica.png)
+
+    La pagina mostra fasi della pipeline, tempi e messaggi utili alla diagnosi.
+
+    ## Pubblicazione e visualizzatori HTML
+
+    ![Installazione HTML](docs/screenshots/09_debug_installazione_html.png)
+
+    I visualizzatori sono statici e caricano i dati JavaScript generati da RecordsNext.
+
+    Gli output principali sono:
+
+    ```text
+    fcmRecordsNext_Core.js
+    fcmRecordsNext_Manifest.js
+    fcmRecordsNext_Classics.js
+    fcmRecordsNext_Series.js
+    fcmRecordsNext_RU.js
+    fcmRecordsNext_Modifiers.js
+    fcmRecordsNext_ThresholdsLuck.js
+    fcmRecordsNext_Culometro.js
+    ```
+
+    I JS pubblici sono destinati alla cartella `js` del sito FCM.
+
+    Sono inclusi i profili:
+
+    - `mauzstrom`
+    - `fantablue2`
+    - `neutral`
+
+    Il profilo `mauzstrom` usa **Trebuchet MS**.
+
+    ## Tabellini
+
+    Ogni stagione può essere associata a sito locale e sito online. Sono supportate pagine risultato `ris.htm`, `ris.html` e `ris.php` quando coerenti con il sito configurato.
+
+    ## Aggiornamento ordinario
+
+    1. aggiornare Fantacalcio Manager;
+    2. avviare RecordsNext;
+    3. scegliere **Consolidata**;
+    4. elaborare;
+    5. generare/pubblicare i JS;
+    6. controllare i visualizzatori.
+
+    ## Documentazione
+
+    - `README.md` — panoramica illustrata
+    - `INSTALL.txt` — installazione e primo avvio
+    - `CHANGELOG.md` — contenuti della release
+    - `docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md` — pubblicazione dei visualizzatori
+    - `docs\CULOMETRO.md` — funzionamento e configurazione del Culometro
+    - `docs\screenshots\` — schermate di riferimento
+
+    ## Autore
+
+    **RecordsNext by mauz79**
 
 ## Architettura
 
@@ -386,43 +512,133 @@ File: docs\ARCHITETTURA_VISUALIZZATORI_HTML.md
 
 File: docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md
 
-    # Installazione visualizzatori HTML RecordsNext 2.0
+    # Installazione visualizzatori HTML — RecordsNext 2.0.0
 
-    ## Destinatari
+    I visualizzatori RecordsNext sono file statici e non contengono i dati della lega.
 
-    Questa guida e destinata all'utente che vuole installare le pagine RecordsNext in una skin FCM.
+    ## Struttura sul sito FCM
 
-    ## Procedura prevista nella GUI
-
-    1. Aprire la sezione di installazione dei visualizzatori.
-    2. Selezionare la cartella principale della skin FCM.
-    3. Scegliere il profilo `mauzstrom`, `fantablue2` oppure `neutral`.
-    4. Verificare le destinazioni proposte.
-    5. Avviare `Installa visualizzatori RecordsNext nella skin`.
-
-    ## File copiati
+    Copiare nella root del sito:
 
     ```text
     recordsnext.html
-    RecordsNext\*.html
-    RecordsNext\recordsnext.css
-    js\fcmRecordsNextFunzioni_common.js
-    js\fcmRecordsNextFunzioni_viewer.js
     ```
 
-    I file dati `fcmRecordsNext_*.js` non vengono copiati dall'installer: sono generati dall'elaborazione.
+    Copiare la cartella:
 
-    ## Aggiornamento del sito
+    ```text
+    RecordsNext\
+    ```
 
-    Dopo l'installazione nella skin, FCM riporta gli asset statici nel sito generato. RecordsNext aggiorna invece i JS dati nella cartella `js` del sito.
+    nella root del sito.
 
-    ## Famiglie non generate
+    Copiare nella cartella `js` del sito:
 
-    Le pagine possono essere presenti anche quando una famiglia non e stata elaborata. Il visualizzatore mostra uno stato vuoto e il collegamento puo essere disabilitato dall'indice tramite il manifest.
+    ```text
+    fcmRecordsNextFunzioni_common.js
+    fcmRecordsNextFunzioni_viewer.js
+    ```
 
-    ## Aggiornamento dei visualizzatori
+    I file dati generati da RecordsNext devono trovarsi nella stessa cartella `js`:
 
-    Una nuova versione puo sostituire HTML, JS statici e CSS senza toccare i JS dati. Prima della sovrascrittura l'installer dovra creare un backup mirato dei file RecordsNext esistenti.
+    ```text
+    fcmRecordsNext_Core.js
+    fcmRecordsNext_Manifest.js
+    fcmRecordsNext_Classics.js
+    fcmRecordsNext_Series.js
+    fcmRecordsNext_RU.js
+    fcmRecordsNext_Modifiers.js
+    fcmRecordsNext_ThresholdsLuck.js
+    fcmRecordsNext_Culometro.js
+    ```
+
+    Sono presenti solo i file relativi alle famiglie effettivamente generate.
+
+    ## Struttura finale
+
+    ```text
+    <root sito>\
+    │
+    ├─ recordsnext.html
+    ├─ js\
+    │  ├─ fcmRecordsNext_Core.js
+    │  ├─ fcmRecordsNext_Manifest.js
+    │  ├─ fcmRecordsNext_Classics.js
+    │  ├─ fcmRecordsNext_Series.js
+    │  ├─ fcmRecordsNext_RU.js
+    │  ├─ fcmRecordsNext_Modifiers.js
+    │  ├─ fcmRecordsNext_ThresholdsLuck.js
+    │  ├─ fcmRecordsNext_Culometro.js
+    │  ├─ fcmRecordsNextFunzioni_common.js
+    │  └─ fcmRecordsNextFunzioni_viewer.js
+    │
+    └─ RecordsNext\
+       ├─ classici.html
+       ├─ serie.html
+       ├─ riserve_ufficio.html
+       ├─ modificatori.html
+       ├─ soglie_fortuna.html
+       ├─ culometro.html
+       ├─ record_di_lega.html
+       └─ recordsnext.css
+    ```
+
+    ## Profili grafici
+
+    La release include:
+
+    ```text
+    profiles\mauzstrom\recordsnext.css
+    profiles\fantablue2\recordsnext.css
+    profiles\neutral\recordsnext.css
+    ```
+
+    `mauzstrom` usa Trebuchet MS.
+
+    ## Dati e aggiornamenti
+
+    Dopo ogni elaborazione della lega è sufficiente aggiornare i file `fcmRecordsNext_*.js` generati.
+
+    I file HTML e le funzioni viewer cambiano solo quando viene aggiornata la release.
+
+    ## Tabellini
+
+    I link ai tabellini dipendono dalla configurazione della stagione e dal sito associato.
+
+    Sono supportate pagine risultato:
+
+    ```text
+    ris.htm
+    ris.html
+    ris.php
+    ```
+
+    ## Controllo rapido
+
+    Aprire:
+
+    ```text
+    recordsnext.html
+    ```
+
+    e verificare:
+
+    - disponibilità delle famiglie;
+    - filtri stagione/competizione;
+    - Classici;
+    - Serie;
+    - RU;
+    - Modificatori;
+    - Soglie/Fortuna;
+    - Culometro;
+    - Record di lega;
+    - link tabellini.
+
+    Per schermate di riferimento vedere:
+
+    ```text
+    docs\screenshots\
+    ```
 
 ## Personalizzazione visualizzatori HTML
 
@@ -2083,64 +2299,88 @@ File: CHANGELOG.md
 
     # Changelog
 
-    ## 2.0.0-dev
+    ## RecordsNext 2.0.0 — 2026-08-10
 
-    ### Fondazione
+    Prima release stabile della nuova linea RecordsNext 2.0.
 
-    - creato progetto separato RecordsNext2.0;
-    - importata la base funzionante RecordsNext 1.0.2;
-    - confermato accesso FCM/FCA tramite UCanAccess;
-    - mantenuti SQLite, mapping canonici, normalizzazione, consolidamento e pubblicazione.
+    ### Novità principali
 
-    ### Architettura modulare
+    - nuova GUI Swing dedicata `RecordsNext by mauz79`;
+    - configurazione guidata di lega e stagioni;
+    - supporto stagioni GESTITE e MANUALI;
+    - associazioni storiche/canoniche di squadre e competizioni;
+    - lettura FCM/FCA tramite UCanAccess 2.0.9.5;
+    - pipeline modulare per famiglie di record;
+    - modalità di elaborazione Consolidata e Completa;
+    - output JavaScript separati per famiglia;
+    - pubblicazione verso il sito FCM;
+    - visualizzatori HTML statici;
+    - supporto ai link tabellini `.htm`, `.html` e `.php`;
+    - record di lega;
+    - Culometro opzionale.
 
-    - definite cinque famiglie elaborabili;
-    - introdotti figli, dipendenze e stati degli output;
-    - introdotta selezione modulare;
-    - mantenuta compatibilita temporanea con Classici e RU legacy;
-    - introdotti planner e preflight;
-    - collegato config\processing.json alla pipeline.
+    ### Famiglie disponibili
 
-    ### Manifest
-
-    - introdotto fcmRecordsNext_Manifest.js;
-    - integrata generazione nella staging;
-    - integrata validazione;
-    - integrata pubblicazione con rollback.
+    - Classici
+    - Serie
+    - Riserve d'Ufficio
+    - Modificatori
+    - Soglie e Fortuna
+    - Culometro
 
     ### Modificatori
 
-    - introdotta la configurazione gerarchica per modificatore e tipo di statistica;
-    - aggiunti Massimo, Totale, Media e Utilizzi;
-    - distinti i modificatori personalizzati dai modificatori standard FCM;
-    - aggiunti i nomi configurabili per `MODM1PERS`, `MODM2PERS` e `MODM3PERS`;
-    - aggiunta la lettura dei campi standard `MODPORTIERE`, `MODDIFESA`, `MODCENTROCAMPO`, `MODATTACCO` e `MODMODULO`;
-    - collegata la famiglia Modificatori direttamente agli archivi `season_records_*.json`;
-    - aggiunti i metadati distinti `availableSections` e `generatedSections`;
-    - verificata l’esportazione del Modificatore Difesa FCM nella stagione 2006_2007;
-    - verificata l’esclusione delle statistiche disattivate.
+    - supporto modificatori standard FCM;
+    - supporto MODM1PERS, MODM2PERS e MODM3PERS;
+    - nomi personalizzabili dei modificatori personali;
+    - selezione granulare delle statistiche;
+    - supporto serie dei modificatori;
+    - supporto Fattore Campo.
 
-    ### Verifica
+    ### Storico
 
-    - 38 test eseguiti;
-    - 0 failure;
-    - 0 errori;
-    - BUILD SUCCESS;
-    - output JavaScript reale controllato con tutte le sezioni selezionate presenti.
+    - associazioni canoniche delle squadre;
+    - associazioni canoniche delle competizioni;
+    - gestione differenze di denominazione tra stagioni;
+    - esclusione delle stagioni MANUALI dall'elaborazione FCM;
+    - ricostruzione completa delle stagioni GESTITE.
 
+    ### Visualizzatori
 
-    ### GUI e visualizzatori
+    - home RecordsNext;
+    - Classici;
+    - Serie;
+    - Riserve d'Ufficio;
+    - Modificatori;
+    - Soglie e Fortuna;
+    - Culometro;
+    - Record di lega;
+    - filtri per stagione e competizione;
+    - nomi competizioni leggibili;
+    - selezione eventi Culometro nella sola vista Eventi;
+    - profili `mauzstrom`, `fantablue2`, `neutral`.
 
-    - evoluta la dashboard GUI e la configurazione granulare delle famiglie;
-    - raggruppati Soglie, Fortuna e Culometro nella stessa area della GUI;
-    - consolidata la regola che gli HTML non contengono dati incorporati;
-    - definiti i JS statici `fcmRecordsNextFunzioni_common.js` e `fcmRecordsNextFunzioni_viewer.js`;
-    - stabilita l'installazione dei JS statici nella cartella `js` della skin;
-    - adottato l'underscore per i nuovi nomi file;
-    - definiti i profili grafici `mauzstrom`, `fantablue2` e `neutral`;
-    - stabilito Trebuchet MS come font principale del profilo `mauzstrom`;
-    - progettato il profilo `neutral` moderno ispirato ai principi grafici di ReNewo;
-    - aggiunta la documentazione di architettura, installazione e personalizzazione dei visualizzatori.
+    ### Release e runtime
+
+    - versione Maven 2.0.0;
+    - manifest applicativo 2.0.0;
+    - launcher `RecordsNext.bat`;
+    - runtime UCanAccess 2.0.9.5 distribuito con dipendenze e licenze;
+    - configurazione `league.json` generata automaticamente dalla GUI.
+
+    ### Verifiche effettuate
+
+    - build Maven completato con successo;
+    - test automatici superati;
+    - audit contratto checkbox → vista superato;
+    - audit semantici Classici, Serie, RU, Modificatori, Fattore Campo, Soglie/Fortuna e Culometro superati;
+    - smoke test GUI e visualizzatori superato;
+    - lettura FCM dalla distribuzione di prova verificata;
+    - generazione automatica `config/league.json` verificata.
+
+    ### Note
+
+    Le stringhe interne che citano RecordsNext 1.0.2 negli exporter indicano la provenienza/compatibilità degli archivi normalizzati e non la versione corrente del prodotto.
 
 ## File reali del progetto
 
@@ -5629,7 +5869,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                 );
                 ManifestMetadata manifestMetadata = new ManifestMetadata(
                         "RecordsNext by mauz79",
-                        "2.0.0-dev",
+                        "2.0.0",
                         "2.0",
                         OffsetDateTime.now(),
                         leagueMetadata.leagueId(),
@@ -10612,11 +10852,17 @@ File: src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
         private CulometroConfig config;
 
         private final JCheckBox enabled = new JCheckBox("Genera il Culometro");
-        private final JSpinner minimumMatches = new JSpinner(new SpinnerNumberModel(20, 10, 40, 1));
-        private final JSpinner kScale = new JSpinner(new SpinnerNumberModel(4.15, 3.00, 6.00, 0.05));
-        private final JSpinner secondaryWeight = new JSpinner(new SpinnerNumberModel(0.20, 0.10, 0.35, 0.01));
-        private final JSpinner rarityMultiplier = new JSpinner(new SpinnerNumberModel(5.25, 3.00, 6.50, 0.05));
-        private final JSpinner minimumOccurrences = new JSpinner(new SpinnerNumberModel(3, 1, 20, 1));
+        private final JSlider minimumMatches = new JSlider(10, 40, 20);
+        private final JSlider kScale = new JSlider(300, 600, 415);
+        private final JSlider secondaryWeight = new JSlider(10, 35, 20);
+        private final JSlider rarityMultiplier = new JSlider(300, 650, 525);
+        private final JSlider minimumOccurrences = new JSlider(1, 20, 3);
+
+        private final JLabel minimumMatchesValue = new JLabel();
+        private final JLabel kScaleValue = new JLabel();
+        private final JLabel secondaryWeightValue = new JLabel();
+        private final JLabel rarityMultiplierValue = new JLabel();
+        private final JLabel minimumOccurrencesValue = new JLabel();
 
         private final JSlider simpleSensitivity = new JSlider(300, 600, 415);
         private final JSlider simpleReliability = new JSlider(10, 40, 20);
@@ -10749,11 +10995,17 @@ File: src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
             g.gridy = 0;
             g.anchor = GridBagConstraints.WEST;
             g.insets = new Insets(7, 7, 7, 16);
-            addRow(panel, g, "Partite minime affidabili", minimumMatches);
-            addRow(panel, g, "Sensibilità della scala", kScale);
-            addRow(panel, g, "Peso evento secondario", secondaryWeight);
-            addRow(panel, g, "Moltiplicatore massimo rarità", rarityMultiplier);
-            addRow(panel, g, "Occorrenze storiche minime", minimumOccurrences);
+            configureSlider(minimumMatches, 5, 1);
+            configureSlider(kScale, 50, 5);
+            configureSlider(secondaryWeight, 5, 1);
+            configureSlider(rarityMultiplier, 50, 5);
+            configureSlider(minimumOccurrences, 5, 1);
+
+            addAdvancedSliderRow(panel, g, "Partite minime affidabili", minimumMatches, minimumMatchesValue, 1);
+            addAdvancedSliderRow(panel, g, "Sensibilità della scala", kScale, kScaleValue, 100);
+            addAdvancedSliderRow(panel, g, "Peso evento secondario", secondaryWeight, secondaryWeightValue, 100);
+            addAdvancedSliderRow(panel, g, "Moltiplicatore massimo rarità", rarityMultiplier, rarityMultiplierValue, 100);
+            addAdvancedSliderRow(panel, g, "Occorrenze storiche minime", minimumOccurrences, minimumOccurrencesValue, 1);
             g.gridy++;
             g.weighty = 1;
             panel.add(Box.createVerticalGlue(), g);
@@ -10800,6 +11052,36 @@ File: src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
             slider.setMajorTickSpacing(major);
             slider.setMinorTickSpacing(minor);
             slider.setPaintTicks(true);
+            slider.setPaintLabels(true);
+        }
+
+
+        private static void addAdvancedSliderRow(JPanel panel, GridBagConstraints g, String label,
+                                                 JSlider slider, JLabel value, int scale) {
+            JPanel control = new JPanel(new BorderLayout(8, 0));
+            control.setOpaque(false);
+            control.add(slider, BorderLayout.CENTER);
+
+            JPanel right = new JPanel(new BorderLayout(4, 0));
+            right.setOpaque(false);
+            JLabel range = new JLabel(formatSliderValue(slider.getMinimum(), scale)
+                    + " - " + formatSliderValue(slider.getMaximum(), scale));
+            range.setForeground(new Color(96, 104, 120));
+            value.setPreferredSize(new Dimension(58, 24));
+            value.setHorizontalAlignment(SwingConstants.RIGHT);
+            value.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            right.add(range, BorderLayout.WEST);
+            right.add(value, BorderLayout.EAST);
+            control.add(right, BorderLayout.EAST);
+
+            addRow(panel, g, label, control);
+            slider.addChangeListener(e -> value.setText(formatSliderValue(slider.getValue(), scale)));
+            value.setText(formatSliderValue(slider.getValue(), scale));
+        }
+
+        private static String formatSliderValue(int value, int scale) {
+            if (scale == 1) return Integer.toString(value);
+            return String.format(java.util.Locale.ROOT, "%.2f", value / (double) scale);
         }
 
         private static void addSimpleRow(JPanel panel, GridBagConstraints g, String label,
@@ -10845,10 +11127,15 @@ File: src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
             synchronizing = true;
             enabled.setSelected(config.enabled());
             minimumMatches.setValue(config.minimumMatches());
-            kScale.setValue(config.kScale().doubleValue());
-            secondaryWeight.setValue(config.secondaryWeight().doubleValue());
-            rarityMultiplier.setValue(config.maximumRarityMultiplier().doubleValue());
+            kScale.setValue((int) Math.round(config.kScale().doubleValue() * 100));
+            secondaryWeight.setValue((int) Math.round(config.secondaryWeight().doubleValue() * 100));
+            rarityMultiplier.setValue((int) Math.round(config.maximumRarityMultiplier().doubleValue() * 100));
             minimumOccurrences.setValue(config.minimumHistoricalOccurrences());
+            minimumMatchesValue.setText(formatSliderValue(minimumMatches.getValue(), 1));
+            kScaleValue.setText(formatSliderValue(kScale.getValue(), 100));
+            secondaryWeightValue.setText(formatSliderValue(secondaryWeight.getValue(), 100));
+            rarityMultiplierValue.setText(formatSliderValue(rarityMultiplier.getValue(), 100));
+            minimumOccurrencesValue.setText(formatSliderValue(minimumOccurrences.getValue(), 1));
             preset.setSelectedItem(config.labelConfiguration().preset());
             componentModel.set(config.components());
             labelModel.set(config.labels());
@@ -10884,12 +11171,12 @@ File: src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
         private void syncSimpleToAdvanced() {
             if (synchronizing) return;
             synchronizing = true;
-            kScale.setValue(simpleSensitivity.getValue() / 100.0);
+            kScale.setValue(simpleSensitivity.getValue());
             minimumMatches.setValue(simpleReliability.getValue());
             rarityMultiplier.setValue(switch (String.valueOf(simpleRarity.getSelectedItem())) {
-                case "Bassa" -> 3.50;
-                case "Alta" -> 6.50;
-                default -> 5.25;
+                case "Bassa" -> 350;
+                case "Alta" -> 650;
+                default -> 525;
             });
             sensitivityValue.setText(String.format(java.util.Locale.ROOT, "%.2f", simpleSensitivity.getValue() / 100.0));
             reliabilityValue.setText(String.valueOf(simpleReliability.getValue()));
@@ -10902,9 +11189,9 @@ File: src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
         private void syncAdvancedToSimple() {
             if (synchronizing) return;
             synchronizing = true;
-            simpleSensitivity.setValue((int) Math.round(((Number) kScale.getValue()).doubleValue() * 100));
-            simpleReliability.setValue(((Number) minimumMatches.getValue()).intValue());
-            double rarity = ((Number) rarityMultiplier.getValue()).doubleValue();
+            simpleSensitivity.setValue(kScale.getValue());
+            simpleReliability.setValue(minimumMatches.getValue());
+            double rarity = rarityMultiplier.getValue() / 100.0;
             simpleRarity.setSelectedItem(rarity <= 4.0 ? "Bassa" : rarity >= 6.0 ? "Alta" : "Normale");
             sensitivityValue.setText(String.format(java.util.Locale.ROOT, "%.2f", simpleSensitivity.getValue() / 100.0));
             reliabilityValue.setText(String.valueOf(simpleReliability.getValue()));
@@ -10935,9 +11222,9 @@ File: src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
                         selectedPreset, customized, resetSource, activeBands,
                         config.labelConfiguration().presetDefaults());
                 CulometroConfig updated = new CulometroConfig(
-                        enabled.isSelected(), ((Number) minimumMatches.getValue()).intValue(),
-                        decimal(kScale), decimal(secondaryWeight), decimal(rarityMultiplier),
-                        ((Number) minimumOccurrences.getValue()).intValue(), components, labels);
+                        enabled.isSelected(), minimumMatches.getValue(),
+                        decimal(kScale, 100), decimal(secondaryWeight, 100), decimal(rarityMultiplier, 100),
+                        minimumOccurrences.getValue(), components, labels);
                 CulometroConfigWriter.save(configFile, updated);
                 config = updated;
                 saved = true;
@@ -10947,8 +11234,8 @@ File: src\main\java\it\alterlega\recordsnext\gui\CulometroSettingsDialog.java
             }
         }
 
-        private static BigDecimal decimal(JSpinner spinner) {
-            return BigDecimal.valueOf(((Number) spinner.getValue()).doubleValue());
+        private static BigDecimal decimal(JSlider slider, int scale) {
+            return BigDecimal.valueOf(slider.getValue()).divide(BigDecimal.valueOf(scale));
         }
 
         private static final class ComponentTableModel extends AbstractTableModel {
@@ -11934,6 +12221,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         private final Path processingFile = root.resolve("config/processing.json");
         private final Path culometroFile = root.resolve("config/culometro.json");
         private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
+        private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
         private final JFrame frame = new JFrame("RecordsNext by mauz79 · 2.0");
         private final CardLayout pages = new CardLayout();
@@ -11958,6 +12246,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         private final JLabel exampleViewsTarget = new JLabel("Non selezionata");
         private final JLabel exampleJsTarget = new JLabel("Non selezionata");
         private final JButton installExamples = new JButton("Installa esempi");
+        private final JComboBox<String> htmlProfile = new JComboBox<>(new String[] {"mauzstrom", "maelstrom", "fantablue2", "neutral"});
         private ProcessingConfigWriter.State state;
         private JPanel dashboardPage;
 
@@ -11977,6 +12266,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             applyLookAndFeel();
             build();
             loadState();
+            refreshProcessingModeAvailability();
         }
 
         private void bootstrap() throws Exception {
@@ -12533,7 +12823,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             JLabel title = new JLabel("Installa esempi nella skin");
             title.setFont(new Font("Segoe UI", Font.BOLD, 15));
             title.setForeground(NAVY);
-            JLabel subtitle = new JLabel("Seleziona la cartella della skin FCM. Nessun file viene copiato in questa versione.");
+            JLabel subtitle = new JLabel("Seleziona la cartella della skin FCM e il profilo grafico da installare.");
             subtitle.setForeground(MUTED);
             heading.add(title);
             heading.add(Box.createVerticalStrut(2));
@@ -12564,6 +12854,21 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
 
             c.gridx = 0;
             c.gridy++;
+            c.gridwidth = 1;
+            c.weightx = 0;
+            body.add(new JLabel("Profilo HTML:"), c);
+
+            htmlProfile.setSelectedItem("mauzstrom");
+            htmlProfile.setPreferredSize(new Dimension(180, 26));
+            c.gridx = 1;
+            c.gridwidth = 2;
+            c.weightx = 1;
+            body.add(htmlProfile, c);
+
+            c.gridx = 0;
+            c.gridy++;
+            c.gridwidth = 1;
+            c.weightx = 0;
             body.add(new JLabel("HTML indice:"), c);
             c.gridx = 1;
             c.gridwidth = 2;
@@ -12590,7 +12895,8 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             JButton preview = new JButton("Anteprima destinazioni");
             preview.setEnabled(false);
             installExamples.setEnabled(false);
-            installExamples.setToolTipText("Disponibile quando sarà definito il pacchetto esempi definitivo");
+            installExamples.setToolTipText("Installa gli HTML RecordsNext e il profilo grafico selezionato");
+            installExamples.addActionListener(e -> installExampleViewers());
             JPanel exampleActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
             exampleActions.setOpaque(false);
             exampleActions.add(preview);
@@ -12620,8 +12926,93 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             exampleRootTarget.setText(siteRoot.toString());
             exampleViewsTarget.setText(siteRoot.resolve("RecordsNext").toString());
             exampleJsTarget.setText(siteRoot.resolve("js").toString());
-            status.setText("Destinazioni skin rilevate; installazione esempi non ancora attiva");
-            status.setForeground(new Color(145, 91, 18));
+            installExamples.setEnabled(true);
+            status.setText("Destinazioni skin rilevate");
+            status.setForeground(new Color(35, 105, 62));
+        }
+
+        private Path resolveViewerPackageDirectory() {
+            Path releasePackage = root.resolve("visualizzatori");
+            if (Files.isDirectory(releasePackage)) return releasePackage;
+
+            Path developmentPackage = root.resolve("release/visualizzatori");
+            if (Files.isDirectory(developmentPackage)) return developmentPackage;
+
+            throw new IllegalStateException("Pacchetto visualizzatori non trovato.");
+        }
+
+        private void installExampleViewers() {
+            String selectedSite = exampleSiteDirectory.getText().trim();
+            if (selectedSite.isEmpty()) {
+                JOptionPane.showMessageDialog(frame,
+                        "Selezionare prima la cartella della skin FCM.",
+                        "Installazione visualizzatori",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                Path siteRoot = Path.of(selectedSite).toAbsolutePath().normalize();
+                if (!Files.isDirectory(siteRoot)) {
+                    throw new IllegalStateException("Cartella skin non trovata: " + siteRoot);
+                }
+
+                Path packageDir = resolveViewerPackageDirectory();
+                String profile = String.valueOf(htmlProfile.getSelectedItem());
+                Path profileCss = packageDir.resolve("profiles").resolve(profile).resolve("recordsnext.css");
+
+                if (!Files.isRegularFile(profileCss)) {
+                    throw new IllegalStateException("Profilo CSS non trovato: " + profileCss);
+                }
+
+                Path siteJs = siteRoot.resolve("js");
+                Path siteViews = siteRoot.resolve("RecordsNext");
+                Files.createDirectories(siteJs);
+                Files.createDirectories(siteViews);
+
+                Files.copy(packageDir.resolve("recordsnext.html"),
+                        siteRoot.resolve("recordsnext.html"),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                try (java.util.stream.Stream<Path> stream = Files.list(packageDir.resolve("RecordsNext"))) {
+                    for (Path source : stream.filter(Files::isRegularFile)
+                            .filter(path -> path.getFileName().toString().toLowerCase(java.util.Locale.ROOT).endsWith(".html"))
+                            .toList()) {
+                        Files.copy(source,
+                                siteViews.resolve(source.getFileName()),
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+
+                Files.copy(packageDir.resolve("js/fcmRecordsNextFunzioni_common.js"),
+                        siteJs.resolve("fcmRecordsNextFunzioni_common.js"),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(packageDir.resolve("js/fcmRecordsNextFunzioni_viewer.js"),
+                        siteJs.resolve("fcmRecordsNextFunzioni_viewer.js"),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(profileCss,
+                        siteViews.resolve("recordsnext.css"),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                status.setText("Visualizzatori installati · profilo " + profile);
+                status.setForeground(new Color(35, 105, 62));
+
+                JOptionPane.showMessageDialog(frame,
+                        "Visualizzatori RecordsNext installati.\n\n"
+                                + "Profilo: " + profile + "\n"
+                                + "Indice: " + siteRoot.resolve("recordsnext.html") + "\n"
+                                + "Viste: " + siteViews + "\n"
+                                + "JavaScript: " + siteJs,
+                        "Installazione visualizzatori",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                status.setText("Errore installazione visualizzatori");
+                status.setForeground(RED);
+                JOptionPane.showMessageDialog(frame,
+                        ex.getMessage(),
+                        "Installazione visualizzatori",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
 
         private JPanel buildLogPage() {
@@ -12861,8 +13252,8 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             loadChildren(ProcessingConfigWriter.THRESHOLDS, "thresholdsLuck");
             culometro.setSelected(state.culometro());
             publish.setSelected(state.publishToSite());
-            consolidated.setSelected(true);
-            full.setSelected(false);
+            // La disponibilita della modalita Consolidata viene aggiornata
+            // da refreshProcessingModeAvailability().
             modifierNameFields.forEach((sourceField, field) ->
                     field.setText(state.modifierName(sourceField)));
         }
@@ -12875,6 +13266,21 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                 child.setEnabled(familyEnabled);
             }
             updateFamilySummary(familyId, ids);
+        }
+
+
+        private void refreshProcessingModeAvailability() {
+            boolean available = Files.isRegularFile(consolidationStateFile);
+            consolidated.setEnabled(available);
+            consolidated.setToolTipText(available
+                    ? "Usa il consolidamento esistente e aggiorna la stagione corrente."
+                    : "Disponibile dopo una prima elaborazione Completa riuscita.");
+            if (!available) {
+                consolidated.setSelected(false);
+                full.setSelected(true);
+            } else if (!consolidated.isSelected() && !full.isSelected()) {
+                consolidated.setSelected(true);
+            }
         }
 
         private void saveState() {
@@ -12963,6 +13369,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                         status.setForeground(new Color(35, 105, 62));
                         progress.setValue(100);
                         phase.setText("Elaborazione completata");
+                        refreshProcessingModeAvailability();
                     } catch (Exception ex) {
                         Throwable cause = ex.getCause() == null ? ex : ex.getCause();
                         log.append("ERRORE: " + cause + System.lineSeparator());
@@ -13710,6 +14117,8 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
 
     import it.alterlega.recordsnext.ConfigurationSchema;
     import it.alterlega.recordsnext.RawSqliteImporter;
+    import it.alterlega.recordsnext.app.core.LeagueMetadata;
+    import it.alterlega.recordsnext.app.core.LeagueMetadataLoader;
 
     import javax.swing.*;
     import javax.swing.border.*;
@@ -13728,6 +14137,8 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
         private final Properties properties = new Properties();
         private final JPanel seasonsPanel = new JPanel();
         private final List<SeasonEditor> editors = new ArrayList<>();
+        private final JTextField leagueName = new JTextField(24);
+        private final JTextField leagueId = new JTextField(20);
         private final SeasonConfigurationRepository repository;
         private boolean saved;
 
@@ -13735,6 +14146,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             super(owner,"RecordsNext - Configurazione stagioni",ModalityType.APPLICATION_MODAL);
             this.projectRoot=projectRoot; this.configPath=configPath;
             loadProperties();
+            loadLeagueIdentity();
             this.databasePath=projectRoot.resolve(properties.getProperty("database","data/database/recordsnext.db")).normalize();
             this.repository=new SeasonConfigurationRepository(databasePath);
             build(); loadSeasons();
@@ -13743,6 +14155,19 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
 
         private void build(){
             JPanel root=new JPanel(new BorderLayout(10,10)); root.setBorder(new EmptyBorder(12,14,12,14));
+
+            JPanel header = new JPanel();
+            header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+
+            JPanel leaguePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+            leaguePanel.setBorder(new TitledBorder("Identità lega"));
+            leaguePanel.add(new JLabel("Nome lega:"));
+            leaguePanel.add(leagueName);
+            leaguePanel.add(new JLabel("ID lega:"));
+            leaguePanel.add(leagueId);
+            header.add(leaguePanel);
+            header.add(Box.createVerticalStrut(8));
+
             JPanel top=new JPanel(new BorderLayout());
             JLabel info=new JLabel("Configurare stagioni gestite e manuali. Le manuali richiedono solo anni e numero stagione.");
             JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
@@ -13750,7 +14175,9 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             mappings.addActionListener(e -> openMappings());
             JButton add=new JButton("Aggiungi stagione"); add.addActionListener(e->addSeason());
             topButtons.add(mappings); topButtons.add(add);
-            top.add(info,BorderLayout.WEST); top.add(topButtons,BorderLayout.EAST); root.add(top,BorderLayout.NORTH);
+            top.add(info,BorderLayout.WEST); top.add(topButtons,BorderLayout.EAST);
+            header.add(top);
+            root.add(header,BorderLayout.NORTH);
             seasonsPanel.setLayout(new BoxLayout(seasonsPanel,BoxLayout.Y_AXIS)); seasonsPanel.setBorder(new EmptyBorder(4,4,4,4));
             JScrollPane scroll=new JScrollPane(seasonsPanel); scroll.getVerticalScrollBar().setUnitIncrement(20); root.add(scroll,BorderLayout.CENTER);
             JPanel buttons=new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -13762,6 +14189,46 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
 
         private void loadProperties(){
             if(Files.isRegularFile(configPath)) try(InputStream in=Files.newInputStream(configPath)){properties.load(in);} catch(IOException ex){error("Lettura configurazione",ex);}
+        }
+
+        private void loadLeagueIdentity() {
+            Path leagueFile = projectRoot.resolve("config/league.json").normalize();
+            if (!Files.isRegularFile(leagueFile)) return;
+            try {
+                LeagueMetadata metadata = LeagueMetadataLoader.load(leagueFile);
+                leagueName.setText(metadata.leagueName());
+                leagueId.setText(metadata.leagueId());
+            } catch (Exception ex) {
+                error("Lettura identità lega", ex);
+            }
+        }
+
+        private void writeLeagueIdentity(String id, String name, String currentSeasonId) throws IOException {
+            Path leagueFile = projectRoot.resolve("config/league.json").normalize();
+            Files.createDirectories(leagueFile.getParent());
+            String json = "{\n"
+                    + "  \"leagueId\": \"" + jsonEscape(id) + "\",\n"
+                    + "  \"leagueName\": \"" + jsonEscape(name) + "\",\n"
+                    + "  \"currentSeasonId\": \"" + jsonEscape(currentSeasonId) + "\"\n"
+                    + "}\n";
+            Files.writeString(leagueFile, json, java.nio.charset.StandardCharsets.UTF_8);
+        }
+
+        private static String slug(String value) {
+            String normalized = java.text.Normalizer.normalize(value, java.text.Normalizer.Form.NFD)
+                    .replaceAll("\\p{M}+", "")
+                    .toLowerCase(Locale.ROOT)
+                    .replaceAll("[^a-z0-9]+", "-")
+                    .replaceAll("^-+|-+$", "");
+            return normalized;
+        }
+
+        private static String jsonEscape(String value) {
+            return value
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\r", "\\r")
+                    .replace("\n", "\\n");
         }
         private void loadSeasons(){
             try {
@@ -13885,6 +14352,16 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
         private void refresh(){seasonsPanel.revalidate();seasonsPanel.repaint();}
 
         private void saveConfiguration(){
+            String leagueNameValue = leagueName.getText().trim();
+            if (leagueNameValue.isEmpty()) { warn("Inserire il nome della lega."); return; }
+
+            String leagueIdValue = leagueId.getText().trim();
+            if (leagueIdValue.isEmpty()) {
+                leagueIdValue = slug(leagueNameValue);
+                leagueId.setText(leagueIdValue);
+            }
+            if (leagueIdValue.isEmpty()) { warn("Inserire un ID lega valido."); return; }
+
             if(editors.isEmpty()){warn("Aggiungere almeno una stagione.");return;}
             List<SeasonConfigurationRepository.SeasonRow> rows=new ArrayList<>();
             for(SeasonEditor e:editors){String problem=e.validateFields(); if(problem!=null){warn(problem);return;} rows.add(e.value());}
@@ -13911,6 +14388,12 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 properties.setProperty("siteJs",Path.of(current.localSitePath()).resolve("js").toString()));
             try{
                 repository.save(rows);
+                String currentSeasonId = rows.stream()
+                        .filter(r -> "GESTITA".equals(r.managementType()))
+                        .max(Comparator.comparing(r -> r.seasonId()))
+                        .map(SeasonConfigurationRepository.SeasonRow::seasonId)
+                        .orElseThrow(() -> new IllegalStateException("Configurare almeno una stagione gestita."));
+                writeLeagueIdentity(leagueIdValue, leagueNameValue, currentSeasonId);
                 Files.createDirectories(configPath.getParent());
                 try(OutputStream out=Files.newOutputStream(configPath)){properties.store(out,"RecordsNext configuration");}
                 saved=true;dispose();
@@ -19077,10 +19560,12 @@ File: src\main\java\it\alterlega\recordsnext\SeasonNormalizedBatchExporter.java
             );
 
             if (competitions.isEmpty()) {
-                throw new IllegalStateException(
-                    "Nessuna competizione trovata per la stagione "
+                System.out.println(
+                    "Nessuna competizione testa-a-testa elaborabile per la stagione "
                         + seasonId
+                        + "; stagione saltata (le competizioni Gran Premio non vengono processate)."
                 );
+                return;
             }
 
             int completed = 0;
@@ -25186,7 +25671,7 @@ File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriterTest.j
             PipelinePreflight.Result preflight = PipelinePreflight.evaluate(options);
             ManifestMetadata metadata = new ManifestMetadata(
                     "RecordsNext by mauz79",
-                    "2.0.0-dev",
+                    "2.0.0",
                     "2.0",
                     OffsetDateTime.parse("2026-08-05T15:30:00+02:00"),
                     "alterlega",
@@ -25235,7 +25720,7 @@ File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
             PipelinePreflight.Result preflight = PipelinePreflight.evaluate(options);
             ManifestMetadata metadata = new ManifestMetadata(
                     "RecordsNext by mauz79",
-                    "2.0.0-dev",
+                    "2.0.0",
                     "2.0",
                     OffsetDateTime.parse("2026-08-05T15:30:00+02:00"),
                     "alterlega",
@@ -26061,14 +26546,14 @@ File: config\culometro.json
       "overlap": { "strategy": "PRIMARY_PLUS_SECONDARY", "secondaryWeight": 0.2, "tagWeight": 0.0, "maxSecondary": 1, "maxTags": 2 },
       "rarity": { "enabled": true, "profile": "NORMAL", "maximumMultiplier": 6.5, "minimumHistoricalOccurrences": 3 },
       "components": [
-        { "componentId": "MISSED_WIN_HALF_POINT", "enabled": true, "weight": 1.35, "allowedRange": { "min": 0.75, "max": 2.5 } },
-        { "componentId": "ONE_GOAL_WIN", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
         { "componentId": "RU_DECISIVE", "enabled": true, "weight": 1.4, "allowedRange": { "min": 0.75, "max": 2.5 } },
-        { "componentId": "ONE_GOAL_LOSS", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
-        { "componentId": "TIGHT_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
-        { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } },
+        { "componentId": "ONE_GOAL_WIN", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
+        { "componentId": "MISSED_WIN_HALF_POINT", "enabled": true, "weight": 1.35, "allowedRange": { "min": 0.75, "max": 2.5 } },
+        { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
         { "componentId": "LOSS_BY_A_WHISKER", "enabled": true, "weight": 1.45, "allowedRange": { "min": 0.75, "max": 2.5 } },
-        { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } }
+        { "componentId": "JUST_ENOUGH", "enabled": true, "weight": 1.15, "allowedRange": { "min": 0.5, "max": 2 } },
+        { "componentId": "TIGHT_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
+        { "componentId": "ONE_GOAL_LOSS", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } }
       ],
       "labels": {
         "preset": "GOLIARDICO",
@@ -26288,7 +26773,7 @@ File: config\processing.json
         "output": {
           "writeManifest": true,
           "writeCore": true,
-          "publishToSite": false
+          "publishToSite": true
         }
       }
     }
@@ -26583,6 +27068,242 @@ File: tools\Audit-RecordsNext2Js.js
     if(errors.length){ md+='\n## Errori di lettura\n\n'; for(const e of errors) md+=`- ${e.file}: ${e.error}\n`; }
     fs.writeFileSync(path.join(outDir,'RecordsNext2_JS_AUDIT.md'),md,'utf8');
     console.log(JSON.stringify({files:rows.length,expectedSeasons:expectedSeasons.length,output:outDir},null,2));
+
+## tools\Build_RecordsNext2_Release_v2.ps1
+
+File: tools\Build_RecordsNext2_Release_v2.ps1
+
+    param(
+        [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
+        [string]$ReleaseVersion = "2.0.0",
+        [string]$DownloadsDir = "D:\DEV_APPS\downloads",
+        [string]$UCanAccessRoot = "D:\DEV_APPS\RecordsNext\tools\ucanaccess\2.0.9.5\UCanAccess-2.0.9.5-bin"
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    $releaseName = "RecordsNext_$ReleaseVersion"
+    $distRoot = Join-Path $ProjectRoot "dist"
+    $releaseDir = Join-Path $distRoot $releaseName
+    $zipPath = Join-Path $DownloadsDir ($releaseName + ".zip")
+    $shaPath = Join-Path $DownloadsDir ($releaseName + "_SHA256.txt")
+
+    Write-Host ""
+    Write-Host "=== RecordsNext $ReleaseVersion - Build Release ==="
+    Write-Host "ProjectRoot    : $ProjectRoot"
+    Write-Host "ReleaseDir     : $releaseDir"
+    Write-Host "Zip            : $zipPath"
+    Write-Host ""
+
+    # 1. Verifiche preliminari
+    $requiredFiles = @(
+        (Join-Path $ProjectRoot "target\RecordsNext.jar"),
+        (Join-Path $ProjectRoot "RecordsNext.bat"),
+        (Join-Path $ProjectRoot "README.md"),
+        (Join-Path $ProjectRoot "INSTALL.txt"),
+        (Join-Path $ProjectRoot "CHANGELOG.md"),
+        (Join-Path $ProjectRoot "config\competitions.json"),
+        (Join-Path $ProjectRoot "config\teams.json"),
+        (Join-Path $ProjectRoot "config\culometro.json"),
+        (Join-Path $ProjectRoot "config\manifest.example.json"),
+        (Join-Path $ProjectRoot "release\visualizzatori\recordsnext.html"),
+        (Join-Path $ProjectRoot "release\visualizzatori\js\fcmRecordsNextFunzioni_common.js"),
+        (Join-Path $ProjectRoot "release\visualizzatori\js\fcmRecordsNextFunzioni_viewer.js"),
+        (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md"),
+        (Join-Path $ProjectRoot "docs\CULOMETRO.md"),
+        (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1"),
+        (Join-Path $UCanAccessRoot "ucanaccess-2.0.9.5.jar")
+    )
+
+    foreach ($file in $requiredFiles) {
+        if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
+            throw "File richiesto mancante: $file"
+        }
+    }
+
+    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "docs\screenshots") -PathType Container)) {
+        throw "Cartella screenshots mancante: $(Join-Path $ProjectRoot 'docs\screenshots')"
+    }
+
+    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "release\visualizzatori\RecordsNext") -PathType Container)) {
+        throw "Cartella visualizzatori RecordsNext mancante."
+    }
+
+    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "release\visualizzatori\profiles") -PathType Container)) {
+        throw "Cartella profili visualizzatori mancante."
+    }
+
+    # 2. Pulizia staging
+    Remove-Item -LiteralPath $releaseDir -Recurse -Force -ErrorAction SilentlyContinue
+    New-Item -ItemType Directory -Path $releaseDir -Force | Out-Null
+
+    # 3. File principali
+    Copy-Item (Join-Path $ProjectRoot "target\RecordsNext.jar") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "RecordsNext.bat") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "README.md") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "INSTALL.txt") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "CHANGELOG.md") $releaseDir -Force
+
+    # 4. Runtime UCanAccess completo
+    $runtimeUcan = Join-Path $releaseDir "runtime\ucanaccess"
+    New-Item -ItemType Directory -Path $runtimeUcan -Force | Out-Null
+    Copy-Item (Join-Path $UCanAccessRoot "*") $runtimeUcan -Recurse -Force
+
+    Remove-Item (Join-Path $runtimeUcan "console.bat") -Force -ErrorAction SilentlyContinue
+    Remove-Item (Join-Path $runtimeUcan "console.sh") -Force -ErrorAction SilentlyContinue
+
+    # 5. Config neutra
+    $configDir = Join-Path $releaseDir "config"
+    New-Item -ItemType Directory -Path $configDir -Force | Out-Null
+
+    $neutralConfig = @(
+        "competitions.json",
+        "teams.json",
+        "culometro.json",
+        "manifest.example.json"
+    )
+
+    foreach ($name in $neutralConfig) {
+        Copy-Item (Join-Path $ProjectRoot ("config\" + $name)) $configDir -Force
+    }
+
+    # NON distribuire configurazioni/dati personali
+    $forbiddenConfig = @(
+        "league.json",
+        "seasons.json",
+        "recordsnext-gui.properties",
+        "processing.json"
+    )
+
+    foreach ($name in $forbiddenConfig) {
+        Remove-Item (Join-Path $configDir $name) -Force -ErrorAction SilentlyContinue
+    }
+
+    # 6. Visualizzatori statici
+    $visSrc = Join-Path $ProjectRoot "release\visualizzatori"
+    $visDst = Join-Path $releaseDir "visualizzatori"
+
+    New-Item -ItemType Directory -Path $visDst -Force | Out-Null
+    Copy-Item (Join-Path $visSrc "recordsnext.html") $visDst -Force
+    Copy-Item (Join-Path $visSrc "RecordsNext") $visDst -Recurse -Force
+    Copy-Item (Join-Path $visSrc "profiles") $visDst -Recurse -Force
+
+    $visJsDst = Join-Path $visDst "js"
+    New-Item -ItemType Directory -Path $visJsDst -Force | Out-Null
+    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_common.js") $visJsDst -Force
+    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_viewer.js") $visJsDst -Force
+
+    # Sicurezza: nessun JS dati della lega / nessun backup
+    Get-ChildItem $visJsDst -File -ErrorAction SilentlyContinue |
+        Where-Object {
+            $_.Name -like "fcmRecordsNext_Core.js" -or
+            $_.Name -like "fcmRecordsNext_Manifest.js" -or
+            $_.Name -like "fcmRecordsNext_Classics.js" -or
+            $_.Name -like "fcmRecordsNext_Series.js" -or
+            $_.Name -like "fcmRecordsNext_RU.js" -or
+            $_.Name -like "fcmRecordsNext_Modifiers.js" -or
+            $_.Name -like "fcmRecordsNext_ThresholdsLuck.js" -or
+            $_.Name -like "fcmRecordsNext_Culometro.js" -or
+            $_.Name -like "*BACKUP*"
+        } |
+        Remove-Item -Force
+
+    # 7. Documentazione
+    $docsDst = Join-Path $releaseDir "docs"
+    New-Item -ItemType Directory -Path $docsDst -Force | Out-Null
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md") `
+        $docsDst `
+        -Force
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "docs\CULOMETRO.md") `
+        $docsDst `
+        -Force
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "docs\screenshots") `
+        $docsDst `
+        -Recurse `
+        -Force
+
+    # 8. Tool utente finale
+    $toolsDst = Join-Path $releaseDir "tools"
+    New-Item -ItemType Directory -Path $toolsDst -Force | Out-Null
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1") `
+        (Join-Path $toolsDst "Install_RecordsNextVisualizzatori.ps1") `
+        -Force
+
+    # 9. Controllo file vietati
+    $forbiddenPatterns = @(
+        "*BACKUP*",
+        "*.fcm",
+        "*.fca",
+        "recordsnext.db",
+        "recordsnext-gui.properties",
+        "league.json",
+        "seasons.json",
+        "processing.json",
+        "fcmRecordsNext_Core.js",
+        "fcmRecordsNext_Manifest.js",
+        "fcmRecordsNext_Classics.js",
+        "fcmRecordsNext_Series.js",
+        "fcmRecordsNext_RU.js",
+        "fcmRecordsNext_Modifiers.js",
+        "fcmRecordsNext_ThresholdsLuck.js",
+        "fcmRecordsNext_Culometro.js"
+    )
+
+    $bad = @()
+    foreach ($pattern in $forbiddenPatterns) {
+        $bad += Get-ChildItem $releaseDir -Recurse -File -Filter $pattern -ErrorAction SilentlyContinue
+    }
+
+    $bad = $bad | Sort-Object FullName -Unique
+
+    if ($bad.Count -gt 0) {
+        Write-Host ""
+        Write-Host "ERRORE: file vietati trovati nella release:"
+        $bad | ForEach-Object { Write-Host $_.FullName }
+        throw "Release non pulita."
+    }
+
+    # 10. Elenco contenuto
+    Write-Host ""
+    Write-Host "=== CONTENUTO RELEASE ==="
+    Get-ChildItem $releaseDir -Recurse -File |
+        Sort-Object FullName |
+        ForEach-Object {
+            $_.FullName.Substring($releaseDir.Length + 1)
+        }
+
+    # 11. ZIP finale
+    New-Item -ItemType Directory -Path $DownloadsDir -Force | Out-Null
+    Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $shaPath -Force -ErrorAction SilentlyContinue
+
+    Compress-Archive `
+        -Path $releaseDir `
+        -DestinationPath $zipPath `
+        -CompressionLevel Optimal `
+        -Force
+
+    $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
+    Set-Content `
+        -LiteralPath $shaPath `
+        -Value ("SHA256  " + $hash + "  " + [IO.Path]::GetFileName($zipPath)) `
+        -Encoding ASCII
+
+    Write-Host ""
+    Write-Host "=== RELEASE CREATA ==="
+    Write-Host "ZIP    : $zipPath"
+    Write-Host "SHA256 : $hash"
+    Write-Host "SHA file: $shaPath"
+    Write-Host ""
+    Write-Host "NON pubblicare ancora: eseguire prima il test pulito dalla cartella dist."
 
 ## tools\Create-RecordsNext2RealJsZip.ps1
 
@@ -27007,8 +27728,8 @@ File: tools\Install-RecordsNextVisualizzatori_v2.ps1
         [Parameter(Mandatory = $true)]
         [string]$SkinDir,
 
-        [ValidateSet('mauzstrom','fantablue2','neutral')]
-        [string]$Profile = 'neutral',
+        [ValidateSet('mauzstrom','maelstrom','fantablue2','neutral')]
+        [string]$Profile = 'mauzstrom',
 
         [string]$PackageDir = (Join-Path $PSScriptRoot '..\release\visualizzatori')
     )
@@ -34396,6 +35117,7 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - config\teams.json
 - tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
 - tools\Audit-RecordsNext2Js.js
+- tools\Build_RecordsNext2_Release_v2.ps1
 - tools\Create-RecordsNext2RealJsZip.ps1
 - tools\Create-RecordsNext2WorkingCodeMd.ps1
 - tools\Initialize-RecordsNext2Project.ps1
