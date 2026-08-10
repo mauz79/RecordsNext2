@@ -1,37 +1,127 @@
-# Installazione visualizzatori HTML RecordsNext 2.0
+# Installazione visualizzatori HTML — RecordsNext 2.0.0
 
-## Destinatari
+I visualizzatori RecordsNext sono file statici e non contengono i dati della lega.
 
-Questa guida e destinata all'utente che vuole installare le pagine RecordsNext in una skin FCM.
+## Struttura sul sito FCM
 
-## Procedura prevista nella GUI
-
-1. Aprire la sezione di installazione dei visualizzatori.
-2. Selezionare la cartella principale della skin FCM.
-3. Scegliere il profilo `mauzstrom`, `fantablue2` oppure `neutral`.
-4. Verificare le destinazioni proposte.
-5. Avviare `Installa visualizzatori RecordsNext nella skin`.
-
-## File copiati
+Copiare nella root del sito:
 
 ```text
 recordsnext.html
-RecordsNext\*.html
-RecordsNext\recordsnext.css
-js\fcmRecordsNextFunzioni_common.js
-js\fcmRecordsNextFunzioni_viewer.js
 ```
 
-I file dati `fcmRecordsNext_*.js` non vengono copiati dall'installer: sono generati dall'elaborazione.
+Copiare la cartella:
 
-## Aggiornamento del sito
+```text
+RecordsNext\
+```
 
-Dopo l'installazione nella skin, FCM riporta gli asset statici nel sito generato. RecordsNext aggiorna invece i JS dati nella cartella `js` del sito.
+nella root del sito.
 
-## Famiglie non generate
+Copiare nella cartella `js` del sito:
 
-Le pagine possono essere presenti anche quando una famiglia non e stata elaborata. Il visualizzatore mostra uno stato vuoto e il collegamento puo essere disabilitato dall'indice tramite il manifest.
+```text
+fcmRecordsNextFunzioni_common.js
+fcmRecordsNextFunzioni_viewer.js
+```
 
-## Aggiornamento dei visualizzatori
+I file dati generati da RecordsNext devono trovarsi nella stessa cartella `js`:
 
-Una nuova versione puo sostituire HTML, JS statici e CSS senza toccare i JS dati. Prima della sovrascrittura l'installer dovra creare un backup mirato dei file RecordsNext esistenti.
+```text
+fcmRecordsNext_Core.js
+fcmRecordsNext_Manifest.js
+fcmRecordsNext_Classics.js
+fcmRecordsNext_Series.js
+fcmRecordsNext_RU.js
+fcmRecordsNext_Modifiers.js
+fcmRecordsNext_ThresholdsLuck.js
+fcmRecordsNext_Culometro.js
+```
+
+Sono presenti solo i file relativi alle famiglie effettivamente generate.
+
+## Struttura finale
+
+```text
+<root sito>\
+│
+├─ recordsnext.html
+├─ js\
+│  ├─ fcmRecordsNext_Core.js
+│  ├─ fcmRecordsNext_Manifest.js
+│  ├─ fcmRecordsNext_Classics.js
+│  ├─ fcmRecordsNext_Series.js
+│  ├─ fcmRecordsNext_RU.js
+│  ├─ fcmRecordsNext_Modifiers.js
+│  ├─ fcmRecordsNext_ThresholdsLuck.js
+│  ├─ fcmRecordsNext_Culometro.js
+│  ├─ fcmRecordsNextFunzioni_common.js
+│  └─ fcmRecordsNextFunzioni_viewer.js
+│
+└─ RecordsNext\
+   ├─ classici.html
+   ├─ serie.html
+   ├─ riserve_ufficio.html
+   ├─ modificatori.html
+   ├─ soglie_fortuna.html
+   ├─ culometro.html
+   ├─ record_di_lega.html
+   └─ recordsnext.css
+```
+
+## Profili grafici
+
+La release include:
+
+```text
+profiles\mauzstrom\recordsnext.css
+profiles\fantablue2\recordsnext.css
+profiles\neutral\recordsnext.css
+```
+
+`mauzstrom` usa Trebuchet MS.
+
+## Dati e aggiornamenti
+
+Dopo ogni elaborazione della lega è sufficiente aggiornare i file `fcmRecordsNext_*.js` generati.
+
+I file HTML e le funzioni viewer cambiano solo quando viene aggiornata la release.
+
+## Tabellini
+
+I link ai tabellini dipendono dalla configurazione della stagione e dal sito associato.
+
+Sono supportate pagine risultato:
+
+```text
+ris.htm
+ris.html
+ris.php
+```
+
+## Controllo rapido
+
+Aprire:
+
+```text
+recordsnext.html
+```
+
+e verificare:
+
+- disponibilità delle famiglie;
+- filtri stagione/competizione;
+- Classici;
+- Serie;
+- RU;
+- Modificatori;
+- Soglie/Fortuna;
+- Culometro;
+- Record di lega;
+- link tabellini.
+
+Per schermate di riferimento vedere:
+
+```text
+docs\screenshots\
+```

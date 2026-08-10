@@ -1,60 +1,84 @@
 # Changelog
 
-## 2.0.0-dev
+## RecordsNext 2.0.0 — 2026-08-10
 
-### Fondazione
+Prima release stabile della nuova linea RecordsNext 2.0.
 
-- creato progetto separato RecordsNext2.0;
-- importata la base funzionante RecordsNext 1.0.2;
-- confermato accesso FCM/FCA tramite UCanAccess;
-- mantenuti SQLite, mapping canonici, normalizzazione, consolidamento e pubblicazione.
+### Novità principali
 
-### Architettura modulare
+- nuova GUI Swing dedicata `RecordsNext by mauz79`;
+- configurazione guidata di lega e stagioni;
+- supporto stagioni GESTITE e MANUALI;
+- associazioni storiche/canoniche di squadre e competizioni;
+- lettura FCM/FCA tramite UCanAccess 2.0.9.5;
+- pipeline modulare per famiglie di record;
+- modalità di elaborazione Consolidata e Completa;
+- output JavaScript separati per famiglia;
+- pubblicazione verso il sito FCM;
+- visualizzatori HTML statici;
+- supporto ai link tabellini `.htm`, `.html` e `.php`;
+- record di lega;
+- Culometro opzionale.
 
-- definite cinque famiglie elaborabili;
-- introdotti figli, dipendenze e stati degli output;
-- introdotta selezione modulare;
-- mantenuta compatibilita temporanea con Classici e RU legacy;
-- introdotti planner e preflight;
-- collegato config\processing.json alla pipeline.
+### Famiglie disponibili
 
-### Manifest
-
-- introdotto fcmRecordsNext_Manifest.js;
-- integrata generazione nella staging;
-- integrata validazione;
-- integrata pubblicazione con rollback.
+- Classici
+- Serie
+- Riserve d'Ufficio
+- Modificatori
+- Soglie e Fortuna
+- Culometro
 
 ### Modificatori
 
-- introdotta la configurazione gerarchica per modificatore e tipo di statistica;
-- aggiunti Massimo, Totale, Media e Utilizzi;
-- distinti i modificatori personalizzati dai modificatori standard FCM;
-- aggiunti i nomi configurabili per `MODM1PERS`, `MODM2PERS` e `MODM3PERS`;
-- aggiunta la lettura dei campi standard `MODPORTIERE`, `MODDIFESA`, `MODCENTROCAMPO`, `MODATTACCO` e `MODMODULO`;
-- collegata la famiglia Modificatori direttamente agli archivi `season_records_*.json`;
-- aggiunti i metadati distinti `availableSections` e `generatedSections`;
-- verificata l’esportazione del Modificatore Difesa FCM nella stagione 2006_2007;
-- verificata l’esclusione delle statistiche disattivate.
+- supporto modificatori standard FCM;
+- supporto MODM1PERS, MODM2PERS e MODM3PERS;
+- nomi personalizzabili dei modificatori personali;
+- selezione granulare delle statistiche;
+- supporto serie dei modificatori;
+- supporto Fattore Campo.
 
-### Verifica
+### Storico
 
-- 38 test eseguiti;
-- 0 failure;
-- 0 errori;
-- BUILD SUCCESS;
-- output JavaScript reale controllato con tutte le sezioni selezionate presenti.
+- associazioni canoniche delle squadre;
+- associazioni canoniche delle competizioni;
+- gestione differenze di denominazione tra stagioni;
+- esclusione delle stagioni MANUALI dall'elaborazione FCM;
+- ricostruzione completa delle stagioni GESTITE.
 
+### Visualizzatori
 
-### GUI e visualizzatori
+- home RecordsNext;
+- Classici;
+- Serie;
+- Riserve d'Ufficio;
+- Modificatori;
+- Soglie e Fortuna;
+- Culometro;
+- Record di lega;
+- filtri per stagione e competizione;
+- nomi competizioni leggibili;
+- selezione eventi Culometro nella sola vista Eventi;
+- profili `mauzstrom`, `fantablue2`, `neutral`.
 
-- evoluta la dashboard GUI e la configurazione granulare delle famiglie;
-- raggruppati Soglie, Fortuna e Culometro nella stessa area della GUI;
-- consolidata la regola che gli HTML non contengono dati incorporati;
-- definiti i JS statici `fcmRecordsNextFunzioni_common.js` e `fcmRecordsNextFunzioni_viewer.js`;
-- stabilita l'installazione dei JS statici nella cartella `js` della skin;
-- adottato l'underscore per i nuovi nomi file;
-- definiti i profili grafici `mauzstrom`, `fantablue2` e `neutral`;
-- stabilito Trebuchet MS come font principale del profilo `mauzstrom`;
-- progettato il profilo `neutral` moderno ispirato ai principi grafici di ReNewo;
-- aggiunta la documentazione di architettura, installazione e personalizzazione dei visualizzatori.
+### Release e runtime
+
+- versione Maven 2.0.0;
+- manifest applicativo 2.0.0;
+- launcher `RecordsNext.bat`;
+- runtime UCanAccess 2.0.9.5 distribuito con dipendenze e licenze;
+- configurazione `league.json` generata automaticamente dalla GUI.
+
+### Verifiche effettuate
+
+- build Maven completato con successo;
+- test automatici superati;
+- audit contratto checkbox → vista superato;
+- audit semantici Classici, Serie, RU, Modificatori, Fattore Campo, Soglie/Fortuna e Culometro superati;
+- smoke test GUI e visualizzatori superato;
+- lettura FCM dalla distribuzione di prova verificata;
+- generazione automatica `config/league.json` verificata.
+
+### Note
+
+Le stringhe interne che citano RecordsNext 1.0.2 negli exporter indicano la provenienza/compatibilità degli archivi normalizzati e non la versione corrente del prodotto.
