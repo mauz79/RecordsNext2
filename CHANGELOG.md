@@ -59,7 +59,7 @@ Prima release stabile della nuova linea RecordsNext 2.0.
 - filtri per stagione e competizione;
 - nomi competizioni leggibili;
 - selezione eventi Culometro nella sola vista Eventi;
-- profili `mauzstrom`, `fantablue2`, `neutral`.
+- profili `mauzstrom`, `maelstrom`, `fantablue2`, `neutral`.
 
 ### Release e runtime
 
