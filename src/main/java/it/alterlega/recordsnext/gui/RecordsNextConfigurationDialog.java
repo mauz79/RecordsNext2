@@ -2,6 +2,8 @@ package it.alterlega.recordsnext.gui;
 
 import it.alterlega.recordsnext.ConfigurationSchema;
 import it.alterlega.recordsnext.RawSqliteImporter;
+import it.alterlega.recordsnext.app.core.LeagueMetadata;
+import it.alterlega.recordsnext.app.core.LeagueMetadataLoader;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -20,6 +22,8 @@ final class RecordsNextConfigurationDialog extends JDialog {
     private final Properties properties = new Properties();
     private final JPanel seasonsPanel = new JPanel();
     private final List<SeasonEditor> editors = new ArrayList<>();
+    private final JTextField leagueName = new JTextField(24);
+    private final JTextField leagueId = new JTextField(20);
     private final SeasonConfigurationRepository repository;
     private boolean saved;
 
@@ -27,6 +31,7 @@ final class RecordsNextConfigurationDialog extends JDialog {
         super(owner,"RecordsNext - Configurazione stagioni",ModalityType.APPLICATION_MODAL);
         this.projectRoot=projectRoot; this.configPath=configPath;
         loadProperties();
+        loadLeagueIdentity();
         this.databasePath=projectRoot.resolve(properties.getProperty("database","data/database/recordsnext.db")).normalize();
         this.repository=new SeasonConfigurationRepository(databasePath);
         build(); loadSeasons();
@@ -35,6 +40,19 @@ final class RecordsNextConfigurationDialog extends JDialog {
 
     private void build(){
         JPanel root=new JPanel(new BorderLayout(10,10)); root.setBorder(new EmptyBorder(12,14,12,14));
+
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+
+        JPanel leaguePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        leaguePanel.setBorder(new TitledBorder("Identità lega"));
+        leaguePanel.add(new JLabel("Nome lega:"));
+        leaguePanel.add(leagueName);
+        leaguePanel.add(new JLabel("ID lega:"));
+        leaguePanel.add(leagueId);
+        header.add(leaguePanel);
+        header.add(Box.createVerticalStrut(8));
+
         JPanel top=new JPanel(new BorderLayout());
         JLabel info=new JLabel("Configurare stagioni gestite e manuali. Le manuali richiedono solo anni e numero stagione.");
         JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
@@ -42,7 +60,9 @@ final class RecordsNextConfigurationDialog extends JDialog {
         mappings.addActionListener(e -> openMappings());
         JButton add=new JButton("Aggiungi stagione"); add.addActionListener(e->addSeason());
         topButtons.add(mappings); topButtons.add(add);
-        top.add(info,BorderLayout.WEST); top.add(topButtons,BorderLayout.EAST); root.add(top,BorderLayout.NORTH);
+        top.add(info,BorderLayout.WEST); top.add(topButtons,BorderLayout.EAST);
+        header.add(top);
+        root.add(header,BorderLayout.NORTH);
         seasonsPanel.setLayout(new BoxLayout(seasonsPanel,BoxLayout.Y_AXIS)); seasonsPanel.setBorder(new EmptyBorder(4,4,4,4));
         JScrollPane scroll=new JScrollPane(seasonsPanel); scroll.getVerticalScrollBar().setUnitIncrement(20); root.add(scroll,BorderLayout.CENTER);
         JPanel buttons=new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -54,6 +74,46 @@ final class RecordsNextConfigurationDialog extends JDialog {
 
     private void loadProperties(){
         if(Files.isRegularFile(configPath)) try(InputStream in=Files.newInputStream(configPath)){properties.load(in);} catch(IOException ex){error("Lettura configurazione",ex);}
+    }
+
+    private void loadLeagueIdentity() {
+        Path leagueFile = projectRoot.resolve("config/league.json").normalize();
+        if (!Files.isRegularFile(leagueFile)) return;
+        try {
+            LeagueMetadata metadata = LeagueMetadataLoader.load(leagueFile);
+            leagueName.setText(metadata.leagueName());
+            leagueId.setText(metadata.leagueId());
+        } catch (Exception ex) {
+            error("Lettura identità lega", ex);
+        }
+    }
+
+    private void writeLeagueIdentity(String id, String name, String currentSeasonId) throws IOException {
+        Path leagueFile = projectRoot.resolve("config/league.json").normalize();
+        Files.createDirectories(leagueFile.getParent());
+        String json = "{\n"
+                + "  \"leagueId\": \"" + jsonEscape(id) + "\",\n"
+                + "  \"leagueName\": \"" + jsonEscape(name) + "\",\n"
+                + "  \"currentSeasonId\": \"" + jsonEscape(currentSeasonId) + "\"\n"
+                + "}\n";
+        Files.writeString(leagueFile, json, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    private static String slug(String value) {
+        String normalized = java.text.Normalizer.normalize(value, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "")
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-+|-+$", "");
+        return normalized;
+    }
+
+    private static String jsonEscape(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\r", "\\r")
+                .replace("\n", "\\n");
     }
     private void loadSeasons(){
         try {
@@ -177,6 +237,16 @@ final class RecordsNextConfigurationDialog extends JDialog {
     private void refresh(){seasonsPanel.revalidate();seasonsPanel.repaint();}
 
     private void saveConfiguration(){
+        String leagueNameValue = leagueName.getText().trim();
+        if (leagueNameValue.isEmpty()) { warn("Inserire il nome della lega."); return; }
+
+        String leagueIdValue = leagueId.getText().trim();
+        if (leagueIdValue.isEmpty()) {
+            leagueIdValue = slug(leagueNameValue);
+            leagueId.setText(leagueIdValue);
+        }
+        if (leagueIdValue.isEmpty()) { warn("Inserire un ID lega valido."); return; }
+
         if(editors.isEmpty()){warn("Aggiungere almeno una stagione.");return;}
         List<SeasonConfigurationRepository.SeasonRow> rows=new ArrayList<>();
         for(SeasonEditor e:editors){String problem=e.validateFields(); if(problem!=null){warn(problem);return;} rows.add(e.value());}
@@ -203,6 +273,12 @@ final class RecordsNextConfigurationDialog extends JDialog {
             properties.setProperty("siteJs",Path.of(current.localSitePath()).resolve("js").toString()));
         try{
             repository.save(rows);
+            String currentSeasonId = rows.stream()
+                    .filter(r -> "GESTITA".equals(r.managementType()))
+                    .max(Comparator.comparing(r -> r.seasonId()))
+                    .map(SeasonConfigurationRepository.SeasonRow::seasonId)
+                    .orElseThrow(() -> new IllegalStateException("Configurare almeno una stagione gestita."));
+            writeLeagueIdentity(leagueIdValue, leagueNameValue, currentSeasonId);
             Files.createDirectories(configPath.getParent());
             try(OutputStream out=Files.newOutputStream(configPath)){properties.store(out,"RecordsNext configuration");}
             saved=true;dispose();

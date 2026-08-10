@@ -24,7 +24,7 @@ class ManifestPublishingSupportTest {
         PipelinePreflight.Result preflight = PipelinePreflight.evaluate(options);
         ManifestMetadata metadata = new ManifestMetadata(
                 "RecordsNext by mauz79",
-                "2.0.0-dev",
+                "2.0.0",
                 "2.0",
                 OffsetDateTime.parse("2026-08-05T15:30:00+02:00"),
                 "alterlega",

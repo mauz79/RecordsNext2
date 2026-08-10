@@ -100,7 +100,7 @@ public final class RecordsNextPipeline {
             );
             ManifestMetadata manifestMetadata = new ManifestMetadata(
                     "RecordsNext by mauz79",
-                    "2.0.0-dev",
+                    "2.0.0",
                     "2.0",
                     OffsetDateTime.now(),
                     leagueMetadata.leagueId(),
