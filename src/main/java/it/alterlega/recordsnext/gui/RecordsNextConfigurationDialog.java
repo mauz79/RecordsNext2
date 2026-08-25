@@ -190,7 +190,7 @@ final class RecordsNextConfigurationDialog extends JDialog {
                 .filter(r -> r.seasonId().equals(row.seasonId()))
                 .findFirst().orElse(row);
             if ("GESTITA".equals(loaded.managementType()) && !loaded.anchor()) {
-                openMappings();
+                openMappings(loaded.seasonId());
                 loadSeasons();
             }
         } catch(Exception ex) { error("Aggiunta stagione",ex); }
@@ -224,9 +224,15 @@ final class RecordsNextConfigurationDialog extends JDialog {
     }
 
     private void openMappings() {
+        openMappings(null);
+    }
+
+    private void openMappings(String initialSeason) {
         try {
             HistoricalMappingRepository mappingRepository = new HistoricalMappingRepository(databasePath);
-            HistoricalMappingDialog dialog = new HistoricalMappingDialog(this, mappingRepository);
+            HistoricalMappingDialog dialog = initialSeason == null
+                ? new HistoricalMappingDialog(this, mappingRepository)
+                : new HistoricalMappingDialog(this, mappingRepository, initialSeason);
             dialog.open();
             loadSeasons();
         } catch (Exception ex) {
