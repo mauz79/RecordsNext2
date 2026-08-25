@@ -56,9 +56,11 @@ public final class CulometroFamilyJsExporter {
 
         Set<String> performances = new LinkedHashSet<>();
         Map<String,Integer> occurrences = new HashMap<>();
+        Map<String,Integer> configurationOccurrences = new HashMap<>();
         for (Event event : candidates) {
             performances.add(event.performanceKey());
             occurrences.merge(event.type(), 1, Integer::sum);
+            configurationOccurrences.merge(event.configurationKey(), 1, Integer::sum);
         }
         int denominator = Math.max(1, performances.size());
 
@@ -74,7 +76,11 @@ public final class CulometroFamilyJsExporter {
                 Event event = group.get(index);
                 BigDecimal overlap = index == 0 ? BigDecimal.ONE : index == 1 ? config.secondaryWeight() : BigDecimal.ZERO;
                 String level = index == 0 ? "PRIMARY" : index == 1 ? "SECONDARY" : "TAG";
-                BigDecimal rarity = rarityMultiplier(occurrences.getOrDefault(event.type(), 1), denominator, config);
+                int eventOccurrences = occurrences.getOrDefault(event.type(), 1);
+                int configurationCount = configurationOccurrences.getOrDefault(event.configurationKey(), 1);
+                BigDecimal eventFrequency = frequency(eventOccurrences, denominator);
+                BigDecimal configurationFrequency = frequency(configurationCount, denominator);
+                BigDecimal rarity = rarityMultiplier(eventOccurrences, denominator, config);
                 BigDecimal contribution = event.weight()
                         .multiply(BigDecimal.valueOf(event.direction()))
                         .multiply(rarity)
@@ -82,9 +88,15 @@ public final class CulometroFamilyJsExporter {
                         .setScale(6, RoundingMode.HALF_UP);
                 Map<String,Object> out = event.toMap();
                 out.put("level", level);
+                out.put("historicalEventFrequency", eventFrequency);
+                out.put("historicalConfigurationFrequency", configurationFrequency);
+                out.put("configurationKey", event.configurationKey());
                 out.put("rarityMultiplier", rarity);
                 out.put("overlapMultiplier", overlap);
                 out.put("contribution", contribution);
+                // Campo diagnostico 2.1: magnitudine dell'impatto nel motore corrente.
+                // Non entra nel calcolo: e' un alias positivo della contribution gia calcolata.
+                out.put("impact", contribution.abs());
                 scoredEvents.add(out);
                 teamAggregates.computeIfAbsent(event.teamKey(), ignored -> new TeamAggregate(event, false)).add(contribution, level);
                 competitionAggregates.computeIfAbsent(event.competitionTeamKey(), ignored -> new TeamAggregate(event, true)).add(contribution, level);
@@ -155,6 +167,11 @@ public final class CulometroFamilyJsExporter {
             default -> competitionId.replace('_', ' ');
         };
     }
+    private static BigDecimal frequency(int occurrences, int denominator) {
+        double value = (double) occurrences / Math.max(1, denominator);
+        return BigDecimal.valueOf(value).setScale(8, RoundingMode.HALF_UP);
+    }
+
     private static BigDecimal rarityMultiplier(int occurrences, int denominator, CulometroConfig config) {
         int safeOccurrences = Math.max(occurrences, config.minimumHistoricalOccurrences());
         double frequency = (double) safeOccurrences / denominator;
@@ -188,18 +205,30 @@ public final class CulometroFamilyJsExporter {
     private static String text(Object v){ return v==null?"":String.valueOf(v); }
     private static BigDecimal number(Object v){ if(v==null||text(v).isBlank())return BigDecimal.ZERO; return v instanceof BigDecimal b?b:new BigDecimal(text(v).replace(',','.')); }
 
-    private record Event(String type,int direction,BigDecimal weight,String seasonId,String competitionId,String matchId,String teamId,String team,String opponent,String url,String detail) {
-        static Event fromThreshold(Map<String,Object> m,String type,int direction,BigDecimal weight){return new Event(type,direction,weight,text(m.get("seasonId")),text(m.get("competitionId")),text(m.get("matchId")),text(m.get("teamId")),text(m.get("team")),text(m.get("opponent")),text(m.get("scorecardUrl")),text(m.get("detail")));}
+    private record Event(String type,int direction,BigDecimal weight,String seasonId,String competitionId,String matchId,String teamId,String team,String opponent,String url,String detail,String configurationKey) {
+        static Event fromThreshold(Map<String,Object> m,String type,int direction,BigDecimal weight){
+            String config = type + "|" + (direction > 0 ? "FAVOURABLE" : "UNFAVOURABLE")
+                    + "|" + canonicalNumber(m.get("scoreFor")) + "|" + canonicalNumber(m.get("scoreAgainst"));
+            return new Event(type,direction,weight,text(m.get("seasonId")),text(m.get("competitionId")),text(m.get("matchId")),text(m.get("teamId")),text(m.get("team")),text(m.get("opponent")),text(m.get("scorecardUrl")),text(m.get("detail")),config);
+        }
         static Event fromRu(Map<String,Object> m,BigDecimal weight){
             boolean decisive = Boolean.TRUE.equals(m.get("decisivo")) || Boolean.TRUE.equals(m.get("ruDecisiva")) || !text(m.get("esitoSenzaRU")).isBlank() && !text(m.get("esitoSenzaRU")).equalsIgnoreCase(text(m.get("esito")));
             if(!decisive)return null;
             String result=text(m.get("esito")).toUpperCase(); int direction="V".equals(result)?1:("S".equals(result)||"P".equals(result)?-1:0); if(direction==0)return null;
-            return new Event("RU_DECISIVE",direction,weight,text(m.get("stagione")),text(m.get("competizione")),text(m.get("idIncontro")),text(m.get("idSquadra")),text(m.get("squadra")),text(m.get("avversaria")),text(m.get("urlTabellino")),"RU decisiva dimostrata dal dataset");
+            String config = "RU_DECISIVE|" + (direction > 0 ? "FAVOURABLE" : "UNFAVOURABLE")
+                    + "|" + text(m.get("numeroRU")) + "|" + canonicalNumber(m.get("valoreRUTotale"))
+                    + "|" + text(m.get("tipiRU"));
+            return new Event("RU_DECISIVE",direction,weight,text(m.get("stagione")),text(m.get("competizione")),text(m.get("idIncontro")),text(m.get("idSquadra")),text(m.get("squadra")),text(m.get("avversaria")),text(m.get("urlTabellino")),"RU decisiva dimostrata dal dataset",config);
         }
         String performanceKey(){return seasonId+"|"+matchId+"|"+teamId;}
         String teamKey(){return seasonId+"|"+teamId;}
         String competitionTeamKey(){return seasonId+"|"+competitionId+"|"+teamId;}
         Map<String,Object> toMap(){Map<String,Object>m=new LinkedHashMap<>();m.put("eventType",type);m.put("direction",direction>0?"FAVOURABLE":"UNFAVOURABLE");m.put("seasonId",seasonId);m.put("competitionId",competitionId);m.put("competitionName",displayCompetitionName(competitionId));m.put("matchId",matchId);m.put("teamId",teamId);m.put("team",team);m.put("opponent",opponent);m.put("scorecardUrl",url);m.put("detail",detail);m.put("componentWeight",weight);return m;}
+        private static String canonicalNumber(Object value){
+            if(value==null||text(value).isBlank())return "";
+            try{return new BigDecimal(text(value).replace(',','.')).stripTrailingZeros().toPlainString();}
+            catch(Exception ex){return text(value);}
+        }
     }
 
     private static final class TeamAggregate {

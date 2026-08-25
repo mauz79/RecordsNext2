@@ -1019,13 +1019,21 @@ public final class SeasonRecordsArchiveBuilder {
                 "recordId", recordId,
                 "nome", name,
                 "valore", series.size(),
+                "stagione", first.get("stagione"),
+                "competizioneStoricaId", first.get("competizioneStoricaId"),
+                "competizioneNome", first.get("competizioneNome"),
                 "idSquadra", first.get("idSquadra"),
                 "squadra", first.get("squadra"),
+                "daGiornata", first.get("giornata"),
+                "aGiornata", last.get("giornata"),
                 "daGiornataDiA", first.get("giornataDiA"),
                 "aGiornataDiA", last.get("giornataDiA"),
                 "dettagli", series.stream().map(r -> ordered(
                         "idIncontro", r.get("idIncontro"),
+                        "matchId", r.get("idIncontro"),
+                        "giornata", r.get("giornata"),
                         "giornataDiA", r.get("giornataDiA"),
+                        "urlTabellino", r.get("urlTabellino"),
                         "avversaria", r.get("avversaria"))).toList());
     }
 

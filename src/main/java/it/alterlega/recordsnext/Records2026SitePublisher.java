@@ -13,6 +13,7 @@ import it.alterlega.recordsnext.app.series.SeriesFamilyJsExporter;
 import it.alterlega.recordsnext.app.modifiers.ModifiersFamilyJsExporter;
 import it.alterlega.recordsnext.app.thresholds.ThresholdsLuckFamilyJsExporter;
 import it.alterlega.recordsnext.app.culometro.CulometroFamilyJsExporter;
+import it.alterlega.recordsnext.app.matches.MatchesJsExporter;
 import it.alterlega.recordsnext.app.model.RecordFamily;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ public final class Records2026SitePublisher {
     private static final String MODIFIERS_2_FILE = ModifiersFamilyJsExporter.FILE_NAME;
     private static final String THRESHOLDS_2_FILE = ThresholdsLuckFamilyJsExporter.FILE_NAME;
     private static final String CULOMETRO_2_FILE = CulometroFamilyJsExporter.FILE_NAME;
+    private static final String MATCHES_2_FILE = MatchesJsExporter.FILE_NAME;
     private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
     private static final String RU_FILE = "records2026.recordstagionali.ru.js";
     private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
@@ -202,12 +204,13 @@ public final class Records2026SitePublisher {
         boolean includeRecordsNextCore = includeRecordsNextManifest
                 && database != null
                 && leagueMetadata != null;
+        boolean includeMatches = includeRecordsNextManifest && reportsRoot != null;
 
-        if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeThresholds && !includeCulometro && !includeRecordsNextManifest && !includeRecordsNextCore) {
+        if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeThresholds && !includeCulometro && !includeRecordsNextManifest && !includeRecordsNextCore && !includeMatches) {
             throw new IOException("Nessun modulo selezionato per la generazione JS");
         }
         if (includeClassic || includeSeries || includeModifiers) requireDirectory(classicArchive, "Archivio classic");
-        if (includeThresholds || includeCulometro) requireDirectory(reportsRoot, "Report normalizzati");
+        if (includeThresholds || includeCulometro || includeMatches) requireDirectory(reportsRoot, "Report normalizzati");
         if (includeRu) requireDirectory(ruArchive, "Archivio RU");
         Files.createDirectories(stagingRoot);
 
@@ -251,6 +254,9 @@ public final class Records2026SitePublisher {
                     generatedDir.resolve(CULOMETRO_2_FILE)
             );
         }
+        if (includeMatches) {
+            MatchesJsExporter.export(reportsRoot, generatedDir.resolve(MATCHES_2_FILE));
+        }
 
         if (includeRecordsNextCore) {
             try {
@@ -284,6 +290,7 @@ public final class Records2026SitePublisher {
                 includeModifiers,
                 includeThresholds,
                 includeCulometro,
+                includeMatches,
                 includeRecordsNextManifest,
                 includeRecordsNextCore
         );
@@ -305,6 +312,7 @@ public final class Records2026SitePublisher {
             boolean includeModifiers,
             boolean includeThresholds,
             boolean includeCulometro,
+            boolean includeMatches,
             boolean includeRecordsNextManifest,
             boolean includeRecordsNextCore) throws IOException {
 
@@ -343,6 +351,10 @@ public final class Records2026SitePublisher {
             requireFile(byName, CULOMETRO_2_FILE);
             validatePrefix(byName.get(CULOMETRO_2_FILE), "window.fcmRecordsNextCulometro");
         }
+        if (includeMatches) {
+            requireFile(byName, MATCHES_2_FILE);
+            validatePrefix(byName.get(MATCHES_2_FILE), "window.fcmRecordsNextMatches");
+        }
         List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
         if (includeRu) {
             requireFile(byName, RU_FILE);
@@ -375,6 +387,7 @@ public final class Records2026SitePublisher {
                 + (includeModifiers ? 1 : 0)
                 + (includeThresholds ? 1 : 0)
                 + (includeCulometro ? 1 : 0)
+                + (includeMatches ? 1 : 0)
                 + (includeRu ? expectedAnnualFiles + 3 : 0)
                 + (includeRecordsNextCore ? 1 : 0)
                 + (includeRecordsNextManifest ? 1 : 0);
