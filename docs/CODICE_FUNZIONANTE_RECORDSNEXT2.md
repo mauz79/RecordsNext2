@@ -35145,3 +35145,14 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 
 ## Fine documento
+
+## Analisi personale RU
+
+Le diagnostiche private sull'impatto storico delle Riserve d'Ufficio,
+sulle squadre sotto 11 e sulla simulazione con 5 sostituzioni sono documentate
+separatamente in:
+
+`docs/ANALISI_PERSONALE_RU.md`
+
+Questa componente usa i dati RecordsNext ma non appartiene agli output pubblici
+del sito e non deve essere eliminata durante le operazioni di pulizia.
