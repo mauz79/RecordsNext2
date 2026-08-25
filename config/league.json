@@ -1,10 +1,5 @@
-﻿{
-  "schemaVersion": "2.0",
-  "league": {
-    "leagueId": "alterlega",
-    "leagueName": "AlterLega",
-    "currentSeasonId": "2025_2026",
-    "defaultLocale": "it-IT",
-    "defaultTimeZone": "Europe/Rome"
-  }
+{
+  "leagueId": "alterlega",
+  "leagueName": "AlterLega",
+  "currentSeasonId": "2025_2026"
 }
