@@ -1,8 +1,8 @@
-# RecordsNext 2.0.0
+# RecordsNext 2.1.0
 
 **RecordsNext by mauz79** è un'applicazione per Fantacalcio Manager che legge gli archivi FCM/FCA, consolida i dati storici della lega e genera record e viste statistiche pubblicabili sul sito FCM.
 
-La versione 2.0 introduce una GUI dedicata, configurazione guidata delle stagioni e delle associazioni storiche, famiglie di record elaborabili separatamente, output JavaScript modulari e visualizzatori HTML.
+RecordsNext 2.1 prosegue la linea 2.x con output JavaScript più completi, maggiori informazioni di dettaglio per Serie e Culometro e un flusso più rapido per la configurazione delle nuove stagioni storiche.
 
 ## Requisiti
 
@@ -15,7 +15,7 @@ La distribuzione include **UCanAccess 2.0.9.5** e le dipendenze necessarie alla 
 
 ## Avvio rapido
 
-1. Estrarre l'intero archivio `RecordsNext_2.0.0.zip` in una cartella.
+1. Estrarre l'intero archivio `RecordsNext_2.1.0.zip` in una cartella.
 2. Avviare `RecordsNext.bat`.
 3. Aprire **Configurazione stagioni**.
 4. Configurare la lega e almeno una stagione gestita.

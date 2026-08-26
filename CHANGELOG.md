@@ -1,5 +1,58 @@
 # Changelog
 
+## RecordsNext 2.1.0 — 2026-08-26
+
+Aggiornamento della linea RecordsNext 2.x orientato alla completezza degli output,
+alla parità dei dati disponibili sul sito e alla semplificazione dell'aggiornamento
+delle installazioni esistenti.
+
+### Output e dati
+
+- aggiunto l'output canonico `fcmRecordsNext_Matches.js`;
+- una riga per squadra per ogni incontro reale, quindi due righe per partita;
+- esclusione dei turni di riposo dall'output Matches;
+- risultati standardizzati `V/N/P`;
+- link ai tabellini storici corretti anche per stagioni precedenti;
+- arricchiti i dettagli delle Serie con stagione, competizione, giornata, incontro e tabellino;
+- arricchiti gli eventi del Culometro con frequenza storica dell'evento,
+  frequenza storica della configurazione e impatto;
+- invariata la formula di calcolo e la classifica del Culometro.
+
+### Configurazione storica
+
+- dopo l'aggiunta di una stagione gestita, la finestra delle associazioni storiche
+  si apre direttamente sulla stagione appena aggiunta;
+- il comando generale di configurazione delle associazioni conserva invece
+  il comportamento newest-first.
+
+### Aggiornamento da RecordsNext 2.0
+
+- introdotto un pacchetto UPDATE dedicato;
+- l'aggiornamento sostituisce soltanto programma e launcher;
+- configurazione, database, stagioni e associazioni storiche vengono conservati;
+- backup automatico di sicurezza prima della sostituzione;
+- aggiornamento 2.0 -> 2.1 verificato su un'installazione reale già configurata.
+
+### Release e runtime
+
+- versione Maven 2.1.0;
+- manifest applicativo 2.1.0;
+- GUI identificata come RecordsNext 2.1;
+- runtime UCanAccess 2.0.9.5 invariato;
+- Java 21 o superiore.
+
+### Verifiche
+
+- suite Maven completata con 41 test superati;
+- regressione completa sui dati storici verificata;
+- Matches verificato su 20 stagioni;
+- 10.930 partite reali e 21.860 righe squadra verificate;
+- nessun gruppo Matches diverso da due righe;
+- nessuna coppia non speculare;
+- confronto semantico delle famiglie preesistenti superato;
+- aggiornamento reale 2.0 -> 2.1 verificato senza modifica di configurazione e database;
+- generazione del sito tramite il flusso reale FCM verificata con RecordsNext 2.1.
+
 ## RecordsNext 2.0.0 — 2026-08-10
 
 Prima release stabile della nuova linea RecordsNext 2.0.

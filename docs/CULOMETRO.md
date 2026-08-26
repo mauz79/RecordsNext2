@@ -1,4 +1,4 @@
-# Culometro — RecordsNext 2.0.0
+# Culometro — RecordsNext 2.1.0
 
 Il **Culometro** è una famiglia opzionale di RecordsNext che prova a sintetizzare, su base storica, quanto una squadra abbia beneficiato o subito eventi favorevoli e sfavorevoli.
 
@@ -109,7 +109,7 @@ Gli eventi più rari possono quindi pesare maggiormente, fino al limite impostat
 
 ![Pesi dei fattori](screenshots/17_culometro_pesi_fattori.png)
 
-La configurazione 2.0.0 mostrata negli screenshot usa questi componenti:
+La configurazione 2.1.0 mostrata negli screenshot usa questi componenti:
 
 | Fattore | Peso | Min | Max |
 |---|---:|---:|---:|
@@ -220,10 +220,10 @@ Per questo motivo:
 - il numero minimo di partite limita l'affidabilità dei campioni piccoli;
 - la normalizzazione per partita rende confrontabili squadre con quantità diverse di gare.
 
-## Configurazione distribuita con RecordsNext 2.0.0
+## Configurazione distribuita con RecordsNext 2.1.0
 
 La release include `config\culometro.json` come configurazione iniziale del Culometro.
 
 L'utente può modificarla tramite GUI senza intervenire manualmente sul JSON.
 
-I valori documentati in questa pagina corrispondono alla configurazione mostrata negli screenshot della release 2.0.0.
+I valori documentati in questa pagina corrispondono alla configurazione mostrata negli screenshot della release 2.1.0.

@@ -1,10 +1,10 @@
-﻿RecordsNext 2.0.0
+RecordsNext 2.1.0
 INSTALLAZIONE E PRIMO AVVIO
 ===========================
 
 RecordsNext by mauz79
 
-Questa guida descrive l'installazione della release RecordsNext 2.0.0 su Windows,
+Questa guida descrive l'installazione della release RecordsNext 2.1.0 su Windows,
 il primo avvio, la configurazione iniziale, l'elaborazione e la pubblicazione.
 
 Per una panoramica illustrata vedere anche README.md e la cartella:
@@ -30,17 +30,17 @@ Non è necessario installare separatamente UCanAccess.
 2. INSTALLAZIONE
 ================
 
-1. Scaricare RecordsNext_2.0.0.zip.
+1. Scaricare RecordsNext_2.1.0.zip.
 
 2. Estrarre TUTTO il contenuto in una cartella scrivibile, ad esempio:
 
-   C:\RecordsNext_2.0.0
+   C:\RecordsNext_2.1.0
 
 3. Non spostare singolarmente RecordsNext.jar o RecordsNext.bat.
 
 La struttura minima deve rimanere simile a:
 
-RecordsNext_2.0.0\
+RecordsNext_2.1.0\
 |
 |-- RecordsNext.jar
 |-- RecordsNext.bat
@@ -70,7 +70,7 @@ UCanAccess incluso nella release.
 Se Java non viene trovato o la versione non è compatibile, viene mostrato
 un messaggio di errore.
 
-RecordsNext 2.0 richiede Java 21 o superiore.
+RecordsNext 2.1 richiede Java 21 o superiore.
 
 
 4. DASHBOARD
@@ -421,7 +421,7 @@ fare una copia di sicurezza di questi dati.
 21. UCanAccess
 ==============
 
-RecordsNext 2.0.0 distribuisce UCanAccess 2.0.9.5 in:
+RecordsNext 2.1.0 distribuisce UCanAccess 2.0.9.5 in:
 
 runtime\ucanaccess\
 
@@ -489,4 +489,4 @@ docs\screenshots\
 
 
 RecordsNext by mauz79
-Versione 2.0.0
+Versione 2.1.0

@@ -1,4 +1,4 @@
-# Installazione visualizzatori HTML — RecordsNext 2.0.0
+# Installazione visualizzatori HTML — RecordsNext 2.1.0
 
 I visualizzatori RecordsNext sono file statici e non contengono i dati della lega.
 
