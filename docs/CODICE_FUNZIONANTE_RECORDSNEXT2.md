@@ -1,8 +1,114 @@
-# Codice funzionante RecordsNext 2.0
+# Codice funzionante RecordsNext 2.1
 
 > Documento generato automaticamente.
 > Data generazione: 2026-08-10 15:56:38 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
+
+## Stato consolidato RecordsNext 2.1.0 — 2026-08-26
+
+RecordsNext 2.1.0 è la release stabile corrente.
+
+Riferimento Git:
+
+- commit release: `682f0f6` — `Release RecordsNext 2.1.0`;
+- tag: `v2.1.0`;
+- branch `main` allineato con `origin/main`.
+
+### Funzionalità consolidate nella 2.1
+
+- pipeline completa sulle 20 stagioni storiche configurate;
+- output modulari pubblici:
+  - `fcmRecordsNext_Core.js`;
+  - `fcmRecordsNext_Classics.js`;
+  - `fcmRecordsNext_Series.js`;
+  - `fcmRecordsNext_RU.js`;
+  - `fcmRecordsNext_Modifiers.js`;
+  - `fcmRecordsNext_ThresholdsLuck.js`;
+  - `fcmRecordsNext_Culometro.js`;
+  - `fcmRecordsNext_Matches.js`;
+  - `fcmRecordsNext_Manifest.js`;
+- `fcmRecordsNext_Matches.js` è l'output canonico delle partite:
+  una riga per squadra per ogni incontro reale, due righe speculari per partita;
+- esclusione dei turni di riposo da Matches;
+- esiti Matches standardizzati `V/N/P`;
+- link ai tabellini storici corretti senza annidamento della stagione corrente;
+- Serie arricchite con stagione, competizione, giornata, match e tabellino;
+- Culometro arricchito per evento con:
+  - frequenza storica dell'evento;
+  - frequenza storica della configurazione;
+  - chiave configurazione;
+  - impatto dell'evento;
+- formula e classifiche del Culometro invariate rispetto alla 2.0;
+- configurazione storica migliorata:
+  dopo l'aggiunta di una stagione gestita il dialog delle associazioni
+  si apre direttamente sulla stagione appena aggiunta;
+- il comando generale delle associazioni continua invece a partire
+  dalla stagione più recente;
+- GUI pubblica identificata come `RecordsNext 2.1`;
+- manifest applicativo `2.1.0`;
+- schema generale del manifest ancora `2.0` dove previsto dal contratto dati.
+
+### Verifiche finali 2.1
+
+- Maven: 41 test eseguiti, 0 failure, 0 errori;
+- regressione completa sulle 20 stagioni superata;
+- Matches:
+  - 21.860 righe squadra;
+  - 10.930 partite reali;
+  - 0 gruppi diversi da due righe;
+  - 0 coppie non speculari;
+  - 0 identità invalide;
+- Culometro:
+  - ranking invariato;
+  - ranking per competizione invariato;
+  - eventi invariati semanticamente al netto dei nuovi campi 2.1;
+- Serie:
+  - aggregati invariati semanticamente;
+  - dettagli arricchiti verificati;
+- Classici, Modificatori, RU e Soglie/Fortuna verificati senza regressioni;
+- generazione reale del sito da FCM verificata con RecordsNext 2.1.
+
+### Aggiornamento 2.0 -> 2.1
+
+È disponibile un aggiornamento in-place.
+
+Il pacchetto UPDATE sostituisce soltanto:
+
+- `RecordsNext.jar`;
+- `RecordsNext.bat`.
+
+Non sovrascrive:
+
+- `config\`;
+- `data\`;
+- `recordsnext.db`;
+- stagioni configurate;
+- associazioni storiche.
+
+Prima della sostituzione viene creato automaticamente un backup di sicurezza.
+
+Il percorso di aggiornamento è stato verificato su una copia dell'installazione
+reale e successivamente sull'installazione FCM effettiva.
+
+### Installazione operativa FCM
+
+Installazione corrente:
+
+`E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2`
+
+Il post-elaborazione FCM richiama questa installazione tramite:
+
+`E:\FCM\plugin\MultidopoMS2014Full.bat`
+
+La vecchia installazione `RecordsNext-1.0.0` e il relativo ZIP sono stati rimossi.
+
+### Nota sulla parte sottostante del documento
+
+Le sezioni successive derivano dalla bibbia generata durante lo sviluppo della 2.0
+e conservano valore storico e di riferimento del codice.
+
+Le indicazioni di stato presenti più avanti, se in conflitto con questa sezione,
+sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra riportato.
 
 ## Regole della bibbia
 
@@ -27461,14 +27567,120 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     $Builder = New-Object System.Text.StringBuilder
     $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 
-    [void]$Builder.AppendLine("# Codice funzionante RecordsNext 2.0")
+    [void]$Builder.AppendLine("# Codice funzionante RecordsNext 2.1")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("> Documento generato automaticamente.")
     [void]$Builder.AppendLine("> Data generazione: " + $GeneratedAt)
     [void]$Builder.AppendLine("> Directory progetto: " + $ProjectDir)
     [void]$Builder.AppendLine("")
 
-    [void]$Builder.AppendLine("## Regole della bibbia")
+    [void]$Builder.AppendLine("## Stato consolidato RecordsNext 2.1.0 — 2026-08-26
+
+RecordsNext 2.1.0 è la release stabile corrente.
+
+Riferimento Git:
+
+- commit release: `682f0f6` — `Release RecordsNext 2.1.0`;
+- tag: `v2.1.0`;
+- branch `main` allineato con `origin/main`.
+
+### Funzionalità consolidate nella 2.1
+
+- pipeline completa sulle 20 stagioni storiche configurate;
+- output modulari pubblici:
+  - `fcmRecordsNext_Core.js`;
+  - `fcmRecordsNext_Classics.js`;
+  - `fcmRecordsNext_Series.js`;
+  - `fcmRecordsNext_RU.js`;
+  - `fcmRecordsNext_Modifiers.js`;
+  - `fcmRecordsNext_ThresholdsLuck.js`;
+  - `fcmRecordsNext_Culometro.js`;
+  - `fcmRecordsNext_Matches.js`;
+  - `fcmRecordsNext_Manifest.js`;
+- `fcmRecordsNext_Matches.js` è l'output canonico delle partite:
+  una riga per squadra per ogni incontro reale, due righe speculari per partita;
+- esclusione dei turni di riposo da Matches;
+- esiti Matches standardizzati `V/N/P`;
+- link ai tabellini storici corretti senza annidamento della stagione corrente;
+- Serie arricchite con stagione, competizione, giornata, match e tabellino;
+- Culometro arricchito per evento con:
+  - frequenza storica dell'evento;
+  - frequenza storica della configurazione;
+  - chiave configurazione;
+  - impatto dell'evento;
+- formula e classifiche del Culometro invariate rispetto alla 2.0;
+- configurazione storica migliorata:
+  dopo l'aggiunta di una stagione gestita il dialog delle associazioni
+  si apre direttamente sulla stagione appena aggiunta;
+- il comando generale delle associazioni continua invece a partire
+  dalla stagione più recente;
+- GUI pubblica identificata come `RecordsNext 2.1`;
+- manifest applicativo `2.1.0`;
+- schema generale del manifest ancora `2.0` dove previsto dal contratto dati.
+
+### Verifiche finali 2.1
+
+- Maven: 41 test eseguiti, 0 failure, 0 errori;
+- regressione completa sulle 20 stagioni superata;
+- Matches:
+  - 21.860 righe squadra;
+  - 10.930 partite reali;
+  - 0 gruppi diversi da due righe;
+  - 0 coppie non speculari;
+  - 0 identità invalide;
+- Culometro:
+  - ranking invariato;
+  - ranking per competizione invariato;
+  - eventi invariati semanticamente al netto dei nuovi campi 2.1;
+- Serie:
+  - aggregati invariati semanticamente;
+  - dettagli arricchiti verificati;
+- Classici, Modificatori, RU e Soglie/Fortuna verificati senza regressioni;
+- generazione reale del sito da FCM verificata con RecordsNext 2.1.
+
+### Aggiornamento 2.0 -> 2.1
+
+È disponibile un aggiornamento in-place.
+
+Il pacchetto UPDATE sostituisce soltanto:
+
+- `RecordsNext.jar`;
+- `RecordsNext.bat`.
+
+Non sovrascrive:
+
+- `config\`;
+- `data\`;
+- `recordsnext.db`;
+- stagioni configurate;
+- associazioni storiche.
+
+Prima della sostituzione viene creato automaticamente un backup di sicurezza.
+
+Il percorso di aggiornamento è stato verificato su una copia dell'installazione
+reale e successivamente sull'installazione FCM effettiva.
+
+### Installazione operativa FCM
+
+Installazione corrente:
+
+`E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2`
+
+Il post-elaborazione FCM richiama questa installazione tramite:
+
+`E:\FCM\plugin\MultidopoMS2014Full.bat`
+
+La vecchia installazione `RecordsNext-1.0.0` e il relativo ZIP sono stati rimossi.
+
+### Nota sulla parte sottostante del documento
+
+Le sezioni successive derivano dalla bibbia generata durante lo sviluppo della 2.0
+e conservano valore storico e di riferimento del codice.
+
+Le indicazioni di stato presenti più avanti, se in conflitto con questa sezione,
+sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra riportato.
+
+## Regole della bibbia")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("- Le decisioni progettuali consolidate sono separate dal codice implementato.")
     [void]$Builder.AppendLine("- Un file incluso non e automaticamente dichiarato funzionante.")

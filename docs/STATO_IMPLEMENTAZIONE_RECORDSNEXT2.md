@@ -1,6 +1,94 @@
-# Stato implementazione RecordsNext 2.0
+# Stato implementazione RecordsNext 2.1
 
-Aggiornamento: 6 agosto 2026.
+Aggiornamento: 26 agosto 2026.
+
+## Stato release 2.1.0
+
+RecordsNext 2.1.0 è completato, testato, taggato e pubblicato nel repository.
+
+Sono implementate e operative:
+
+- GUI completa `RecordsNext by mauz79`;
+- configurazione guidata della lega e delle stagioni;
+- stagioni GESTITE e MANUALI;
+- associazioni storiche di squadre e competizioni;
+- normalizzazione e consolidamento multistagione;
+- modalità Completa e Consolidata;
+- Classici;
+- Serie;
+- Riserve d'Ufficio;
+- Modificatori;
+- Fattore Campo;
+- Soglie e Fortuna;
+- Culometro opzionale;
+- visualizzatori HTML statici;
+- pubblicazione nel sito FCM;
+- output Matches canonico;
+- manifest;
+- link ai tabellini storici.
+
+Output pubblico corrente:
+
+- `fcmRecordsNext_Core.js`;
+- `fcmRecordsNext_Classics.js`;
+- `fcmRecordsNext_Series.js`;
+- `fcmRecordsNext_RU.js`;
+- `fcmRecordsNext_Modifiers.js`;
+- `fcmRecordsNext_ThresholdsLuck.js`;
+- `fcmRecordsNext_Culometro.js`;
+- `fcmRecordsNext_Matches.js`;
+- `fcmRecordsNext_Manifest.js`.
+
+### Novità specifiche 2.1
+
+`fcmRecordsNext_Matches.js` espone il dataset canonico delle gare,
+con due righe per ogni partita reale e una riga per squadra.
+
+Le Serie espongono ora nel dettaglio:
+
+- stagione;
+- competizione;
+- giornata;
+- identificativo incontro;
+- link al tabellino.
+
+Gli eventi Culometro espongono inoltre:
+
+- frequenza storica evento;
+- frequenza storica configurazione;
+- chiave configurazione;
+- impatto.
+
+L'aggiunta di una nuova stagione storica apre direttamente le associazioni
+sulla stagione appena importata.
+
+### Test finali
+
+Ultimo stato verificato il 26 agosto 2026:
+
+- 41 test automatici;
+- 0 failure;
+- 0 errori;
+- BUILD SUCCESS;
+- regressione reale su 20 stagioni completata;
+- generazione reale del sito FCM completata;
+- aggiornamento reale 2.0 -> 2.1 completato senza perdita di configurazione.
+
+### Release
+
+- Maven: `2.1.0`;
+- tag Git: `v2.1.0`;
+- commit release: `682f0f6`;
+- UCanAccess: `2.0.9.5`;
+- Java: 21 o superiore.
+
+Sono disponibili:
+
+- `RecordsNext_2.1.0.zip`;
+- `RecordsNext_2.1.0_UPDATE.zip`.
+
+Le sezioni storiche sottostanti descrivono le tappe di sviluppo precedenti
+e non prevalgono sullo stato corrente qui riportato.
 
 ## Base tecnica verificata
 

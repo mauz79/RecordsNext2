@@ -1,8 +1,8 @@
-# Architettura RecordsNext 2.0
+# Architettura RecordsNext 2.1
 
 ## Scopo
 
-RecordsNext 2.0 genera viste dati tematiche complete e filtrabili, non semplici classifiche finali.
+RecordsNext 2.1 genera viste dati tematiche complete e filtrabili, non semplici classifiche finali.
 
 ## Flusso
 
@@ -63,6 +63,38 @@ Easter egg opzionale: non viene generato automaticamente; richiede selezione e c
 
 Output: `fcmRecordsNext_Culometro.js`
 
+## Dataset canonico Matches
+
+RecordsNext 2.1 introduce:
+
+`fcmRecordsNext_Matches.js`
+
+È il dataset pubblico canonico delle partite.
+
+Per ogni incontro reale contiene esattamente due righe:
+
+- una dalla prospettiva della prima squadra;
+- una dalla prospettiva dell'avversaria.
+
+Ogni riga contiene almeno:
+
+- stagione;
+- competizione;
+- identificativo incontro;
+- giornata;
+- numero giornata;
+- link tabellino;
+- squadra e identificativo canonico;
+- avversario e identificativo canonico;
+- gol fatti;
+- gol subiti;
+- risultato standardizzato `V/N/P`.
+
+I turni di riposo non appartengono al dataset Matches.
+
+Questo output permette ai visualizzatori e ad altri consumer di ricostruire
+le statistiche basate sulle singole gare senza dipendere da HTML o JavaScript legacy.
+
 ## Dipendenze
 
 Ogni figlio dichiara dipendenze obbligatorie e opzionali. Una dipendenza mancante blocca solo il figlio interessato.
@@ -99,7 +131,7 @@ Palmares, albo d'oro, promozioni, retrocessioni, bilancio prossimo turno, confro
 
 ### Regola vincolante
 
-Gli HTML a corredo di RecordsNext 2.0 non devono contenere dati incorporati, record precalcolati, nomi di squadre o classifiche scritte nel markup.
+Gli HTML a corredo di RecordsNext 2.1 non devono contenere dati incorporati, record precalcolati, nomi di squadre o classifiche scritte nel markup.
 
 Devono essere visualizzatori statici dei JavaScript generati dal programma. Questa separazione consente di:
 
