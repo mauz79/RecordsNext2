@@ -19,7 +19,6 @@ import it.alterlega.recordsnext.app.model.RecordFamily;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -33,8 +32,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Coordina la generazione e la pubblicazione degli output JS compatibili
- * con Records2026.
+ * Coordina la generazione e la pubblicazione degli output JS pubblici
+ * di RecordsNext.
  *
  * Flusso:
  *  1. genera tutto in una staging isolata;
@@ -52,11 +51,6 @@ public final class Records2026SitePublisher {
     private static final String THRESHOLDS_2_FILE = ThresholdsLuckFamilyJsExporter.FILE_NAME;
     private static final String CULOMETRO_2_FILE = CulometroFamilyJsExporter.FILE_NAME;
     private static final String MATCHES_2_FILE = MatchesJsExporter.FILE_NAME;
-    private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
-    private static final String RU_FILE = "records2026.recordstagionali.ru.js";
-    private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
-    private static final String ANNUAL_PREFIX = "records2026.storico.ru.";
-    private static final String ANNUAL_SUFFIX = ".js";
 
     private Records2026SitePublisher() {
     }
@@ -224,11 +218,9 @@ public final class Records2026SitePublisher {
         int ruSeasons = 0;
         int annualFiles = 0;
         if (includeClassic) {
-            var classic = Records2026ClassicJsExporter.export(
-                    classicArchive, generatedDir.resolve(CLASSIC_FILE), List.of());
-            classicEntries = classic.entryCount();
-            ClassicsFamilyJsExporter.export(
+            var classic = ClassicsFamilyJsExporter.export(
                     classicArchive, generatedDir.resolve(CLASSICS_2_FILE));
+            classicEntries = classic.entryCount();
         }
         if (includeSeries) {
             SeriesFamilyJsExporter.export(classicArchive, generatedDir.resolve(SERIES_2_FILE));
@@ -240,10 +232,10 @@ public final class Records2026SitePublisher {
             ThresholdsLuckFamilyJsExporter.export(reportsRoot, generatedDir.resolve(THRESHOLDS_2_FILE));
         }
         if (includeRu) {
-            var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
-            ruSeasons = ru.seasons();
-            annualFiles = ru.annualFiles();
-            RuFamilyJsExporter.export(ruArchive, generatedDir.resolve(RU_2_FILE));
+            var ru = RuFamilyJsExporter.export(
+                    ruArchive, generatedDir.resolve(RU_2_FILE));
+            ruSeasons = ru.seasonCount();
+            annualFiles = ru.annualFileCount();
         }
         if (includeCulometro) {
             Path projectRoot = reportsRoot.toAbsolutePath().normalize().getParent().getParent();
@@ -283,7 +275,6 @@ public final class Records2026SitePublisher {
 
         ValidationResult validation = validateGenerated(
                 generatedDir,
-                annualFiles,
                 includeClassic,
                 includeRu,
                 includeSeries,
@@ -305,7 +296,6 @@ public final class Records2026SitePublisher {
 
     private static ValidationResult validateGenerated(
             Path generatedDir,
-            int expectedAnnualFiles,
             boolean includeClassic,
             boolean includeRu,
             boolean includeSeries,
@@ -330,8 +320,6 @@ public final class Records2026SitePublisher {
         }
 
         if (includeClassic) {
-            requireFile(byName, CLASSIC_FILE);
-            validatePrefix(byName.get(CLASSIC_FILE), "window.RECORDS2026_PREVIEW_CLASSIC");
             requireFile(byName, CLASSICS_2_FILE);
             validatePrefix(byName.get(CLASSICS_2_FILE), "window.fcmRecordsNextClassics");
         }
@@ -355,21 +343,9 @@ public final class Records2026SitePublisher {
             requireFile(byName, MATCHES_2_FILE);
             validatePrefix(byName.get(MATCHES_2_FILE), "window.fcmRecordsNextMatches");
         }
-        List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
         if (includeRu) {
-            requireFile(byName, RU_FILE);
-            requireFile(byName, MANIFEST_FILE);
-            if (annuals.size() != expectedAnnualFiles) {
-                throw new IOException("Numero file annuali inatteso: " + annuals.size()
-                        + ", attesi " + expectedAnnualFiles);
-            }
-            validatePrefix(byName.get(RU_FILE), "window.RECORDS2026_PREVIEW_RU");
-            validatePrefix(byName.get(MANIFEST_FILE), "window.RECORDS2026_STORICO_RU_MANIFEST");
             requireFile(byName, RU_2_FILE);
             validatePrefix(byName.get(RU_2_FILE), "window.fcmRecordsNextRU");
-            for (Path annual : annuals) validateContains(annual, "window.RECORDS2026_STORICO_RU");
-        } else if (!annuals.isEmpty()) {
-            throw new IOException("File RU annuali generati nonostante il modulo RU sia disattivato");
         }
         if (includeRecordsNextCore) {
             requireFile(byName, CORE_FILE);
@@ -382,13 +358,13 @@ public final class Records2026SitePublisher {
                     "window.fcmRecordsNextManifest"
             );
         }
-        int expectedTotal = (includeClassic ? 2 : 0)
+        int expectedTotal = (includeClassic ? 1 : 0)
                 + (includeSeries ? 1 : 0)
                 + (includeModifiers ? 1 : 0)
                 + (includeThresholds ? 1 : 0)
                 + (includeCulometro ? 1 : 0)
                 + (includeMatches ? 1 : 0)
-                + (includeRu ? expectedAnnualFiles + 3 : 0)
+                + (includeRu ? 1 : 0)
                 + (includeRecordsNextCore ? 1 : 0)
                 + (includeRecordsNextManifest ? 1 : 0);
         if (files.size() != expectedTotal) {
@@ -496,26 +472,11 @@ public final class Records2026SitePublisher {
         }
     }
 
-    private static boolean isAnnualFile(Path path) {
-        String name = path.getFileName().toString();
-        return name.startsWith(ANNUAL_PREFIX)
-                && name.endsWith(ANNUAL_SUFFIX)
-                && !name.equals(MANIFEST_FILE);
-    }
-
     private static void validatePrefix(Path path, String expectedPrefix) throws IOException {
         String sample = readStart(path, 4096);
         if (!stripBom(sample).stripLeading().startsWith(expectedPrefix)) {
             throw new IOException("Prefisso JS non valido in " + path.getFileName()
                     + ": atteso " + expectedPrefix);
-        }
-    }
-
-    private static void validateContains(Path path, String expectedToken) throws IOException {
-        String sample = readStart(path, 8192);
-        if (!stripBom(sample).contains(expectedToken)) {
-            throw new IOException("Token JS non trovato in " + path.getFileName()
-                    + ": " + expectedToken);
         }
     }
 

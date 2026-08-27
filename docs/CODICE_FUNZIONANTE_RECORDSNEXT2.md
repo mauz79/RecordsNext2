@@ -1,22 +1,29 @@
 # Codice funzionante RecordsNext 2.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-10 15:56:38 +02:00
+> Data generazione: 2026-08-27 20:35:54 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
-## Stato consolidato RecordsNext 2.1.0 — 2026-08-26
+## Stato consolidato RecordsNext 2.1.0 - 2026-08-27
 
-RecordsNext 2.1.0 è la release stabile corrente.
+RecordsNext 2.1.0 e' la release stabile corrente.
 
 Riferimento Git:
 
-- commit release: `682f0f6` — `Release RecordsNext 2.1.0`;
+- commit release: `682f0f6` - `Release RecordsNext 2.1.0`;
 - tag: `v2.1.0`;
-- branch `main` allineato con `origin/main`.
+- branch di sviluppo: `main`.
 
-### Funzionalità consolidate nella 2.1
+### Stato operativo corrente
 
-- pipeline completa sulle 20 stagioni storiche configurate;
+- stagione corrente: `2026_2027` (2026/2027);
+- sito FCM corrente configurato: `E:\fantacalcio\Lega2026`;
+- cartella JS corrente: `E:\fantacalcio\Lega2026\js`;
+- archivio Classici/RU consolidato disponibile per le stagioni 2006_2007-2025_2026;
+- la stagione 2026_2027 e' registrata come anchor corrente nel database operativo e dispone dei report normalizzati correnti.
+
+### Funzionalita' consolidate nella 2.1
+
 - output modulari pubblici:
   - `fcmRecordsNext_Core.js`;
   - `fcmRecordsNext_Classics.js`;
@@ -27,88 +34,41 @@ Riferimento Git:
   - `fcmRecordsNext_Culometro.js`;
   - `fcmRecordsNext_Matches.js`;
   - `fcmRecordsNext_Manifest.js`;
-- `fcmRecordsNext_Matches.js` è l'output canonico delle partite:
-  una riga per squadra per ogni incontro reale, due righe speculari per partita;
+- `fcmRecordsNext_Matches.js` e' l'output canonico delle partite: una riga per squadra per ogni incontro reale, due righe speculari per partita;
 - esclusione dei turni di riposo da Matches;
 - esiti Matches standardizzati `V/N/P`;
 - link ai tabellini storici corretti senza annidamento della stagione corrente;
 - Serie arricchite con stagione, competizione, giornata, match e tabellino;
-- Culometro arricchito per evento con:
-  - frequenza storica dell'evento;
-  - frequenza storica della configurazione;
-  - chiave configurazione;
-  - impatto dell'evento;
+- Culometro arricchito per evento con frequenza storica evento, frequenza storica configurazione, chiave configurazione e impatto;
 - formula e classifiche del Culometro invariate rispetto alla 2.0;
-- configurazione storica migliorata:
-  dopo l'aggiunta di una stagione gestita il dialog delle associazioni
-  si apre direttamente sulla stagione appena aggiunta;
-- il comando generale delle associazioni continua invece a partire
-  dalla stagione più recente;
 - GUI pubblica identificata come `RecordsNext 2.1`;
 - manifest applicativo `2.1.0`;
 - schema generale del manifest ancora `2.0` dove previsto dal contratto dati.
 
+### Bonifica output legacy - 2026-08-27
+
+- i file pubblici `records2026.recordstagionali.classic.js`, `records2026.recordstagionali.ru.js`, `records2026.storico.ru.<stagione>.js` e `records2026.storico.ru.manifest.js` non vengono piu' generati ne' pubblicati;
+- `Records2026ClassicJsExporter` e `Records2026RuJsExporter` restano nel codice come sorgenti interne di compatibilita' per i wrapper RecordsNext;
+- il frontend non cambia: nomi, globali e struttura degli output `fcmRecordsNext_*` restano invariati;
+- test su dati operativi reali: 9 output moderni validati, 0 output legacy;
+- `fcmRecordsNext_Classics.js` e `fcmRecordsNext_RU.js` verificati byte-per-byte invariati rispetto alla staging 2.1 precedente;
+- riduzione misurata: circa 28 MiB di output legacy eliminati per sito.
+
 ### Verifiche finali 2.1
 
-- Maven: 41 test eseguiti, 0 failure, 0 errori;
-- regressione completa sulle 20 stagioni superata;
-- Matches:
-  - 21.860 righe squadra;
-  - 10.930 partite reali;
-  - 0 gruppi diversi da due righe;
-  - 0 coppie non speculari;
-  - 0 identità invalide;
-- Culometro:
-  - ranking invariato;
-  - ranking per competizione invariato;
-  - eventi invariati semanticamente al netto dei nuovi campi 2.1;
-- Serie:
-  - aggregati invariati semanticamente;
-  - dettagli arricchiti verificati;
-- Classici, Modificatori, RU e Soglie/Fortuna verificati senza regressioni;
-- generazione reale del sito da FCM verificata con RecordsNext 2.1.
+- Maven: 41 test eseguiti, 0 failure, 0 errori dopo la pulizia finale del codice morto;
+- build/package 2.1 completato con successo;
+- regressione completa dello storico preesistente superata;
+- generazione reale del sito da FCM verificata con RecordsNext 2.1;
+- publisher bonificato compilato separatamente e verificato sui dati operativi 2026/2027.
 
 ### Aggiornamento 2.0 -> 2.1
 
-È disponibile un aggiornamento in-place.
-
-Il pacchetto UPDATE sostituisce soltanto:
-
-- `RecordsNext.jar`;
-- `RecordsNext.bat`.
-
-Non sovrascrive:
-
-- `config\`;
-- `data\`;
-- `recordsnext.db`;
-- stagioni configurate;
-- associazioni storiche.
-
-Prima della sostituzione viene creato automaticamente un backup di sicurezza.
-
-Il percorso di aggiornamento è stato verificato su una copia dell'installazione
-reale e successivamente sull'installazione FCM effettiva.
-
-### Installazione operativa FCM
-
-Installazione corrente:
-
-`E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2`
-
-Il post-elaborazione FCM richiama questa installazione tramite:
-
-`E:\FCM\plugin\MultidopoMS2014Full.bat`
-
-La vecchia installazione `RecordsNext-1.0.0` e il relativo ZIP sono stati rimossi.
+E' disponibile un aggiornamento in-place che sostituisce programma e launcher e conserva configurazione, database, stagioni e associazioni storiche.
 
 ### Nota sulla parte sottostante del documento
 
-Le sezioni successive derivano dalla bibbia generata durante lo sviluppo della 2.0
-e conservano valore storico e di riferimento del codice.
-
-Le indicazioni di stato presenti più avanti, se in conflitto con questa sezione,
-sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra riportato.
+Le sezioni successive includono documentazione e codice reale del progetto. Le indicazioni di stato storiche, se in conflitto con questa sezione, sono superate dallo stato consolidato sopra riportato.
 
 ## Regole della bibbia
 
@@ -122,6 +82,7 @@ sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra ri
 ### Decisioni consolidate
 
 - Progetto separato in D:\DEV_APPS\RecordsNext2.0.
+- Stagione operativa corrente verificata al 27/08/2026: 2026_2027; sito corrente E:\fantacalcio\Lega2026.
 - Cinque famiglie: Classici, Serie, Riserve d'Ufficio, Modificatori, Soglie e Fortuna.
 - Fattore Campo incluso nei Modificatori.
 - Culometro opzionale e prodotto soltanto su richiesta.
@@ -139,12 +100,12 @@ sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra ri
 
 ### Implementato e verificato
 
-- Base funzionante RecordsNext 1.0.2 importata nel progetto 2.0.
+- Base funzionante RecordsNext 1.0.2 importata nella linea RecordsNext 2.x.
 - Accesso ai database FCM e FCA tramite UCanAccess.
 - Configurazione delle stagioni gestite e manuali.
 - Importazione, normalizzazione e consolidamento storico delle stagioni gestite.
 - Modello modulare con famiglie, figli, dipendenze, planner e preflight.
-- GUI RecordsNext 2.0 con configurazione granulare delle famiglie.
+- GUI RecordsNext 2.1 con configurazione granulare delle famiglie.
 - Configurazione gerarchica dei Modificatori per tipo e statistica.
 - Nomi configurabili per MODM1PERS, MODM2PERS e MODM3PERS.
 - Modificatori standard FCM distinti dai modificatori personalizzati.
@@ -152,38 +113,24 @@ sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra ri
 - Statistiche Massimo, Totale, Media e Utilizzi per i modificatori selezionati.
 - Esportazione verificata del MODDIFESA FCM della stagione 2006_2007.
 - Metadati availableSections e generatedSections distinti.
-- Test automatici: 38 eseguiti, 0 failure, 0 errori.
+- Test automatici: 41 eseguiti, 0 failure, 0 errori.
+- Gli output legacy records2026.* non vengono piu pubblicati; gli exporter legacy Classici/RU restano solo come sorgente interna di compatibilita.
+- Bonifica publisher verificata sui dati operativi: 9 output moderni, 0 output legacy; Classics e RU invariati byte-per-byte.
 - Verifica reale del JS Modificatori completata con tutte le sezioni selezionate presenti.
 
-### Non ancora implementato o da completare
+### Questioni aperte
 
-- Elaboratore nativo completo della famiglia Serie.
-- Elaboratore nativo completo della famiglia Soglie e Fortuna.
-- Culometro definitivo e relativo contratto dati pubblico.
-- Contratto JavaScript pubblico definitivo di tutte le famiglie.
-- Visualizzatori HTML 2.0 definitivi.
-- JS statici definitivi dei visualizzatori.
-- Installer definitivo dei visualizzatori e dei profili CSS.
-
-### Non ancora implementato
-
-- Lettura FCM e FCA.
-- Modello dati.
-- Elaboratori delle famiglie.
-- Esportatori JS.
-- Consolidamento GUI 2.0.
-- Installer.
-- Viste HTML 2.0.
+- Le questioni ancora aperte sono mantenute in docs\DECISIONI_APERTE.md e non vengono duplicate nella sintesi della bibbia.
 
 ## README
 
 File: README.md
 
-    # RecordsNext 2.0.0
+    # RecordsNext 2.1.0
 
     **RecordsNext by mauz79** è un'applicazione per Fantacalcio Manager che legge gli archivi FCM/FCA, consolida i dati storici della lega e genera record e viste statistiche pubblicabili sul sito FCM.
 
-    La versione 2.0 introduce una GUI dedicata, configurazione guidata delle stagioni e delle associazioni storiche, famiglie di record elaborabili separatamente, output JavaScript modulari e visualizzatori HTML.
+    RecordsNext 2.1 prosegue la linea 2.x con output JavaScript più completi, maggiori informazioni di dettaglio per Serie e Culometro e un flusso più rapido per la configurazione delle nuove stagioni storiche.
 
     ## Requisiti
 
@@ -196,7 +143,7 @@ File: README.md
 
     ## Avvio rapido
 
-    1. Estrarre l'intero archivio `RecordsNext_2.0.0.zip` in una cartella.
+    1. Estrarre l'intero archivio `RecordsNext_2.1.0.zip` in una cartella.
     2. Avviare `RecordsNext.bat`.
     3. Aprire **Configurazione stagioni**.
     4. Configurare la lega e almeno una stagione gestita.
@@ -373,11 +320,11 @@ File: README.md
 
 File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
-    # Architettura RecordsNext 2.0
+    # Architettura RecordsNext 2.1
 
     ## Scopo
 
-    RecordsNext 2.0 genera viste dati tematiche complete e filtrabili, non semplici classifiche finali.
+    RecordsNext 2.1 genera viste dati tematiche complete e filtrabili, non semplici classifiche finali.
 
     ## Flusso
 
@@ -438,6 +385,38 @@ File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
     Output: `fcmRecordsNext_Culometro.js`
 
+    ## Dataset canonico Matches
+
+    RecordsNext 2.1 introduce:
+
+    `fcmRecordsNext_Matches.js`
+
+    È il dataset pubblico canonico delle partite.
+
+    Per ogni incontro reale contiene esattamente due righe:
+
+    - una dalla prospettiva della prima squadra;
+    - una dalla prospettiva dell'avversaria.
+
+    Ogni riga contiene almeno:
+
+    - stagione;
+    - competizione;
+    - identificativo incontro;
+    - giornata;
+    - numero giornata;
+    - link tabellino;
+    - squadra e identificativo canonico;
+    - avversario e identificativo canonico;
+    - gol fatti;
+    - gol subiti;
+    - risultato standardizzato `V/N/P`.
+
+    I turni di riposo non appartengono al dataset Matches.
+
+    Questo output permette ai visualizzatori e ad altri consumer di ricostruire
+    le statistiche basate sulle singole gare senza dipendere da HTML o JavaScript legacy.
+
     ## Dipendenze
 
     Ogni figlio dichiara dipendenze obbligatorie e opzionali. Una dipendenza mancante blocca solo il figlio interessato.
@@ -474,7 +453,7 @@ File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
     ### Regola vincolante
 
-    Gli HTML a corredo di RecordsNext 2.0 non devono contenere dati incorporati, record precalcolati, nomi di squadre o classifiche scritte nel markup.
+    Gli HTML a corredo di RecordsNext 2.1 non devono contenere dati incorporati, record precalcolati, nomi di squadre o classifiche scritte nel markup.
 
     Devono essere visualizzatori statici dei JavaScript generati dal programma. Questa separazione consente di:
 
@@ -618,7 +597,7 @@ File: docs\ARCHITETTURA_VISUALIZZATORI_HTML.md
 
 File: docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md
 
-    # Installazione visualizzatori HTML — RecordsNext 2.0.0
+    # Installazione visualizzatori HTML — RecordsNext 2.1.0
 
     I visualizzatori RecordsNext sono file statici e non contengono i dati della lega.
 
@@ -1897,7 +1876,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - `seasonAggregates` derivati dagli archivi Classici consolidati 1.0.2;
     - stato `GENERATED_COMPLETE`.
 
-    Durante la migrazione resta generato anche il file legacy `records2026.recordstagionali.classic.js`.
+    Gli exporter legacy di Classici e Riserve d'Ufficio restano utilizzati internamente come sorgente di compatibilita, ma i file pubblici `records2026.*` non vengono piu generati ne pubblicati. Il contratto pubblico del sito resta costituito dagli output `fcmRecordsNext_*`.
 
     ## 34. Cartelle pubbliche
 
@@ -2159,9 +2138,103 @@ File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
 
 File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
-    # Stato implementazione RecordsNext 2.0
+    # Stato implementazione RecordsNext 2.1
 
-    Aggiornamento: 6 agosto 2026.
+    Aggiornamento: 27 agosto 2026.
+
+    ## Stato release 2.1.0
+
+    RecordsNext 2.1.0 è completato, testato, taggato e pubblicato nel repository.
+
+    Sono implementate e operative:
+
+    - GUI completa `RecordsNext by mauz79`;
+    - configurazione guidata della lega e delle stagioni;
+    - stagioni GESTITE e MANUALI;
+    - associazioni storiche di squadre e competizioni;
+    - normalizzazione e consolidamento multistagione;
+    - modalità Completa e Consolidata;
+    - Classici;
+    - Serie;
+    - Riserve d'Ufficio;
+    - Modificatori;
+    - Fattore Campo;
+    - Soglie e Fortuna;
+    - Culometro opzionale;
+    - visualizzatori HTML statici;
+    - pubblicazione nel sito FCM;
+    - output Matches canonico;
+    - manifest;
+    - link ai tabellini storici.
+
+    - stagione operativa corrente verificata: `2026_2027`;
+    - sito corrente configurato: `E:\\fantacalcio\\Lega2026\\js`;
+    - gli output legacy `records2026.*` non fanno piu parte della pubblicazione; gli exporter legacy Classici/RU restano solo come implementazione interna di compatibilita.
+
+    Output pubblico corrente:
+
+    - `fcmRecordsNext_Core.js`;
+    - `fcmRecordsNext_Classics.js`;
+    - `fcmRecordsNext_Series.js`;
+    - `fcmRecordsNext_RU.js`;
+    - `fcmRecordsNext_Modifiers.js`;
+    - `fcmRecordsNext_ThresholdsLuck.js`;
+    - `fcmRecordsNext_Culometro.js`;
+    - `fcmRecordsNext_Matches.js`;
+    - `fcmRecordsNext_Manifest.js`.
+
+    ### Novità specifiche 2.1
+
+    `fcmRecordsNext_Matches.js` espone il dataset canonico delle gare,
+    con due righe per ogni partita reale e una riga per squadra.
+
+    Le Serie espongono ora nel dettaglio:
+
+    - stagione;
+    - competizione;
+    - giornata;
+    - identificativo incontro;
+    - link al tabellino.
+
+    Gli eventi Culometro espongono inoltre:
+
+    - frequenza storica evento;
+    - frequenza storica configurazione;
+    - chiave configurazione;
+    - impatto.
+
+    L'aggiunta di una nuova stagione storica apre direttamente le associazioni
+    sulla stagione appena importata.
+
+    ### Test finali
+
+    Ultimo stato verificato il 26 agosto 2026:
+
+    - 41 test automatici;
+    - 0 failure;
+    - 0 errori;
+    - BUILD SUCCESS;
+    - regressione reale su 20 stagioni completata;
+    - generazione reale del sito FCM completata;
+    - test di bonifica publisher sui dati operativi completato: 9 output moderni validati, 0 output `records2026.*`;
+    - `fcmRecordsNext_Classics.js` e `fcmRecordsNext_RU.js` confrontati SHA-256/byte-per-byte con la staging 2.1: identici;
+    - aggiornamento reale 2.0 -> 2.1 completato senza perdita di configurazione.
+
+    ### Release
+
+    - Maven: `2.1.0`;
+    - tag Git: `v2.1.0`;
+    - commit release: `682f0f6`;
+    - UCanAccess: `2.0.9.5`;
+    - Java: 21 o superiore.
+
+    Sono disponibili:
+
+    - `RecordsNext_2.1.0.zip`;
+    - `RecordsNext_2.1.0_UPDATE.zip`.
+
+    Le sezioni storiche sottostanti descrivono le tappe di sviluppo precedenti
+    e non prevalgono sullo stato corrente qui riportato.
 
     ## Base tecnica verificata
 
@@ -2405,6 +2478,66 @@ File: CHANGELOG.md
 
     # Changelog
 
+    ## RecordsNext 2.1.0 — 2026-08-26
+
+    Aggiornamento della linea RecordsNext 2.x orientato alla completezza degli output,
+    alla parità dei dati disponibili sul sito e alla semplificazione dell'aggiornamento
+    delle installazioni esistenti.
+
+    ### Output e dati
+
+    - aggiunto l'output canonico `fcmRecordsNext_Matches.js`;
+    - una riga per squadra per ogni incontro reale, quindi due righe per partita;
+    - esclusione dei turni di riposo dall'output Matches;
+    - risultati standardizzati `V/N/P`;
+    - link ai tabellini storici corretti anche per stagioni precedenti;
+    - arricchiti i dettagli delle Serie con stagione, competizione, giornata, incontro e tabellino;
+    - arricchiti gli eventi del Culometro con frequenza storica dell'evento,
+      frequenza storica della configurazione e impatto;
+    - invariata la formula di calcolo e la classifica del Culometro.
+
+    ### Bonifica output legacy
+
+    - rimossa dalla pubblicazione la famiglia di file `records2026.*` non piu consumata dal sito moderno;
+    - `Records2026ClassicJsExporter` e `Records2026RuJsExporter` restano usati solo internamente dai wrapper RecordsNext per preservare la compatibilita dei dati;
+    - `fcmRecordsNext_Classics.js` e `fcmRecordsNext_RU.js` verificati byte-per-byte invariati rispetto agli output 2.1 precedenti;
+    - eliminati circa 28 MiB di output legacy per sito senza modifiche al frontend.
+
+    ### Configurazione storica
+
+    - dopo l'aggiunta di una stagione gestita, la finestra delle associazioni storiche
+      si apre direttamente sulla stagione appena aggiunta;
+    - il comando generale di configurazione delle associazioni conserva invece
+      il comportamento newest-first.
+
+    ### Aggiornamento da RecordsNext 2.0
+
+    - introdotto un pacchetto UPDATE dedicato;
+    - l'aggiornamento sostituisce soltanto programma e launcher;
+    - configurazione, database, stagioni e associazioni storiche vengono conservati;
+    - backup automatico di sicurezza prima della sostituzione;
+    - aggiornamento 2.0 -> 2.1 verificato su un'installazione reale già configurata.
+
+    ### Release e runtime
+
+    - versione Maven 2.1.0;
+    - manifest applicativo 2.1.0;
+    - GUI identificata come RecordsNext 2.1;
+    - runtime UCanAccess 2.0.9.5 invariato;
+    - Java 21 o superiore.
+
+    ### Verifiche
+
+    - suite Maven completata con 41 test superati;
+    - regressione completa sui dati storici verificata;
+    - Matches verificato su 20 stagioni;
+    - 10.930 partite reali e 21.860 righe squadra verificate;
+    - nessun gruppo Matches diverso da due righe;
+    - nessuna coppia non speculare;
+    - confronto semantico delle famiglie preesistenti superato;
+    - aggiornamento reale 2.0 -> 2.1 verificato senza modifica di configurazione e database;
+    - generazione del sito tramite il flusso reale FCM verificata con RecordsNext 2.1.
+
     ## RecordsNext 2.0.0 — 2026-08-10
 
     Prima release stabile della nuova linea RecordsNext 2.0.
@@ -2464,7 +2597,7 @@ File: CHANGELOG.md
     - filtri per stagione e competizione;
     - nomi competizioni leggibili;
     - selezione eventi Culometro nella sola vista Eventi;
-    - profili `mauzstrom`, `fantablue2`, `neutral`.
+    - profili `mauzstrom`, `maelstrom`, `fantablue2`, `neutral`.
 
     ### Release e runtime
 
@@ -3883,9 +4016,11 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
 
             Set<String> performances = new LinkedHashSet<>();
             Map<String,Integer> occurrences = new HashMap<>();
+            Map<String,Integer> configurationOccurrences = new HashMap<>();
             for (Event event : candidates) {
                 performances.add(event.performanceKey());
                 occurrences.merge(event.type(), 1, Integer::sum);
+                configurationOccurrences.merge(event.configurationKey(), 1, Integer::sum);
             }
             int denominator = Math.max(1, performances.size());
 
@@ -3901,7 +4036,11 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                     Event event = group.get(index);
                     BigDecimal overlap = index == 0 ? BigDecimal.ONE : index == 1 ? config.secondaryWeight() : BigDecimal.ZERO;
                     String level = index == 0 ? "PRIMARY" : index == 1 ? "SECONDARY" : "TAG";
-                    BigDecimal rarity = rarityMultiplier(occurrences.getOrDefault(event.type(), 1), denominator, config);
+                    int eventOccurrences = occurrences.getOrDefault(event.type(), 1);
+                    int configurationCount = configurationOccurrences.getOrDefault(event.configurationKey(), 1);
+                    BigDecimal eventFrequency = frequency(eventOccurrences, denominator);
+                    BigDecimal configurationFrequency = frequency(configurationCount, denominator);
+                    BigDecimal rarity = rarityMultiplier(eventOccurrences, denominator, config);
                     BigDecimal contribution = event.weight()
                             .multiply(BigDecimal.valueOf(event.direction()))
                             .multiply(rarity)
@@ -3909,9 +4048,15 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                             .setScale(6, RoundingMode.HALF_UP);
                     Map<String,Object> out = event.toMap();
                     out.put("level", level);
+                    out.put("historicalEventFrequency", eventFrequency);
+                    out.put("historicalConfigurationFrequency", configurationFrequency);
+                    out.put("configurationKey", event.configurationKey());
                     out.put("rarityMultiplier", rarity);
                     out.put("overlapMultiplier", overlap);
                     out.put("contribution", contribution);
+                    // Campo diagnostico 2.1: magnitudine dell'impatto nel motore corrente.
+                    // Non entra nel calcolo: e' un alias positivo della contribution gia calcolata.
+                    out.put("impact", contribution.abs());
                     scoredEvents.add(out);
                     teamAggregates.computeIfAbsent(event.teamKey(), ignored -> new TeamAggregate(event, false)).add(contribution, level);
                     competitionAggregates.computeIfAbsent(event.competitionTeamKey(), ignored -> new TeamAggregate(event, true)).add(contribution, level);
@@ -3982,6 +4127,11 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                 default -> competitionId.replace('_', ' ');
             };
         }
+        private static BigDecimal frequency(int occurrences, int denominator) {
+            double value = (double) occurrences / Math.max(1, denominator);
+            return BigDecimal.valueOf(value).setScale(8, RoundingMode.HALF_UP);
+        }
+
         private static BigDecimal rarityMultiplier(int occurrences, int denominator, CulometroConfig config) {
             int safeOccurrences = Math.max(occurrences, config.minimumHistoricalOccurrences());
             double frequency = (double) safeOccurrences / denominator;
@@ -4015,18 +4165,30 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
         private static String text(Object v){ return v==null?"":String.valueOf(v); }
         private static BigDecimal number(Object v){ if(v==null||text(v).isBlank())return BigDecimal.ZERO; return v instanceof BigDecimal b?b:new BigDecimal(text(v).replace(',','.')); }
 
-        private record Event(String type,int direction,BigDecimal weight,String seasonId,String competitionId,String matchId,String teamId,String team,String opponent,String url,String detail) {
-            static Event fromThreshold(Map<String,Object> m,String type,int direction,BigDecimal weight){return new Event(type,direction,weight,text(m.get("seasonId")),text(m.get("competitionId")),text(m.get("matchId")),text(m.get("teamId")),text(m.get("team")),text(m.get("opponent")),text(m.get("scorecardUrl")),text(m.get("detail")));}
+        private record Event(String type,int direction,BigDecimal weight,String seasonId,String competitionId,String matchId,String teamId,String team,String opponent,String url,String detail,String configurationKey) {
+            static Event fromThreshold(Map<String,Object> m,String type,int direction,BigDecimal weight){
+                String config = type + "|" + (direction > 0 ? "FAVOURABLE" : "UNFAVOURABLE")
+                        + "|" + canonicalNumber(m.get("scoreFor")) + "|" + canonicalNumber(m.get("scoreAgainst"));
+                return new Event(type,direction,weight,text(m.get("seasonId")),text(m.get("competitionId")),text(m.get("matchId")),text(m.get("teamId")),text(m.get("team")),text(m.get("opponent")),text(m.get("scorecardUrl")),text(m.get("detail")),config);
+            }
             static Event fromRu(Map<String,Object> m,BigDecimal weight){
                 boolean decisive = Boolean.TRUE.equals(m.get("decisivo")) || Boolean.TRUE.equals(m.get("ruDecisiva")) || !text(m.get("esitoSenzaRU")).isBlank() && !text(m.get("esitoSenzaRU")).equalsIgnoreCase(text(m.get("esito")));
                 if(!decisive)return null;
                 String result=text(m.get("esito")).toUpperCase(); int direction="V".equals(result)?1:("S".equals(result)||"P".equals(result)?-1:0); if(direction==0)return null;
-                return new Event("RU_DECISIVE",direction,weight,text(m.get("stagione")),text(m.get("competizione")),text(m.get("idIncontro")),text(m.get("idSquadra")),text(m.get("squadra")),text(m.get("avversaria")),text(m.get("urlTabellino")),"RU decisiva dimostrata dal dataset");
+                String config = "RU_DECISIVE|" + (direction > 0 ? "FAVOURABLE" : "UNFAVOURABLE")
+                        + "|" + text(m.get("numeroRU")) + "|" + canonicalNumber(m.get("valoreRUTotale"))
+                        + "|" + text(m.get("tipiRU"));
+                return new Event("RU_DECISIVE",direction,weight,text(m.get("stagione")),text(m.get("competizione")),text(m.get("idIncontro")),text(m.get("idSquadra")),text(m.get("squadra")),text(m.get("avversaria")),text(m.get("urlTabellino")),"RU decisiva dimostrata dal dataset",config);
             }
             String performanceKey(){return seasonId+"|"+matchId+"|"+teamId;}
             String teamKey(){return seasonId+"|"+teamId;}
             String competitionTeamKey(){return seasonId+"|"+competitionId+"|"+teamId;}
             Map<String,Object> toMap(){Map<String,Object>m=new LinkedHashMap<>();m.put("eventType",type);m.put("direction",direction>0?"FAVOURABLE":"UNFAVOURABLE");m.put("seasonId",seasonId);m.put("competitionId",competitionId);m.put("competitionName",displayCompetitionName(competitionId));m.put("matchId",matchId);m.put("teamId",teamId);m.put("team",team);m.put("opponent",opponent);m.put("scorecardUrl",url);m.put("detail",detail);m.put("componentWeight",weight);return m;}
+            private static String canonicalNumber(Object value){
+                if(value==null||text(value).isBlank())return "";
+                try{return new BigDecimal(text(value).replace(',','.')).stripTrailingZeros().toPlainString();}
+                catch(Exception ex){return text(value);}
+            }
         }
 
         private static final class TeamAggregate {
@@ -4345,6 +4507,211 @@ File: src\main\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
                     preflight,
                     effectiveMetadata
             );
+        }
+    }
+
+## src\main\java\it\alterlega\recordsnext\app\matches\MatchesJsExporter.java
+
+File: src\main\java\it\alterlega\recordsnext\app\matches\MatchesJsExporter.java
+
+    package it.alterlega.recordsnext.app.matches;
+
+    import java.io.IOException;
+    import java.math.BigDecimal;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.nio.file.StandardOpenOption;
+    import java.util.ArrayList;
+    import java.util.Comparator;
+    import java.util.LinkedHashMap;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.stream.Stream;
+
+    /**
+     * Esporta il dataset canonico delle partite RecordsNext 2.1.
+     * Una partita reale produce due righe, una per ciascuna squadra.
+     */
+    public final class MatchesJsExporter {
+        public static final String FILE_NAME = "fcmRecordsNext_Matches.js";
+        public static final String GLOBAL_NAME = "window.fcmRecordsNextMatches";
+
+        private MatchesJsExporter() {}
+
+        public static ExportResult export(Path reportsRoot, Path outputFile) throws IOException {
+            if (!Files.isDirectory(reportsRoot)) {
+                throw new IOException("Cartella report normalizzati non trovata: " + reportsRoot);
+            }
+            Path parent = outputFile.toAbsolutePath().normalize().getParent();
+            if (parent == null) throw new IOException("Directory output Matches non determinabile: " + outputFile);
+            Files.createDirectories(parent);
+
+            List<Path> files;
+            try (Stream<Path> stream = Files.walk(reportsRoot)) {
+                files = stream.filter(Files::isRegularFile)
+                        .filter(path -> path.getFileName().toString().startsWith("season_normalized_"))
+                        .filter(path -> path.getFileName().toString().endsWith(".json"))
+                        .sorted()
+                        .toList();
+            }
+            if (files.isEmpty()) throw new IOException("Nessun report season_normalized_*.json in " + reportsRoot);
+
+            List<Object> matches = new ArrayList<>();
+            int sourceRows = 0;
+            int discardedRestRows = 0;
+
+            for (Path file : files) {
+                Object parsed = new JsonParser(Files.readString(file, StandardCharsets.UTF_8), file).parse();
+                Map<String,Object> root = object(parsed, file, "radice");
+                for (Map<String,Object> row : rows(root.get("partiteSquadra"))) {
+                    sourceRows++;
+                    if (!isRealTeamMatch(row)) {
+                        discardedRestRows++;
+                        continue;
+                    }
+                    matches.add(publicRow(row));
+                }
+            }
+
+            matches.sort(Comparator
+                    .comparing((Object value) -> string(((Map<?,?>) value).get("seasonId")))
+                    .thenComparing(value -> string(((Map<?,?>) value).get("competitionId")))
+                    .thenComparing(value -> string(((Map<?,?>) value).get("matchId")))
+                    .thenComparing(value -> string(((Map<?,?>) value).get("teamId"))));
+
+            Map<String,Object> metadata = new LinkedHashMap<>();
+            metadata.put("source", "RecordsNext normalized reports");
+            metadata.put("normalizedFileCount", files.size());
+            metadata.put("sourceTeamMatchRowCount", sourceRows);
+            metadata.put("discardedRestRowCount", discardedRestRows);
+            metadata.put("teamMatchRowCount", matches.size());
+            metadata.put("realMatchCount", matches.size() / 2);
+            metadata.put("rowModel", "one team per real match; two rows per match");
+            metadata.put("resultConvention", "V=win, N=draw, P=loss");
+
+            Map<String,Object> root = new LinkedHashMap<>();
+            root.put("schemaVersion", "2.1");
+            root.put("familyId", "matches");
+            root.put("metadata", metadata);
+            root.put("matches", matches);
+            root.put("outputStatus", List.of(Map.of(
+                    "status", "GENERATED_COMPLETE",
+                    "detail", "Dataset canonico completo delle partite reali, una riga per squadra per incontro"
+            )));
+
+            Files.writeString(outputFile, GLOBAL_NAME + " = " + JsonWriter.write(root) + ";\n",
+                    StandardCharsets.UTF_8, StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+
+            return new ExportResult(files.size(), sourceRows, discardedRestRows, matches.size(), matches.size() / 2, outputFile);
+        }
+
+        private static boolean isRealTeamMatch(Map<String,Object> row) {
+            return integer(row.get("idSquadra")) > 0
+                    && integer(row.get("idAvversaria")) > 0
+                    && !string(row.get("squadra")).isBlank()
+                    && !string(row.get("avversaria")).isBlank()
+                    && !string(row.get("idIncontro")).isBlank();
+        }
+
+        private static Map<String,Object> publicRow(Map<String,Object> row) {
+            BigDecimal pointsFor = number(row.get("puntiFatti"));
+            BigDecimal pointsAgainst = number(row.get("puntiSubiti"));
+
+            Map<String,Object> out = new LinkedHashMap<>();
+            out.put("seasonId", row.get("stagione"));
+            out.put("competitionId", row.get("competizioneStoricaId"));
+            out.put("competitionName", row.get("competizioneNome"));
+            out.put("matchId", row.get("idIncontro"));
+            out.put("round", row.get("giornata"));
+            out.put("roundNumber", row.get("giornataDiA"));
+            out.put("scorecardUrl", row.get("urlTabellino"));
+            out.put("teamId", row.get("idSquadra"));
+            out.put("team", row.get("squadra"));
+            out.put("opponentId", row.get("idAvversaria"));
+            out.put("opponent", row.get("avversaria"));
+            out.put("goalsFor", integer(row.get("golFatti")));
+            out.put("goalsAgainst", integer(row.get("golSubiti")));
+            out.put("result", publicResult(row.get("esito")));
+            out.put("pointsFor", pointsFor);
+            out.put("pointsAgainst", pointsAgainst);
+            out.put("pointsTotal", pointsFor.add(pointsAgainst));
+            out.put("regulationGoalsFor", integer(row.get("golRegolamentariFatti")));
+            out.put("regulationGoalsAgainst", integer(row.get("golRegolamentariSubiti")));
+            return out;
+        }
+
+        private static String publicResult(Object value) throws IllegalArgumentException {
+            return switch (string(value).trim().toUpperCase()) {
+                case "V", "W" -> "V";
+                case "P", "N", "D" -> "N";
+                case "S", "L" -> "P";
+                default -> throw new IllegalArgumentException("Esito normalizzato non previsto: " + value);
+            };
+        }
+
+        private static Map<String,Object> object(Object value, Path source, String label) throws IOException {
+            if (!(value instanceof Map<?,?> raw)) throw new IOException("Oggetto JSON '" + label + "' non valido: " + source);
+            Map<String,Object> out = new LinkedHashMap<>();
+            for (Map.Entry<?,?> e : raw.entrySet()) out.put(String.valueOf(e.getKey()), e.getValue());
+            return out;
+        }
+
+        private static List<Map<String,Object>> rows(Object value) {
+            List<Map<String,Object>> out = new ArrayList<>();
+            if (!(value instanceof List<?> list)) return out;
+            for (Object item : list) if (item instanceof Map<?,?> raw) {
+                Map<String,Object> map = new LinkedHashMap<>();
+                for (Map.Entry<?,?> e : raw.entrySet()) map.put(String.valueOf(e.getKey()), e.getValue());
+                out.add(map);
+            }
+            return out;
+        }
+
+        private static String string(Object value) { return value == null ? "" : String.valueOf(value); }
+        private static BigDecimal number(Object value) {
+            if (value == null || string(value).isBlank()) return BigDecimal.ZERO;
+            if (value instanceof BigDecimal b) return b;
+            if (value instanceof Number n) return new BigDecimal(n.toString());
+            return new BigDecimal(string(value).replace(',', '.'));
+        }
+        private static int integer(Object value) { return number(value).intValue(); }
+
+        public record ExportResult(int normalizedFileCount, int sourceTeamMatchRowCount,
+                                   int discardedRestRowCount, int teamMatchRowCount,
+                                   int realMatchCount, Path outputFile) {}
+
+        private static final class JsonParser {
+            private final String text; private final Path source; private int index;
+            JsonParser(String text, Path source){this.text=text.charAt(0)=='\uFEFF'?text.substring(1):text;this.source=source;}
+            Object parse() throws IOException { skip(); Object v=value(); skip(); if(index!=text.length()) fail("Contenuto dopo JSON"); return v; }
+            private Object value() throws IOException { skip(); if(index>=text.length()) fail("Valore mancante"); return switch(text.charAt(index)){
+                case '{'->object(); case '['->array(); case '"'->string(); case 't'->literal("true",Boolean.TRUE);
+                case 'f'->literal("false",Boolean.FALSE); case 'n'->literal("null",null); default->number();}; }
+            private Map<String,Object> object() throws IOException { expect('{'); Map<String,Object> m=new LinkedHashMap<>(); skip(); if(peek('}')){index++;return m;} while(true){String k=string();expect(':');m.put(k,value());skip();if(peek('}')){index++;return m;}expect(',');} }
+            private List<Object> array() throws IOException { expect('['); List<Object> l=new ArrayList<>(); skip(); if(peek(']')){index++;return l;} while(true){l.add(value());skip();if(peek(']')){index++;return l;}expect(',');} }
+            private String string() throws IOException { expect('"'); StringBuilder b=new StringBuilder(); while(index<text.length()){char c=text.charAt(index++);if(c=='"')return b.toString();if(c=='\\'){if(index>=text.length())fail("Escape troncato");char e=text.charAt(index++);switch(e){case '"'->b.append('"');case '\\'->b.append('\\');case '/'->b.append('/');case 'b'->b.append('\b');case 'f'->b.append('\f');case 'n'->b.append('\n');case 'r'->b.append('\r');case 't'->b.append('\t');case 'u'->{if(index+4>text.length())fail("Unicode troncato");b.append((char)Integer.parseInt(text.substring(index,index+4),16));index+=4;}default->fail("Escape non valido");}}else b.append(c);}fail("Stringa non terminata");return ""; }
+            private Object number() throws IOException { int start=index; while(index<text.length()&&"-+0123456789.eE".indexOf(text.charAt(index))>=0)index++; try{return new BigDecimal(text.substring(start,index));}catch(Exception ex){fail("Numero non valido");return null;} }
+            private Object literal(String token,Object value) throws IOException { if(!text.startsWith(token,index))fail("Letterale non valido");index+=token.length();return value; }
+            private void skip(){while(index<text.length()&&Character.isWhitespace(text.charAt(index)))index++;}
+            private boolean peek(char c){skip();return index<text.length()&&text.charAt(index)==c;}
+            private void expect(char c)throws IOException{skip();if(index>=text.length()||text.charAt(index)!=c)fail("Atteso '"+c+"'");index++;}
+            private void fail(String message)throws IOException{throw new IOException(message+" in "+source+" alla posizione "+index);}
+        }
+
+        private static final class JsonWriter {
+            static String write(Object value){StringBuilder b=new StringBuilder();append(value,b);return b.toString();}
+            private static void append(Object value,StringBuilder b){
+                if(value==null){b.append("null");return;}
+                if(value instanceof String s){quote(s,b);return;}
+                if(value instanceof BigDecimal d){b.append(d.stripTrailingZeros().toPlainString());return;}
+                if(value instanceof Number||value instanceof Boolean){b.append(value);return;}
+                if(value instanceof Map<?,?> map){b.append('{');boolean first=true;for(Map.Entry<?,?> e:map.entrySet()){if(!first)b.append(',');first=false;quote(String.valueOf(e.getKey()),b);b.append(':');append(e.getValue(),b);}b.append('}');return;}
+                if(value instanceof Iterable<?> iterable){b.append('[');boolean first=true;for(Object item:iterable){if(!first)b.append(',');first=false;append(item,b);}b.append(']');return;}
+                quote(String.valueOf(value),b);
+            }
+            private static void quote(String value,StringBuilder b){b.append('"');for(int i=0;i<value.length();i++){char c=value.charAt(i);switch(c){case '"'->b.append("\\\"");case '\\'->b.append("\\\\");case '\b'->b.append("\\b");case '\f'->b.append("\\f");case '\n'->b.append("\\n");case '\r'->b.append("\\r");case '\t'->b.append("\\t");default->{if(c<0x20)b.append(String.format("\\u%04x",(int)c));else b.append(c);}}}b.append('"');}
         }
     }
 
@@ -5975,7 +6342,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                 );
                 ManifestMetadata manifestMetadata = new ManifestMetadata(
                         "RecordsNext by mauz79",
-                        "2.0.0",
+                        "2.1.0",
                         "2.0",
                         OffsetDateTime.now(),
                         leagueMetadata.leagueId(),
@@ -12329,7 +12696,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
         private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
-        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 2.0");
+        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 2.1");
         private final CardLayout pages = new CardLayout();
         private final JPanel pageHost = new JPanel(pages);
         private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
@@ -12361,7 +12728,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                 try {
                     new RecordsNext2Dashboard().show();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 2.0", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 2.1", JOptionPane.ERROR_MESSAGE);
                 }
             });
         }
@@ -12421,7 +12788,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             brand.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
             brand.setForeground(Color.WHITE);
             side.add(brand);
-            JLabel version = new JLabel("by mauz79 · 2.0");
+            JLabel version = new JLabel("by mauz79 · 2.1");
             version.setAlignmentX(Component.LEFT_ALIGNMENT);
             version.setForeground(new Color(174, 192, 224));
             version.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -12495,7 +12862,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             c.weightx = 0.0;
             header.add(leftSpacer, c);
 
-            JLabel title = new JLabel("RecordsNext 2.0", SwingConstants.CENTER);
+            JLabel title = new JLabel("RecordsNext 2.1", SwingConstants.CENTER);
             title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
             title.setForeground(RED);
             c.gridx = 1;
@@ -13481,7 +13848,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                         log.append("ERRORE: " + cause + System.lineSeparator());
                         status.setText("Errore");
                         status.setForeground(RED);
-                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 2.0", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 2.1", JOptionPane.ERROR_MESSAGE);
                     } finally {
                         run.setEnabled(true);
                     }
@@ -14411,7 +14778,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                     .filter(r -> r.seasonId().equals(row.seasonId()))
                     .findFirst().orElse(row);
                 if ("GESTITA".equals(loaded.managementType()) && !loaded.anchor()) {
-                    openMappings();
+                    openMappings(loaded.seasonId());
                     loadSeasons();
                 }
             } catch(Exception ex) { error("Aggiunta stagione",ex); }
@@ -14445,9 +14812,15 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
         }
 
         private void openMappings() {
+            openMappings(null);
+        }
+
+        private void openMappings(String initialSeason) {
             try {
                 HistoricalMappingRepository mappingRepository = new HistoricalMappingRepository(databasePath);
-                HistoricalMappingDialog dialog = new HistoricalMappingDialog(this, mappingRepository);
+                HistoricalMappingDialog dialog = initialSeason == null
+                    ? new HistoricalMappingDialog(this, mappingRepository)
+                    : new HistoricalMappingDialog(this, mappingRepository, initialSeason);
                 dialog.open();
                 loadSeasons();
             } catch (Exception ex) {
@@ -17630,12 +18003,12 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import it.alterlega.recordsnext.app.modifiers.ModifiersFamilyJsExporter;
     import it.alterlega.recordsnext.app.thresholds.ThresholdsLuckFamilyJsExporter;
     import it.alterlega.recordsnext.app.culometro.CulometroFamilyJsExporter;
+    import it.alterlega.recordsnext.app.matches.MatchesJsExporter;
     import it.alterlega.recordsnext.app.model.RecordFamily;
 
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
     import java.nio.file.AtomicMoveNotSupportedException;
-    import java.nio.file.DirectoryStream;
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.nio.file.StandardCopyOption;
@@ -17649,8 +18022,8 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import java.util.UUID;
 
     /**
-     * Coordina la generazione e la pubblicazione degli output JS compatibili
-     * con Records2026.
+     * Coordina la generazione e la pubblicazione degli output JS pubblici
+     * di RecordsNext.
      *
      * Flusso:
      *  1. genera tutto in una staging isolata;
@@ -17667,11 +18040,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
         private static final String MODIFIERS_2_FILE = ModifiersFamilyJsExporter.FILE_NAME;
         private static final String THRESHOLDS_2_FILE = ThresholdsLuckFamilyJsExporter.FILE_NAME;
         private static final String CULOMETRO_2_FILE = CulometroFamilyJsExporter.FILE_NAME;
-        private static final String CLASSIC_FILE = "records2026.recordstagionali.classic.js";
-        private static final String RU_FILE = "records2026.recordstagionali.ru.js";
-        private static final String MANIFEST_FILE = "records2026.storico.ru.manifest.js";
-        private static final String ANNUAL_PREFIX = "records2026.storico.ru.";
-        private static final String ANNUAL_SUFFIX = ".js";
+        private static final String MATCHES_2_FILE = MatchesJsExporter.FILE_NAME;
 
         private Records2026SitePublisher() {
         }
@@ -17819,12 +18188,13 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             boolean includeRecordsNextCore = includeRecordsNextManifest
                     && database != null
                     && leagueMetadata != null;
+            boolean includeMatches = includeRecordsNextManifest && reportsRoot != null;
 
-            if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeThresholds && !includeCulometro && !includeRecordsNextManifest && !includeRecordsNextCore) {
+            if (!includeClassic && !includeRu && !includeSeries && !includeModifiers && !includeThresholds && !includeCulometro && !includeRecordsNextManifest && !includeRecordsNextCore && !includeMatches) {
                 throw new IOException("Nessun modulo selezionato per la generazione JS");
             }
             if (includeClassic || includeSeries || includeModifiers) requireDirectory(classicArchive, "Archivio classic");
-            if (includeThresholds || includeCulometro) requireDirectory(reportsRoot, "Report normalizzati");
+            if (includeThresholds || includeCulometro || includeMatches) requireDirectory(reportsRoot, "Report normalizzati");
             if (includeRu) requireDirectory(ruArchive, "Archivio RU");
             Files.createDirectories(stagingRoot);
 
@@ -17838,11 +18208,9 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             int ruSeasons = 0;
             int annualFiles = 0;
             if (includeClassic) {
-                var classic = Records2026ClassicJsExporter.export(
-                        classicArchive, generatedDir.resolve(CLASSIC_FILE), List.of());
-                classicEntries = classic.entryCount();
-                ClassicsFamilyJsExporter.export(
+                var classic = ClassicsFamilyJsExporter.export(
                         classicArchive, generatedDir.resolve(CLASSICS_2_FILE));
+                classicEntries = classic.entryCount();
             }
             if (includeSeries) {
                 SeriesFamilyJsExporter.export(classicArchive, generatedDir.resolve(SERIES_2_FILE));
@@ -17854,10 +18222,10 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 ThresholdsLuckFamilyJsExporter.export(reportsRoot, generatedDir.resolve(THRESHOLDS_2_FILE));
             }
             if (includeRu) {
-                var ru = Records2026RuJsExporter.export(ruArchive, generatedDir);
-                ruSeasons = ru.seasons();
-                annualFiles = ru.annualFiles();
-                RuFamilyJsExporter.export(ruArchive, generatedDir.resolve(RU_2_FILE));
+                var ru = RuFamilyJsExporter.export(
+                        ruArchive, generatedDir.resolve(RU_2_FILE));
+                ruSeasons = ru.seasonCount();
+                annualFiles = ru.annualFileCount();
             }
             if (includeCulometro) {
                 Path projectRoot = reportsRoot.toAbsolutePath().normalize().getParent().getParent();
@@ -17867,6 +18235,9 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                         projectRoot.resolve("config/culometro.json"),
                         generatedDir.resolve(CULOMETRO_2_FILE)
                 );
+            }
+            if (includeMatches) {
+                MatchesJsExporter.export(reportsRoot, generatedDir.resolve(MATCHES_2_FILE));
             }
 
             if (includeRecordsNextCore) {
@@ -17894,13 +18265,13 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
 
             ValidationResult validation = validateGenerated(
                     generatedDir,
-                    annualFiles,
                     includeClassic,
                     includeRu,
                     includeSeries,
                     includeModifiers,
                     includeThresholds,
                     includeCulometro,
+                    includeMatches,
                     includeRecordsNextManifest,
                     includeRecordsNextCore
             );
@@ -17915,13 +18286,13 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
 
         private static ValidationResult validateGenerated(
                 Path generatedDir,
-                int expectedAnnualFiles,
                 boolean includeClassic,
                 boolean includeRu,
                 boolean includeSeries,
                 boolean includeModifiers,
                 boolean includeThresholds,
                 boolean includeCulometro,
+                boolean includeMatches,
                 boolean includeRecordsNextManifest,
                 boolean includeRecordsNextCore) throws IOException {
 
@@ -17939,8 +18310,6 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             }
 
             if (includeClassic) {
-                requireFile(byName, CLASSIC_FILE);
-                validatePrefix(byName.get(CLASSIC_FILE), "window.RECORDS2026_PREVIEW_CLASSIC");
                 requireFile(byName, CLASSICS_2_FILE);
                 validatePrefix(byName.get(CLASSICS_2_FILE), "window.fcmRecordsNextClassics");
             }
@@ -17960,21 +18329,13 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 requireFile(byName, CULOMETRO_2_FILE);
                 validatePrefix(byName.get(CULOMETRO_2_FILE), "window.fcmRecordsNextCulometro");
             }
-            List<Path> annuals = files.stream().filter(Records2026SitePublisher::isAnnualFile).toList();
+            if (includeMatches) {
+                requireFile(byName, MATCHES_2_FILE);
+                validatePrefix(byName.get(MATCHES_2_FILE), "window.fcmRecordsNextMatches");
+            }
             if (includeRu) {
-                requireFile(byName, RU_FILE);
-                requireFile(byName, MANIFEST_FILE);
-                if (annuals.size() != expectedAnnualFiles) {
-                    throw new IOException("Numero file annuali inatteso: " + annuals.size()
-                            + ", attesi " + expectedAnnualFiles);
-                }
-                validatePrefix(byName.get(RU_FILE), "window.RECORDS2026_PREVIEW_RU");
-                validatePrefix(byName.get(MANIFEST_FILE), "window.RECORDS2026_STORICO_RU_MANIFEST");
                 requireFile(byName, RU_2_FILE);
                 validatePrefix(byName.get(RU_2_FILE), "window.fcmRecordsNextRU");
-                for (Path annual : annuals) validateContains(annual, "window.RECORDS2026_STORICO_RU");
-            } else if (!annuals.isEmpty()) {
-                throw new IOException("File RU annuali generati nonostante il modulo RU sia disattivato");
             }
             if (includeRecordsNextCore) {
                 requireFile(byName, CORE_FILE);
@@ -17987,12 +18348,13 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                         "window.fcmRecordsNextManifest"
                 );
             }
-            int expectedTotal = (includeClassic ? 2 : 0)
+            int expectedTotal = (includeClassic ? 1 : 0)
                     + (includeSeries ? 1 : 0)
                     + (includeModifiers ? 1 : 0)
                     + (includeThresholds ? 1 : 0)
                     + (includeCulometro ? 1 : 0)
-                    + (includeRu ? expectedAnnualFiles + 3 : 0)
+                    + (includeMatches ? 1 : 0)
+                    + (includeRu ? 1 : 0)
                     + (includeRecordsNextCore ? 1 : 0)
                     + (includeRecordsNextManifest ? 1 : 0);
             if (files.size() != expectedTotal) {
@@ -18100,26 +18462,11 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             }
         }
 
-        private static boolean isAnnualFile(Path path) {
-            String name = path.getFileName().toString();
-            return name.startsWith(ANNUAL_PREFIX)
-                    && name.endsWith(ANNUAL_SUFFIX)
-                    && !name.equals(MANIFEST_FILE);
-        }
-
         private static void validatePrefix(Path path, String expectedPrefix) throws IOException {
             String sample = readStart(path, 4096);
             if (!stripBom(sample).stripLeading().startsWith(expectedPrefix)) {
                 throw new IOException("Prefisso JS non valido in " + path.getFileName()
                         + ": atteso " + expectedPrefix);
-            }
-        }
-
-        private static void validateContains(Path path, String expectedToken) throws IOException {
-            String sample = readStart(path, 8192);
-            if (!stripBom(sample).contains(expectedToken)) {
-                throw new IOException("Token JS non trovato in " + path.getFileName()
-                        + ": " + expectedToken);
             }
         }
 
@@ -23598,13 +23945,21 @@ File: src\main\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilder.java
                     "recordId", recordId,
                     "nome", name,
                     "valore", series.size(),
+                    "stagione", first.get("stagione"),
+                    "competizioneStoricaId", first.get("competizioneStoricaId"),
+                    "competizioneNome", first.get("competizioneNome"),
                     "idSquadra", first.get("idSquadra"),
                     "squadra", first.get("squadra"),
+                    "daGiornata", first.get("giornata"),
+                    "aGiornata", last.get("giornata"),
                     "daGiornataDiA", first.get("giornataDiA"),
                     "aGiornataDiA", last.get("giornataDiA"),
                     "dettagli", series.stream().map(r -> ordered(
                             "idIncontro", r.get("idIncontro"),
+                            "matchId", r.get("idIncontro"),
+                            "giornata", r.get("giornata"),
                             "giornataDiA", r.get("giornataDiA"),
+                            "urlTabellino", r.get("urlTabellino"),
                             "avversaria", r.get("avversaria"))).toList());
         }
 
@@ -25820,7 +26175,7 @@ File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
 
         @Test
         void manifestIncludesAlreadyGeneratedFilesAndItself() throws Exception {
-            Files.writeString(tempDir.resolve("records2026.recordstagionali.classic.js"), "window.TEST = {};\n");
+            Files.writeString(tempDir.resolve("fcmRecordsNext_Classics.js"), "window.TEST = {};\n");
 
             ProcessingOptions options = new ProcessingOptions(true, false, true, false);
             PipelinePreflight.Result preflight = PipelinePreflight.evaluate(options);
@@ -25838,7 +26193,7 @@ File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
             Path manifest = ManifestPublishingSupport.write(tempDir, options, preflight, metadata);
             String js = Files.readString(manifest);
 
-            assertTrue(js.contains("records2026.recordstagionali.classic.js"));
+            assertTrue(js.contains("fcmRecordsNext_Classics.js"));
             assertTrue(js.contains("fcmRecordsNext_Manifest.js"));
             assertTrue(js.contains("window.fcmRecordsNextManifest"));
         }
@@ -26710,14 +27065,9 @@ File: config\culometro.json
 File: config\league.json
 
     {
-      "schemaVersion": "2.0",
-      "league": {
-        "leagueId": "alterlega",
-        "leagueName": "AlterLega",
-        "currentSeasonId": "2025_2026",
-        "defaultLocale": "it-IT",
-        "defaultTimeZone": "Europe/Rome"
-      }
+      "leagueId": "alterlega",
+      "leagueName": "AlterLega",
+      "currentSeasonId": "2025_2026"
     }
 
 ## config\manifest.example.json
@@ -26944,6 +27294,123 @@ File: config\teams.json
         "EXCLUDED"
       ]
     }
+
+## tools\Aggiorna-RecordsNext-2.1.ps1
+
+File: tools\Aggiorna-RecordsNext-2.1.ps1
+
+    param(
+        [string]$InstallDir = ""
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    Write-Host ""
+    Write-Host "========================================="
+    Write-Host " RecordsNext 2.0 -> 2.1"
+    Write-Host "========================================="
+    Write-Host ""
+
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $payload = Join-Path $scriptDir "payload"
+
+    if ([string]::IsNullOrWhiteSpace($InstallDir)) {
+        $candidates = @(
+            "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2",
+            "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext-2.0.0",
+            "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext"
+        )
+
+        $InstallDir = $candidates |
+            Where-Object {
+                Test-Path (Join-Path $_ "RecordsNext.jar")
+            } |
+            Select-Object -First 1
+    }
+
+    if ([string]::IsNullOrWhiteSpace($InstallDir)) {
+        Write-Host "Installazione RecordsNext non trovata automaticamente."
+        Write-Host ""
+        $InstallDir = Read-Host "Inserisci il percorso della cartella RecordsNext 2.0"
+    }
+
+    $InstallDir = [IO.Path]::GetFullPath($InstallDir)
+
+    if (-not (Test-Path (Join-Path $InstallDir "RecordsNext.jar"))) {
+        throw "RecordsNext.jar non trovato in: $InstallDir"
+    }
+
+    if (-not (Test-Path (Join-Path $payload "RecordsNext.jar"))) {
+        throw "Payload non valido: RecordsNext.jar mancante."
+    }
+
+    $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+    $backupDir = Join-Path $InstallDir ("backup_update_2.0_to_2.1_" + $timestamp)
+
+    Write-Host "Installazione: $InstallDir"
+    Write-Host "Backup       : $backupDir"
+    Write-Host ""
+
+    New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+
+    # Backup del vecchio programma.
+    Copy-Item `
+        (Join-Path $InstallDir "RecordsNext.jar") `
+        $backupDir `
+        -Force
+
+    if (Test-Path (Join-Path $InstallDir "RecordsNext.bat")) {
+        Copy-Item `
+            (Join-Path $InstallDir "RecordsNext.bat") `
+            $backupDir `
+            -Force
+    }
+
+    # Backup dei dati NON rigenerabili.
+    if (Test-Path (Join-Path $InstallDir "config")) {
+        Copy-Item `
+            (Join-Path $InstallDir "config") `
+            $backupDir `
+            -Recurse `
+            -Force
+    }
+
+    $db = Join-Path $InstallDir "data\database\recordsnext.db"
+
+    if (Test-Path $db) {
+        $dbBackup = Join-Path $backupDir "data\database"
+        New-Item -ItemType Directory -Path $dbBackup -Force | Out-Null
+        Copy-Item $db $dbBackup -Force
+    }
+
+    Write-Host "Backup completato."
+    Write-Host ""
+
+    # Aggiornamento applicazione.
+    Copy-Item `
+        (Join-Path $payload "RecordsNext.jar") `
+        (Join-Path $InstallDir "RecordsNext.jar") `
+        -Force
+
+    if (Test-Path (Join-Path $payload "RecordsNext.bat")) {
+        Copy-Item `
+            (Join-Path $payload "RecordsNext.bat") `
+            (Join-Path $InstallDir "RecordsNext.bat") `
+            -Force
+    }
+
+    Write-Host "RecordsNext aggiornato alla versione 2.1."
+    Write-Host ""
+    Write-Host "NON sono stati modificati:"
+    Write-Host "  config\"
+    Write-Host "  data\"
+    Write-Host "  associazioni storiche"
+    Write-Host "  configurazione delle stagioni"
+    Write-Host ""
+    Write-Host "Backup disponibile in:"
+    Write-Host "  $backupDir"
+    Write-Host ""
+    Write-Host "Aggiornamento completato."
 
 ## tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
 
@@ -27411,6 +27878,383 @@ File: tools\Build_RecordsNext2_Release_v2.ps1
     Write-Host ""
     Write-Host "NON pubblicare ancora: eseguire prima il test pulito dalla cartella dist."
 
+## tools\Build_RecordsNext2_Release_v3.ps1
+
+File: tools\Build_RecordsNext2_Release_v3.ps1
+
+    param(
+        [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
+        [string]$ReleaseVersion = "2.1.0",
+        [string]$DownloadsDir = "D:\DEV_APPS\downloads",
+        [string]$UCanAccessRoot = "D:\DEV_APPS\RecordsNext\tools\ucanaccess\2.0.9.5\UCanAccess-2.0.9.5-bin"
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    $releaseName = "RecordsNext_$ReleaseVersion"
+    $distRoot = Join-Path $ProjectRoot "dist"
+    $releaseDir = Join-Path $distRoot $releaseName
+    $zipPath = Join-Path $DownloadsDir ($releaseName + ".zip")
+    $shaPath = Join-Path $DownloadsDir ($releaseName + "_SHA256.txt")
+
+    Write-Host ""
+    Write-Host "=== RecordsNext $ReleaseVersion - Build Release ==="
+    Write-Host "ProjectRoot    : $ProjectRoot"
+    Write-Host "ReleaseDir     : $releaseDir"
+    Write-Host "Zip            : $zipPath"
+    Write-Host ""
+
+    # 1. Verifiche preliminari
+    $requiredFiles = @(
+        (Join-Path $ProjectRoot "target\RecordsNext.jar"),
+        (Join-Path $ProjectRoot "RecordsNext.bat"),
+        (Join-Path $ProjectRoot "README.md"),
+        (Join-Path $ProjectRoot "INSTALL.txt"),
+        (Join-Path $ProjectRoot "CHANGELOG.md"),
+        (Join-Path $ProjectRoot "config\competitions.json"),
+        (Join-Path $ProjectRoot "config\teams.json"),
+        (Join-Path $ProjectRoot "config\culometro.json"),
+        (Join-Path $ProjectRoot "config\manifest.example.json"),
+        (Join-Path $ProjectRoot "release\visualizzatori\recordsnext.html"),
+        (Join-Path $ProjectRoot "release\visualizzatori\js\fcmRecordsNextFunzioni_common.js"),
+        (Join-Path $ProjectRoot "release\visualizzatori\js\fcmRecordsNextFunzioni_viewer.js"),
+        (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md"),
+        (Join-Path $ProjectRoot "docs\CULOMETRO.md"),
+        (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1"),
+        (Join-Path $UCanAccessRoot "ucanaccess-2.0.9.5.jar")
+    )
+
+    foreach ($file in $requiredFiles) {
+        if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
+            throw "File richiesto mancante: $file"
+        }
+    }
+
+    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "docs\screenshots") -PathType Container)) {
+        throw "Cartella screenshots mancante: $(Join-Path $ProjectRoot 'docs\screenshots')"
+    }
+
+    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "release\visualizzatori\RecordsNext") -PathType Container)) {
+        throw "Cartella visualizzatori RecordsNext mancante."
+    }
+
+    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "release\visualizzatori\profiles") -PathType Container)) {
+        throw "Cartella profili visualizzatori mancante."
+    }
+
+    # 2. Pulizia staging
+    Remove-Item -LiteralPath $releaseDir -Recurse -Force -ErrorAction SilentlyContinue
+    New-Item -ItemType Directory -Path $releaseDir -Force | Out-Null
+
+    # 3. File principali
+    Copy-Item (Join-Path $ProjectRoot "target\RecordsNext.jar") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "RecordsNext.bat") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "README.md") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "INSTALL.txt") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "CHANGELOG.md") $releaseDir -Force
+
+    # 4. Runtime UCanAccess completo
+    $runtimeUcan = Join-Path $releaseDir "runtime\ucanaccess"
+    New-Item -ItemType Directory -Path $runtimeUcan -Force | Out-Null
+    Copy-Item (Join-Path $UCanAccessRoot "*") $runtimeUcan -Recurse -Force
+
+    Remove-Item (Join-Path $runtimeUcan "console.bat") -Force -ErrorAction SilentlyContinue
+    Remove-Item (Join-Path $runtimeUcan "console.sh") -Force -ErrorAction SilentlyContinue
+
+    # 5. Config neutra
+    $configDir = Join-Path $releaseDir "config"
+    New-Item -ItemType Directory -Path $configDir -Force | Out-Null
+
+    $neutralConfig = @(
+        "competitions.json",
+        "teams.json",
+        "culometro.json",
+        "manifest.example.json"
+    )
+
+    foreach ($name in $neutralConfig) {
+        Copy-Item (Join-Path $ProjectRoot ("config\" + $name)) $configDir -Force
+    }
+
+    # NON distribuire configurazioni/dati personali
+    $forbiddenConfig = @(
+        "league.json",
+        "seasons.json",
+        "recordsnext-gui.properties",
+        "processing.json"
+    )
+
+    foreach ($name in $forbiddenConfig) {
+        Remove-Item (Join-Path $configDir $name) -Force -ErrorAction SilentlyContinue
+    }
+
+    # 6. Visualizzatori statici
+    $visSrc = Join-Path $ProjectRoot "release\visualizzatori"
+    $visDst = Join-Path $releaseDir "visualizzatori"
+
+    New-Item -ItemType Directory -Path $visDst -Force | Out-Null
+    Copy-Item (Join-Path $visSrc "recordsnext.html") $visDst -Force
+    Copy-Item (Join-Path $visSrc "RecordsNext") $visDst -Recurse -Force
+    Copy-Item (Join-Path $visSrc "profiles") $visDst -Recurse -Force
+
+    $visJsDst = Join-Path $visDst "js"
+    New-Item -ItemType Directory -Path $visJsDst -Force | Out-Null
+    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_common.js") $visJsDst -Force
+    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_viewer.js") $visJsDst -Force
+
+    # Sicurezza: nessun JS dati della lega / nessun backup
+    Get-ChildItem $visJsDst -File -ErrorAction SilentlyContinue |
+        Where-Object {
+            $_.Name -like "fcmRecordsNext_Core.js" -or
+            $_.Name -like "fcmRecordsNext_Manifest.js" -or
+            $_.Name -like "fcmRecordsNext_Classics.js" -or
+            $_.Name -like "fcmRecordsNext_Series.js" -or
+            $_.Name -like "fcmRecordsNext_RU.js" -or
+            $_.Name -like "fcmRecordsNext_Modifiers.js" -or
+            $_.Name -like "fcmRecordsNext_ThresholdsLuck.js" -or
+            $_.Name -like "fcmRecordsNext_Culometro.js" -or
+            $_.Name -like "fcmRecordsNext_Matches.js" -or
+            $_.Name -like "*BACKUP*"
+        } |
+        Remove-Item -Force
+
+    # 7. Documentazione
+    $docsDst = Join-Path $releaseDir "docs"
+    New-Item -ItemType Directory -Path $docsDst -Force | Out-Null
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md") `
+        $docsDst `
+        -Force
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "docs\CULOMETRO.md") `
+        $docsDst `
+        -Force
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "docs\screenshots") `
+        $docsDst `
+        -Recurse `
+        -Force
+
+    # 8. Tool utente finale
+    $toolsDst = Join-Path $releaseDir "tools"
+    New-Item -ItemType Directory -Path $toolsDst -Force | Out-Null
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1") `
+        (Join-Path $toolsDst "Install_RecordsNextVisualizzatori.ps1") `
+        -Force
+
+    # 9. Controllo file vietati
+    $forbiddenPatterns = @(
+        "*BACKUP*",
+        "*.fcm",
+        "*.fca",
+        "recordsnext.db",
+        "recordsnext-gui.properties",
+        "league.json",
+        "seasons.json",
+        "processing.json",
+        "fcmRecordsNext_Core.js",
+        "fcmRecordsNext_Manifest.js",
+        "fcmRecordsNext_Classics.js",
+        "fcmRecordsNext_Series.js",
+        "fcmRecordsNext_RU.js",
+        "fcmRecordsNext_Modifiers.js",
+        "fcmRecordsNext_ThresholdsLuck.js",
+        "fcmRecordsNext_Culometro.js",
+        "fcmRecordsNext_Matches.js"
+    )
+
+    $bad = @()
+    foreach ($pattern in $forbiddenPatterns) {
+        $bad += Get-ChildItem $releaseDir -Recurse -File -Filter $pattern -ErrorAction SilentlyContinue
+    }
+
+    $bad = $bad | Sort-Object FullName -Unique
+
+    if ($bad.Count -gt 0) {
+        Write-Host ""
+        Write-Host "ERRORE: file vietati trovati nella release:"
+        $bad | ForEach-Object { Write-Host $_.FullName }
+        throw "Release non pulita."
+    }
+
+    # 10. Elenco contenuto
+    Write-Host ""
+    Write-Host "=== CONTENUTO RELEASE ==="
+    Get-ChildItem $releaseDir -Recurse -File |
+        Sort-Object FullName |
+        ForEach-Object {
+            $_.FullName.Substring($releaseDir.Length + 1)
+        }
+
+    # 11. ZIP finale
+    New-Item -ItemType Directory -Path $DownloadsDir -Force | Out-Null
+    Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $shaPath -Force -ErrorAction SilentlyContinue
+
+    Compress-Archive `
+        -Path $releaseDir `
+        -DestinationPath $zipPath `
+        -CompressionLevel Optimal `
+        -Force
+
+    $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
+    Set-Content `
+        -LiteralPath $shaPath `
+        -Value ("SHA256  " + $hash + "  " + [IO.Path]::GetFileName($zipPath)) `
+        -Encoding ASCII
+
+    Write-Host ""
+    Write-Host "=== RELEASE CREATA ==="
+    Write-Host "ZIP    : $zipPath"
+    Write-Host "SHA256 : $hash"
+    Write-Host "SHA file: $shaPath"
+    Write-Host ""
+    Write-Host "NON pubblicare ancora: eseguire prima il test pulito dalla cartella dist."
+
+## tools\Build_RecordsNext2_Update_v1.ps1
+
+File: tools\Build_RecordsNext2_Update_v1.ps1
+
+    param(
+        [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
+        [string]$ReleaseVersion = "2.1.0",
+        [string]$DownloadsDir = "D:\DEV_APPS\downloads"
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    $updateName = "RecordsNext_${ReleaseVersion}_UPDATE"
+    $distRoot = Join-Path $ProjectRoot "dist"
+    $updateDir = Join-Path $distRoot $updateName
+    $payloadDir = Join-Path $updateDir "payload"
+
+    $zipPath = Join-Path $DownloadsDir ($updateName + ".zip")
+    $shaPath = Join-Path $DownloadsDir ($updateName + "_SHA256.txt")
+
+    Write-Host ""
+    Write-Host "=== RecordsNext $ReleaseVersion - Build UPDATE ==="
+    Write-Host ""
+
+    $required = @(
+        (Join-Path $ProjectRoot "target\RecordsNext.jar"),
+        (Join-Path $ProjectRoot "RecordsNext.bat"),
+        (Join-Path $ProjectRoot "tools\Aggiorna-RecordsNext-2.1.ps1"),
+        (Join-Path $ProjectRoot "tools\Aggiorna-RecordsNext-2.1.bat")
+    )
+
+    foreach ($file in $required) {
+        if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
+            throw "File richiesto mancante: $file"
+        }
+    }
+
+    Remove-Item -LiteralPath $updateDir -Recurse -Force -ErrorAction SilentlyContinue
+
+    New-Item -ItemType Directory -Path $payloadDir -Force | Out-Null
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "target\RecordsNext.jar") `
+        $payloadDir `
+        -Force
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "RecordsNext.bat") `
+        $payloadDir `
+        -Force
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "tools\Aggiorna-RecordsNext-2.1.ps1") `
+        (Join-Path $updateDir "Aggiorna-RecordsNext-2.1.ps1") `
+        -Force
+
+    Copy-Item `
+        (Join-Path $ProjectRoot "tools\Aggiorna-RecordsNext-2.1.bat") `
+        (Join-Path $updateDir "Aggiorna-RecordsNext-2.1.bat") `
+        -Force
+
+    $readme = @"
+    RecordsNext $ReleaseVersion - AGGIORNAMENTO DA 2.0
+
+    1. Chiudere RecordsNext.
+    2. Estrarre completamente questa cartella.
+    3. Eseguire Aggiorna-RecordsNext-2.1.bat.
+    4. Se l'installazione non viene trovata automaticamente,
+       indicare la cartella della propria installazione RecordsNext 2.0.
+
+    L'aggiornamento sostituisce soltanto il programma.
+
+    NON vengono cancellati o sostituiti:
+    - configurazione della lega;
+    - stagioni configurate;
+    - associazioni storiche;
+    - database RecordsNext;
+    - dati e archivi esistenti.
+
+    Prima della sostituzione viene creato automaticamente un backup
+    del programma precedente, della configurazione e del database.
+    "@
+
+    [IO.File]::WriteAllText(
+        (Join-Path $updateDir "LEGGIMI-AGGIORNAMENTO.txt"),
+        $readme,
+        (New-Object System.Text.UTF8Encoding($false))
+    )
+
+    # Sicurezza assoluta: nell'UPDATE non devono esistere dati/config utente.
+    $forbidden = Get-ChildItem $updateDir -Recurse -File |
+        Where-Object {
+            $_.Name -eq "recordsnext.db" -or
+            $_.Name -eq "league.json" -or
+            $_.Name -eq "seasons.json" -or
+            $_.Name -eq "recordsnext-gui.properties" -or
+            $_.Name -eq "processing.json" -or
+            $_.FullName -match '\\data\\' -or
+            $_.FullName -match '\\config\\'
+        }
+
+    if ($forbidden) {
+        Write-Host ""
+        Write-Host "ERRORE: file vietati trovati:"
+        $forbidden | ForEach-Object { Write-Host $_.FullName }
+        throw "UPDATE non sicuro."
+    }
+
+    Write-Host "=== CONTENUTO UPDATE ==="
+
+    Get-ChildItem $updateDir -Recurse -File |
+        Sort-Object FullName |
+        ForEach-Object {
+            $_.FullName.Substring($updateDir.Length + 1)
+        }
+
+    New-Item -ItemType Directory -Path $DownloadsDir -Force | Out-Null
+
+    Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
+    Remove-Item $shaPath -Force -ErrorAction SilentlyContinue
+
+    Compress-Archive `
+        -Path $updateDir `
+        -DestinationPath $zipPath `
+        -CompressionLevel Optimal `
+        -Force
+
+    $hash = (Get-FileHash $zipPath -Algorithm SHA256).Hash
+
+    Set-Content `
+        -LiteralPath $shaPath `
+        -Value ("SHA256  " + $hash + "  " + [IO.Path]::GetFileName($zipPath)) `
+        -Encoding ASCII
+
+    Write-Host ""
+    Write-Host "=== UPDATE CREATO ==="
+    Write-Host "ZIP    : $zipPath"
+    Write-Host "SHA256 : $hash"
+
 ## tools\Create-RecordsNext2RealJsZip.ps1
 
 File: tools\Create-RecordsNext2RealJsZip.ps1
@@ -27574,113 +28418,74 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     [void]$Builder.AppendLine("> Directory progetto: " + $ProjectDir)
     [void]$Builder.AppendLine("")
 
-    [void]$Builder.AppendLine("## Stato consolidato RecordsNext 2.1.0 — 2026-08-26
+    [void]$Builder.AppendLine("## Stato consolidato RecordsNext 2.1.0 - 2026-08-27")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("RecordsNext 2.1.0 e' la release stabile corrente.")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("Riferimento Git:")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("- commit release: ``682f0f6`` - ``Release RecordsNext 2.1.0``;")
+    [void]$Builder.AppendLine("- tag: ``v2.1.0``;")
+    [void]$Builder.AppendLine("- branch di sviluppo: ``main``.")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("### Stato operativo corrente")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("- stagione corrente: ``2026_2027`` (2026/2027);")
+    [void]$Builder.AppendLine("- sito FCM corrente configurato: ``E:\fantacalcio\Lega2026``;")
+    [void]$Builder.AppendLine("- cartella JS corrente: ``E:\fantacalcio\Lega2026\js``;")
+    [void]$Builder.AppendLine("- archivio Classici/RU consolidato disponibile per le stagioni 2006_2007-2025_2026;")
+    [void]$Builder.AppendLine("- la stagione 2026_2027 e' registrata come anchor corrente nel database operativo e dispone dei report normalizzati correnti.")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("### Funzionalita' consolidate nella 2.1")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("- output modulari pubblici:")
+    [void]$Builder.AppendLine("  - ``fcmRecordsNext_Core.js``;")
+    [void]$Builder.AppendLine("  - ``fcmRecordsNext_Classics.js``;")
+    [void]$Builder.AppendLine("  - ``fcmRecordsNext_Series.js``;")
+    [void]$Builder.AppendLine("  - ``fcmRecordsNext_RU.js``;")
+    [void]$Builder.AppendLine("  - ``fcmRecordsNext_Modifiers.js``;")
+    [void]$Builder.AppendLine("  - ``fcmRecordsNext_ThresholdsLuck.js``;")
+    [void]$Builder.AppendLine("  - ``fcmRecordsNext_Culometro.js``;")
+    [void]$Builder.AppendLine("  - ``fcmRecordsNext_Matches.js``;")
+    [void]$Builder.AppendLine("  - ``fcmRecordsNext_Manifest.js``;")
+    [void]$Builder.AppendLine("- ``fcmRecordsNext_Matches.js`` e' l'output canonico delle partite: una riga per squadra per ogni incontro reale, due righe speculari per partita;")
+    [void]$Builder.AppendLine("- esclusione dei turni di riposo da Matches;")
+    [void]$Builder.AppendLine("- esiti Matches standardizzati ``V/N/P``;")
+    [void]$Builder.AppendLine("- link ai tabellini storici corretti senza annidamento della stagione corrente;")
+    [void]$Builder.AppendLine("- Serie arricchite con stagione, competizione, giornata, match e tabellino;")
+    [void]$Builder.AppendLine("- Culometro arricchito per evento con frequenza storica evento, frequenza storica configurazione, chiave configurazione e impatto;")
+    [void]$Builder.AppendLine("- formula e classifiche del Culometro invariate rispetto alla 2.0;")
+    [void]$Builder.AppendLine("- GUI pubblica identificata come ``RecordsNext 2.1``;")
+    [void]$Builder.AppendLine("- manifest applicativo ``2.1.0``;")
+    [void]$Builder.AppendLine("- schema generale del manifest ancora ``2.0`` dove previsto dal contratto dati.")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("### Bonifica output legacy - 2026-08-27")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("- i file pubblici ``records2026.recordstagionali.classic.js``, ``records2026.recordstagionali.ru.js``, ``records2026.storico.ru.<stagione>.js`` e ``records2026.storico.ru.manifest.js`` non vengono piu' generati ne' pubblicati;")
+    [void]$Builder.AppendLine("- ``Records2026ClassicJsExporter`` e ``Records2026RuJsExporter`` restano nel codice come sorgenti interne di compatibilita' per i wrapper RecordsNext;")
+    [void]$Builder.AppendLine("- il frontend non cambia: nomi, globali e struttura degli output ``fcmRecordsNext_*`` restano invariati;")
+    [void]$Builder.AppendLine("- test su dati operativi reali: 9 output moderni validati, 0 output legacy;")
+    [void]$Builder.AppendLine("- ``fcmRecordsNext_Classics.js`` e ``fcmRecordsNext_RU.js`` verificati byte-per-byte invariati rispetto alla staging 2.1 precedente;")
+    [void]$Builder.AppendLine("- riduzione misurata: circa 28 MiB di output legacy eliminati per sito.")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("### Verifiche finali 2.1")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("- Maven: 41 test eseguiti, 0 failure, 0 errori dopo la pulizia finale del codice morto;")
+    [void]$Builder.AppendLine("- build/package 2.1 completato con successo;")
+    [void]$Builder.AppendLine("- regressione completa dello storico preesistente superata;")
+    [void]$Builder.AppendLine("- generazione reale del sito da FCM verificata con RecordsNext 2.1;")
+    [void]$Builder.AppendLine("- publisher bonificato compilato separatamente e verificato sui dati operativi 2026/2027.")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("### Aggiornamento 2.0 -> 2.1")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("E' disponibile un aggiornamento in-place che sostituisce programma e launcher e conserva configurazione, database, stagioni e associazioni storiche.")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("### Nota sulla parte sottostante del documento")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("Le sezioni successive includono documentazione e codice reale del progetto. Le indicazioni di stato storiche, se in conflitto con questa sezione, sono superate dallo stato consolidato sopra riportato.")
+    [void]$Builder.AppendLine("")
 
-RecordsNext 2.1.0 è la release stabile corrente.
-
-Riferimento Git:
-
-- commit release: `682f0f6` — `Release RecordsNext 2.1.0`;
-- tag: `v2.1.0`;
-- branch `main` allineato con `origin/main`.
-
-### Funzionalità consolidate nella 2.1
-
-- pipeline completa sulle 20 stagioni storiche configurate;
-- output modulari pubblici:
-  - `fcmRecordsNext_Core.js`;
-  - `fcmRecordsNext_Classics.js`;
-  - `fcmRecordsNext_Series.js`;
-  - `fcmRecordsNext_RU.js`;
-  - `fcmRecordsNext_Modifiers.js`;
-  - `fcmRecordsNext_ThresholdsLuck.js`;
-  - `fcmRecordsNext_Culometro.js`;
-  - `fcmRecordsNext_Matches.js`;
-  - `fcmRecordsNext_Manifest.js`;
-- `fcmRecordsNext_Matches.js` è l'output canonico delle partite:
-  una riga per squadra per ogni incontro reale, due righe speculari per partita;
-- esclusione dei turni di riposo da Matches;
-- esiti Matches standardizzati `V/N/P`;
-- link ai tabellini storici corretti senza annidamento della stagione corrente;
-- Serie arricchite con stagione, competizione, giornata, match e tabellino;
-- Culometro arricchito per evento con:
-  - frequenza storica dell'evento;
-  - frequenza storica della configurazione;
-  - chiave configurazione;
-  - impatto dell'evento;
-- formula e classifiche del Culometro invariate rispetto alla 2.0;
-- configurazione storica migliorata:
-  dopo l'aggiunta di una stagione gestita il dialog delle associazioni
-  si apre direttamente sulla stagione appena aggiunta;
-- il comando generale delle associazioni continua invece a partire
-  dalla stagione più recente;
-- GUI pubblica identificata come `RecordsNext 2.1`;
-- manifest applicativo `2.1.0`;
-- schema generale del manifest ancora `2.0` dove previsto dal contratto dati.
-
-### Verifiche finali 2.1
-
-- Maven: 41 test eseguiti, 0 failure, 0 errori;
-- regressione completa sulle 20 stagioni superata;
-- Matches:
-  - 21.860 righe squadra;
-  - 10.930 partite reali;
-  - 0 gruppi diversi da due righe;
-  - 0 coppie non speculari;
-  - 0 identità invalide;
-- Culometro:
-  - ranking invariato;
-  - ranking per competizione invariato;
-  - eventi invariati semanticamente al netto dei nuovi campi 2.1;
-- Serie:
-  - aggregati invariati semanticamente;
-  - dettagli arricchiti verificati;
-- Classici, Modificatori, RU e Soglie/Fortuna verificati senza regressioni;
-- generazione reale del sito da FCM verificata con RecordsNext 2.1.
-
-### Aggiornamento 2.0 -> 2.1
-
-È disponibile un aggiornamento in-place.
-
-Il pacchetto UPDATE sostituisce soltanto:
-
-- `RecordsNext.jar`;
-- `RecordsNext.bat`.
-
-Non sovrascrive:
-
-- `config\`;
-- `data\`;
-- `recordsnext.db`;
-- stagioni configurate;
-- associazioni storiche.
-
-Prima della sostituzione viene creato automaticamente un backup di sicurezza.
-
-Il percorso di aggiornamento è stato verificato su una copia dell'installazione
-reale e successivamente sull'installazione FCM effettiva.
-
-### Installazione operativa FCM
-
-Installazione corrente:
-
-`E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2`
-
-Il post-elaborazione FCM richiama questa installazione tramite:
-
-`E:\FCM\plugin\MultidopoMS2014Full.bat`
-
-La vecchia installazione `RecordsNext-1.0.0` e il relativo ZIP sono stati rimossi.
-
-### Nota sulla parte sottostante del documento
-
-Le sezioni successive derivano dalla bibbia generata durante lo sviluppo della 2.0
-e conservano valore storico e di riferimento del codice.
-
-Le indicazioni di stato presenti più avanti, se in conflitto con questa sezione,
-sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra riportato.
-
-## Regole della bibbia")
+    [void]$Builder.AppendLine("## Regole della bibbia")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("- Le decisioni progettuali consolidate sono separate dal codice implementato.")
     [void]$Builder.AppendLine("- Un file incluso non e automaticamente dichiarato funzionante.")
@@ -27693,6 +28498,7 @@ sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra ri
     [void]$Builder.AppendLine("### Decisioni consolidate")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("- Progetto separato in D:\DEV_APPS\RecordsNext2.0.")
+    [void]$Builder.AppendLine("- Stagione operativa corrente verificata al 27/08/2026: 2026_2027; sito corrente E:\fantacalcio\Lega2026.")
     [void]$Builder.AppendLine("- Cinque famiglie: Classici, Serie, Riserve d'Ufficio, Modificatori, Soglie e Fortuna.")
     [void]$Builder.AppendLine("- Fattore Campo incluso nei Modificatori.")
     [void]$Builder.AppendLine("- Culometro opzionale e prodotto soltanto su richiesta.")
@@ -27711,12 +28517,12 @@ sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra ri
 
     [void]$Builder.AppendLine("### Implementato e verificato")
     [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("- Base funzionante RecordsNext 1.0.2 importata nel progetto 2.0.")
+    [void]$Builder.AppendLine("- Base funzionante RecordsNext 1.0.2 importata nella linea RecordsNext 2.x.")
     [void]$Builder.AppendLine("- Accesso ai database FCM e FCA tramite UCanAccess.")
     [void]$Builder.AppendLine("- Configurazione delle stagioni gestite e manuali.")
     [void]$Builder.AppendLine("- Importazione, normalizzazione e consolidamento storico delle stagioni gestite.")
     [void]$Builder.AppendLine("- Modello modulare con famiglie, figli, dipendenze, planner e preflight.")
-    [void]$Builder.AppendLine("- GUI RecordsNext 2.0 con configurazione granulare delle famiglie.")
+    [void]$Builder.AppendLine("- GUI RecordsNext 2.1 con configurazione granulare delle famiglie.")
     [void]$Builder.AppendLine("- Configurazione gerarchica dei Modificatori per tipo e statistica.")
     [void]$Builder.AppendLine("- Nomi configurabili per MODM1PERS, MODM2PERS e MODM3PERS.")
     [void]$Builder.AppendLine("- Modificatori standard FCM distinti dai modificatori personalizzati.")
@@ -27724,30 +28530,15 @@ sono da considerarsi superate dallo stato consolidato RecordsNext 2.1.0 sopra ri
     [void]$Builder.AppendLine("- Statistiche Massimo, Totale, Media e Utilizzi per i modificatori selezionati.")
     [void]$Builder.AppendLine("- Esportazione verificata del MODDIFESA FCM della stagione 2006_2007.")
     [void]$Builder.AppendLine("- Metadati availableSections e generatedSections distinti.")
-    [void]$Builder.AppendLine("- Test automatici: 38 eseguiti, 0 failure, 0 errori.")
+    [void]$Builder.AppendLine("- Test automatici: 41 eseguiti, 0 failure, 0 errori.")
+    [void]$Builder.AppendLine("- Gli output legacy records2026.* non vengono piu pubblicati; gli exporter legacy Classici/RU restano solo come sorgente interna di compatibilita.")
+    [void]$Builder.AppendLine("- Bonifica publisher verificata sui dati operativi: 9 output moderni, 0 output legacy; Classics e RU invariati byte-per-byte.")
     [void]$Builder.AppendLine("- Verifica reale del JS Modificatori completata con tutte le sezioni selezionate presenti.")
     [void]$Builder.AppendLine("")
 
-    [void]$Builder.AppendLine("### Non ancora implementato o da completare")
+    [void]$Builder.AppendLine("### Questioni aperte")
     [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("- Elaboratore nativo completo della famiglia Serie.")
-    [void]$Builder.AppendLine("- Elaboratore nativo completo della famiglia Soglie e Fortuna.")
-    [void]$Builder.AppendLine("- Culometro definitivo e relativo contratto dati pubblico.")
-    [void]$Builder.AppendLine("- Contratto JavaScript pubblico definitivo di tutte le famiglie.")
-    [void]$Builder.AppendLine("- Visualizzatori HTML 2.0 definitivi.")
-    [void]$Builder.AppendLine("- JS statici definitivi dei visualizzatori.")
-    [void]$Builder.AppendLine("- Installer definitivo dei visualizzatori e dei profili CSS.")
-    [void]$Builder.AppendLine("")
-
-    [void]$Builder.AppendLine("### Non ancora implementato")
-    [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("- Lettura FCM e FCA.")
-    [void]$Builder.AppendLine("- Modello dati.")
-    [void]$Builder.AppendLine("- Elaboratori delle famiglie.")
-    [void]$Builder.AppendLine("- Esportatori JS.")
-    [void]$Builder.AppendLine("- Consolidamento GUI 2.0.")
-    [void]$Builder.AppendLine("- Installer.")
-    [void]$Builder.AppendLine("- Viste HTML 2.0.")
+    [void]$Builder.AppendLine("- Le questioni ancora aperte sono mantenute in docs\DECISIONI_APERTE.md e non vengono duplicate nella sintesi della bibbia.")
     [void]$Builder.AppendLine("")
 
     Add-IndentedFileSection -Builder $Builder -Title "README" -RelativePath "README.md"
@@ -28026,6 +28817,4301 @@ File: tools\Prepare-RecordsNextVisualizzatoriPreview_v2.ps1
     Write-Host ""
     Write-Host "Apri nel browser:" -ForegroundColor Cyan
     Write-Host (Join-Path $viewerRoot "recordsnext.html")
+
+## tools\Report_RU_5Sostituzioni_v6_1.ps1
+
+File: tools\Report_RU_5Sostituzioni_v6_1.ps1
+
+    param(
+        [string]$RecordsNextRoot = "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2",
+        [string]$TabellinoCsv = "",
+        [string]$DiagnosticaCsv = "",
+        [string]$FormazioneCsv = ""
+    )
+
+    $ErrorActionPreference = "Stop"
+    $CompetizioniEscluse = @("Youth League")
+
+    $outputDir = Join-Path $RecordsNextRoot "data\personal-reports"
+    $reportsRoot = Join-Path $RecordsNextRoot "data\reports"
+    $ruArchiveRoot = Join-Path $RecordsNextRoot "data\records-archive\riserveufficio"
+
+    if ([string]::IsNullOrWhiteSpace($TabellinoCsv)) {
+        $TabellinoCsv = Join-Path $outputDir "RU_tabellino_storico_v2.csv"
+    }
+    if ([string]::IsNullOrWhiteSpace($DiagnosticaCsv)) {
+        $DiagnosticaCsv = Join-Path $outputDir "diagnostica_sotto11_v3\Panchina_sotto11_diagnostica_v3.csv"
+    }
+    if ([string]::IsNullOrWhiteSpace($FormazioneCsv)) {
+        $FormazioneCsv = Join-Path $outputDir "diagnostica_sotto11_v3\Panchina_sotto11_formazione_v3.csv"
+    }
+
+    foreach ($p in @($TabellinoCsv,$DiagnosticaCsv,$FormazioneCsv,$reportsRoot,$ruArchiveRoot)) {
+        if (-not (Test-Path $p)) { throw "Percorso non trovato: $p" }
+    }
+
+    New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
+
+    function Get-Prop {
+        param($Object,[string]$Name)
+        if ($null -eq $Object) { return $null }
+        $p = $Object.PSObject.Properties[$Name]
+        if ($null -eq $p) { return $null }
+        return $p.Value
+    }
+
+    function Num {
+        param($Value)
+        if ($null -eq $Value) { return 0.0 }
+        $t = ([string]$Value).Trim().Replace(",",".")
+        $n = 0.0
+        if ([double]::TryParse($t,[Globalization.NumberStyles]::Any,[Globalization.CultureInfo]::InvariantCulture,[ref]$n)) {
+            return $n
+        }
+        return 0.0
+    }
+
+    function Int {
+        param($Value)
+        return [int](Num $Value)
+    }
+
+    function Pct {
+        param([double]$N,[double]$D,[int]$Decimals=2)
+        if ($D -le 0) { return 0 }
+        return [math]::Round(($N/$D)*100,$Decimals)
+    }
+
+    function Html {
+        param($Text)
+        return [System.Net.WebUtility]::HtmlEncode([string]$Text)
+    }
+
+    function Is-ExcludedCompetition {
+        param([string]$Competition)
+        foreach ($x in $CompetizioniEscluse) {
+            if (([string]$Competition).Trim().Equals($x,[System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+        }
+        return $false
+    }
+
+    function Is-KeeperRU {
+        param($Row)
+        $tipo = ([string]$Row.TipoRU).Trim().ToUpperInvariant()
+        $ruolo = ([string]$Row.RuoloRU).Trim().ToUpperInvariant()
+        return ($tipo -eq "PU" -or $ruolo -eq "P" -or $ruolo -eq "PU" -or $ruolo -eq "PORTIERE")
+    }
+
+    function Normalize-Effect {
+        param($Effect)
+        $text = ([string]$Effect).Trim().ToUpperInvariant()
+        if ($text -match "SCONFITTA.*PAREGGIO") { return "SCONFITTA_PAREGGIO" }
+        if ($text -match "PAREGGIO.*VITTORIA") { return "PAREGGIO_VITTORIA" }
+        if ($text -match "SCONFITTA.*VITTORIA") { return "SCONFITTA_VITTORIA" }
+        return "NESSUN_EFFETTO"
+    }
+
+    function New-Key {
+        param($Season,$Match,$Team)
+        return "$Season|$Match|$Team"
+    }
+
+    function New-MatchKey {
+        param($Season,$Match)
+        return "$Season|$Match"
+    }
+
+    # ============================================================
+    # 1. Universo TABELLINO
+    # ============================================================
+
+    $tabRows = @(
+        Import-Csv $TabellinoCsv -Delimiter ";" |
+        Where-Object { -not (Is-ExcludedCompetition $_.competizione) } |
+        ForEach-Object {
+            [pscustomobject]@{
+                Stagione = [string]$_.stagione
+                Competizione = [string]$_.competizione
+                IdIncontro = [string]$_.idIncontro
+                IdSquadra = [string]$_.idSquadra
+                Squadra = [string]$_.squadra
+                PostiVuoti = Int $_.postiVuoti
+                NumeroRU = Int $_.numeroRU
+                GiocatoriEffettivi = Int $_.giocatoriEffettivi
+            }
+        }
+    )
+
+    $allMatchKeys = @{}
+    foreach ($r in $tabRows) { $allMatchKeys[(New-MatchKey $r.Stagione $r.IdIncontro)] = $true }
+    $totalMatches = $allMatchKeys.Count
+
+    # ============================================================
+    # 2. Sotto 11 senza RU: peso sul totale
+    # ============================================================
+
+    $diag = @(Import-Csv $DiagnosticaCsv -Delimiter ";")
+
+    $under11NoRuMatchKeys = @{}
+    foreach ($r in $diag) {
+        $under11NoRuMatchKeys[(New-MatchKey $r.stagione $r.idIncontro)] = $true
+    }
+
+    $under11NoRuMatches = $under11NoRuMatchKeys.Count
+    $pctUnder11NoRuMatches = Pct $under11NoRuMatches $totalMatches 2
+
+    $missingDist = @()
+    foreach ($missing in @(1,2,3,4,11)) {
+        $rows = @($diag | Where-Object { (Int $_.postiVuoti) -eq $missing })
+        $mk = @{}
+        foreach ($r in $rows) { $mk[(New-MatchKey $r.stagione $r.idIncontro)] = $true }
+        $label = switch ($missing) {
+            1 { "IN 10 (manca 1 giocatore)" }
+            2 { "IN 9 (mancano 2 giocatori)" }
+            3 { "IN 8 (mancano 3 giocatori)" }
+            4 { "IN 7 (mancano 4 giocatori)" }
+            11 { "TABELLINO VUOTO / ANOMALO" }
+        }
+        $missingDist += [pscustomobject]@{
+            Situazione = $label
+            SquadrePartita = $rows.Count
+            PartiteDistinte = $mk.Count
+            PctTotale = Pct $mk.Count $totalMatches 3
+        }
+    }
+
+    $twoPlusRows = @($diag | Where-Object { (Int $_.postiVuoti) -ge 2 -and (Int $_.postiVuoti) -lt 11 })
+    $twoPlusKeys = @{}
+    foreach ($r in $twoPlusRows) { $twoPlusKeys[(New-MatchKey $r.stagione $r.idIncontro)] = $true }
+
+    $threePlusRows = @($diag | Where-Object { (Int $_.postiVuoti) -ge 3 -and (Int $_.postiVuoti) -lt 11 })
+    $threePlusKeys = @{}
+    foreach ($r in $threePlusRows) { $threePlusKeys[(New-MatchKey $r.stagione $r.idIncontro)] = $true }
+
+    # ============================================================
+    # 3. Simulazione 5 sostituzioni
+    #    POS=0 viene usato SOLO nei casi dove produce esattamente 11
+    #    titolari. Gli altri restano esplicitamente non simulabili.
+    # ============================================================
+
+    $form = @(Import-Csv $FormazioneCsv -Delimiter ";")
+    $formGroups = @{}
+    foreach ($r in $form) {
+        $key = New-Key $r.stagione $r.idIncontro $r.idSquadra
+        if (-not $formGroups.ContainsKey($key)) {
+            $formGroups[$key] = New-Object System.Collections.Generic.List[object]
+        }
+        $formGroups[$key].Add($r)
+    }
+
+    $simulationRows = New-Object System.Collections.Generic.List[object]
+    $simulabili = 0
+    $anomali = 0
+    $benefitTeam = 0
+    $fullTeam = 0
+    $benefitMatchKeys = @{}
+    $fullMatchKeys = @{}
+
+    foreach ($d in $diag) {
+        $key = New-Key $d.stagione $d.idIncontro $d.idSquadra
+        $g = if ($formGroups.ContainsKey($key)) { $formGroups[$key].ToArray() } else { @() }
+
+        $initial = @($g | Where-Object { (Int $_.pos) -eq 0 })
+        if ($initial.Count -ne 11) {
+            $anomali++
+            $simulationRows.Add([pscustomobject]@{
+                Stagione=$d.stagione; IdIncontro=$d.idIncontro; IdSquadra=$d.idSquadra; Squadra=$d.squadra
+                PostiVuoti=Int $d.postiVuoti; Simulabile=$false; SostituzioniUsate=""; ExtraFinoA5=""
+                Compatibili=0; RisoltoCon5=$false; Nota="POS=0 non produce 11 titolari (o FORMAZIONE assente)"
+            })
+            continue
+        }
+
+        $simulabili++
+
+        $initialRole = @{}
+        foreach ($r in $initial) {
+            $role = ([string]$r.ruoloFca).Trim()
+            if ([string]::IsNullOrWhiteSpace($role)) { continue }
+            if (-not $initialRole.ContainsKey($role)) { $initialRole[$role] = 0 }
+            $initialRole[$role]++
+        }
+
+        $finalRole = @{}
+        foreach ($r in @($g | Where-Object { (Int $_.nelPrimi11Finale) -eq 1 })) {
+            $role = ([string]$r.ruoloFca).Trim()
+            if ([string]::IsNullOrWhiteSpace($role)) { continue }
+            if (-not $finalRole.ContainsKey($role)) { $finalRole[$role] = 0 }
+            $finalRole[$role]++
+        }
+
+        $deficit = @{}
+        foreach ($role in $initialRole.Keys) {
+            $f = if ($finalRole.ContainsKey($role)) { $finalRole[$role] } else { 0 }
+            $n = $initialRole[$role] - $f
+            if ($n -gt 0) { $deficit[$role] = $n }
+        }
+
+        $candidate = @{}
+        foreach ($r in @($g | Where-Object {
+            (Int $_.inPanchinaTabellino) -eq 1 -and (Int $_.nelPrimi11Finale) -eq 0
+        })) {
+            $role = ([string]$r.ruoloFca).Trim()
+            if ([string]::IsNullOrWhiteSpace($role)) { continue }
+            if (-not $candidate.ContainsKey($role)) { $candidate[$role] = 0 }
+            $candidate[$role]++
+        }
+
+        $compatible = 0
+        $allCovered = $true
+        foreach ($role in $deficit.Keys) {
+            $c = if ($candidate.ContainsKey($role)) { $candidate[$role] } else { 0 }
+            $compatible += [math]::Min($deficit[$role],$c)
+            if ($c -lt $deficit[$role]) { $allCovered = $false }
+        }
+
+        $subsUsed = @($g | Where-Object { (Int $_.entratoRiserva) -ne 0 }).Count
+        $extra = [math]::Max(0,5-$subsUsed)
+        $missing = Int $d.postiVuoti
+        $resolved = ($allCovered -and $missing -le $extra)
+
+        if ($compatible -gt 0) {
+            $benefitTeam++
+            $benefitMatchKeys[(New-MatchKey $d.stagione $d.idIncontro)] = $true
+        }
+        if ($resolved) {
+            $fullTeam++
+            $fullMatchKeys[(New-MatchKey $d.stagione $d.idIncontro)] = $true
+        }
+
+        $defText = @($deficit.Keys | Sort-Object | ForEach-Object { "$_=$($deficit[$_])" }) -join ","
+        $candText = @($candidate.Keys | Sort-Object | ForEach-Object { "$_=$($candidate[$_])" }) -join ","
+
+        $simulationRows.Add([pscustomobject]@{
+            Stagione=$d.stagione
+            IdIncontro=$d.idIncontro
+            IdSquadra=$d.idSquadra
+            Squadra=$d.squadra
+            PostiVuoti=$missing
+            Simulabile=$true
+            SostituzioniUsate=$subsUsed
+            ExtraFinoA5=$extra
+            RuoliMancanti=$defText
+            PanchinaValidaPerRuolo=$candText
+            Compatibili=$compatible
+            RisoltoCon5=$resolved
+            Nota=""
+        })
+    }
+
+    $pctBenefitAllMatches = Pct $benefitMatchKeys.Count $totalMatches 2
+    $pctFullAllMatches = Pct $fullMatchKeys.Count $totalMatches 2
+    $pctBenefitSim = Pct $benefitTeam $simulabili 2
+    $pctFullSim = Pct $fullTeam $simulabili 2
+
+    # ============================================================
+    # 4. RU complete + effetto
+    # ============================================================
+
+    $allRu = New-Object System.Collections.Generic.List[object]
+
+    $normalizedFiles = @(
+        Get-ChildItem $reportsRoot -Recurse -Filter "season_normalized_*.json" |
+        Where-Object { -not $_.PSIsContainer }
+    )
+
+    foreach ($file in $normalizedFiles) {
+        $season = Split-Path $file.DirectoryName -Leaf
+        $doc = Get-Content $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+
+        foreach ($ru in @($doc.riserveUfficioDettaglio)) {
+            if ($null -eq $ru) { continue }
+
+            $idMatch = [string](Get-Prop $ru "idIncontro")
+            $idTeam = [string](Get-Prop $ru "idSquadra")
+            if ([string]::IsNullOrWhiteSpace($idMatch) -or [string]::IsNullOrWhiteSpace($idTeam)) { continue }
+            if (-not $allMatchKeys.ContainsKey((New-MatchKey $season $idMatch))) { continue }
+
+            $allRu.Add([pscustomobject]@{
+                Stagione=$season
+                IdIncontro=$idMatch
+                IdSquadra=$idTeam
+                Squadra=[string](Get-Prop $ru "squadra")
+                TipoRU=[string](Get-Prop $ru "tipoRU")
+                RuoloRU=[string](Get-Prop $ru "ruoloRU")
+                ValoreRU=Num (Get-Prop $ru "valoreRU")
+            })
+        }
+    }
+
+    $effects = @{}
+    Get-ChildItem $ruArchiveRoot -Recurse -Filter "riserveufficio.json" |
+    Where-Object { -not $_.PSIsContainer } |
+    ForEach-Object {
+        $season = Split-Path $_.DirectoryName -Leaf
+        $doc = Get-Content $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        $views = Get-Prop $doc "views"
+
+        foreach ($row in @(Get-Prop $views "ruDecisiva")) {
+            if ($null -eq $row) { continue }
+            $idMatch = [string](Get-Prop $row "idIncontro")
+            $idTeam = [string](Get-Prop $row "idSquadra")
+            if ([string]::IsNullOrWhiteSpace($idMatch) -or [string]::IsNullOrWhiteSpace($idTeam)) { continue }
+            $effects[(New-Key $season $idMatch $idTeam)] = Normalize-Effect (Get-Prop $row "effetto")
+        }
+    }
+
+    function Get-RuStats {
+        param($Rows,[hashtable]$UniverseMatches)
+
+        $teamKeys=@{}
+        $matchKeys=@{}
+        foreach ($r in $Rows) {
+            $teamKeys[(New-Key $r.Stagione $r.IdIncontro $r.IdSquadra)]=$true
+            $matchKeys[(New-MatchKey $r.Stagione $r.IdIncontro)]=$true
+        }
+
+        $sp=0; $pv=0; $sv=0
+        $decMatch=@{}
+        foreach ($key in $teamKeys.Keys) {
+            $fx = if ($effects.ContainsKey($key)) { $effects[$key] } else { "NESSUN_EFFETTO" }
+            switch ($fx) {
+                "SCONFITTA_PAREGGIO" { $sp++ }
+                "PAREGGIO_VITTORIA" { $pv++ }
+                "SCONFITTA_VITTORIA" { $sv++ }
+            }
+            if ($fx -ne "NESSUN_EFFETTO") {
+                $parts=$key -split "\|",3
+                $decMatch["$($parts[0])|$($parts[1])"]=$true
+            }
+        }
+
+        $dec=$sp+$pv+$sv
+        return [pscustomobject]@{
+            TeamCases=$teamKeys.Count
+            RuOccurrences=$Rows.Count
+            Matches=$matchKeys.Count
+            Universe=$UniverseMatches.Count
+            PctMatches=Pct $matchKeys.Count $UniverseMatches.Count 2
+            DefeatDraw=$sp
+            DrawWin=$pv
+            DefeatWin=$sv
+            DecisiveTeam=$dec
+            PctDecisiveTeam=Pct $dec $teamKeys.Count 2
+            DecisiveMatches=$decMatch.Count
+            PctDecisiveMatchesUniverse=Pct $decMatch.Count $UniverseMatches.Count 2
+        }
+    }
+
+    $allHistoryStats = Get-RuStats $allRu $allMatchKeys
+
+    # ============================================================
+    # 5. Identificazione automatica dell'era RU 3 movimento / 2 portiere
+    #    Regola: prendo il suffisso cronologico piu recente in cui tutte
+    #    le RU osservate sono compatibili con movimento=3 e portiere=2.
+    # ============================================================
+
+    $seasonPatterns = @()
+    $seasonsWithRu = @($allRu | Select-Object -ExpandProperty Stagione -Unique | Sort-Object)
+
+    foreach ($season in $seasonsWithRu) {
+        $rows=@($allRu | Where-Object { $_.Stagione -eq $season })
+        $mov=@($rows | Where-Object { -not (Is-KeeperRU $_) } | Select-Object -ExpandProperty ValoreRU -Unique | Sort-Object)
+        $keep=@($rows | Where-Object { (Is-KeeperRU $_) } | Select-Object -ExpandProperty ValoreRU -Unique | Sort-Object)
+
+        $movOk = (@($mov | Where-Object { $_ -ne 3 }).Count -eq 0)
+        $keepOk = (@($keep | Where-Object { $_ -ne 2 }).Count -eq 0)
+        $compatible32 = ($rows.Count -gt 0 -and $movOk -and $keepOk)
+
+        $seasonPatterns += [pscustomobject]@{
+            Stagione=$season
+            Movimento=if($mov.Count){($mov -join ",")}else{"-"}
+            Portiere=if($keep.Count){($keep -join ",")}else{"-"}
+            Compatibile32=$compatible32
+            RU=$rows.Count
+        }
+    }
+
+    $rule32Seasons = New-Object System.Collections.Generic.List[string]
+    $sortedDesc = @($seasonPatterns | Sort-Object Stagione -Descending)
+    $started=$false
+    foreach ($s in $sortedDesc) {
+        if (-not $started) {
+            if ($s.Compatibile32) {
+                $rule32Seasons.Add($s.Stagione)
+                $started=$true
+            }
+            continue
+        }
+        if ($s.Compatibile32) {
+            $rule32Seasons.Add($s.Stagione)
+        } else {
+            break
+        }
+    }
+    $rule32Seasons = @($rule32Seasons | Sort-Object)
+
+    $rule32SeasonSet=@{}
+    foreach($s in $rule32Seasons){$rule32SeasonSet[$s]=$true}
+
+    $rule32Universe=@{}
+    foreach($r in $tabRows){
+        if($rule32SeasonSet.ContainsKey($r.Stagione)){
+            $rule32Universe[(New-MatchKey $r.Stagione $r.IdIncontro)]=$true
+        }
+    }
+
+    $rule32Ru=@($allRu | Where-Object { $rule32SeasonSet.ContainsKey($_.Stagione) })
+    $rule32Stats=Get-RuStats $rule32Ru $rule32Universe
+
+    $ruleStart = if($rule32Seasons.Count){$rule32Seasons[0]}else{"NON RILEVATA"}
+    $ruleEnd = if($rule32Seasons.Count){$rule32Seasons[-1]}else{"NON RILEVATA"}
+
+    # ============================================================
+    # 6. Output CSV
+    # ============================================================
+
+    $simCsv = Join-Path $outputDir "RU_5_sostituzioni_simulazione_v6_1.csv"
+    $seasonCsv = Join-Path $outputDir "RU_regole_per_stagione_v6_1.csv"
+    $htmlPath = Join-Path $outputDir "RU_5_sostituzioni_analisi_v6_1.html"
+
+    $simulationRows | Export-Csv -Path $simCsv -Delimiter ";" -NoTypeInformation -Encoding UTF8
+    $seasonPatterns | Export-Csv -Path $seasonCsv -Delimiter ";" -NoTypeInformation -Encoding UTF8
+
+    # ============================================================
+    # 7. HTML
+    # ============================================================
+
+    $missingHtml = foreach($r in $missingDist){
+    @"
+    <tr>
+    <td class="left strong">$(Html $r.Situazione)</td>
+    <td>$($r.SquadrePartita)</td>
+    <td>$($r.PartiteDistinte)</td>
+    <td>$($r.PctTotale)%</td>
+    </tr>
+    "@
+    }
+
+    $seasonHtml = foreach($r in $seasonPatterns){
+        $class = if($rule32SeasonSet.ContainsKey($r.Stagione)){"rule"}else{""}
+    @"
+    <tr class="$class">
+    <td>$(Html $r.Stagione)</td>
+    <td>$($r.RU)</td>
+    <td>$(Html $r.Movimento)</td>
+    <td>$(Html $r.Portiere)</td>
+    <td>$(if($r.Compatibile32){"SI"}else{"NO"})</td>
+    </tr>
+    "@
+    }
+
+    function RuStatsHtml {
+        param([string]$Label,$S)
+    @"
+    <tr>
+    <td class="left strong">$(Html $Label)</td>
+    <td>$($S.Universe)</td>
+    <td>$($S.TeamCases)</td>
+    <td>$($S.RuOccurrences)</td>
+    <td>$($S.Matches)</td>
+    <td>$($S.PctMatches)%</td>
+    <td>$($S.DefeatDraw)</td>
+    <td>$($S.DrawWin)</td>
+    <td>$($S.DefeatWin)</td>
+    <td class="red strong">$($S.DecisiveTeam)</td>
+    <td class="red strong">$($S.PctDecisiveTeam)%</td>
+    <td class="red strong">$($S.DecisiveMatches)</td>
+    <td class="red strong">$($S.PctDecisiveMatchesUniverse)%</td>
+    </tr>
+    "@
+    }
+
+    $ruleSeasonText = if($rule32Seasons.Count){$rule32Seasons -join ", "}else{"nessuna"}
+
+    $html = @"
+    <!doctype html>
+    <html lang="it">
+    <head>
+    <meta charset="utf-8">
+    <title>RU e 5 sostituzioni - analisi storica</title>
+    <style>
+    body{font-family:"Trebuchet MS",Verdana,Arial,sans-serif;margin:22px;color:#111;background:#fff}
+    h1,h2,h3{color:#003366} h1{margin-bottom:4px}
+    .subtitle{color:#666;margin-bottom:20px}
+    .box{padding:15px;margin:16px 0 22px;border:1px solid #003366;background:#f7f7f7}
+    .important{padding:16px;margin:18px 0 24px;border:2px solid #990000;background:#fff8f8}
+    .good{padding:16px;margin:18px 0 24px;border:2px solid #2b6b2b;background:#f6fff6}
+    .big{font-size:21px;font-weight:bold;color:#003366}.red{color:#990000}.strong{font-weight:bold}.left{text-align:left}
+    .small{font-size:12px;color:#555}.note{line-height:1.55}
+    table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px}
+    th{padding:7px 5px;border:1px solid #003366;background:#003366;color:#fff;text-align:center}
+    td{padding:6px 5px;border:1px solid #003366;text-align:right;vertical-align:top}
+    tbody tr:nth-child(even){background:#ccffff} tr.rule{background:#e7ffe7!important}
+    </style>
+    </head>
+    <body>
+
+    <h1>RU e 5 sostituzioni: cosa dice davvero lo storico</h1>
+    <div class="subtitle">RecordsNext 2.0 - analisi personale sulle $totalMatches partite con TABELLINO reale</div>
+
+    <div class="box">
+    <h2>1. Prima domanda: quanto pesa davvero il problema del giocare sotto 11?</h2>
+    <p>Le partite con almeno una squadra <strong>sotto 11 e senza RU</strong> sono <span class="big">$under11NoRuMatches</span> su <strong>$totalMatches</strong>: <span class="big">$pctUnder11NoRuMatches%</span>.</p>
+    <p>Quindi il fenomeno esiste, ma riguarda circa <strong>1 partita ogni $([math]::Round($totalMatches/[math]::Max(1,$under11NoRuMatches),1))</strong>.</p>
+    <p>Le situazioni più estreme sono molto più rare: almeno due giocatori mancanti compaiono in <strong>$($twoPlusKeys.Count) partite ($((Pct $twoPlusKeys.Count $totalMatches 2))%)</strong>; almeno tre mancanti in <strong>$($threePlusKeys.Count) partite ($((Pct $threePlusKeys.Count $totalMatches 2))%)</strong>.</p>
+    </div>
+
+    <table>
+    <thead><tr><th>Situazione</th><th>Casi-squadra</th><th>Partite distinte</th><th>% di tutte le partite</th></tr></thead>
+    <tbody>
+    $($missingHtml -join "`r`n")
+    </tbody>
+    </table>
+
+    <div class="note">
+    <p><strong>Interpretazione:</strong> aumentare i cambi può essere utile, ma va pesato sul totale. Una regola generale non va valutata soltanto sulla percentuale di casi che riesce a correggere <em>dopo che il problema si è verificato</em>: conta anche quanto spesso quel problema nasce davvero.</p>
+    <p>I 10 casi con 11 slot vuoti sono tabellini anomali/vuoti e non vengono usati nella simulazione delle 5 sostituzioni.</p>
+    </div>
+
+    <h2>2. Cinque sostituzioni: cosa avrebbero cambiato?</h2>
+    <div class="box">
+    <p>Dei <strong>$($diag.Count)</strong> casi-squadra sotto 11 senza RU, <strong>$simulabili</strong> sono ricostruibili in modo coerente con 11 titolari iniziali identificati da <code>POS=0</code>; <strong>$anomali</strong> restano fuori dalla simulazione.</p>
+    <p>Nei casi simulabili, <strong>$benefitTeam ($pctBenefitSim%)</strong> avevano almeno un panchinaro con voto valido del ruolo effettivamente mancante.</p>
+    <p>Con un massimo di 5 sostituzioni, <strong>$fullTeam ($pctFullSim%)</strong> sarebbero tornati completamente a 11.</p>
+    </div>
+
+    <div class="important">
+    <h3>Ma sul totale storico?</h3>
+    <p>Le partite nelle quali almeno una squadra avrebbe potuto beneficiare di un cambio aggiuntivo compatibile sono <span class="big">$($benefitMatchKeys.Count)</span>: <strong>$pctBenefitAllMatches% di tutte le $totalMatches partite</strong>.</p>
+    <p>Le partite nelle quali la simulazione ricostruisce una squadra completamente riportata a 11 con massimo 5 cambi sono <span class="big">$($fullMatchKeys.Count)</span>: <strong>$pctFullAllMatches% di tutte le partite</strong>.</p>
+    <p>Questa è la misura più utile per la decisione regolamentare: il vantaggio condizionato è consistente, ma l'effetto complessivo riguarda circa <strong>3 partite ogni 100</strong> dello storico.</p>
+    </div>
+
+    <p class="small">La simulazione considera compatibile un panchinaro con TOT valido appartenente a un ruolo rimasto scoperto rispetto agli 11 iniziali. Il numero di sostituzioni già utilizzate viene letto da FORMATION.ENTRATORISERVA; si concedono cambi aggiuntivi fino a un massimo di 5.</p>
+
+    <h2>3. Il "fattore sfiga"</h2>
+    <div class="box">
+    <p>Rimanere senza <strong>due o più</strong> giocatori senza RU è successo in <strong>$($twoPlusKeys.Count) partite su $totalMatches</strong>: <strong>$(Pct $twoPlusKeys.Count $totalMatches 2)%</strong>.</p>
+    <p>Rimanere senza <strong>tre o più</strong> giocatori è successo in appena <strong>$($threePlusKeys.Count) partite</strong>: <strong>$(Pct $threePlusKeys.Count $totalMatches 3)%</strong>.</p>
+    <p>Rimanere addirittura con <strong>quattro giocatori mancanti</strong> compare in <strong>$((@($missingDist|Where-Object{$_.Situazione -like "IN 7*"}))[0].PartiteDistinte) partite</strong>, cioè <strong>$((@($missingDist|Where-Object{$_.Situazione -like "IN 7*"}))[0].PctTotale)%</strong> dello storico.</p>
+    <p>Questi eventi sono quindi realmente eccezionali. Se la filosofia della lega vuole conservare una componente di rischio/sfortuna quando una formazione viene travolta da assenze imprevedibili, i numeri mostrano che questa componente non domina affatto il campionato: è rara.</p>
+    </div>
+
+    <h2>4. RU: effetto su tutto lo storico e nella sola era 3/2</h2>
+    <p>Per la RU il problema è diverso: la RU entra quando non esiste più un sostituto utilizzabile per quel ruolo. Qui interessa soprattutto sapere <strong>quanto spesso modifica il risultato</strong>.</p>
+
+    <table>
+    <thead>
+    <tr>
+    <th>Campione</th><th>Partite del campione</th><th>Casi-squadra con RU</th><th>RU usate</th><th>Partite con RU</th><th>% partite con RU</th>
+    <th>Sconfitta→Pareggio</th><th>Pareggio→Vittoria</th><th>Sconfitta→Vittoria</th>
+    <th>Casi-squadra decisivi</th><th>% decisivi quando c'è RU</th><th>Partite distinte con RU decisiva</th><th>% di tutte le partite del campione</th>
+    </tr>
+    </thead>
+    <tbody>
+    $(RuStatsHtml "TUTTO LO STORICO" $allHistoryStats)
+    $(RuStatsHtml "SOLO REGOLA RU 3 MOVIMENTO / 2 PORTIERE" $rule32Stats)
+    </tbody>
+    </table>
+
+    <div class="good">
+    <h3>Campione RU 3/2 rilevato automaticamente</h3>
+    <p>Il report ha individuato come era compatibile con <strong>RU di movimento = 3</strong> e <strong>RU portiere = 2</strong> il periodo da <strong>$ruleStart</strong> a <strong>$ruleEnd</strong>.</p>
+    <p>Stagioni incluse: <strong>$(Html $ruleSeasonText)</strong>.</p>
+    <p>Nel solo campione 3/2, la RU è decisiva in <strong>$($rule32Stats.DecisiveTeam) casi-squadra su $($rule32Stats.TeamCases)</strong>: <strong>$($rule32Stats.PctDecisiveTeam)%</strong> dei casi in cui viene usata.</p>
+    <p>Guardando invece tutte le partite del periodo, una RU decisiva compare in <strong>$($rule32Stats.DecisiveMatches) partite su $($rule32Stats.Universe)</strong>: <strong>$($rule32Stats.PctDecisiveMatchesUniverse)%</strong>.</p>
+    <p>Questo secondo numero è quello più corretto per confrontare il peso regolamentare della RU con il peso complessivo delle 5 sostituzioni.</p>
+    </div>
+
+    <h3>Controllo della regola RU per stagione</h3>
+    <table>
+    <thead><tr><th>Stagione</th><th>RU osservate</th><th>Valori movimento</th><th>Valori portiere</th><th>Compatibile 3/2</th></tr></thead>
+    <tbody>
+    $($seasonHtml -join "`r`n")
+    </tbody>
+    </table>
+
+    <div class="important">
+    <h2>5. Lettura regolamentare</h2>
+    <p><strong>5 sostituzioni:</strong> risolvono una quota importante dei casi in cui il problema è già sorto, ma la simulazione completa riguarda soltanto <strong>$pctFullAllMatches% di tutte le partite storiche</strong>.</p>
+    <p><strong>RU:</strong> interviene su un fenomeno diverso, legato all'esaurimento dei sostituti utilizzabili per ruolo. Il suo peso va giudicato soprattutto dalla quota di partite nelle quali è <strong>decisiva</strong>, in particolare nel periodo moderno con valore 3/2.</p>
+    <p>Quindi non è corretto dedurre automaticamente «5 cambi = RU inutile». Le due regole correggono due problemi differenti. I numeri permettono invece di decidere quanta protezione si vuole dare contro l'imprevisto e quanta responsabilità si vuole lasciare alla costruzione della rosa e alla scelta della formazione.</p>
+    </div>
+
+    <div class="small">
+    File generato da Report_RU_5Sostituzioni_v6_1.ps1.<br>
+    Simulazione dettagliata: $(Html $simCsv)<br>
+    Regole RU per stagione: $(Html $seasonCsv)
+    </div>
+
+    </body>
+    </html>
+    "@
+
+    Set-Content -Path $htmlPath -Value $html -Encoding UTF8
+
+    Write-Host ""
+    Write-Host "=== RU E 5 SOSTITUZIONI - ANALISI v6.1 ==="
+    Write-Host ""
+    Write-Host "Partite storiche                           : $totalMatches"
+    Write-Host "Partite sotto 11 senza RU                  : $under11NoRuMatches ($pctUnder11NoRuMatches%)"
+    Write-Host "Casi simulabili                            : $simulabili"
+    Write-Host "Casi anomali/non simulabili                : $anomali"
+    Write-Host "Partite che beneficerebbero di un cambio   : $($benefitMatchKeys.Count) ($pctBenefitAllMatches%)"
+    Write-Host "Partite completamente risolte con 5 cambi  : $($fullMatchKeys.Count) ($pctFullAllMatches%)"
+    Write-Host ""
+    Write-Host "Era RU 3/2                                 : $ruleStart -> $ruleEnd"
+    Write-Host "Partite campione 3/2                       : $($rule32Stats.Universe)"
+    Write-Host "Partite con RU nel campione 3/2            : $($rule32Stats.Matches) ($($rule32Stats.PctMatches)%)"
+    Write-Host "Casi-squadra RU decisiva nel campione 3/2  : $($rule32Stats.DecisiveTeam) ($($rule32Stats.PctDecisiveTeam)%)"
+    Write-Host "Partite RU decisiva nel campione 3/2       : $($rule32Stats.DecisiveMatches) ($($rule32Stats.PctDecisiveMatchesUniverse)%)"
+    Write-Host ""
+    Write-Host "HTML                                       : $htmlPath"
+    Write-Host "CSV simulazione                            : $simCsv"
+    Write-Host "CSV regole RU                              : $seasonCsv"
+    Write-Host ""
+
+## tools\Report_RU_Storico_Completo_v8_4.ps1
+
+File: tools\Report_RU_Storico_Completo_v8_4.ps1
+
+    param(
+        [string]$RecordsNextRoot = "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2",
+        [string]$TabellinoCsv = "",
+        [string]$DiagnosticaCsv = "",
+        [string]$FormazioneCsv = ""
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    $CompetizioniEscluse = @("Youth League")
+
+    $reportsRoot = Join-Path $RecordsNextRoot "data\reports"
+    $ruArchiveRoot = Join-Path $RecordsNextRoot "data\records-archive\riserveufficio"
+    $outputDir = Join-Path $RecordsNextRoot "data\personal-reports"
+
+    if ([string]::IsNullOrWhiteSpace($TabellinoCsv)) {
+        $TabellinoCsv = Join-Path $outputDir "RU_tabellino_storico_v2.csv"
+    }
+    if ([string]::IsNullOrWhiteSpace($DiagnosticaCsv)) {
+        $DiagnosticaCsv = Join-Path $outputDir "diagnostica_sotto11_v3\Panchina_sotto11_diagnostica_v3.csv"
+    }
+    if ([string]::IsNullOrWhiteSpace($FormazioneCsv)) {
+        $FormazioneCsv = Join-Path $outputDir "diagnostica_sotto11_v3\Panchina_sotto11_formazione_v3.csv"
+    }
+
+    if (-not (Test-Path $TabellinoCsv)) { throw "CSV TABELLINO non trovato: $TabellinoCsv" }
+    if (-not (Test-Path $DiagnosticaCsv)) { throw "CSV diagnostica sotto 11 non trovato: $DiagnosticaCsv" }
+    if (-not (Test-Path $FormazioneCsv)) { throw "CSV formazione sotto 11 non trovato: $FormazioneCsv" }
+    if (-not (Test-Path $reportsRoot)) { throw "Cartella reports non trovata: $reportsRoot" }
+    if (-not (Test-Path $ruArchiveRoot)) { throw "Archivio RU non trovato: $ruArchiveRoot" }
+
+    New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
+
+    function Get-Prop {
+        param($Object,[string]$Name)
+        if ($null -eq $Object) { return $null }
+        $p = $Object.PSObject.Properties[$Name]
+        if ($null -eq $p) { return $null }
+        return $p.Value
+    }
+
+    function Get-Number {
+        param($Value)
+        if ($null -eq $Value) { return 0.0 }
+        $text = ([string]$Value).Trim().Replace(",", ".")
+        if ([string]::IsNullOrWhiteSpace($text)) { return 0.0 }
+        $n = 0.0
+        if ([double]::TryParse($text,[Globalization.NumberStyles]::Any,[Globalization.CultureInfo]::InvariantCulture,[ref]$n)) {
+            return $n
+        }
+        return 0.0
+    }
+
+    function Get-Percent {
+        param([double]$Numerator,[double]$Denominator,[int]$Decimals = 2)
+        if ($Denominator -le 0) { return 0 }
+        return [math]::Round(($Numerator / $Denominator) * 100,$Decimals)
+    }
+
+    function Html {
+        param($Text)
+        return [System.Net.WebUtility]::HtmlEncode([string]$Text)
+    }
+
+    function Is-ExcludedCompetition {
+        param([string]$Competition)
+        if ([string]::IsNullOrWhiteSpace($Competition)) { return $false }
+        foreach ($excluded in $CompetizioniEscluse) {
+            if ($Competition.Trim().Equals($excluded,[System.StringComparison]::OrdinalIgnoreCase)) {
+                return $true
+            }
+        }
+        return $false
+    }
+
+    function Is-ExcludedFakeTeam {
+        param([string]$TeamName)
+        if ([string]::IsNullOrWhiteSpace($TeamName)) { return $false }
+        return ($TeamName.Trim() -match "(?i)\bFANTOCCIO\b")
+    }
+
+    function Normalize-Effect {
+        param($Effect)
+        $text = ([string]$Effect).Trim().ToUpperInvariant()
+        if ($text -match "SCONFITTA.*PAREGGIO") { return "SCONFITTA_PAREGGIO" }
+        if ($text -match "PAREGGIO.*VITTORIA") { return "PAREGGIO_VITTORIA" }
+        if ($text -match "SCONFITTA.*VITTORIA") { return "SCONFITTA_VITTORIA" }
+        return "NESSUN_EFFETTO"
+    }
+
+    function Is-KeeperRU {
+        param($Row)
+        $tipo = ([string]$Row.TipoRU).Trim().ToUpperInvariant()
+        $ruolo = ([string]$Row.RuoloRU).Trim().ToUpperInvariant()
+        return ($tipo -eq "PU" -or $ruolo -eq "P" -or $ruolo -eq "PU" -or $ruolo -eq "PORTIERE")
+    }
+
+    function Get-EffectForKey {
+        param([string]$Key)
+        if ($effects.ContainsKey($Key)) { return $effects[$Key] }
+        return "NESSUN_EFFETTO"
+    }
+
+    function Get-OutcomeCounts {
+        param([object[]]$Rows)
+        return @{
+            VITTORIA = @($Rows | Where-Object { $_.Esito -eq "VITTORIA" }).Count
+            PAREGGIO = @($Rows | Where-Object { $_.Esito -eq "PAREGGIO" }).Count
+            SCONFITTA = @($Rows | Where-Object { $_.Esito -eq "SCONFITTA" }).Count
+        }
+    }
+
+
+    function Get-TeamGoalsFromResult {
+        param([string]$Result,[string]$Side)
+        if ([string]::IsNullOrWhiteSpace($Result)) { return $null }
+        $m = [regex]::Match($Result.Trim(),"^\s*(\d+)\s*-\s*(\d+)\s*$")
+        if (-not $m.Success) { return $null }
+        $homeGoalsParsed = [int]$m.Groups[1].Value
+        $awayGoalsParsed = [int]$m.Groups[2].Value
+        $s = ([string]$Side).Trim().ToUpperInvariant()
+        if ($s -eq "CASA" -or $s -eq "HOME") { return $homeGoalsParsed }
+        if ($s -eq "FUORI" -or $s -eq "AWAY") { return $awayGoalsParsed }
+        return $null
+    }
+
+    function Get-EffectCountsFromKeys {
+        param([string[]]$Keys)
+        $counts = @{
+            SCONFITTA_PAREGGIO = 0
+            PAREGGIO_VITTORIA = 0
+            SCONFITTA_VITTORIA = 0
+            NESSUN_EFFETTO = 0
+        }
+        foreach ($key in $Keys) {
+            $effect = Get-EffectForKey $key
+            $counts[$effect]++
+        }
+        return $counts
+    }
+
+    # ------------------------------------------------------------
+    # 1. TABELLINO: universo del report
+    # ------------------------------------------------------------
+
+    # Esclude l'intera partita se coinvolge "Il Fantoccio", squadra fittizia a 0.
+    $fakeTeamMatchKeys = @{}
+    $fakeTeamMatchesBySeason = @{}
+
+    Get-ChildItem $reportsRoot -Recurse -Filter "season_normalized_*.json" |
+    Where-Object { -not $_.PSIsContainer } |
+    ForEach-Object {
+        $season = Split-Path $_.DirectoryName -Leaf
+        $doc = Get-Content $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+
+        foreach ($tm in @($doc.partiteSquadra)) {
+            if ($null -eq $tm) { continue }
+            $competition = [string](Get-Prop $tm "competizioneNome")
+            if (Is-ExcludedCompetition $competition) { continue }
+
+            $idMatch = [string](Get-Prop $tm "idIncontro")
+            if ([string]::IsNullOrWhiteSpace($idMatch)) { continue }
+
+            $team = [string](Get-Prop $tm "squadra")
+            $opponent = [string](Get-Prop $tm "avversaria")
+
+            if ((Is-ExcludedFakeTeam $team) -or (Is-ExcludedFakeTeam $opponent)) {
+                $fakeTeamMatchKeys["$season|$idMatch"] = $true
+            }
+        }
+    }
+
+    foreach ($mk in $fakeTeamMatchKeys.Keys) {
+        $season = ($mk -split "\|",2)[0]
+        if (-not $fakeTeamMatchesBySeason.ContainsKey($season)) {
+            $fakeTeamMatchesBySeason[$season] = 0
+        }
+        $fakeTeamMatchesBySeason[$season]++
+    }
+
+    $tabRows = @(
+        Import-Csv $TabellinoCsv -Delimiter ";" |
+        Where-Object { -not (Is-ExcludedCompetition $_.competizione) } |
+        ForEach-Object {
+            [pscustomobject]@{
+                Stagione = [string]$_.stagione
+                CompetizioneId = [string]$_.competizioneId
+                Competizione = [string]$_.competizione
+                IdIncontro = [string]$_.idIncontro
+                IdSquadra = [string]$_.idSquadra
+                Squadra = [string]$_.squadra
+                Lato = [string]$_.lato
+                Esito = ([string]$_.esito).ToUpperInvariant()
+                ListaPrimi11 = [string]$_.listaPrimi11
+                GiocatoriReali = [int]$_.giocatoriReali
+                NumeroRU_Tabellino = [int]$_.numeroRU
+                PostiVuoti = [int]$_.postiVuoti
+                GiocatoriEffettivi = [int]$_.giocatoriEffettivi
+            }
+        } |
+        Where-Object { -not $fakeTeamMatchKeys.ContainsKey("$($_.Stagione)|$($_.IdIncontro)") }
+    )
+
+    $allMatchKeys = @{}
+    foreach ($r in $tabRows) { $allMatchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true }
+    $totalMatches = $allMatchKeys.Count
+
+    # ------------------------------------------------------------
+    # 2. Metadata normalized + dettaglio RU
+    # ------------------------------------------------------------
+
+    $metaByTeamMatch = @{}
+    $allRu = New-Object System.Collections.Generic.List[object]
+    $ruCountByTeamMatch = @{}
+    $normalizedAllMatchKeys = @{}
+
+    $normalizedFiles = @(
+        Get-ChildItem $reportsRoot -Recurse -Filter "season_normalized_*.json" |
+        Where-Object { -not $_.PSIsContainer }
+    )
+
+    foreach ($file in $normalizedFiles) {
+        $season = Split-Path $file.DirectoryName -Leaf
+        $doc = Get-Content $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+
+        foreach ($tm in @($doc.partiteSquadra)) {
+            if ($null -eq $tm) { continue }
+
+            $competition = [string](Get-Prop $tm "competizioneNome")
+            if (Is-ExcludedCompetition $competition) { continue }
+
+            $idMatch = [string](Get-Prop $tm "idIncontro")
+            $idTeam = [string](Get-Prop $tm "idSquadra")
+            if ([string]::IsNullOrWhiteSpace($idMatch) -or [string]::IsNullOrWhiteSpace($idTeam)) { continue }
+
+            if (-not $fakeTeamMatchKeys.ContainsKey("$season|$idMatch")) {
+                $normalizedAllMatchKeys["$season|$idMatch"] = $true
+            }
+
+            if (-not $allMatchKeys.ContainsKey("$season|$idMatch")) {
+                continue
+            }
+
+            $key = "$season|$idMatch|$idTeam"
+            $metaByTeamMatch[$key] = [pscustomobject]@{
+                Giornata = [string](Get-Prop $tm "giornata")
+                GiornataDiA = [string](Get-Prop $tm "giornataDiA")
+                Avversaria = [string](Get-Prop $tm "avversaria")
+                Risultato = [string](Get-Prop $tm "risultato")
+                Punteggio = [string](Get-Prop $tm "punteggio")
+                UrlTabellinoLocale = [string](Get-Prop $tm "urlTabellinoLocale")
+                UrlTabellinoOnline = [string](Get-Prop $tm "urlTabellinoOnline")
+            }
+        }
+
+        foreach ($ru in @($doc.riserveUfficioDettaglio)) {
+            if ($null -eq $ru) { continue }
+
+            $idMatch = [string](Get-Prop $ru "idIncontro")
+            $idTeam = [string](Get-Prop $ru "idSquadra")
+            if ([string]::IsNullOrWhiteSpace($idMatch) -or [string]::IsNullOrWhiteSpace($idTeam)) { continue }
+
+            if (-not $allMatchKeys.ContainsKey("$season|$idMatch")) {
+                continue
+            }
+
+            $key = "$season|$idMatch|$idTeam"
+            if (-not $ruCountByTeamMatch.ContainsKey($key)) { $ruCountByTeamMatch[$key] = 0 }
+            $ruCountByTeamMatch[$key]++
+
+            $allRu.Add([pscustomobject]@{
+                Stagione = $season
+                IdIncontro = $idMatch
+                IdSquadra = $idTeam
+                Squadra = [string](Get-Prop $ru "squadra")
+                TipoRU = [string](Get-Prop $ru "tipoRU")
+                RuoloRU = [string](Get-Prop $ru "ruoloRU")
+                ValoreRU = Get-Number (Get-Prop $ru "valoreRU")
+            })
+        }
+    }
+
+    $normalizedMatches = $normalizedAllMatchKeys.Count
+    $normalizedNonCanonical = $normalizedMatches - $totalMatches
+
+    # ------------------------------------------------------------
+    # 3. Effetti RU
+    # ------------------------------------------------------------
+
+    $effects = @{}
+
+    Get-ChildItem $ruArchiveRoot -Recurse -Filter "riserveufficio.json" |
+    Where-Object { -not $_.PSIsContainer } |
+    ForEach-Object {
+        $season = Split-Path $_.DirectoryName -Leaf
+        $doc = Get-Content $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        $views = Get-Prop $doc "views"
+
+        foreach ($row in @(Get-Prop $views "ruDecisiva")) {
+            if ($null -eq $row) { continue }
+            $idMatch = [string](Get-Prop $row "idIncontro")
+            $idTeam = [string](Get-Prop $row "idSquadra")
+            if ([string]::IsNullOrWhiteSpace($idMatch) -or [string]::IsNullOrWhiteSpace($idTeam)) { continue }
+            $effects["$season|$idMatch|$idTeam"] = Normalize-Effect (Get-Prop $row "effetto")
+        }
+    }
+
+    function New-RuCategoryRow {
+        param([string]$Categoria,$Rows)
+
+        $teamKeys = @{}
+        $matchKeys = @{}
+
+        foreach ($r in $Rows) {
+            $teamKeys["$($r.Stagione)|$($r.IdIncontro)|$($r.IdSquadra)"] = $true
+            $matchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true
+        }
+
+        $keys = @($teamKeys.Keys)
+        $fx = Get-EffectCountsFromKeys $keys
+        $decisive = $fx["SCONFITTA_PAREGGIO"] + $fx["PAREGGIO_VITTORIA"] + $fx["SCONFITTA_VITTORIA"]
+
+        $decisiveMatchKeys = @{}
+        foreach ($key in $keys) {
+            if ((Get-EffectForKey $key) -ne "NESSUN_EFFETTO") {
+                $parts = $key -split "\|", 3
+                if ($parts.Count -ge 2) {
+                    $decisiveMatchKeys["$($parts[0])|$($parts[1])"] = $true
+                }
+            }
+        }
+
+        return [pscustomobject]@{
+            Categoria = $Categoria
+            SquadrePartita = $teamKeys.Count
+            OccorrenzeRU = $Rows.Count
+            PartiteDistinte = $matchKeys.Count
+            PercentualePartite = Get-Percent $matchKeys.Count $totalMatches 2
+            SconfittaPareggio = $fx["SCONFITTA_PAREGGIO"]
+            PctSconfittaPareggio = Get-Percent $fx["SCONFITTA_PAREGGIO"] $teamKeys.Count 2
+            PareggioVittoria = $fx["PAREGGIO_VITTORIA"]
+            PctPareggioVittoria = Get-Percent $fx["PAREGGIO_VITTORIA"] $teamKeys.Count 2
+            SconfittaVittoria = $fx["SCONFITTA_VITTORIA"]
+            PctSconfittaVittoria = Get-Percent $fx["SCONFITTA_VITTORIA"] $teamKeys.Count 2
+            TotaleDecisive = $decisive
+            PctDecisive = Get-Percent $decisive $teamKeys.Count 2
+            PartiteDecisiveDistinte = $decisiveMatchKeys.Count
+            PctPartiteDecisiveTotale = Get-Percent $decisiveMatchKeys.Count $totalMatches 2
+        }
+    }
+
+    $ruTeamGroups = @($allRu | Group-Object Stagione,IdIncontro,IdSquadra)
+
+    $ruExactly2 = @(
+        $ruTeamGroups |
+        Where-Object { $_.Count -eq 2 } |
+        ForEach-Object { $_.Group }
+    )
+
+    $ruMore2 = @(
+        $ruTeamGroups |
+        Where-Object { $_.Count -gt 2 } |
+        ForEach-Object { $_.Group }
+    )
+
+    $movement4 = @($allRu | Where-Object { -not (Is-KeeperRU $_) -and $_.ValoreRU -eq 4 })
+    $movement3 = @($allRu | Where-Object { -not (Is-KeeperRU $_) -and $_.ValoreRU -eq 3 })
+    $keeper3 = @($allRu | Where-Object { (Is-KeeperRU $_) -and $_.ValoreRU -eq 3 })
+    $keeper2 = @($allRu | Where-Object { (Is-KeeperRU $_) -and $_.ValoreRU -eq 2 })
+
+
+    $ruSummary = @(
+        New-RuCategoryRow "ALMENO UNA RU" $allRu
+        New-RuCategoryRow "ESATTAMENTE 2 RU NELLA STESSA SQUADRA" $ruExactly2
+        New-RuCategoryRow "PIÙ DI 2 RU NELLA STESSA SQUADRA" $ruMore2
+        New-RuCategoryRow "ALMENO UNA RU DI MOVIMENTO DA 4 PUNTI" $movement4
+        New-RuCategoryRow "ALMENO UNA RU DI MOVIMENTO DA 3 PUNTI" $movement3
+        New-RuCategoryRow "ALMENO UNA RU PORTIERE DA 3 PUNTI" $keeper3
+        New-RuCategoryRow "ALMENO UNA RU PORTIERE DA 2 PUNTI" $keeper2
+    )
+
+    # ------------------------------------------------------------
+    # 3 bis. Periodo moderno RU: movimento=3, portiere=2
+    # ------------------------------------------------------------
+
+    $ruRulesBySeason = @()
+    $seasonsWithRu = @($allRu | Select-Object -ExpandProperty Stagione -Unique | Sort-Object)
+
+    foreach ($season in $seasonsWithRu) {
+        $rows = @($allRu | Where-Object { $_.Stagione -eq $season })
+        $movementValues = @(
+            $rows |
+            Where-Object { -not (Is-KeeperRU $_) } |
+            Select-Object -ExpandProperty ValoreRU -Unique |
+            Sort-Object
+        )
+        $keeperValues = @(
+            $rows |
+            Where-Object { (Is-KeeperRU $_) } |
+            Select-Object -ExpandProperty ValoreRU -Unique |
+            Sort-Object
+        )
+
+        $movementOk = (@($movementValues | Where-Object { $_ -ne 3 }).Count -eq 0)
+        $keeperOk = (@($keeperValues | Where-Object { $_ -ne 2 }).Count -eq 0)
+        $compatible32 = ($rows.Count -gt 0 -and $movementOk -and $keeperOk)
+
+        $ruRulesBySeason += [pscustomobject]@{
+            Stagione = $season
+            RU = $rows.Count
+            Movimento = if ($movementValues.Count -gt 0) { $movementValues -join "," } else { "-" }
+            Portiere = if ($keeperValues.Count -gt 0) { $keeperValues -join "," } else { "-" }
+            Compatibile32 = $compatible32
+        }
+    }
+
+    # Prende il blocco cronologico più recente e continuo compatibile con 3/2.
+    $modern32SeasonsList = New-Object System.Collections.Generic.List[string]
+    $startedModern32 = $false
+
+    foreach ($seasonRow in @($ruRulesBySeason | Sort-Object Stagione -Descending)) {
+        if (-not $startedModern32) {
+            if ($seasonRow.Compatibile32) {
+                $modern32SeasonsList.Add($seasonRow.Stagione)
+                $startedModern32 = $true
+            }
+            continue
+        }
+
+        if ($seasonRow.Compatibile32) {
+            $modern32SeasonsList.Add($seasonRow.Stagione)
+        } else {
+            break
+        }
+    }
+
+    $modern32Seasons = @($modern32SeasonsList.ToArray() | Sort-Object)
+    $modern32Set = @{}
+    foreach ($season in $modern32Seasons) { $modern32Set[$season] = $true }
+
+    $modern32MatchKeys = @{}
+    foreach ($r in $tabRows) {
+        if ($modern32Set.ContainsKey($r.Stagione)) {
+            $modern32MatchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true
+        }
+    }
+
+    $modern32Ru = @($allRu | Where-Object { $modern32Set.ContainsKey($_.Stagione) })
+
+    function New-RuPeriodStats {
+        param($Rows,[hashtable]$UniverseMatchKeys)
+
+        $teamKeys = @{}
+        $matchKeys = @{}
+        foreach ($r in $Rows) {
+            $teamKeys["$($r.Stagione)|$($r.IdIncontro)|$($r.IdSquadra)"] = $true
+            $matchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true
+        }
+
+        $keys = @($teamKeys.Keys)
+        $fx = Get-EffectCountsFromKeys $keys
+        $decisive = $fx["SCONFITTA_PAREGGIO"] + $fx["PAREGGIO_VITTORIA"] + $fx["SCONFITTA_VITTORIA"]
+
+        $decisiveMatches = @{}
+        foreach ($key in $keys) {
+            if ((Get-EffectForKey $key) -ne "NESSUN_EFFETTO") {
+                $parts = $key -split "\|",3
+                if ($parts.Count -ge 2) {
+                    $decisiveMatches["$($parts[0])|$($parts[1])"] = $true
+                }
+            }
+        }
+
+        return [pscustomobject]@{
+            PartiteCampione = $UniverseMatchKeys.Count
+            SquadrePartitaRU = $teamKeys.Count
+            OccorrenzeRU = $Rows.Count
+            PartiteConRU = $matchKeys.Count
+            PctPartiteConRU = Get-Percent $matchKeys.Count $UniverseMatchKeys.Count 2
+            SconfittaPareggio = $fx["SCONFITTA_PAREGGIO"]
+            PareggioVittoria = $fx["PAREGGIO_VITTORIA"]
+            SconfittaVittoria = $fx["SCONFITTA_VITTORIA"]
+            CasiDecisivi = $decisive
+            PctDecisiviSuRU = Get-Percent $decisive $teamKeys.Count 2
+            PartiteDecisive = $decisiveMatches.Count
+            PctPartiteDecisiveCampione = Get-Percent $decisiveMatches.Count $UniverseMatchKeys.Count 2
+        }
+    }
+
+    $modern32Stats = New-RuPeriodStats $modern32Ru $modern32MatchKeys
+    $modern32Start = if ($modern32Seasons.Count -gt 0) { $modern32Seasons[0] } else { "NON RILEVATO" }
+    $modern32End = if ($modern32Seasons.Count -gt 0) { $modern32Seasons[-1] } else { "NON RILEVATO" }
+    $modern32SingleSeason = ($modern32Seasons.Count -eq 1)
+
+    # ------------------------------------------------------------
+    # 4. Arricchisce le righe TABELLINO
+    # ------------------------------------------------------------
+
+    $teamRows = @(
+        $tabRows |
+        ForEach-Object {
+            $r = $_
+            $key = "$($r.Stagione)|$($r.IdIncontro)|$($r.IdSquadra)"
+            $meta = if ($metaByTeamMatch.ContainsKey($key)) { $metaByTeamMatch[$key] } else { $null }
+
+            [pscustomobject]@{
+                Stagione = $r.Stagione
+                Competizione = $r.Competizione
+                IdIncontro = $r.IdIncontro
+                IdSquadra = $r.IdSquadra
+                Squadra = $r.Squadra
+                Lato = $r.Lato
+                Esito = $r.Esito
+                GiocatoriReali = $r.GiocatoriReali
+                NumeroRU = [int]$r.NumeroRU_Tabellino
+                NumeroRU_Normalizzato = if ($ruCountByTeamMatch.ContainsKey($key)) { [int]$ruCountByTeamMatch[$key] } else { 0 }
+                PostiVuoti = $r.PostiVuoti
+                GiocatoriEffettivi = $r.GiocatoriEffettivi
+                Giornata = if ($null -ne $meta) { $meta.Giornata } else { "" }
+                GiornataDiA = if ($null -ne $meta) { $meta.GiornataDiA } else { "" }
+                Avversaria = if ($null -ne $meta) { $meta.Avversaria } else { "" }
+                Risultato = if ($null -ne $meta) { $meta.Risultato } else { "" }
+                Punteggio = if ($null -ne $meta) { $meta.Punteggio } else { "" }
+                UrlTabellinoLocale = if ($null -ne $meta) { $meta.UrlTabellinoLocale } else { "" }
+                UrlTabellinoOnline = if ($null -ne $meta) { $meta.UrlTabellinoOnline } else { "" }
+                EffettoRU = Get-EffectForKey $key
+            }
+        }
+    )
+
+    # ------------------------------------------------------------
+    # 5. Statistiche sotto 11
+    # ------------------------------------------------------------
+
+    $under11 = @($teamRows | Where-Object { $_.PostiVuoti -gt 0 })
+    $under11NoRu = @($under11 | Where-Object { $_.NumeroRU -eq 0 })
+    $under11WithRu = @($under11 | Where-Object { $_.NumeroRU -gt 0 })
+    $allWithRu = @($teamRows | Where-Object { $_.NumeroRU -gt 0 })
+    $full11WithRu = @($allWithRu | Where-Object { $_.PostiVuoti -eq 0 })
+
+    # Esiti per numero effettivo di giocatori:
+    # - esattamente 10 = un solo slot mancante
+    # - meno di 10 = 9 o meno giocatori effettivi
+    $playedIn10 = @($teamRows | Where-Object { $_.GiocatoriEffettivi -eq 10 })
+    $playedBelow10 = @($teamRows | Where-Object { $_.GiocatoriEffettivi -lt 10 })
+
+    $under11MatchKeys = @{}
+    foreach ($r in $under11) { $under11MatchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true }
+
+    $under11NoRuMatchKeys = @{}
+    foreach ($r in $under11NoRu) { $under11NoRuMatchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true }
+
+    $under11WithRuMatchKeys = @{}
+    foreach ($r in $under11WithRu) { $under11WithRuMatchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true }
+
+    $outcomeAll = Get-OutcomeCounts $under11
+    $outcomeNoRu = Get-OutcomeCounts $under11NoRu
+    $outcomeWithRu = Get-OutcomeCounts $under11WithRu
+    $outcomeFull11WithRu = Get-OutcomeCounts $full11WithRu
+
+    $outcomePlayedIn10 = Get-OutcomeCounts $playedIn10
+    $outcomePlayedBelow10 = Get-OutcomeCounts $playedBelow10
+
+    $playedIn10MatchKeys = @{}
+    foreach ($r in $playedIn10) { $playedIn10MatchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true }
+
+    $playedBelow10MatchKeys = @{}
+    foreach ($r in $playedBelow10) { $playedBelow10MatchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true }
+
+    $full11WithRuKeys = @(
+        $full11WithRu |
+        ForEach-Object { "$($_.Stagione)|$($_.IdIncontro)|$($_.IdSquadra)" }
+    )
+    $full11Effects = Get-EffectCountsFromKeys $full11WithRuKeys
+    $full11Decisive =
+        $full11Effects["SCONFITTA_PAREGGIO"] +
+        $full11Effects["PAREGGIO_VITTORIA"] +
+        $full11Effects["SCONFITTA_VITTORIA"]
+
+    $under11WithRuKeys = @(
+        $under11WithRu |
+        ForEach-Object { "$($_.Stagione)|$($_.IdIncontro)|$($_.IdSquadra)" }
+    )
+
+    $under11Effects = Get-EffectCountsFromKeys $under11WithRuKeys
+    $under11Decisive =
+        $under11Effects["SCONFITTA_PAREGGIO"] +
+        $under11Effects["PAREGGIO_VITTORIA"] +
+        $under11Effects["SCONFITTA_VITTORIA"]
+
+    $pctUnder11Total = Get-Percent $under11MatchKeys.Count $totalMatches 2
+    $pctNoRuAmongUnder11 = Get-Percent $under11NoRu.Count $under11.Count 2
+    $pctWithRuAmongUnder11 = Get-Percent $under11WithRu.Count $under11.Count 2
+    $pctRuFailedToReach11 = Get-Percent $under11WithRu.Count $allWithRu.Count 2
+    $pctRuCompleted11 = Get-Percent $full11WithRu.Count $allWithRu.Count 2
+    $oneEveryRuFailure = if ($under11WithRu.Count -gt 0) { [math]::Round($allWithRu.Count / $under11WithRu.Count,1) } else { 0 }
+
+
+    # ------------------------------------------------------------
+    # 5 bis. Peso reale delle 5 sostituzioni
+    # ------------------------------------------------------------
+
+    $diagRows = @(
+        Import-Csv $DiagnosticaCsv -Delimiter ";" |
+        Where-Object { -not $fakeTeamMatchKeys.ContainsKey("$($_.stagione)|$($_.idIncontro)") }
+    )
+    $formRows = @(
+        Import-Csv $FormazioneCsv -Delimiter ";" |
+        Where-Object { -not $fakeTeamMatchKeys.ContainsKey("$($_.stagione)|$($_.idIncontro)") }
+    )
+
+    $formGroups = @{}
+    foreach ($r in $formRows) {
+        $key = "$($r.stagione)|$($r.idIncontro)|$($r.idSquadra)"
+        if (-not $formGroups.ContainsKey($key)) {
+            $formGroups[$key] = New-Object System.Collections.Generic.List[object]
+        }
+        $formGroups[$key].Add($r)
+    }
+
+    $fiveSubRows = New-Object System.Collections.Generic.List[object]
+    $fiveSubSimulable = 0
+    $fiveSubNotSimulable = 0
+    $fiveSubTeamBenefit = 0
+    $fiveSubTeamResolved = 0
+    $fiveSubBenefitMatchKeys = @{}
+    $fiveSubResolvedMatchKeys = @{}
+
+    foreach ($d in $diagRows) {
+        $key = "$($d.stagione)|$($d.idIncontro)|$($d.idSquadra)"
+        $g = if ($formGroups.ContainsKey($key)) { $formGroups[$key].ToArray() } else { @() }
+
+        $initial = @($g | Where-Object { [int]$_.pos -eq 0 })
+
+        if ($initial.Count -ne 11) {
+            $fiveSubNotSimulable++
+            $fiveSubRows.Add([pscustomobject]@{
+                Stagione=$d.stagione; IdIncontro=$d.idIncontro; IdSquadra=$d.idSquadra; Squadra=$d.squadra
+                PostiVuoti=[int]$d.postiVuoti; Simulabile=$false; SostituzioniUsate=""; ExtraFinoA5=""
+                Compatibili=0; RisoltoCon5=$false; Nota="FORMAZIONE non ricostruibile con 11 titolari POS=0"
+            })
+            continue
+        }
+
+        $fiveSubSimulable++
+
+        $initialRoles = @{}
+        foreach ($r in $initial) {
+            $role = ([string]$r.ruoloFca).Trim()
+            if ([string]::IsNullOrWhiteSpace($role)) { continue }
+            if (-not $initialRoles.ContainsKey($role)) { $initialRoles[$role] = 0 }
+            $initialRoles[$role]++
+        }
+
+        $finalRoles = @{}
+        foreach ($r in @($g | Where-Object { [int]$_.nelPrimi11Finale -eq 1 })) {
+            $role = ([string]$r.ruoloFca).Trim()
+            if ([string]::IsNullOrWhiteSpace($role)) { continue }
+            if (-not $finalRoles.ContainsKey($role)) { $finalRoles[$role] = 0 }
+            $finalRoles[$role]++
+        }
+
+        $deficit = @{}
+        foreach ($role in $initialRoles.Keys) {
+            $finalCount = if ($finalRoles.ContainsKey($role)) { $finalRoles[$role] } else { 0 }
+            $missing = $initialRoles[$role] - $finalCount
+            if ($missing -gt 0) { $deficit[$role] = $missing }
+        }
+
+        $candidates = @{}
+        foreach ($r in @($g | Where-Object {
+            [int]$_.inPanchinaTabellino -eq 1 -and [int]$_.nelPrimi11Finale -eq 0
+        })) {
+            $role = ([string]$r.ruoloFca).Trim()
+            if ([string]::IsNullOrWhiteSpace($role)) { continue }
+            if (-not $candidates.ContainsKey($role)) { $candidates[$role] = 0 }
+            $candidates[$role]++
+        }
+
+        $compatible = 0
+        $allCovered = $true
+        foreach ($role in $deficit.Keys) {
+            $available = if ($candidates.ContainsKey($role)) { $candidates[$role] } else { 0 }
+            $compatible += [math]::Min($deficit[$role],$available)
+            if ($available -lt $deficit[$role]) { $allCovered = $false }
+        }
+
+        # ENTRATORISERVA è il flag che, nei 513 casi diagnosticati,
+        # restituisce il numero effettivo di sostituzioni: 499 casi a 3,
+        # un caso a 2 e 13 casi non ricostruibili.
+        $subsUsed = @($g | Where-Object { [int]$_.entratoRiserva -ne 0 }).Count
+        $extraAllowed = [math]::Max(0,5-$subsUsed)
+        $emptySlots = [int]$d.postiVuoti
+        $resolved = ($allCovered -and $emptySlots -le $extraAllowed)
+
+        if ($compatible -gt 0) {
+            $fiveSubTeamBenefit++
+            $fiveSubBenefitMatchKeys["$($d.stagione)|$($d.idIncontro)"] = $true
+        }
+        if ($resolved) {
+            $fiveSubTeamResolved++
+            $fiveSubResolvedMatchKeys["$($d.stagione)|$($d.idIncontro)"] = $true
+        }
+
+        $fiveSubRows.Add([pscustomobject]@{
+            Stagione=$d.stagione
+            IdIncontro=$d.idIncontro
+            IdSquadra=$d.idSquadra
+            Squadra=$d.squadra
+            PostiVuoti=$emptySlots
+            Simulabile=$true
+            SostituzioniUsate=$subsUsed
+            ExtraFinoA5=$extraAllowed
+            Compatibili=$compatible
+            RisoltoCon5=$resolved
+            Nota=""
+        })
+    }
+
+    $fiveSubBenefitPctAll = Get-Percent $fiveSubBenefitMatchKeys.Count $totalMatches 2
+    $fiveSubResolvedPctAll = Get-Percent $fiveSubResolvedMatchKeys.Count $totalMatches 2
+    $fiveSubBenefitPctCases = Get-Percent $fiveSubTeamBenefit $fiveSubSimulable 2
+    $fiveSubResolvedPctCases = Get-Percent $fiveSubTeamResolved $fiveSubSimulable 2
+
+    # Quanto è raro il "crollo" più grave.
+    $under11NoRuTwoPlusKeys = @{}
+    $under11NoRuThreePlusKeys = @{}
+    $under11NoRuFourPlusKeys = @{}
+
+    foreach ($r in $under11NoRu) {
+        $mk = "$($r.Stagione)|$($r.IdIncontro)"
+        if ($r.PostiVuoti -ge 2) { $under11NoRuTwoPlusKeys[$mk] = $true }
+        if ($r.PostiVuoti -ge 3) { $under11NoRuThreePlusKeys[$mk] = $true }
+        if ($r.PostiVuoti -ge 4) { $under11NoRuFourPlusKeys[$mk] = $true }
+    }
+
+    $pctTwoPlusAll = Get-Percent $under11NoRuTwoPlusKeys.Count $totalMatches 2
+    $pctThreePlusAll = Get-Percent $under11NoRuThreePlusKeys.Count $totalMatches 3
+    $pctFourPlusAll = Get-Percent $under11NoRuFourPlusKeys.Count $totalMatches 3
+
+    # Quante prestazioni sotto 11 senza RU producono zero gol.
+    $under11NoRuZeroGoals = 0
+    $under11NoRuKnownGoals = 0
+    foreach ($r in $under11NoRu) {
+        $goals = Get-TeamGoalsFromResult $r.Risultato $r.Lato
+        if ($null -ne $goals) {
+            $under11NoRuKnownGoals++
+            if ($goals -eq 0) { $under11NoRuZeroGoals++ }
+        }
+    }
+    $pctUnder11NoRuZeroGoals = Get-Percent $under11NoRuZeroGoals $under11NoRuKnownGoals 2
+
+
+    # ------------------------------------------------------------
+    # 5 ter. Andamento RU per stagione
+    # ------------------------------------------------------------
+
+    # Breakpoint richiesto per il confronto:
+    # 2021/2022 = stagione dalla quale la Serie A reale ha continuato a usare
+    # le cinque sostituzioni in deroga; la modifica permanente della Regola 3
+    # FIGC/IFAB è stata poi formalizzata dall'estate 2022.
+    $fiveSubsBreakpoint = "2021_2022"
+
+    $seasonRuStats = @()
+
+    $allSeasons = @(
+        $tabRows |
+        Select-Object -ExpandProperty Stagione -Unique |
+        Sort-Object
+    )
+
+    foreach ($season in $allSeasons) {
+        $seasonTab = @($tabRows | Where-Object { $_.Stagione -eq $season })
+
+        $seasonMatchKeys = @{}
+        foreach ($r in $seasonTab) {
+            $seasonMatchKeys["$($r.Stagione)|$($r.IdIncontro)"] = $true
+        }
+
+        $seasonRu = @($allRu | Where-Object { $_.Stagione -eq $season })
+
+        $teamGroupsSeason = @{}
+        foreach ($r in $seasonRu) {
+            $key = "$($r.Stagione)|$($r.IdIncontro)|$($r.IdSquadra)"
+            if (-not $teamGroupsSeason.ContainsKey($key)) {
+                $teamGroupsSeason[$key] = New-Object System.Collections.Generic.List[object]
+            }
+            $teamGroupsSeason[$key].Add($r)
+        }
+
+        $ruTeamKeys = @{}
+        $ruMatchKeysSeason = @{}
+        $oneRuTeam = 0
+        $twoRuTeam = 0
+        $moreThanTwoRuTeam = 0
+        $maxRuObserved = 0
+
+        foreach ($key in $teamGroupsSeason.Keys) {
+            $rows = $teamGroupsSeason[$key].ToArray()
+            $count = $rows.Count
+
+            $ruTeamKeys[$key] = $true
+
+            $parts = $key -split "\|",3
+            if ($parts.Count -ge 2) {
+                $ruMatchKeysSeason["$($parts[0])|$($parts[1])"] = $true
+            }
+
+            if ($count -eq 1) { $oneRuTeam++ }
+            elseif ($count -eq 2) { $twoRuTeam++ }
+            elseif ($count -gt 2) { $moreThanTwoRuTeam++ }
+
+            if ($count -gt $maxRuObserved) { $maxRuObserved = $count }
+        }
+
+        $fx = Get-EffectCountsFromKeys @($ruTeamKeys.Keys)
+        $decisiveTeam = $fx["SCONFITTA_PAREGGIO"] + $fx["PAREGGIO_VITTORIA"] + $fx["SCONFITTA_VITTORIA"]
+
+        $decisiveMatchKeysSeason = @{}
+        foreach ($key in $ruTeamKeys.Keys) {
+            if ((Get-EffectForKey $key) -ne "NESSUN_EFFETTO") {
+                $parts = $key -split "\|",3
+                if ($parts.Count -ge 2) {
+                    $decisiveMatchKeysSeason["$($parts[0])|$($parts[1])"] = $true
+                }
+            }
+        }
+
+        $seasonRuStats += [pscustomobject]@{
+            Stagione = $season
+            Periodo5Sost = if ($season -ge $fiveSubsBreakpoint) { "DAL 2021/2022" } else { "PRIMA DEL 2021/2022" }
+            Partite = $seasonMatchKeys.Count
+            PartiteConRU = $ruMatchKeysSeason.Count
+            PctPartiteConRU = Get-Percent $ruMatchKeysSeason.Count $seasonMatchKeys.Count 2
+            CasiSquadraConRU = $ruTeamKeys.Count
+            OccorrenzeRU = $seasonRu.Count
+            MediaRUPerCaso = if ($ruTeamKeys.Count -gt 0) { [math]::Round($seasonRu.Count / $ruTeamKeys.Count,3) } else { 0 }
+            Casi1RU = $oneRuTeam
+            Casi2RU = $twoRuTeam
+            CasiPiu2RU = $moreThanTwoRuTeam
+            MaxRUOsservate = $maxRuObserved
+            CasiDecisivi = $decisiveTeam
+            PctDecisiviSuCasiRU = Get-Percent $decisiveTeam $ruTeamKeys.Count 2
+            PartiteDecisive = $decisiveMatchKeysSeason.Count
+            PctPartiteDecisive = Get-Percent $decisiveMatchKeysSeason.Count $seasonMatchKeys.Count 2
+        }
+    }
+
+    function New-RuEraSummary {
+        param([string]$Label,$Rows)
+
+        $matches = 0
+        $matchesRu = 0
+        $teamCases = 0
+        $occ = 0
+        $decMatches = 0
+        $decTeam = 0
+
+        foreach ($r in $Rows) {
+            $matches += [int]$r.Partite
+            $matchesRu += [int]$r.PartiteConRU
+            $teamCases += [int]$r.CasiSquadraConRU
+            $occ += [int]$r.OccorrenzeRU
+            $decMatches += [int]$r.PartiteDecisive
+            $decTeam += [int]$r.CasiDecisivi
+        }
+
+        return [pscustomobject]@{
+            Periodo = $Label
+            Stagioni = $Rows.Count
+            Partite = $matches
+            PartiteConRU = $matchesRu
+            PctPartiteConRU = Get-Percent $matchesRu $matches 2
+            CasiSquadraConRU = $teamCases
+            OccorrenzeRU = $occ
+            PctDecisiviSuCasiRU = Get-Percent $decTeam $teamCases 2
+            PartiteDecisive = $decMatches
+            PctPartiteDecisive = Get-Percent $decMatches $matches 2
+        }
+    }
+
+    $preFiveSubs = @($seasonRuStats | Where-Object { $_.Stagione -lt $fiveSubsBreakpoint })
+    $postFiveSubs = @($seasonRuStats | Where-Object { $_.Stagione -ge $fiveSubsBreakpoint })
+
+    $ruEraSummary = @(
+        New-RuEraSummary "PRIMA DEL 2021/2022" $preFiveSubs
+        New-RuEraSummary "DAL 2021/2022" $postFiveSubs
+    )
+
+    # ------------------------------------------------------------
+    # 6. CSV output
+    # ------------------------------------------------------------
+
+    $ruSummaryCsv = Join-Path $outputDir "RU_statistiche_storiche_complete_v8_4.csv"
+    $under11Csv = Join-Path $outputDir "RU_casi_sotto_11_v8_4.csv"
+    $htmlPath = Join-Path $outputDir "RU_statistiche_storiche_complete_v8_4.html"
+
+    $fiveSubCsv = Join-Path $outputDir "RU_5_sostituzioni_simulazione_v8_4.csv"
+    $ruRulesCsv = Join-Path $outputDir "RU_regole_per_stagione_v8_4.csv"
+    $ruSeasonCsv = Join-Path $outputDir "RU_andamento_per_stagione_v8_4.csv"
+    $ruEraCsv = Join-Path $outputDir "RU_confronto_pre_post_2021_2022_v8_4.csv"
+
+    $ruSummary | Export-Csv -Path $ruSummaryCsv -Delimiter ";" -NoTypeInformation -Encoding UTF8
+    $under11 | Export-Csv -Path $under11Csv -Delimiter ";" -NoTypeInformation -Encoding UTF8
+    $fiveSubRows | Export-Csv -Path $fiveSubCsv -Delimiter ";" -NoTypeInformation -Encoding UTF8
+    $ruRulesBySeason | Export-Csv -Path $ruRulesCsv -Delimiter ";" -NoTypeInformation -Encoding UTF8
+    $seasonRuStats | Export-Csv -Path $ruSeasonCsv -Delimiter ";" -NoTypeInformation -Encoding UTF8
+    $ruEraSummary | Export-Csv -Path $ruEraCsv -Delimiter ";" -NoTypeInformation -Encoding UTF8
+
+    # ------------------------------------------------------------
+    # 7. HTML
+    # ------------------------------------------------------------
+
+    $ruRowsHtml = foreach ($r in $ruSummary) {
+    @"
+    <tr>
+    <td class="left strong">$(Html $r.Categoria)</td>
+    <td>$($r.SquadrePartita)</td>
+    <td>$($r.OccorrenzeRU)</td>
+    <td>$($r.PartiteDistinte)</td>
+    <td>$($r.PercentualePartite)%</td>
+    <td>$($r.SconfittaPareggio)</td>
+    <td>$($r.PctSconfittaPareggio)%</td>
+    <td>$($r.PareggioVittoria)</td>
+    <td>$($r.PctPareggioVittoria)%</td>
+    <td>$($r.SconfittaVittoria)</td>
+    <td>$($r.PctSconfittaVittoria)%</td>
+    <td class="red strong">$($r.TotaleDecisive)</td>
+    <td class="red strong">$($r.PctDecisive)%</td>
+    <td class="red strong">$($r.PartiteDecisiveDistinte)</td>
+    <td class="red strong">$($r.PctPartiteDecisiveTotale)%</td>
+    </tr>
+    "@
+    }
+
+    function Under11RowHtml {
+        param(
+            [string]$Label,
+            [object[]]$Rows,
+            [hashtable]$MatchKeys,
+            [hashtable]$Outcomes,
+            [string]$ExtraPct
+        )
+
+        $pctTotal = Get-Percent $MatchKeys.Count $totalMatches 2
+
+        return @"
+    <tr>
+    <td class="left strong">$(Html $Label)</td>
+    <td>$($Rows.Count)</td>
+    <td>$($MatchKeys.Count)</td>
+    <td>$pctTotal%</td>
+    <td>$($Outcomes["VITTORIA"])</td>
+    <td>$(Get-Percent $Outcomes["VITTORIA"] $Rows.Count 2)%</td>
+    <td>$($Outcomes["PAREGGIO"])</td>
+    <td>$(Get-Percent $Outcomes["PAREGGIO"] $Rows.Count 2)%</td>
+    <td>$($Outcomes["SCONFITTA"])</td>
+    <td>$(Get-Percent $Outcomes["SCONFITTA"] $Rows.Count 2)%</td>
+    <td>$ExtraPct</td>
+    </tr>
+    "@
+    }
+
+    $under11RowsHtml = @(
+        Under11RowHtml "IN 10 O MENO - TOTALE" $under11 $under11MatchKeys $outcomeAll "100%"
+        Under11RowHtml "IN 10 O MENO SENZA ALCUNA RU" $under11NoRu $under11NoRuMatchKeys $outcomeNoRu "$pctNoRuAmongUnder11% dei casi sotto 11"
+        Under11RowHtml "IN 10 O MENO CON ALMENO UNA RU" $under11WithRu $under11WithRuMatchKeys $outcomeWithRu "$pctWithRuAmongUnder11% dei casi sotto 11"
+    )
+
+    $casesHtml = foreach ($r in @($under11 | Sort-Object Stagione,Competizione,IdIncontro,Squadra)) {
+
+        $effectText = switch ($r.EffettoRU) {
+            "SCONFITTA_PAREGGIO" { "La RU ha evitato la sconfitta" }
+            "PAREGGIO_VITTORIA" { "La RU ha trasformato il pareggio in vittoria" }
+            "SCONFITTA_VITTORIA" { "La RU ha trasformato la sconfitta in vittoria" }
+            default { "Nessun effetto decisivo registrato" }
+        }
+
+        $url = ""
+        if (-not [string]::IsNullOrWhiteSpace($r.UrlTabellinoLocale)) { $url = $r.UrlTabellinoLocale }
+        elseif (-not [string]::IsNullOrWhiteSpace($r.UrlTabellinoOnline)) { $url = $r.UrlTabellinoOnline }
+
+        $link = if (-not [string]::IsNullOrWhiteSpace($url)) {
+            '<a href="' + (Html $url) + '">Apri tabellino</a>'
+        } else { "" }
+
+    @"
+    <tr>
+    <td>$(Html $r.Stagione)</td>
+    <td>$(Html $r.Competizione)</td>
+    <td>$(Html $r.Giornata)</td>
+    <td class="left strong">$(Html $r.Squadra)</td>
+    <td class="left">$(Html $r.Avversaria)</td>
+    <td>$($r.GiocatoriEffettivi)</td>
+    <td>$($r.NumeroRU)</td>
+    <td>$(Html $r.Esito)</td>
+    <td>$(Html $r.Risultato)</td>
+    <td>$(Html $r.Punteggio)</td>
+    <td class="left">$(Html $effectText)</td>
+    <td>$link</td>
+    </tr>
+    "@
+    }
+
+    $allRuRow = $ruSummary | Select-Object -First 1
+    $ruMatchPct = $allRuRow.PercentualePartite
+    $oneEveryRuMatch = if ($allRuRow.PartiteDistinte -gt 0) { [math]::Round($totalMatches / $allRuRow.PartiteDistinte,1) } else { 0 }
+
+    $modern32Warning = if ($modern32SingleSeason) {
+        "ATTENZIONE: il regime RU 3/2 risulta presente in una sola stagione ($modern32Start). È un campione corto e va interpretato con cautela."
+    } elseif ($modern32Seasons.Count -gt 1) {
+        "Il regime RU 3/2 è stato rilevato nel blocco $modern32Start - $modern32End."
+    } else {
+        "Il regime RU 3/2 non è stato identificato automaticamente."
+    }
+
+
+    $fakeTeamSeasonRowsHtml = foreach ($season in @($fakeTeamMatchesBySeason.Keys | Sort-Object)) {
+    @"
+    <tr><td>$(Html $season)</td><td>$($fakeTeamMatchesBySeason[$season])</td></tr>
+    "@
+    }
+    $fakeTeamMatchesExcluded = $fakeTeamMatchKeys.Count
+
+    $ruSeasonRowsHtml = foreach ($r in $seasonRuStats) {
+        $class = if ($r.Stagione -ge $fiveSubsBreakpoint) { ' class="fiveSubsEra"' } else { "" }
+    @"
+    <tr$class>
+    <td>$(Html $r.Stagione)</td>
+    <td>$($r.Partite)</td>
+    <td>$($r.PartiteConRU)</td>
+    <td><strong>$($r.PctPartiteConRU)%</strong></td>
+    <td>$($r.CasiSquadraConRU)</td>
+    <td>$($r.OccorrenzeRU)</td>
+    <td>$($r.MediaRUPerCaso)</td>
+    <td>$($r.Casi1RU)</td>
+    <td>$($r.Casi2RU)</td>
+    <td>$($r.CasiPiu2RU)</td>
+    <td>$($r.MaxRUOsservate)</td>
+    <td>$($r.CasiDecisivi)</td>
+    <td>$($r.PctDecisiviSuCasiRU)%</td>
+    <td>$($r.PartiteDecisive)</td>
+    <td>$($r.PctPartiteDecisive)%</td>
+    </tr>
+    "@
+    }
+
+    $ruEraRowsHtml = foreach ($r in $ruEraSummary) {
+    @"
+    <tr>
+    <td class="left strong">$(Html $r.Periodo)</td>
+    <td>$($r.Stagioni)</td>
+    <td>$($r.Partite)</td>
+    <td>$($r.PartiteConRU)</td>
+    <td><strong>$($r.PctPartiteConRU)%</strong></td>
+    <td>$($r.CasiSquadraConRU)</td>
+    <td>$($r.OccorrenzeRU)</td>
+    <td>$($r.PctDecisiviSuCasiRU)%</td>
+    <td>$($r.PartiteDecisive)</td>
+    <td><strong>$($r.PctPartiteDecisive)%</strong></td>
+    </tr>
+    "@
+    }
+
+    $ruRulesRowsHtml = foreach ($r in $ruRulesBySeason) {
+        $class = if ($modern32Set.ContainsKey($r.Stagione)) { ' class="modern"' } else { "" }
+    @"
+    <tr$class><td>$(Html $r.Stagione)</td><td>$($r.RU)</td><td>$(Html $r.Movimento)</td><td>$(Html $r.Portiere)</td><td>$(if($r.Compatibile32){"SI"}else{"NO"})</td></tr>
+    "@
+    }
+
+    $htmlContent = @"
+    <!doctype html>
+    <html lang="it">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Statistiche storiche Riserve d'Ufficio</title>
+    <style>
+    body { font-family:"Trebuchet MS",Verdana,Arial,sans-serif; margin:22px; color:#111; background:#fff; }
+    h1,h2,h3 { color:#003366; }
+    h1 { margin-bottom:4px; }
+    .subtitle { color:#666; margin-bottom:20px; }
+    .box { padding:15px; margin:16px 0 22px 0; border:1px solid #003366; background:#f7f7f7; }
+    .box-important { padding:16px; margin:18px 0 24px 0; border:2px solid #990000; background:#fff8f8; }
+    .big { color:#003366; font-size:20px; font-weight:bold; }
+    .red { color:#990000; }
+    .strong { font-weight:bold; }
+    .left { text-align:left; }
+    .small { font-size:12px; }
+    table { width:100%; border-collapse:collapse; margin-bottom:24px; font-size:13px; }
+    th { padding:7px 5px; border:1px solid #003366; background:#003366; color:#fff; text-align:center; }
+    td { padding:6px 5px; border:1px solid #003366; text-align:right; vertical-align:top; }
+    tbody tr:nth-child(even) { background:#ccffff; }
+    tbody tr.modern { background:#e9ffe9; }
+    tbody tr.fiveSubsEra { background:#fff4cc; }
+    .conclusion { padding:18px; margin:22px 0; border:3px solid #003366; background:#f4f8ff; line-height:1.6; }
+    .policy { padding:16px; margin:18px 0; border:2px solid #666; background:#fafafa; line-height:1.55; }
+    .explain { line-height:1.55; }
+    .explain p { margin:8px 0; }
+    .code { font-family:Consolas,monospace; background:#eee; padding:1px 4px; }
+
+    .mobileHint { display:none; }
+    @media (max-width: 760px) {
+      body { margin:10px; font-size:16px; line-height:1.5; }
+      h1 { font-size:25px; line-height:1.15; }
+      h2 { font-size:21px; line-height:1.2; margin-top:22px; }
+      h3 { font-size:18px; }
+      .subtitle { font-size:14px; }
+      .box,.policy,.conclusion { padding:12px; margin:14px 0; }
+      .big { font-size:20px; }
+      .mobileHint { display:block; font-size:12px; color:#555; margin:4px 0 8px; }
+      table { display:block; width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; white-space:nowrap; font-size:13px; }
+      th,td { padding:8px 7px; }
+      p { margin:10px 0; }
+      code { white-space:normal; word-break:break-word; }
+    }
+
+    </style>
+    </head>
+    <body>
+
+    <h1>Statistiche storiche Riserve d'Ufficio</h1>
+    <div class="subtitle">RecordsNext 2.0 - report storico personale completo</div>
+    <div class="mobileHint">Versione mobile: le tabelle scorrono lateralmente. Anche i numeri, a differenza di certe opinioni, si adattano allo schermo.</div>
+    <div class="policy">
+    <h2>0. Pulizia del campione: esclusione de "Il Fantoccio"</h2>
+    <p>Tutte le statistiche escludono integralmente le partite che coinvolgono <strong>Il Fantoccio</strong>, squadra fittizia che totalizzava 0 di default.</p>
+    <p>Viene esclusa <strong>l'intera partita</strong>, quindi anche la prestazione dell'avversario: altrimenti lo 0 artificiale altererebbe esiti, gol, frequenze RU e denominatori.</p>
+    <p>Partite escluse: <strong>$fakeTeamMatchesExcluded</strong>.</p>
+    <table>
+    <thead><tr><th>Stagione</th><th>Partite escluse con Il Fantoccio</th></tr></thead>
+    <tbody>
+    $($fakeTeamSeasonRowsHtml -join "`r`n")
+    </tbody>
+    </table>
+    </div>
+
+    <div class="box">
+    <h2>1. Quadro generale</h2>
+    <p>Sono state analizzate <span class="big">$totalMatches</span> partite storiche, dopo l'esclusione di <strong>$($CompetizioniEscluse -join ", ")</strong>.</p>
+    <p>In <span class="big">$($allRuRow.PartiteDistinte)</span> partite è comparsa almeno una Riserva d'Ufficio: <strong>$ruMatchPct%</strong> del totale, cioè circa <strong>1 partita ogni $oneEveryRuMatch</strong>.</p>
+    <p>Le prestazioni di squadra con almeno una RU sono state <strong>$($allRuRow.SquadrePartita)</strong>; le singole RU rilevate nei dati normalizzati sono state <strong>$($allRuRow.OccorrenzeRU)</strong>.</p>
+
+    <p><strong>Perché il totale storico è $totalMatches e non $normalizedMatches?</strong>
+    I file normalizzati contengono <strong>$normalizedNonCanonical</strong> riferimenti-partita in più che non hanno un corrispondente TABELLINO FCM.
+    Queste eccedenze sono concentrate nelle coppe e sono compatibili con turni di riposo/byes o altre righe di calendario senza una partita effettivamente disputata.
+    Per evitare di contare come partita qualcosa che non ha un tabellino reale, questo report usa come universo statistico solo le <strong>$totalMatches partite con TABELLINO</strong>.</p>
+    </div>
+
+    <h2>2. Frequenza ed effetto delle Riserve d'Ufficio</h2>
+    <div class="explain">
+    <p>La tabella distingue <strong>quanto spesso compare una RU</strong> da <strong>quanto spesso cambia il risultato</strong>.</p>
+    <p>Una <strong>squadra-partita</strong> è una singola prestazione di una squadra. Se nella stessa partita entrambe le squadre usano RU, la partita conta una volta ma le squadre-partita sono due.</p>
+    <p>Le percentuali degli effetti sono calcolate sulle squadre-partita della relativa categoria.</p>
+    </div>
+
+    <table>
+    <thead>
+    <tr>
+    <th>Situazione</th><th>Volte accaduto a una squadra</th><th>RU utilizzate</th><th>Partite coinvolte</th><th>% di tutte le partite</th>
+    <th>Ha evitato una sconfitta</th><th>% sui casi</th><th>Ha trasformato il pari in vittoria</th><th>% sui casi</th>
+    <th>Ha trasformato la sconfitta in vittoria</th><th>% sui casi</th><th>Casi-squadra decisivi</th><th>% decisivi sui casi con RU</th><th>Partite distinte con RU decisiva</th><th>% di tutte le partite</th>
+    </tr>
+    </thead>
+    <tbody>
+    $($ruRowsHtml -join "`r`n")
+    </tbody>
+    </table>
+
+    <h2>3. Quando una squadra non riesce ad arrivare a 11</h2>
+    <div class="explain">
+    <p>Per questa parte non viene usato <span class="code">NGioc</span>. Il dato viene letto direttamente dal <strong>tabellino finale FCM</strong>.</p>
+    <p>Nei primi 11 posti di <span class="code">TABELLINO.LISTA</span>: un numero positivo è un giocatore reale, <span class="code">-1</span> è una RU e <span class="code">0</span> è un posto rimasto scoperto.</p>
+    <p>Una squadra è quindi <strong>in 10 o meno</strong> quando esiste almeno uno slot vuoto nei primi 11 posti. Un solo zero = 10 giocatori effettivi; due zeri = 9; e così via.</p>
+    <p>Il criterio è stato verificato sul caso reale <strong>F.C. Boliverz - SegaTori FC, Serie C 2025/2026</strong>, nel quale il tabellino di SegaTori mostra 10 giocatori validi e un undicesimo slot a zero.</p>
+    </div>
+
+    <table>
+    <thead>
+    <tr><th>Situazione</th><th>Volte accaduto a una squadra</th><th>Partite coinvolte</th><th>% di tutte le partite</th><th>Vittorie</th><th>% vittorie</th><th>Pareggi</th><th>% pareggi</th><th>Sconfitte</th><th>% sconfitte</th><th>Peso tra i casi sotto 11</th></tr>
+    </thead>
+    <tbody>
+    $($under11RowsHtml -join "`r`n")
+    </tbody>
+    </table>
+
+    <div class="box-important">
+    <h2>4. Quando nemmeno la RU basta</h2>
+    <p>In tutto lo storico risultano <span class="big">$($allWithRu.Count)</span> prestazioni di squadra nelle quali almeno una RU è entrata effettivamente negli 11 posti del tabellino.</p>
+    <p>In <span class="big red">$($under11WithRu.Count)</span> di queste occasioni, nonostante una o più RU, la squadra è rimasta comunque con meno di 11 giocatori.</p>
+    <p>Questo rappresenta il <span class="big red">$pctRuFailedToReach11%</span> dei casi con almeno una RU effettivamente in campo.</p>
+    <p>In altre parole: <strong>circa 1 volta ogni $oneEveryRuFailure utilizzi di RU</strong> la squadra è rimasta comunque sotto gli 11.</p>
+    </div>
+
+    <div class="box">
+    <h2>4 bis. Quanto pesa davvero il problema che le 5 sostituzioni cercano di correggere?</h2>
+    <p>Le partite in cui almeno una squadra è rimasta sotto 11 <strong>senza RU</strong> sono <strong>$($under11NoRuMatchKeys.Count) su $totalMatches</strong>: <strong>$(Get-Percent $under11NoRuMatchKeys.Count $totalMatches 2)%</strong>.</p>
+    <p>La diagnostica sulle formazioni rende simulabili <strong>$fiveSubSimulable casi-squadra</strong>; <strong>$fiveSubNotSimulable</strong> restano fuori perché la formazione iniziale non è ricostruibile in modo coerente.</p>
+    <p>Portando il tetto a 5 sostituzioni, almeno una squadra avrebbe avuto un cambio aggiuntivo realmente compatibile in <strong>$($fiveSubBenefitMatchKeys.Count) partite</strong>, cioè nel <strong>$fiveSubBenefitPctAll%</strong> di tutto lo storico.</p>
+    <p>Le partite nelle quali la simulazione ricostruisce una squadra <strong>completamente riportata a 11</strong> sono <strong>$($fiveSubResolvedMatchKeys.Count)</strong>: appena <strong>$fiveSubResolvedPctAll%</strong> delle $totalMatches partite.</p>
+    <p>Quindi le 5 sostituzioni sono efficaci quando il problema si presenta, ma il loro impatto complessivo sul campionato è basso: correggerebbero completamente circa <strong>3 partite ogni 100</strong> dello storico.</p>
+    </div>
+
+    <div class="policy">
+    <h2>4 ter. Il fattore sfortuna è raro</h2>
+    <p>Rimanere senza almeno <strong>due giocatori</strong> e senza RU è successo in <strong>$($under11NoRuTwoPlusKeys.Count) partite</strong>: <strong>$pctTwoPlusAll%</strong> del totale.</p>
+    <p>Rimanere senza almeno <strong>tre giocatori</strong> è successo in <strong>$($under11NoRuThreePlusKeys.Count) partite</strong>: <strong>$pctThreePlusAll%</strong>.</p>
+    <p>Rimanere senza almeno <strong>quattro giocatori</strong> è successo in appena <strong>$($under11NoRuFourPlusKeys.Count) partite</strong>: <strong>$pctFourPlusAll%</strong>.</p>
+    <p>Se la filosofia regolamentare vuole lasciare una piccola quota di partite esposta alla pura sfortuna - la "tegola in testa" dopo una formazione ragionevole - i numeri mostrano che questa aleatorietà è circoscritta e non domina il campionato.</p>
+    <p>Tra le prestazioni sotto 11 senza RU per cui il risultato è leggibile, <strong>$under11NoRuZeroGoals su $under11NoRuKnownGoals</strong> hanno prodotto zero gol: <strong>$pctUnder11NoRuZeroGoals%</strong>.</p>
+    </div>
+
+    <div class="box">
+    <h2>4 quater. Uso delle RU anno per anno</h2>
+    <p>Per capire se la maggiore disponibilità di cambi nel calcio reale abbia ridotto la necessità delle RU nel fantacalcio, il report mostra l'incidenza delle RU <strong>stagione per stagione</strong>. Il confronto evidenzia dal <strong>2021/2022</strong> il periodo richiesto per l'analisi delle cinque sostituzioni.</p>
+
+    <table>
+    <thead>
+    <tr>
+    <th>Stagione</th><th>Partite</th><th>Partite con RU</th><th>% partite con RU</th>
+    <th>Casi-squadra RU</th><th>RU totali</th><th>RU/caso</th>
+    <th>1 RU</th><th>2 RU</th><th>&gt;2 RU</th><th>Max RU</th>
+    <th>Casi decisivi</th><th>% decisivi sui casi RU</th><th>Partite decisive</th><th>% decisive su tutte</th>
+    </tr>
+    </thead>
+    <tbody>
+    $($ruSeasonRowsHtml -join "`r`n")
+    </tbody>
+    </table>
+
+    <p><strong>Come leggere 1, 2 e &gt;2 RU:</strong> la lega ha nel tempo ridotto il numero ordinario di RU da 2 a 1 per partita. I casi con più di 2 RU non rappresentano il normale limite regolamentare: sono casi eccezionali legati ai recuperi di partite rinviate, possibilità prevista storicamente dal regolamento. Per questo vengono mostrati separatamente e non vanno interpretati come normale dipendenza della lega da 3 o più RU.</p>
+
+    <h3>Confronto aggregato prima/dopo 2021/2022</h3>
+    <table>
+    <thead>
+    <tr><th>Periodo</th><th>Stagioni</th><th>Partite</th><th>Partite con RU</th><th>% partite con RU</th><th>Casi-squadra RU</th><th>RU totali</th><th>% decisivi sui casi RU</th><th>Partite decisive</th><th>% decisive su tutte</th></tr>
+    </thead>
+    <tbody>
+    $($ruEraRowsHtml -join "`r`n")
+    </tbody>
+    </table>
+
+    <p class="small"><strong>Nota storica:</strong> il 2021/2022 è usato qui come soglia di confronto richiesta. In Serie A le cinque sostituzioni erano già utilizzate in deroga nelle stagioni dell'emergenza Covid; la disciplina permanente FIGC/IFAB è stata formalizzata dall'estate 2022. La tabella serve quindi soprattutto a verificare empiricamente se, nella nostra lega, l'incidenza delle RU mostri un calo nel periodo recente.</p>
+    </div>
+
+    <div class="box">
+    <h2>4 quinquies. La RU è molto usata, ma quanto incide davvero sul risultato?</h2>
+    <p>Una RU compare in <strong>$($allRuRow.PartiteDistinte) partite</strong>, cioè nel <strong>$($allRuRow.PercentualePartite)%</strong> dello storico: è quindi una rete di sicurezza usata frequentemente.</p>
+    <p>Nonostante questo largo utilizzo, le partite distinte in cui la RU cambia realmente il risultato sono <strong>$($allRuRow.PartiteDecisiveDistinte)</strong>, pari al <strong>$($allRuRow.PctPartiteDecisiveTotale)%</strong> di tutte le partite.</p>
+    <p>Questo distingue nettamente <strong>frequenza</strong> e <strong>potere decisivo</strong>: la RU evita molto spesso di lasciare una squadra incompleta, ma solo in una quota molto più piccola delle partite altera l'esito finale.</p>
+
+    <h3>Effetto nel solo regime moderno RU 3/2</h3>
+    <p><strong>$modern32Warning</strong></p>
+    <p>Nel campione moderno sono state analizzate <strong>$($modern32Stats.PartiteCampione)</strong> partite. Una RU compare in <strong>$($modern32Stats.PartiteConRU)</strong> partite (<strong>$($modern32Stats.PctPartiteConRU)%</strong>).</p>
+    <p>Le RU decisive sono <strong>$($modern32Stats.CasiDecisivi) casi-squadra</strong>, pari al <strong>$($modern32Stats.PctDecisiviSuRU)%</strong> dei casi con RU; le <strong>partite distinte</strong> in cui la RU cambia l'esito sono <strong>$($modern32Stats.PartiteDecisive)</strong>, cioè il <strong>$($modern32Stats.PctPartiteDecisiveCampione)%</strong> di tutte le partite del periodo.</p>
+
+    <table>
+    <thead><tr><th>Stagione</th><th>RU osservate</th><th>Valori RU movimento</th><th>Valori RU portiere</th><th>Compatibile con 3/2</th></tr></thead>
+    <tbody>
+    $($ruRulesRowsHtml -join "`r`n")
+    </tbody>
+    </table>
+    </div>
+
+    <div class="conclusion">
+    <h2>Conclusione regolamentare</h2>
+    <p><strong>Le 5 sostituzioni risolvono bene un problema raro.</strong> La simulazione completa riporta a 11 almeno una squadra in circa <strong>$fiveSubResolvedPctAll%</strong> delle partite storiche. Due cambi in più possono quindi essere comodi; semplicemente, non stanno salvando il campionato dall'apocalisse. Se si accetta che una quota intorno al 3% delle partite resti esposta alla sfortuna pura, non emerge una necessità statistica forte di cambiare la regola soltanto per eliminare questi episodi.</p>
+    <p><strong>La RU, invece, risponde a un problema frequente.</strong> È comparsa nel <strong>$($allRuRow.PercentualePartite)%</strong> delle partite: senza quella rete di sicurezza, una quantità molto maggiore di gare avrebbe almeno una squadra costretta a rinunciare a un giocatore perché non dispone più di un sostituto utilizzabile per quel ruolo.</p>
+    <p><strong>Il suo impatto sul risultato è però molto più basso del suo utilizzo.</strong> Solo il <strong>$($allRuRow.PctPartiteDecisiveTotale)%</strong> di tutte le partite storiche viene effettivamente deciso dalla RU. Quindi sì, la RU compare spesso; no, non è il ministero dei risultati regalati. Nella maggior parte dei casi evita soprattutto che una partita venga impoverita dalla formazione incompleta senza diventare essa stessa il fattore che decide l'esito.</p>
+    <p>Dal punto di vista della filosofia della lega, la distinzione è quindi utile: la sfortuna estrema può essere lasciata vivere perché è rara; la RU conserva invece una responsabilità gestionale, perché interviene quando una rosa o una formazione non dispone più di alternative valide per quel ruolo. Toglierla aumenterebbe molto più della regola dei 5 cambi il numero di squadre incomplete e renderebbe più prevedibili alcune gare per l'avversario, riducendo la possibilità che la squadra penalizzata resti comunque competitiva.</p>
+    <p><strong>Andamento nel tempo:</strong> la tabella per stagione consente inoltre di verificare se l'uso della RU sia effettivamente diminuito nel periodo recente, in particolare dal 2021/2022. Se la percentuale di partite con RU scende, questo suggerisce che rose, disponibilità di calciatori e maggiore flessibilità delle sostituzioni abbiano ridotto il bisogno della rete di sicurezza; se resta stabile, significa invece che il problema coperto dalla RU è strutturale e non viene eliminato semplicemente aumentando i cambi. Le impressioni del lunedì mattina, purtroppo, non hanno una colonna nel database.</p>
+    <p><strong>Quando si gioca davvero corti:</strong> la nuova sezione 5C mostra separatamente gli esiti con esattamente 10 giocatori e con meno di 10. È il controllo finale più concreto: se le sconfitte dominano soprattutto scendendo sotto 10, allora lasciare qualche raro caso alla sfortuna può essere una scelta; moltiplicare artificialmente quei casi abolendo la RU è tutt'altra faccenda.</p>
+    <p><strong>In sintesi:</strong> i dati sostengono meglio il mantenimento della RU che l'introduzione delle 5 sostituzioni. Le 5 sostituzioni hanno un beneficio reale ma limitato sul totale; la RU è molto più necessaria come meccanismo di continuità della partita, pur risultando decisiva soltanto in una minoranza delle gare.</p>
+    </div>
+
+    <h2>5A. Risultato delle squadre arrivate a 11 con almeno una RU</h2>
+    <p>Questi sono i casi in cui almeno una RU è entrata e la squadra ha comunque chiuso con tutti gli 11 posti coperti: <strong>$($full11WithRu.Count)</strong> casi-squadra, cioè il <strong>$pctRuCompleted11%</strong> di tutti i casi con RU.</p>
+    <p>È il gruppo che chiarisce meglio se la RU sia davvero una scorciatoia per vincere o se, molto più prosaicamente, serva soprattutto a non giocare con un buco. Spoiler statistico: le leggende da spogliatoio soffrono parecchio quando incontrano un denominatore.</p>
+    <table>
+    <thead><tr><th>Situazione</th><th>Casi</th><th>% sui casi a 11 con RU</th></tr></thead>
+    <tbody>
+    <tr><td class="left strong">Vittorie</td><td>$($outcomeFull11WithRu["VITTORIA"])</td><td>$(Get-Percent $outcomeFull11WithRu["VITTORIA"] $full11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">Pareggi</td><td>$($outcomeFull11WithRu["PAREGGIO"])</td><td>$(Get-Percent $outcomeFull11WithRu["PAREGGIO"] $full11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">Sconfitte</td><td>$($outcomeFull11WithRu["SCONFITTA"])</td><td>$(Get-Percent $outcomeFull11WithRu["SCONFITTA"] $full11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">La RU ha evitato una sconfitta</td><td>$($full11Effects["SCONFITTA_PAREGGIO"])</td><td>$(Get-Percent $full11Effects["SCONFITTA_PAREGGIO"] $full11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">La RU ha trasformato il pareggio in vittoria</td><td>$($full11Effects["PAREGGIO_VITTORIA"])</td><td>$(Get-Percent $full11Effects["PAREGGIO_VITTORIA"] $full11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">La RU ha trasformato la sconfitta in vittoria</td><td>$($full11Effects["SCONFITTA_VITTORIA"])</td><td>$(Get-Percent $full11Effects["SCONFITTA_VITTORIA"] $full11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong red">Totale casi in cui la RU ha cambiato il risultato</td><td class="red strong">$full11Decisive</td><td class="red strong">$(Get-Percent $full11Decisive $full11WithRu.Count 2)%</td></tr>
+    </tbody>
+    </table>
+
+    <h2>5B. Risultato delle squadre rimaste sotto 11 pur avendo RU</h2>
+    <p>Qui invece la sfortuna ha deciso di fare straordinario: almeno una RU è entrata, ma la squadra è rimasta comunque incompleta. Sono <strong>$($under11WithRu.Count)</strong> casi-squadra, il <strong>$pctRuFailedToReach11%</strong> dei casi con RU.</p>
+    <table>
+    <thead><tr><th>Situazione</th><th>Casi</th><th>% sui casi sotto 11 con RU</th></tr></thead>
+    <tbody>
+    <tr><td class="left strong">Vittorie</td><td>$($outcomeWithRu["VITTORIA"])</td><td>$(Get-Percent $outcomeWithRu["VITTORIA"] $under11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">Pareggi</td><td>$($outcomeWithRu["PAREGGIO"])</td><td>$(Get-Percent $outcomeWithRu["PAREGGIO"] $under11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">Sconfitte</td><td>$($outcomeWithRu["SCONFITTA"])</td><td>$(Get-Percent $outcomeWithRu["SCONFITTA"] $under11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">La RU ha evitato una sconfitta</td><td>$($under11Effects["SCONFITTA_PAREGGIO"])</td><td>$(Get-Percent $under11Effects["SCONFITTA_PAREGGIO"] $under11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">La RU ha trasformato il pareggio in vittoria</td><td>$($under11Effects["PAREGGIO_VITTORIA"])</td><td>$(Get-Percent $under11Effects["PAREGGIO_VITTORIA"] $under11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong">La RU ha trasformato la sconfitta in vittoria</td><td>$($under11Effects["SCONFITTA_VITTORIA"])</td><td>$(Get-Percent $under11Effects["SCONFITTA_VITTORIA"] $under11WithRu.Count 2)%</td></tr>
+    <tr><td class="left strong red">Totale casi in cui la RU ha cambiato il risultato</td><td class="red strong">$under11Decisive</td><td class="red strong">$(Get-Percent $under11Decisive $under11WithRu.Count 2)%</td></tr>
+    </tbody>
+    </table>
+
+
+    <h2>5C. Quando si gioca davvero in 10, e quando va persino peggio</h2>
+    <p>Questo è il dato che mancava: non quante volte succede, ma <strong>come finiscono le partite quando succede</strong>. Perché "giocare in 10 non è poi così grave" è una frase che merita almeno di incontrare una tabella prima di diventare regolamento.</p>
+
+    <h3>Esattamente 10 giocatori effettivi</h3>
+    <p>Casi-squadra: <strong>$($playedIn10.Count)</strong>. Partite distinte coinvolte: <strong>$($playedIn10MatchKeys.Count)</strong> su $totalMatches (<strong>$(Get-Percent $playedIn10MatchKeys.Count $totalMatches 2)%</strong>).</p>
+    <table>
+    <thead><tr><th>Esito</th><th>Casi</th><th>% sui casi giocati in 10</th></tr></thead>
+    <tbody>
+    <tr><td class="left strong">Vittorie</td><td>$($outcomePlayedIn10["VITTORIA"])</td><td>$(Get-Percent $outcomePlayedIn10["VITTORIA"] $playedIn10.Count 2)%</td></tr>
+    <tr><td class="left strong">Pareggi</td><td>$($outcomePlayedIn10["PAREGGIO"])</td><td>$(Get-Percent $outcomePlayedIn10["PAREGGIO"] $playedIn10.Count 2)%</td></tr>
+    <tr><td class="left strong red">Sconfitte</td><td class="red strong">$($outcomePlayedIn10["SCONFITTA"])</td><td class="red strong">$(Get-Percent $outcomePlayedIn10["SCONFITTA"] $playedIn10.Count 2)%</td></tr>
+    </tbody>
+    </table>
+
+    <h3>Meno di 10 giocatori effettivi</h3>
+    <p>Casi-squadra: <strong>$($playedBelow10.Count)</strong>. Partite distinte coinvolte: <strong>$($playedBelow10MatchKeys.Count)</strong> su $totalMatches (<strong>$(Get-Percent $playedBelow10MatchKeys.Count $totalMatches 3)%</strong>).</p>
+    <table>
+    <thead><tr><th>Esito</th><th>Casi</th><th>% sui casi giocati in meno di 10</th></tr></thead>
+    <tbody>
+    <tr><td class="left strong">Vittorie</td><td>$($outcomePlayedBelow10["VITTORIA"])</td><td>$(Get-Percent $outcomePlayedBelow10["VITTORIA"] $playedBelow10.Count 2)%</td></tr>
+    <tr><td class="left strong">Pareggi</td><td>$($outcomePlayedBelow10["PAREGGIO"])</td><td>$(Get-Percent $outcomePlayedBelow10["PAREGGIO"] $playedBelow10.Count 2)%</td></tr>
+    <tr><td class="left strong red">Sconfitte</td><td class="red strong">$($outcomePlayedBelow10["SCONFITTA"])</td><td class="red strong">$(Get-Percent $outcomePlayedBelow10["SCONFITTA"] $playedBelow10.Count 2)%</td></tr>
+    </tbody>
+    </table>
+
+    <p class="small">Qui "giocatori effettivi" significa giocatori reali + eventuali RU nei primi 11 slot del TABELLINO. Quindi la distinzione 10 / meno di 10 fotografa davvero quanti uomini hanno prodotto il tabellino finale.</p>
+
+    <h2>6. Tutti i casi in cui una squadra è rimasta in 10 o meno</h2>
+    <div class="explain">
+    <p>Questa tabella elenca ogni singolo caso trovato e serve anche come controllo manuale.</p>
+    <p><strong>Giocatori effettivi</strong> = giocatori reali + RU presenti nei primi 11 slot. Gli slot vuoti non vengono contati.</p>
+    </div>
+
+    <table>
+    <thead>
+    <tr><th>Stagione</th><th>Competizione</th><th>Giornata</th><th>Squadra</th><th>Avversaria</th><th>Giocatori effettivi</th><th>RU in campo</th><th>Esito</th><th>Risultato</th><th>Punteggio</th><th>Effetto RU</th><th>Tabellino</th></tr>
+    </thead>
+    <tbody>
+    $($casesHtml -join "`r`n")
+    </tbody>
+    </table>
+
+    <h2>7. Glossario</h2>
+    <div class="box explain">
+    <p><strong>Riserva d'Ufficio (RU):</strong> un voto assegnato d'ufficio quando le normali sostituzioni non riescono a coprire un giocatore mancante.</p>
+    <p><strong>Partita coinvolta:</strong> l'incontro viene contato una sola volta anche se entrambe le squadre presentano la stessa situazione.</p>
+    <p><strong>Squadra-partita:</strong> la prestazione di una singola squadra in una singola partita.</p>
+    <p><strong>RU decisiva:</strong> una RU è decisiva quando, togliendo i suoi punti, il risultato della squadra peggiorerebbe.</p>
+    <p><strong>In 10 o meno:</strong> il tabellino finale FCM presenta almeno uno dei primi 11 posti scoperto.</p>
+    <p><strong>In 10 o meno senza RU:</strong> almeno uno slot è vuoto e nessuna RU è presente nei primi 11 posti.</p>
+    <p><strong>In 10 o meno con RU:</strong> almeno una RU è effettivamente in campo ma resta ancora almeno uno slot vuoto. È il caso in cui la RU non basta a completare gli 11.</p>
+    <p><strong>% sul totale storico:</strong> usa come denominatore tutte le partite valide analizzate.</p>
+    <p><strong>% RU che non completano gli 11:</strong> usa come denominatore esclusivamente le prestazioni di squadra nelle quali almeno una RU è presente negli 11 posti finali.</p>
+    <p><strong>Simulazione 5 sostituzioni:</strong> usa i casi sotto 11 senza RU, ricostruisce gli 11 iniziali quando FORMATION.POS=0 produce esattamente 11 titolari, individua i ruoli rimasti scoperti e verifica se esistono panchinari con voto valido e ruolo compatibile. Le sostituzioni già effettuate sono lette da ENTRATORISERVA.</p>
+    <p><strong>Regime RU 3/2:</strong> blocco cronologico più recente in cui tutte le RU di movimento osservate valgono 3 e tutte le RU portiere osservate valgono 2. Se il blocco comprende una sola stagione, il report lo segnala esplicitamente come campione corto.</p>
+    <p><strong>Il Fantoccio:</strong> tutte le partite che coinvolgono la squadra fittizia sono escluse integralmente dal campione e da ogni denominatore.</p>
+    </div>
+
+    <div class="small">File generato automaticamente da Report_RU_Storico_Completo_v8_4.ps1.</div>
+
+    </body>
+    </html>
+    "@
+
+    Set-Content -Path $htmlPath -Value $htmlContent -Encoding UTF8
+
+    Write-Host ""
+    Write-Host "=== REPORT RU STORICO COMPLETO ==="
+    Write-Host ""
+    Write-Host "Partite storiche valide (TABELLINO)      : $totalMatches"
+    Write-Host "Partite uniche nei normalized            : $normalizedMatches"
+    Write-Host "Normalized senza TABELLINO               : $normalizedNonCanonical"
+    Write-Host "Partite con almeno una RU                : $($allRuRow.PartiteDistinte)"
+    Write-Host "Prestazioni squadra con RU (normalized)  : $($allRuRow.SquadrePartita)"
+    Write-Host "RU totali (normalized)                   : $($allRuRow.OccorrenzeRU)"
+    Write-Host ""
+    Write-Host "Prestazioni squadra sotto 11             : $($under11.Count)"
+    Write-Host "Partite con almeno una squadra sotto 11  : $($under11MatchKeys.Count)"
+    Write-Host "% partite con almeno una squadra sotto11 : $pctUnder11Total %"
+    Write-Host ""
+    Write-Host "Sotto 11 senza RU                        : $($under11NoRu.Count)"
+    Write-Host "Sotto 11 con almeno una RU               : $($under11WithRu.Count)"
+    Write-Host "Giocato esattamente in 10                : $($playedIn10.Count) | V=$($outcomePlayedIn10["VITTORIA"]) N=$($outcomePlayedIn10["PAREGGIO"]) P=$($outcomePlayedIn10["SCONFITTA"])"
+    Write-Host "Giocato in meno di 10                    : $($playedBelow10.Count) | V=$($outcomePlayedBelow10["VITTORIA"]) N=$($outcomePlayedBelow10["PAREGGIO"]) P=$($outcomePlayedBelow10["SCONFITTA"])"
+    Write-Host "% senza RU tra i casi sotto 11           : $pctNoRuAmongUnder11 %"
+    Write-Host "% con RU tra i casi sotto 11             : $pctWithRuAmongUnder11 %"
+    Write-Host ""
+    Write-Host "Prestazioni con RU in campo (TABELLINO)  : $($allWithRu.Count)"
+    Write-Host "Con RU e formazione completa a 11        : $($full11WithRu.Count) ($pctRuCompleted11 %)"
+    Write-Host "Con RU ma ancora sotto 11                : $($under11WithRu.Count) ($pctRuFailedToReach11 %)"
+    Write-Host "% RU che non completano gli 11           : $pctRuFailedToReach11 %"
+    Write-Host ""
+    Write-Host ""
+    Write-Host "=== PULIZIA CAMPIONE ==="
+    Write-Host "Partite Il Fantoccio escluse              : $fakeTeamMatchesExcluded"
+    Write-Host "Partite valide dopo esclusione             : $totalMatches"
+    Write-Host ""
+    Write-Host "=== 5 SOSTITUZIONI ==="
+    Write-Host "Casi simulabili                           : $fiveSubSimulable"
+    Write-Host "Partite con cambio compatibile            : $($fiveSubBenefitMatchKeys.Count) ($fiveSubBenefitPctAll %)"
+    Write-Host "Partite completamente riportate a 11      : $($fiveSubResolvedMatchKeys.Count) ($fiveSubResolvedPctAll %)"
+    Write-Host ""
+    Write-Host "=== RU MODERNA 3/2 ==="
+    Write-Host "Periodo rilevato                          : $modern32Start -> $modern32End"
+    Write-Host "Numero stagioni                           : $($modern32Seasons.Count)"
+    Write-Host "Partite campione                          : $($modern32Stats.PartiteCampione)"
+    Write-Host "Partite con RU                            : $($modern32Stats.PartiteConRU) ($($modern32Stats.PctPartiteConRU) %)"
+    Write-Host "Partite con RU decisiva                   : $($modern32Stats.PartiteDecisive) ($($modern32Stats.PctPartiteDecisiveCampione) %)"
+    Write-Host ""
+    Write-Host "CSV riepilogo RU  : $ruSummaryCsv"
+    Write-Host "CSV casi sotto 11 : $under11Csv"
+    Write-Host "CSV simulazione 5 : $fiveSubCsv"
+    Write-Host "CSV regole RU     : $ruRulesCsv"
+    Write-Host "CSV RU per annata : $ruSeasonCsv"
+    Write-Host "CSV pre/post 21/22: $ruEraCsv"
+    Write-Host "HTML completo     : $htmlPath"
+    Write-Host ""
+
+## tools\Report-RU-InDieci-Storico.ps1
+
+File: tools\Report-RU-InDieci-Storico.ps1
+
+    param(
+        [string]$RecordsNextRoot = "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2",
+        [string]$FcmRoot = "E:\FCM\data"
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    # ============================================================
+    # CONFIGURAZIONE
+    # ============================================================
+
+    $reportsRoot = Join-Path $RecordsNextRoot "data\reports"
+    $ruArchiveRoot = Join-Path $RecordsNextRoot "data\records-archive\riserveufficio"
+    $outputDir = Join-Path $RecordsNextRoot "data\personal-reports"
+
+    $CompetizioniEscluse = @(
+        "Youth League"
+    )
+
+    New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
+
+
+    # ============================================================
+    # FUNZIONI
+    # ============================================================
+
+    function Get-Prop {
+        param(
+            $Object,
+            [string]$Name
+        )
+
+        if ($null -eq $Object) {
+            return $null
+        }
+
+        $p = $Object.PSObject.Properties[$Name]
+
+        if ($null -eq $p) {
+            return $null
+        }
+
+        return $p.Value
+    }
+
+
+    function Get-Percent {
+        param(
+            [double]$Numerator,
+            [double]$Denominator,
+            [int]$Decimals = 2
+        )
+
+        if ($Denominator -le 0) {
+            return 0
+        }
+
+        return [math]::Round(
+            ($Numerator / $Denominator) * 100,
+            $Decimals
+        )
+    }
+
+
+    function Is-ExcludedCompetition {
+        param([string]$Competition)
+
+        if ([string]::IsNullOrWhiteSpace($Competition)) {
+            return $false
+        }
+
+        foreach ($excluded in $CompetizioniEscluse) {
+
+            if (
+                $Competition.Trim().Equals(
+                    $excluded,
+                    [System.StringComparison]::OrdinalIgnoreCase
+                )
+            ) {
+                return $true
+            }
+        }
+
+        return $false
+    }
+
+
+    function Normalize-Effect {
+        param($Effect)
+
+        $text = ([string]$Effect).Trim().ToUpperInvariant()
+
+        if ($text -match "SCONFITTA.*PAREGGIO") {
+            return "SCONFITTA_PAREGGIO"
+        }
+
+        if ($text -match "PAREGGIO.*VITTORIA") {
+            return "PAREGGIO_VITTORIA"
+        }
+
+        if ($text -match "SCONFITTA.*VITTORIA") {
+            return "SCONFITTA_VITTORIA"
+        }
+
+        return "NESSUN_EFFETTO"
+    }
+
+
+    function Get-FcmFileForSeason {
+        param([string]$Season)
+
+        $parts = $Season -split "_"
+
+        if ($parts.Count -ne 2) {
+            throw "Stagione non valida: $Season"
+        }
+
+        $startYear = $parts[0]
+        $endYear = $parts[1]
+
+        $pattern = "*${startYear}_${endYear}*.fcm"
+
+        $files = @(
+            Get-ChildItem $FcmRoot -Filter $pattern |
+            Where-Object { -not $_.PSIsContainer }
+        )
+
+        if ($files.Count -eq 1) {
+            return $files[0].FullName
+        }
+
+        # Caso storico speciale 2006/2007
+        if ($Season -eq "2006_2007") {
+
+            $special = Join-Path $FcmRoot "Lega Reame Perduto 2006_2007-2-2006.fcm"
+
+            if (Test-Path $special) {
+                return $special
+            }
+        }
+
+        if ($files.Count -eq 0) {
+            throw "Nessun FCM trovato per $Season in $FcmRoot"
+        }
+
+        throw "Più FCM trovati per ${Season}: $($files.Name -join ', ')"
+    }
+
+
+    function Read-Recordset {
+        param(
+            $Connection,
+            [string]$Sql
+        )
+
+        $rs = New-Object -ComObject ADODB.Recordset
+        $rs.Open($Sql, $Connection)
+
+        $rows = New-Object System.Collections.Generic.List[object]
+
+        while (-not $rs.EOF) {
+
+            $obj = [ordered]@{}
+
+            for ($i = 0; $i -lt $rs.Fields.Count; $i++) {
+
+                $name = $rs.Fields.Item($i).Name
+                $value = $rs.Fields.Item($i).Value
+
+                $obj[$name] = $value
+            }
+
+            $rows.Add([pscustomobject]$obj)
+
+            $rs.MoveNext()
+        }
+
+        $rs.Close()
+
+        return @($rows)
+    }
+
+
+    # ============================================================
+    # UNIVERSO PARTITE RECORDSNEXT
+    #
+    # Usiamo i normalized per sapere quali incontri fanno parte
+    # del nostro archivio storico. IDIncontro è univoco nel FCM
+    # della singola stagione.
+    # ============================================================
+
+    $eligibleMatches = @{}
+    $seasons = @{}
+
+    $normalizedFiles = @(
+        Get-ChildItem $reportsRoot -Recurse -Filter "season_normalized_*.json" |
+        Where-Object { -not $_.PSIsContainer }
+    )
+
+    foreach ($file in $normalizedFiles) {
+
+        $season = Split-Path $file.DirectoryName -Leaf
+        $seasons[$season] = $true
+
+        $doc = Get-Content $file.FullName -Raw -Encoding UTF8 |
+            ConvertFrom-Json
+
+        foreach ($row in @($doc.partiteSquadra)) {
+
+            if ($null -eq $row) {
+                continue
+            }
+
+            $idMatch = [string]$row.idIncontro
+
+            if ([string]::IsNullOrWhiteSpace($idMatch)) {
+                continue
+            }
+
+            $eligibleMatches["$season|$idMatch"] = $true
+        }
+    }
+
+
+    # ============================================================
+    # RU PER SQUADRA-PARTITA
+    # ============================================================
+
+    $ruByTeamMatch = @{}
+
+    foreach ($file in $normalizedFiles) {
+
+        $season = Split-Path $file.DirectoryName -Leaf
+
+        $doc = Get-Content $file.FullName -Raw -Encoding UTF8 |
+            ConvertFrom-Json
+
+        foreach ($row in @($doc.riserveUfficioDettaglio)) {
+
+            if ($null -eq $row) {
+                continue
+            }
+
+            $idMatch = [string]$row.idIncontro
+            $idTeam = [string]$row.idSquadra
+
+            if (
+                [string]::IsNullOrWhiteSpace($idMatch) -or
+                [string]::IsNullOrWhiteSpace($idTeam)
+            ) {
+                continue
+            }
+
+            $key = "$season|$idMatch|$idTeam"
+
+            if (-not $ruByTeamMatch.ContainsKey($key)) {
+                $ruByTeamMatch[$key] = 0
+            }
+
+            $ruByTeamMatch[$key]++
+        }
+    }
+
+
+    # ============================================================
+    # EFFETTI RU
+    # ============================================================
+
+    $effects = @{}
+
+    $ruArchiveFiles = @(
+        Get-ChildItem $ruArchiveRoot -Recurse -Filter "riserveufficio.json" |
+        Where-Object { -not $_.PSIsContainer }
+    )
+
+    foreach ($file in $ruArchiveFiles) {
+
+        $season = Split-Path $file.DirectoryName -Leaf
+
+        $doc = Get-Content $file.FullName -Raw -Encoding UTF8 |
+            ConvertFrom-Json
+
+        $views = Get-Prop $doc "views"
+
+        foreach ($row in @(Get-Prop $views "ruDecisiva")) {
+
+            if ($null -eq $row) {
+                continue
+            }
+
+            if (Is-ExcludedCompetition ([string]$row.competizione)) {
+                continue
+            }
+
+            $idMatch = [string]$row.idIncontro
+            $idTeam = [string]$row.idSquadra
+
+            if (
+                [string]::IsNullOrWhiteSpace($idMatch) -or
+                [string]::IsNullOrWhiteSpace($idTeam)
+            ) {
+                continue
+            }
+
+            $key = "$season|$idMatch|$idTeam"
+
+            $effects[$key] = Normalize-Effect $row.effetto
+        }
+    }
+
+
+    # ============================================================
+    # LETTURA INCONTRO DA TUTTI GLI FCM
+    # ============================================================
+
+    $allTeamMatches = New-Object System.Collections.Generic.List[object]
+
+    foreach ($season in @($seasons.Keys | Sort-Object)) {
+
+        $fcmFile = Get-FcmFileForSeason $season
+
+        Write-Host ""
+        Write-Host "Lettura $season"
+        Write-Host "FCM: $fcmFile"
+
+        $cn = New-Object -ComObject ADODB.Connection
+
+        $connectionString =
+            "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=$fcmFile;"
+
+        $cn.Open($connectionString)
+
+        try {
+
+            # Squadre
+            $teamRows = Read-Recordset `
+                $cn `
+                "SELECT ID, Nome FROM Fantasquadra"
+
+            $teamNames = @{}
+
+            foreach ($team in $teamRows) {
+                $teamNames[[string]$team.ID] = [string]$team.Nome
+            }
+
+
+            # Competizioni per girone
+            $gironeRows = Read-Recordset `
+                $cn `
+                "SELECT g.ID, c.Nome AS Competizione FROM Girone AS g LEFT JOIN Competizione AS c ON g.IDCompetizione = c.ID"
+
+            $competitionByGirone = @{}
+
+            foreach ($g in $gironeRows) {
+                $competitionByGirone[[string]$g.ID] = [string]$g.Competizione
+            }
+
+
+            # Incontri
+            $matches = Read-Recordset `
+                $cn `
+                "SELECT ID, IDCasa, IDFuori, IDGirone, NGiocCasa, NGiocFuori, GolCasa, GolFuori, Giocato, GiornataDiA FROM Incontro"
+
+            foreach ($match in $matches) {
+
+                $idMatch = [string]$match.ID
+
+                if (-not $eligibleMatches.ContainsKey("$season|$idMatch")) {
+                    continue
+                }
+
+                $idCasa = [string]$match.IDCasa
+                $idFuori = [string]$match.IDFuori
+
+                if (
+                    [string]::IsNullOrWhiteSpace($idCasa) -or
+                    [string]::IsNullOrWhiteSpace($idFuori) -or
+                    $idCasa -eq "0" -or
+                    $idFuori -eq "0"
+                ) {
+                    continue
+                }
+
+                $competition = ""
+
+                $gironeKey = [string]$match.IDGirone
+
+                if ($competitionByGirone.ContainsKey($gironeKey)) {
+                    $competition = $competitionByGirone[$gironeKey]
+                }
+
+                if (Is-ExcludedCompetition $competition) {
+                    continue
+                }
+
+
+                $golCasa = [int]$match.GolCasa
+                $golFuori = [int]$match.GolFuori
+
+                $esitoCasa = if ($golCasa -gt $golFuori) {
+                    "VITTORIA"
+                }
+                elseif ($golCasa -eq $golFuori) {
+                    "PAREGGIO"
+                }
+                else {
+                    "SCONFITTA"
+                }
+
+                $esitoFuori = if ($golFuori -gt $golCasa) {
+                    "VITTORIA"
+                }
+                elseif ($golFuori -eq $golCasa) {
+                    "PAREGGIO"
+                }
+                else {
+                    "SCONFITTA"
+                }
+
+
+                # CASA
+                $keyCasa = "$season|$idMatch|$idCasa"
+
+                $ruCasa = 0
+
+                if ($ruByTeamMatch.ContainsKey($keyCasa)) {
+                    $ruCasa = [int]$ruByTeamMatch[$keyCasa]
+                }
+
+                $effectCasa = "NESSUN_EFFETTO"
+
+                if ($effects.ContainsKey($keyCasa)) {
+                    $effectCasa = $effects[$keyCasa]
+                }
+
+                $allTeamMatches.Add(
+                    [pscustomobject]@{
+                        Stagione = $season
+                        Competizione = $competition
+                        IdIncontro = $idMatch
+                        IdSquadra = $idCasa
+                        Squadra = $teamNames[$idCasa]
+                        Lato = "Casa"
+                        NGioc = [int]$match.NGiocCasa
+                        NumeroRU = $ruCasa
+                        Esito = $esitoCasa
+                        EffettoRU = $effectCasa
+                    }
+                )
+
+
+                # FUORI
+                $keyFuori = "$season|$idMatch|$idFuori"
+
+                $ruFuori = 0
+
+                if ($ruByTeamMatch.ContainsKey($keyFuori)) {
+                    $ruFuori = [int]$ruByTeamMatch[$keyFuori]
+                }
+
+                $effectFuori = "NESSUN_EFFETTO"
+
+                if ($effects.ContainsKey($keyFuori)) {
+                    $effectFuori = $effects[$keyFuori]
+                }
+
+                $allTeamMatches.Add(
+                    [pscustomobject]@{
+                        Stagione = $season
+                        Competizione = $competition
+                        IdIncontro = $idMatch
+                        IdSquadra = $idFuori
+                        Squadra = $teamNames[$idFuori]
+                        Lato = "Fuori"
+                        NGioc = [int]$match.NGiocFuori
+                        NumeroRU = $ruFuori
+                        Esito = $esitoFuori
+                        EffettoRU = $effectFuori
+                    }
+                )
+            }
+        }
+        finally {
+
+            if ($cn.State -ne 0) {
+                $cn.Close()
+            }
+        }
+    }
+
+
+    # ============================================================
+    # POPOLAZIONI
+    # ============================================================
+
+    $totalMatches = @(
+        $allTeamMatches |
+        Group-Object Stagione,IdIncontro
+    ).Count
+
+
+    # Esattamente 10 giocatori validi
+    $in10 = @(
+        $allTeamMatches |
+        Where-Object {
+            $_.NGioc -eq 10
+        }
+    )
+
+
+    # 9 o meno, tenuti separati
+    $sotto10 = @(
+        $allTeamMatches |
+        Where-Object {
+            $_.NGioc -lt 10
+        }
+    )
+
+
+    $in10SenzaRU = @(
+        $in10 |
+        Where-Object {
+            $_.NumeroRU -eq 0
+        }
+    )
+
+
+    $in10ConRU = @(
+        $in10 |
+        Where-Object {
+            $_.NumeroRU -gt 0
+        }
+    )
+
+
+    $in10Con1RU = @(
+        $in10 |
+        Where-Object {
+            $_.NumeroRU -eq 1
+        }
+    )
+
+
+    $in10Con2RU = @(
+        $in10 |
+        Where-Object {
+            $_.NumeroRU -eq 2
+        }
+    )
+
+
+    $in10ConPiu2RU = @(
+        $in10 |
+        Where-Object {
+            $_.NumeroRU -gt 2
+        }
+    )
+
+
+    # ============================================================
+    # STATISTICHE
+    # ============================================================
+
+    function Get-Stats {
+        param(
+            [object[]]$Rows,
+            [string]$Categoria
+        )
+
+        $matches = @(
+            $Rows |
+            Group-Object Stagione,IdIncontro
+        ).Count
+
+        $wins = @(
+            $Rows |
+            Where-Object { $_.Esito -eq "VITTORIA" }
+        ).Count
+
+        $draws = @(
+            $Rows |
+            Where-Object { $_.Esito -eq "PAREGGIO" }
+        ).Count
+
+        $losses = @(
+            $Rows |
+            Where-Object { $_.Esito -eq "SCONFITTA" }
+        ).Count
+
+        $sp = @(
+            $Rows |
+            Where-Object {
+                $_.EffettoRU -eq "SCONFITTA_PAREGGIO"
+            }
+        ).Count
+
+        $pv = @(
+            $Rows |
+            Where-Object {
+                $_.EffettoRU -eq "PAREGGIO_VITTORIA"
+            }
+        ).Count
+
+        $sv = @(
+            $Rows |
+            Where-Object {
+                $_.EffettoRU -eq "SCONFITTA_VITTORIA"
+            }
+        ).Count
+
+        $decisive = $sp + $pv + $sv
+
+        [pscustomobject]@{
+            Categoria = $Categoria
+
+            SquadrePartita = $Rows.Count
+
+            PartiteDistinte = $matches
+
+            PercentualeSulTotale = Get-Percent `
+                $matches `
+                $totalMatches
+
+            Vittorie = $wins
+            Pareggi = $draws
+            Sconfitte = $losses
+
+            SconfittaPareggio = $sp
+            PareggioVittoria = $pv
+            SconfittaVittoria = $sv
+
+            TotaleEffettiDecisivi = $decisive
+
+            PercentualeEffettiDecisivi = Get-Percent `
+                $decisive `
+                $Rows.Count
+        }
+    }
+
+
+    $summary = @()
+
+    $summary += Get-Stats `
+        $in10 `
+        "SQUADRA CON ESATTAMENTE 10 GIOCATORI VALIDI"
+
+    $summary += Get-Stats `
+        $in10SenzaRU `
+        "IN 10 SENZA AVER UTILIZZATO RU"
+
+    $summary += Get-Stats `
+        $in10ConRU `
+        "IN 10 NONOSTANTE L'UTILIZZO DI ALMENO UNA RU"
+
+    $summary += Get-Stats `
+        $in10Con1RU `
+        "IN 10 CON ESATTAMENTE 1 RU"
+
+    $summary += Get-Stats `
+        $in10Con2RU `
+        "IN 10 CON ESATTAMENTE 2 RU"
+
+    $summary += Get-Stats `
+        $in10ConPiu2RU `
+        "IN 10 CON PIÙ DI 2 RU"
+
+    $summary += Get-Stats `
+        $sotto10 `
+        "SQUADRA CON 9 O MENO GIOCATORI VALIDI"
+
+
+    # ============================================================
+    # OUTPUT CSV
+    # ============================================================
+
+    $csv = Join-Path $outputDir "RU_squadre_in_10_storico.csv"
+    $html = Join-Path $outputDir "RU_squadre_in_10_storico.html"
+
+    $summary |
+        Export-Csv `
+            -Path $csv `
+            -Delimiter ";" `
+            -NoTypeInformation `
+            -Encoding UTF8
+
+
+    # ============================================================
+    # HTML
+    # ============================================================
+
+    $in10Matches = @(
+        $in10 |
+        Group-Object Stagione,IdIncontro
+    ).Count
+
+    $in10Pct = Get-Percent $in10Matches $totalMatches
+
+    $in10ConRuMatches = @(
+        $in10ConRU |
+        Group-Object Stagione,IdIncontro
+    ).Count
+
+    $in10ConRuPct = Get-Percent `
+        $in10ConRU.Count `
+        $in10.Count
+
+
+    $rowsHtml = foreach ($r in $summary) {
+
+    @"
+    <tr>
+    <td class="cat">$([System.Net.WebUtility]::HtmlEncode($r.Categoria))</td>
+    <td>$($r.SquadrePartita)</td>
+    <td>$($r.PartiteDistinte)</td>
+    <td>$($r.PercentualeSulTotale)%</td>
+    <td>$($r.Vittorie)</td>
+    <td>$($r.Pareggi)</td>
+    <td>$($r.Sconfitte)</td>
+    <td>$($r.SconfittaPareggio)</td>
+    <td>$($r.PareggioVittoria)</td>
+    <td>$($r.SconfittaVittoria)</td>
+    <td class="important">$($r.TotaleEffettiDecisivi)</td>
+    <td class="important">$($r.PercentualeEffettiDecisivi)%</td>
+    </tr>
+    "@
+    }
+
+
+    $htmlContent = @"
+    <!doctype html>
+
+    <html lang="it">
+
+    <head>
+
+    <meta charset="utf-8">
+
+    <title>Squadre rimaste in 10 - Riserve d'Ufficio</title>
+
+    <style>
+
+    body {
+        font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+        margin: 22px;
+        color: #111;
+        background: #fff;
+    }
+
+    h1, h2 {
+        color: #003366;
+    }
+
+    h1 {
+        margin-bottom: 4px;
+    }
+
+    .subtitle {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .box {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #003366;
+        background: #f7f7f7;
+    }
+
+    .big {
+        font-size: 20px;
+        font-weight: bold;
+        color: #003366;
+    }
+
+    .warning {
+        font-weight: bold;
+        color: #990000;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    th {
+        border: 1px solid #003366;
+        background: #003366;
+        color: white;
+        padding: 7px 5px;
+        text-align: center;
+    }
+
+    td {
+        border: 1px solid #003366;
+        padding: 6px 5px;
+        text-align: right;
+    }
+
+    tbody tr:nth-child(even) {
+        background: #ccffff;
+    }
+
+    td.cat {
+        text-align: left;
+        color: #003366;
+        font-weight: bold;
+    }
+
+    td.important {
+        color: #990000;
+        font-weight: bold;
+    }
+
+    .notes {
+        margin-top: 22px;
+        line-height: 1.5;
+    }
+
+    </style>
+
+    </head>
+
+    <body>
+
+    <h1>Quando una squadra rimane in 10</h1>
+
+    <div class="subtitle">
+    RecordsNext 2.0 — analisi storica personale
+    </div>
+
+
+    <div class="box">
+
+    <h2>Quadro generale</h2>
+
+    <p>
+    L'archivio analizzato contiene
+    <span class="big">$totalMatches</span>
+    partite.
+    </p>
+
+    <p>
+    In
+    <span class="big">$in10Matches</span>
+    partite almeno una squadra ha terminato il calcolo FCM
+    con <strong>esattamente 10 giocatori validi</strong>.
+    </p>
+
+    <p>
+    L'incidenza è pari al
+    <span class="big">$in10Pct%</span>
+    delle partite storiche.
+    </p>
+
+    <p>
+    Le singole prestazioni di squadra in 10 sono
+    <strong>$($in10.Count)</strong>.
+    </p>
+
+    <p>
+    Di queste,
+    <strong>$($in10ConRU.Count)</strong>
+    si sono verificate
+    <span class="warning">nonostante la squadra avesse già utilizzato almeno una Riserva d'Ufficio</span>.
+    Sono il
+    <strong>$in10ConRuPct%</strong>
+    di tutte le prestazioni in 10.
+    </p>
+
+    </div>
+
+
+    <table>
+
+    <thead>
+
+    <tr>
+
+    <th>Situazione</th>
+    <th>Volte accaduto<br>a una squadra</th>
+    <th>Partite<br>coinvolte</th>
+    <th>% di tutte<br>le partite</th>
+
+    <th>Vittorie</th>
+    <th>Pareggi</th>
+    <th>Sconfitte</th>
+
+    <th>RU: sconfitta<br>→ pareggio</th>
+    <th>RU: pareggio<br>→ vittoria</th>
+    <th>RU: sconfitta<br>→ vittoria</th>
+
+    <th>Effetti decisivi<br>totali</th>
+    <th>% effetti decisivi<br>sui casi</th>
+
+    </tr>
+
+    </thead>
+
+    <tbody>
+
+    $($rowsHtml -join "`r`n")
+
+    </tbody>
+
+    </table>
+
+
+    <div class="notes">
+
+    <h2>Come leggere questa pagina</h2>
+
+    <p>
+    <strong>Giocare in 10</strong> significa che Fantacalcio Manager
+    ha registrato <strong>10 giocatori validi</strong> per quella squadra
+    nel campo <code>NGiocCasa</code> o <code>NGiocFuori</code>
+    della partita.
+    </p>
+
+    <p>
+    Questo è un dato registrato direttamente da FCM:
+    non viene ricostruito contando manualmente titolari,
+    riserve o voti.
+    </p>
+
+    <p>
+    <strong>In 10 senza RU</strong> significa che la squadra ha avuto
+    10 giocatori validi e non risulta alcuna Riserva d'Ufficio utilizzata.
+    </p>
+
+    <p>
+    <strong>In 10 nonostante almeno una RU</strong> è il caso più interessante:
+    la squadra ha già ricevuto uno o più voti d'ufficio,
+    ma FCM registra comunque soltanto 10 giocatori validi.
+    </p>
+
+    <p>
+    Le righe successive distinguono questi casi in base al numero
+    di RU utilizzate: una, due oppure più di due.
+    </p>
+
+    <p>
+    <strong>Vittorie, pareggi e sconfitte</strong> indicano il risultato
+    effettivamente ottenuto dalla squadra che ha giocato in 10.
+    </p>
+
+    <p>
+    Le tre colonne sull'effetto della RU indicano invece i casi nei quali
+    i punti forniti dalla Riserva d'Ufficio hanno modificato concretamente
+    l'esito della partita.
+    </p>
+
+    <p>
+    La riga <strong>9 o meno giocatori validi</strong> è tenuta separata:
+    non viene mescolata con i casi in cui la squadra ha giocato
+    esattamente in 10.
+    </p>
+
+    <p>
+    La competizione <strong>Youth League</strong> viene esclususa
+    dall'analisi.
+    </p>
+
+    </div>
+
+    </body>
+
+    </html>
+    "@
+
+    Set-Content `
+        -Path $html `
+        -Value $htmlContent `
+        -Encoding UTF8
+
+
+    # ============================================================
+    # CONSOLE
+    # ============================================================
+
+    Write-Host ""
+    Write-Host "=== SQUADRE IN 10 - REPORT STORICO ==="
+    Write-Host ""
+
+    Write-Host "Partite storiche                  : $totalMatches"
+    Write-Host "Partite con almeno una squadra in 10: $in10Matches"
+    Write-Host "Percentuale                       : $in10Pct %"
+    Write-Host "Prestazioni di squadra in 10      : $($in10.Count)"
+    Write-Host "In 10 senza RU                    : $($in10SenzaRU.Count)"
+    Write-Host "In 10 con almeno una RU           : $($in10ConRU.Count)"
+    Write-Host "  - con 1 RU                      : $($in10Con1RU.Count)"
+    Write-Host "  - con 2 RU                      : $($in10Con2RU.Count)"
+    Write-Host "  - con più di 2 RU               : $($in10ConPiu2RU.Count)"
+    Write-Host "Prestazioni con 9 o meno          : $($sotto10.Count)"
+    Write-Host ""
+
+    $summary | Format-Table -AutoSize
+
+    Write-Host ""
+    Write-Host "CSV : $csv"
+    Write-Host "HTML: $html"
+    Write-Host ""
+
+## tools\Report-RU-Storico-Personale.ps1
+
+File: tools\Report-RU-Storico-Personale.ps1
+
+    param(
+        [string]$RecordsNextRoot = "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2"
+    )
+
+    $ErrorActionPreference = "Stop"
+
+    # ============================================================
+    # CONFIGURAZIONE
+    # ============================================================
+
+    $CompetizioniEscluse = @(
+        "Youth League"
+    )
+
+    $reportsRoot   = Join-Path $RecordsNextRoot "data\reports"
+    $ruArchiveRoot = Join-Path $RecordsNextRoot "data\records-archive\riserveufficio"
+    $outputDir     = Join-Path $RecordsNextRoot "data\personal-reports"
+
+    if (-not (Test-Path $reportsRoot)) {
+        throw "Cartella reports non trovata: $reportsRoot"
+    }
+
+    if (-not (Test-Path $ruArchiveRoot)) {
+        throw "Archivio RU non trovato: $ruArchiveRoot"
+    }
+
+    New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
+
+
+    # ============================================================
+    # FUNZIONI BASE
+    # ============================================================
+
+    function Get-Prop {
+        param(
+            $Object,
+            [string]$Name
+        )
+
+        if ($null -eq $Object) {
+            return $null
+        }
+
+        $p = $Object.PSObject.Properties[$Name]
+
+        if ($null -eq $p) {
+            return $null
+        }
+
+        return $p.Value
+    }
+
+
+    function Get-Number {
+        param($Value)
+
+        if ($null -eq $Value) {
+            return 0.0
+        }
+
+        $text = ([string]$Value).Trim()
+
+        if ([string]::IsNullOrWhiteSpace($text)) {
+            return 0.0
+        }
+
+        $text = $text.Replace(",", ".")
+
+        $number = 0.0
+
+        if (
+            [double]::TryParse(
+                $text,
+                [Globalization.NumberStyles]::Any,
+                [Globalization.CultureInfo]::InvariantCulture,
+                [ref]$number
+            )
+        ) {
+            return $number
+        }
+
+        return 0.0
+    }
+
+
+    function Get-Percent {
+        param(
+            [double]$Numerator,
+            [double]$Denominator,
+            [int]$Decimals = 2
+        )
+
+        if ($Denominator -le 0) {
+            return 0
+        }
+
+        return [math]::Round(
+            ($Numerator / $Denominator) * 100,
+            $Decimals
+        )
+    }
+
+
+    function Canonical-Competition {
+        param(
+            [string]$Value
+        )
+
+        if ([string]::IsNullOrWhiteSpace($Value)) {
+            return ""
+        }
+
+        return (
+            $Value.ToLowerInvariant() -replace '[^a-z0-9]', ''
+        )
+    }
+
+
+    function Get-CompetitionFromFile {
+        param(
+            [System.IO.FileInfo]$File
+        )
+
+        $name = $File.BaseName
+
+        if ($name -match '^season_normalized_(.+)$') {
+            return $Matches[1].Replace("_", " ")
+        }
+
+        return $name
+    }
+
+
+    function Is-ExcludedCompetition {
+        param(
+            [string]$Competition
+        )
+
+        $canonical = Canonical-Competition $Competition
+
+        foreach ($excluded in $CompetizioniEscluse) {
+
+            if (
+                $canonical -eq
+                (Canonical-Competition $excluded)
+            ) {
+                return $true
+            }
+        }
+
+        return $false
+    }
+
+
+    function Normalize-Effect {
+        param($Effect)
+
+        $text = ([string]$Effect).Trim().ToUpperInvariant()
+
+        if ([string]::IsNullOrWhiteSpace($text)) {
+            return "NESSUN_EFFETTO"
+        }
+
+        if ($text -match "SCONFITTA.*PAREGGIO") {
+            return "SCONFITTA_PAREGGIO"
+        }
+
+        if ($text -match "PAREGGIO.*VITTORIA") {
+            return "PAREGGIO_VITTORIA"
+        }
+
+        if ($text -match "SCONFITTA.*VITTORIA") {
+            return "SCONFITTA_VITTORIA"
+        }
+
+        return "NESSUN_EFFETTO"
+    }
+
+
+    function Is-KeeperRU {
+        param($Row)
+
+        $tipo  = ([string]$Row.TipoRU).Trim().ToUpperInvariant()
+        $ruolo = ([string]$Row.RuoloRU).Trim().ToUpperInvariant()
+
+        if ($tipo -eq "PU") {
+            return $true
+        }
+
+        if ($ruolo -eq "P") {
+            return $true
+        }
+
+        if ($ruolo -eq "PU") {
+            return $true
+        }
+
+        if ($ruolo -eq "PORTIERE") {
+            return $true
+        }
+
+        return $false
+    }
+
+
+    # ============================================================
+    # LETTURA DEI FILE NORMALIZZATI
+    # ============================================================
+
+    $allMatches = @{}
+    $allRu = New-Object System.Collections.Generic.List[object]
+
+    $normalizedFiles = @(
+        Get-ChildItem `
+            $reportsRoot `
+            -Recurse `
+            -File `
+            -Filter "season_normalized_*.json"
+    )
+
+    foreach ($file in $normalizedFiles) {
+
+        $season = Split-Path $file.DirectoryName -Leaf
+
+        $fileCompetition = Get-CompetitionFromFile $file
+
+        if (Is-ExcludedCompetition $fileCompetition) {
+            continue
+        }
+
+        $doc = Get-Content `
+            $file.FullName `
+            -Raw `
+            -Encoding UTF8 |
+            ConvertFrom-Json
+
+
+        # --------------------------------------------------------
+        # PARTITE TOTALI
+        # --------------------------------------------------------
+
+        foreach ($row in @(Get-Prop $doc "partiteSquadra")) {
+
+            if ($null -eq $row) {
+                continue
+            }
+
+            $competition = [string](Get-Prop $row "competizione")
+
+            if ([string]::IsNullOrWhiteSpace($competition)) {
+                $competition = $fileCompetition
+            }
+
+            if (Is-ExcludedCompetition $competition) {
+                continue
+            }
+
+            $idMatch = [string](Get-Prop $row "idIncontro")
+
+            if ([string]::IsNullOrWhiteSpace($idMatch)) {
+                $idMatch = [string](Get-Prop $row "sourceMatchId")
+            }
+
+            if ([string]::IsNullOrWhiteSpace($idMatch)) {
+                continue
+            }
+
+            $competitionKey = Canonical-Competition $competition
+
+            $matchKey = "$season|$competitionKey|$idMatch"
+
+            $allMatches[$matchKey] = $true
+        }
+
+
+        # --------------------------------------------------------
+        # RISERVE D'UFFICIO
+        # --------------------------------------------------------
+
+        foreach ($row in @(Get-Prop $doc "riserveUfficioDettaglio")) {
+
+            if ($null -eq $row) {
+                continue
+            }
+
+            $competition = [string](Get-Prop $row "competizione")
+
+            if ([string]::IsNullOrWhiteSpace($competition)) {
+                $competition = $fileCompetition
+            }
+
+            if (Is-ExcludedCompetition $competition) {
+                continue
+            }
+
+            $idMatch = [string](Get-Prop $row "idIncontro")
+            $idTeam  = [string](Get-Prop $row "idSquadra")
+
+            if (
+                [string]::IsNullOrWhiteSpace($idMatch) -or
+                [string]::IsNullOrWhiteSpace($idTeam)
+            ) {
+                continue
+            }
+
+            $allRu.Add(
+                [pscustomobject]@{
+                    Stagione       = $season
+                    Competizione   = $competition
+                    CompetizioneKey = Canonical-Competition $competition
+                    IdIncontro     = $idMatch
+                    IdSquadra      = $idTeam
+                    Squadra        = [string](Get-Prop $row "squadra")
+                    TipoRU         = [string](Get-Prop $row "tipoRU")
+                    RuoloRU        = [string](Get-Prop $row "ruoloRU")
+                    ValoreRU       = Get-Number (Get-Prop $row "valoreRU")
+                }
+            )
+        }
+    }
+
+
+    # ============================================================
+    # EFFETTI DELLE RU
+    # ============================================================
+
+    $effectsExact = @{}
+    $effectsFallback = @{}
+
+    $ruArchiveFiles = @(
+        Get-ChildItem `
+            $ruArchiveRoot `
+            -Recurse `
+            -File `
+            -Filter "riserveufficio.json"
+    )
+
+    foreach ($file in $ruArchiveFiles) {
+
+        $season = Split-Path $file.DirectoryName -Leaf
+
+        $doc = Get-Content `
+            $file.FullName `
+            -Raw `
+            -Encoding UTF8 |
+            ConvertFrom-Json
+
+        $views = Get-Prop $doc "views"
+
+        if ($null -eq $views) {
+            continue
+        }
+
+        foreach ($row in @(Get-Prop $views "ruDecisiva")) {
+
+            if ($null -eq $row) {
+                continue
+            }
+
+            $competition = [string](Get-Prop $row "competizione")
+
+            if (Is-ExcludedCompetition $competition) {
+                continue
+            }
+
+            $idMatch = [string](Get-Prop $row "idIncontro")
+            $idTeam  = [string](Get-Prop $row "idSquadra")
+
+            if (
+                [string]::IsNullOrWhiteSpace($idMatch) -or
+                [string]::IsNullOrWhiteSpace($idTeam)
+            ) {
+                continue
+            }
+
+            $effect = Normalize-Effect (Get-Prop $row "effetto")
+
+            if ($effect -eq "NESSUN_EFFETTO") {
+                continue
+            }
+
+            $competitionKey = Canonical-Competition $competition
+
+            if (-not [string]::IsNullOrWhiteSpace($competitionKey)) {
+
+                $exactKey =
+                    "$season|$competitionKey|$idMatch|$idTeam"
+
+                $effectsExact[$exactKey] = $effect
+            }
+
+            $fallbackKey =
+                "$season|$idMatch|$idTeam"
+
+            if (-not $effectsFallback.ContainsKey($fallbackKey)) {
+                $effectsFallback[$fallbackKey] = $effect
+            }
+        }
+    }
+
+
+    function Get-EffectForTeamMatch {
+        param(
+            $Row
+        )
+
+        $exactKey =
+            "$($Row.Stagione)|$($Row.CompetizioneKey)|$($Row.IdIncontro)|$($Row.IdSquadra)"
+
+        if ($effectsExact.ContainsKey($exactKey)) {
+            return $effectsExact[$exactKey]
+        }
+
+        $fallbackKey =
+            "$($Row.Stagione)|$($Row.IdIncontro)|$($Row.IdSquadra)"
+
+        if ($effectsFallback.ContainsKey($fallbackKey)) {
+            return $effectsFallback[$fallbackKey]
+        }
+
+        return "NESSUN_EFFETTO"
+    }
+
+
+    # ============================================================
+    # TOTALI GENERALI
+    # ============================================================
+
+    $totalMatches = $allMatches.Count
+
+    $teamMatchGroups = @(
+        $allRu |
+            Group-Object `
+                Stagione,
+                CompetizioneKey,
+                IdIncontro,
+                IdSquadra
+    )
+
+    $ruMatchGroups = @(
+        $allRu |
+            Group-Object `
+                Stagione,
+                CompetizioneKey,
+                IdIncontro
+    )
+
+    $totalRuOccurrences = $allRu.Count
+    $totalRuTeamMatches  = $teamMatchGroups.Count
+    $totalRuMatches      = $ruMatchGroups.Count
+
+
+    # ============================================================
+    # FUNZIONE STATISTICHE EFFETTI
+    # ============================================================
+
+    function Get-EffectCounts {
+        param(
+            [object[]]$Groups
+        )
+
+        $counts = @{
+            SCONFITTA_PAREGGIO = 0
+            PAREGGIO_VITTORIA  = 0
+            SCONFITTA_VITTORIA = 0
+            NESSUN_EFFETTO     = 0
+        }
+
+        foreach ($group in $Groups) {
+
+            $first = $group.Group[0]
+
+            $effect = Get-EffectForTeamMatch $first
+
+            $counts[$effect]++
+        }
+
+        return $counts
+    }
+
+
+    # ============================================================
+    # RIGA: ALMENO UNA RU
+    # ============================================================
+
+    $allRuEffects = Get-EffectCounts $teamMatchGroups
+
+    $allRuDecisive =
+        $allRuEffects["SCONFITTA_PAREGGIO"] +
+        $allRuEffects["PAREGGIO_VITTORIA"] +
+        $allRuEffects["SCONFITTA_VITTORIA"]
+
+
+    # ============================================================
+    # FUNZIONE MULTI-RU
+    # ============================================================
+
+    function Get-GroupStats {
+        param(
+            [object[]]$Groups,
+            [string]$Title
+        )
+
+        $matches = @{}
+
+        foreach ($group in $Groups) {
+
+            $first = $group.Group[0]
+
+            $key =
+                "$($first.Stagione)|$($first.CompetizioneKey)|$($first.IdIncontro)"
+
+            $matches[$key] = $true
+        }
+
+        $counts = Get-EffectCounts $Groups
+
+        $teamMatchCount = $Groups.Count
+        $matchCount = $matches.Count
+
+        $decisive =
+            $counts["SCONFITTA_PAREGGIO"] +
+            $counts["PAREGGIO_VITTORIA"] +
+            $counts["SCONFITTA_VITTORIA"]
+
+        return [pscustomobject]@{
+
+            Categoria = $Title
+
+            SquadrePartita = $teamMatchCount
+
+            OccorrenzeRU = (
+                $Groups |
+                ForEach-Object {
+                    $_.Count
+                } |
+                Measure-Object -Sum
+            ).Sum
+
+            PartiteDistinte = $matchCount
+
+            PercentualePartite =
+                Get-Percent $matchCount $totalMatches 2
+
+            SconfittaPareggio =
+                $counts["SCONFITTA_PAREGGIO"]
+
+            PctSconfittaPareggio =
+                Get-Percent `
+                    $counts["SCONFITTA_PAREGGIO"] `
+                    $teamMatchCount
+
+            PareggioVittoria =
+                $counts["PAREGGIO_VITTORIA"]
+
+            PctPareggioVittoria =
+                Get-Percent `
+                    $counts["PAREGGIO_VITTORIA"] `
+                    $teamMatchCount
+
+            SconfittaVittoria =
+                $counts["SCONFITTA_VITTORIA"]
+
+            PctSconfittaVittoria =
+                Get-Percent `
+                    $counts["SCONFITTA_VITTORIA"] `
+                    $teamMatchCount
+
+            TotaleDecisive = $decisive
+
+            PctDecisive =
+                Get-Percent `
+                    $decisive `
+                    $teamMatchCount
+        }
+    }
+
+
+    # ============================================================
+    # FUNZIONE TIPO/VALORE RU
+    # ============================================================
+
+    function Get-RuValueStats {
+        param(
+            [object[]]$Rows,
+            [string]$Title
+        )
+
+        $teamGroups = @(
+            $Rows |
+                Group-Object `
+                    Stagione,
+                    CompetizioneKey,
+                    IdIncontro,
+                    IdSquadra
+        )
+
+        $matchGroups = @(
+            $Rows |
+                Group-Object `
+                    Stagione,
+                    CompetizioneKey,
+                    IdIncontro
+        )
+
+        $counts = Get-EffectCounts $teamGroups
+
+        $teamMatchCount = $teamGroups.Count
+        $matchCount = $matchGroups.Count
+
+        $decisive =
+            $counts["SCONFITTA_PAREGGIO"] +
+            $counts["PAREGGIO_VITTORIA"] +
+            $counts["SCONFITTA_VITTORIA"]
+
+        return [pscustomobject]@{
+
+            Categoria = $Title
+
+            SquadrePartita = $teamMatchCount
+
+            OccorrenzeRU = $Rows.Count
+
+            PartiteDistinte = $matchCount
+
+            PercentualePartite =
+                Get-Percent $matchCount $totalMatches 2
+
+            SconfittaPareggio =
+                $counts["SCONFITTA_PAREGGIO"]
+
+            PctSconfittaPareggio =
+                Get-Percent `
+                    $counts["SCONFITTA_PAREGGIO"] `
+                    $teamMatchCount
+
+            PareggioVittoria =
+                $counts["PAREGGIO_VITTORIA"]
+
+            PctPareggioVittoria =
+                Get-Percent `
+                    $counts["PAREGGIO_VITTORIA"] `
+                    $teamMatchCount
+
+            SconfittaVittoria =
+                $counts["SCONFITTA_VITTORIA"]
+
+            PctSconfittaVittoria =
+                Get-Percent `
+                    $counts["SCONFITTA_VITTORIA"] `
+                    $teamMatchCount
+
+            TotaleDecisive = $decisive
+
+            PctDecisive =
+                Get-Percent `
+                    $decisive `
+                    $teamMatchCount
+        }
+    }
+
+
+    # ============================================================
+    # CATEGORIE
+    # ============================================================
+
+    $groups2 = @(
+        $teamMatchGroups |
+            Where-Object {
+                $_.Count -eq 2
+            }
+    )
+
+    $groupsMore2 = @(
+        $teamMatchGroups |
+            Where-Object {
+                $_.Count -gt 2
+            }
+    )
+
+    $movement4 = @(
+        $allRu |
+            Where-Object {
+                -not (Is-KeeperRU $_) -and
+                $_.ValoreRU -eq 4
+            }
+    )
+
+    $movement3 = @(
+        $allRu |
+            Where-Object {
+                -not (Is-KeeperRU $_) -and
+                $_.ValoreRU -eq 3
+            }
+    )
+
+    $keeper3 = @(
+        $allRu |
+            Where-Object {
+                (Is-KeeperRU $_) -and
+                $_.ValoreRU -eq 3
+            }
+    )
+
+    $keeper2 = @(
+        $allRu |
+            Where-Object {
+                (Is-KeeperRU $_) -and
+                $_.ValoreRU -eq 2
+            }
+    )
+
+
+    # ============================================================
+    # RIEPILOGO
+    # ============================================================
+
+    $summary = @()
+
+    $summary += [pscustomobject]@{
+        Categoria = "TOTALE PARTITE STORICHE"
+        SquadrePartita = ""
+        OccorrenzeRU = ""
+        PartiteDistinte = $totalMatches
+        PercentualePartite = 100
+        SconfittaPareggio = ""
+        PctSconfittaPareggio = ""
+        PareggioVittoria = ""
+        PctPareggioVittoria = ""
+        SconfittaVittoria = ""
+        PctSconfittaVittoria = ""
+        TotaleDecisive = ""
+        PctDecisive = ""
+    }
+
+
+    $summary += [pscustomobject]@{
+
+        Categoria = "PARTITE CON ALMENO UNA RU"
+
+        SquadrePartita = $totalRuTeamMatches
+
+        OccorrenzeRU = $totalRuOccurrences
+
+        PartiteDistinte = $totalRuMatches
+
+        PercentualePartite =
+            Get-Percent $totalRuMatches $totalMatches 2
+
+        SconfittaPareggio =
+            $allRuEffects["SCONFITTA_PAREGGIO"]
+
+        PctSconfittaPareggio =
+            Get-Percent `
+                $allRuEffects["SCONFITTA_PAREGGIO"] `
+                $totalRuTeamMatches
+
+        PareggioVittoria =
+            $allRuEffects["PAREGGIO_VITTORIA"]
+
+        PctPareggioVittoria =
+            Get-Percent `
+                $allRuEffects["PAREGGIO_VITTORIA"] `
+                $totalRuTeamMatches
+
+        SconfittaVittoria =
+            $allRuEffects["SCONFITTA_VITTORIA"]
+
+        PctSconfittaVittoria =
+            Get-Percent `
+                $allRuEffects["SCONFITTA_VITTORIA"] `
+                $totalRuTeamMatches
+
+        TotaleDecisive = $allRuDecisive
+
+        PctDecisive =
+            Get-Percent `
+                $allRuDecisive `
+                $totalRuTeamMatches
+    }
+
+
+    $summary += Get-GroupStats `
+        $groups2 `
+        "ESATTAMENTE 2 RU NELLA STESSA SQUADRA"
+
+
+    $summary += Get-GroupStats `
+        $groupsMore2 `
+        "PIÙ DI 2 RU NELLA STESSA SQUADRA"
+
+
+    $summary += Get-RuValueStats `
+        $movement4 `
+        "ALMENO UNA RU DI MOVIMENTO DA 4 PUNTI"
+
+
+    $summary += Get-RuValueStats `
+        $movement3 `
+        "ALMENO UNA RU DI MOVIMENTO DA 3 PUNTI"
+
+
+    $summary += Get-RuValueStats `
+        $keeper3 `
+        "ALMENO UNA RU PORTIERE DA 3 PUNTI"
+
+
+    $summary += Get-RuValueStats `
+        $keeper2 `
+        "ALMENO UNA RU PORTIERE DA 2 PUNTI"
+
+
+    # ============================================================
+    # OUTPUT
+    # ============================================================
+
+    $csv  = Join-Path $outputDir "RU_statistiche_storiche.csv"
+    $txt  = Join-Path $outputDir "RU_statistiche_storiche.txt"
+    $html = Join-Path $outputDir "RU_statistiche_storiche.html"
+
+    $summary |
+        Export-Csv `
+            -Path $csv `
+            -Delimiter ";" `
+            -NoTypeInformation `
+            -Encoding UTF8
+
+    $summary |
+        Format-Table -AutoSize |
+        Out-String -Width 300 |
+        Set-Content `
+            -Path $txt `
+            -Encoding UTF8
+
+
+    # ============================================================
+    # HTML
+    # ============================================================
+
+    $ruMatchPct =
+        Get-Percent $totalRuMatches $totalMatches 2
+
+    $oneEvery = if ($totalRuMatches -gt 0) {
+        [math]::Round($totalMatches / $totalRuMatches, 1)
+    }
+    else {
+        0
+    }
+
+    $decisivePct =
+        Get-Percent $allRuDecisive $totalRuTeamMatches 2
+
+
+    $rowsHtml = foreach ($row in $summary) {
+
+        $categoria = [System.Net.WebUtility]::HtmlEncode(
+            [string]$row.Categoria
+        )
+
+    @"
+    <tr>
+        <td class="categoria">$categoria</td>
+
+        <td>$($row.SquadrePartita)</td>
+        <td>$($row.OccorrenzeRU)</td>
+        <td>$($row.PartiteDistinte)</td>
+        <td>$($row.PercentualePartite)%</td>
+
+        <td>$($row.SconfittaPareggio)</td>
+        <td>$($row.PctSconfittaPareggio)%</td>
+
+        <td>$($row.PareggioVittoria)</td>
+        <td>$($row.PctPareggioVittoria)%</td>
+
+        <td>$($row.SconfittaVittoria)</td>
+        <td>$($row.PctSconfittaVittoria)%</td>
+
+        <td class="decisive">$($row.TotaleDecisive)</td>
+        <td class="decisive">$($row.PctDecisive)%</td>
+    </tr>
+    "@
+    }
+
+
+    $htmlContent = @"
+    <!doctype html>
+
+    <html lang="it">
+
+    <head>
+
+    <meta charset="utf-8">
+
+    <title>Statistiche storiche Riserve d'Ufficio</title>
+
+    <style>
+
+    body {
+        font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+        margin: 20px;
+        background: #ffffff;
+        color: #111111;
+    }
+
+    h1 {
+        margin: 0 0 4px 0;
+        color: #003366;
+    }
+
+    h2 {
+        margin-top: 0;
+        color: #003366;
+    }
+
+    .subtitle {
+        margin-bottom: 20px;
+        color: #666666;
+    }
+
+    .box {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid #003366;
+        background: #f7f7f7;
+    }
+
+    .big {
+        font-size: 20px;
+        font-weight: bold;
+        color: #003366;
+    }
+
+    .highlight {
+        font-weight: bold;
+        color: #990000;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    th {
+        padding: 7px 5px;
+        border: 1px solid #003366;
+        background: #003366;
+        color: white;
+        text-align: center;
+    }
+
+    td {
+        padding: 6px 5px;
+        border: 1px solid #003366;
+        text-align: right;
+    }
+
+    tbody tr:nth-child(even) {
+        background: #ccffff;
+    }
+
+    td.categoria {
+        text-align: left;
+        font-weight: bold;
+        color: #003366;
+    }
+
+    td.decisive {
+        font-weight: bold;
+        color: #990000;
+    }
+
+    .spiegazioni {
+        margin-top: 22px;
+        line-height: 1.5;
+    }
+
+    .spiegazioni h2 {
+        margin-bottom: 8px;
+    }
+
+    .spiegazioni p {
+        margin: 7px 0;
+    }
+
+    </style>
+
+    </head>
+
+
+    <body>
+
+    <h1>Statistiche storiche Riserve d'Ufficio</h1>
+
+    <div class="subtitle">
+    RecordsNext 2.0 — report storico personale
+    </div>
+
+
+    <div class="box">
+
+    <h2>Quadro generale</h2>
+
+    <p>
+    Sono state analizzate
+    <span class="big">$totalMatches</span>
+    partite storiche.
+    </p>
+
+    <p>
+    In
+    <span class="big">$totalRuMatches</span>
+    partite è comparsa almeno una Riserva d'Ufficio.
+    </p>
+
+    <p>
+    Questo corrisponde al
+    <span class="big">$ruMatchPct%</span>
+    delle partite analizzate:
+    in media circa
+    <span class="big">1 partita ogni $oneEvery</span>
+    ha visto l'utilizzo di almeno una RU.
+    </p>
+
+    <p>
+    Le singole RU utilizzate complessivamente sono state
+    <strong>$totalRuOccurrences</strong>.
+    </p>
+
+    <p>
+    Le squadre che, considerate partita per partita,
+    hanno utilizzato almeno una RU sono state
+    <strong>$totalRuTeamMatches</strong>.
+    </p>
+
+    <p>
+    In
+    <span class="highlight">$allRuDecisive</span>
+    di queste situazioni la presenza delle RU
+    ha cambiato concretamente il risultato della squadra.
+    L'incidenza degli effetti decisivi è stata del
+    <span class="highlight">$decisivePct%</span>.
+    </p>
+
+    </div>
+
+
+    <table>
+
+    <thead>
+
+    <tr>
+
+    <th>Situazione</th>
+
+    <th>Volte in cui una squadra<br>si è trovata nel caso</th>
+
+    <th>Numero totale<br>di RU utilizzate</th>
+
+    <th>Partite<br>coinvolte</th>
+
+    <th>% di tutte<br>le partite</th>
+
+    <th>RU che ha evitato<br>una sconfitta</th>
+
+    <th>%</th>
+
+    <th>RU che ha trasformato<br>il pari in vittoria</th>
+
+    <th>%</th>
+
+    <th>RU che ha trasformato<br>la sconfitta in vittoria</th>
+
+    <th>%</th>
+
+    <th>Casi in cui la RU<br>ha cambiato il risultato</th>
+
+    <th>% dei casi<br>con RU</th>
+
+    </tr>
+
+    </thead>
+
+
+    <tbody>
+
+    $($rowsHtml -join "`r`n")
+
+    </tbody>
+
+    </table>
+
+
+    <div class="spiegazioni">
+
+    <h2>Come leggere i dati</h2>
+
+    <p>
+    <strong>Partite coinvolte</strong> conta ogni incontro una sola volta,
+    anche quando entrambe le squadre hanno utilizzato una Riserva d'Ufficio.
+    </p>
+
+    <p>
+    <strong>Volte in cui una squadra si è trovata nel caso</strong>
+    considera invece separatamente le due squadre.
+    Se nella stessa partita entrambe utilizzano una RU,
+    la partita conta una volta nelle "Partite coinvolte"
+    ma due volte in questa colonna.
+    </p>
+
+    <p>
+    <strong>Numero totale di RU utilizzate</strong>
+    conta le singole Riserve d'Ufficio.
+    Una squadra può utilizzare due o più RU nella stessa partita.
+    </p>
+
+    <p>
+    <strong>% di tutte le partite</strong>
+    indica quanto frequentemente quella situazione si è verificata
+    rispetto all'intero archivio storico.
+    </p>
+
+    <p>
+    <strong>RU che ha evitato una sconfitta</strong>
+    indica i casi nei quali, senza i punti forniti dalla RU,
+    la squadra avrebbe perso e invece ha pareggiato.
+    </p>
+
+    <p>
+    <strong>RU che ha trasformato il pari in vittoria</strong>
+    indica i casi nei quali, senza RU, la squadra avrebbe pareggiato,
+    mentre grazie alla RU ha vinto.
+    </p>
+
+    <p>
+    <strong>RU che ha trasformato la sconfitta in vittoria</strong>
+    indica i casi più estremi:
+    senza RU la squadra avrebbe perso,
+    mentre con la RU ha vinto.
+    </p>
+
+    <p>
+    <strong>Casi in cui la RU ha cambiato il risultato</strong>
+    è la somma dei tre effetti precedenti.
+    </p>
+
+    <p>
+    Per le righe relative a RU da 4, 3 o 2 punti,
+    una partita viene considerata quando la squadra ha utilizzato
+    <strong>almeno una RU di quel tipo</strong>.
+    </p>
+
+    <p>
+    Le competizioni indicate come escluse nella configurazione,
+    come <strong>Youth League</strong>,
+    non vengono considerate quando sono identificabili nei dati
+    o nel nome del file normalizzato.
+    </p>
+
+    </div>
+
+
+    </body>
+
+    </html>
+    "@
+
+
+    Set-Content `
+        -Path $html `
+        -Value $htmlContent `
+        -Encoding UTF8
+
+
+    # ============================================================
+    # CONSOLE
+    # ============================================================
+
+    Write-Host ""
+    Write-Host "=== REPORT RU STORICO ==="
+    Write-Host ""
+
+    Write-Host "Partite storiche             : $totalMatches"
+    Write-Host "Partite con almeno una RU    : $totalRuMatches"
+    Write-Host "Percentuale partite con RU   : $ruMatchPct %"
+    Write-Host "Una partita con RU ogni      : $oneEvery"
+    Write-Host "Squadre-partita con RU       : $totalRuTeamMatches"
+    Write-Host "Occorrenze RU totali         : $totalRuOccurrences"
+    Write-Host "Casi decisivi complessivi    : $allRuDecisive"
+    Write-Host "Incidenza effetti decisivi   : $decisivePct %"
+    Write-Host ""
+
+    $summary | Format-Table -AutoSize
+
+    Write-Host ""
+    Write-Host "CSV : $csv"
+    Write-Host "TXT : $txt"
+    Write-Host "HTML: $html"
+    Write-Host ""
 
 ## tools\Run-RecordsNext2JsAudit_v1.ps1
 
@@ -35244,6 +40330,7 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - src\main\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriter.java
 - src\main\java\it\alterlega\recordsnext\app\manifest\ManifestMetadata.java
 - src\main\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupport.java
+- src\main\java\it\alterlega\recordsnext\app\matches\MatchesJsExporter.java
 - src\main\java\it\alterlega\recordsnext\app\model\CoreRecordCatalog.java
 - src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluation.java
 - src\main\java\it\alterlega\recordsnext\app\model\DependencyEvaluator.java
@@ -35327,15 +40414,22 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - config\recordsnext-gui.properties
 - config\seasons.json
 - config\teams.json
+- tools\Aggiorna-RecordsNext-2.1.ps1
 - tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
 - tools\Audit-RecordsNext2Js.js
 - tools\Build_RecordsNext2_Release_v2.ps1
+- tools\Build_RecordsNext2_Release_v3.ps1
+- tools\Build_RecordsNext2_Update_v1.ps1
 - tools\Create-RecordsNext2RealJsZip.ps1
 - tools\Create-RecordsNext2WorkingCodeMd.ps1
 - tools\Initialize-RecordsNext2Project.ps1
 - tools\Install-RecordsNextVisualizzatori_v1.ps1
 - tools\Install-RecordsNextVisualizzatori_v2.ps1
 - tools\Prepare-RecordsNextVisualizzatoriPreview_v2.ps1
+- tools\Report_RU_5Sostituzioni_v6_1.ps1
+- tools\Report_RU_Storico_Completo_v8_4.ps1
+- tools\Report-RU-InDieci-Storico.ps1
+- tools\Report-RU-Storico-Personale.ps1
 - tools\Run-RecordsNext2JsAudit_v1.ps1
 - tools\Run-RecordsNext2JsAudit_v2.ps1
 - tools\Run-RecordsNext2JsAudit_v3.ps1
@@ -35357,14 +40451,3 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 
 ## Fine documento
-
-## Analisi personale RU
-
-Le diagnostiche private sull'impatto storico delle Riserve d'Ufficio,
-sulle squadre sotto 11 e sulla simulazione con 5 sostituzioni sono documentate
-separatamente in:
-
-`docs/ANALISI_PERSONALE_RU.md`
-
-Questa componente usa i dati RecordsNext ma non appartiene agli output pubblici
-del sito e non deve essere eliminata durante le operazioni di pulizia.

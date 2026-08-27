@@ -18,7 +18,7 @@ class ManifestPublishingSupportTest {
 
     @Test
     void manifestIncludesAlreadyGeneratedFilesAndItself() throws Exception {
-        Files.writeString(tempDir.resolve("records2026.recordstagionali.classic.js"), "window.TEST = {};\n");
+        Files.writeString(tempDir.resolve("fcmRecordsNext_Classics.js"), "window.TEST = {};\n");
 
         ProcessingOptions options = new ProcessingOptions(true, false, true, false);
         PipelinePreflight.Result preflight = PipelinePreflight.evaluate(options);
@@ -36,7 +36,7 @@ class ManifestPublishingSupportTest {
         Path manifest = ManifestPublishingSupport.write(tempDir, options, preflight, metadata);
         String js = Files.readString(manifest);
 
-        assertTrue(js.contains("records2026.recordstagionali.classic.js"));
+        assertTrue(js.contains("fcmRecordsNext_Classics.js"));
         assertTrue(js.contains("fcmRecordsNext_Manifest.js"));
         assertTrue(js.contains("window.fcmRecordsNextManifest"));
     }

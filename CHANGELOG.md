@@ -18,6 +18,13 @@ delle installazioni esistenti.
   frequenza storica della configurazione e impatto;
 - invariata la formula di calcolo e la classifica del Culometro.
 
+### Bonifica output legacy
+
+- rimossa dalla pubblicazione la famiglia di file `records2026.*` non piu consumata dal sito moderno;
+- `Records2026ClassicJsExporter` e `Records2026RuJsExporter` restano usati solo internamente dai wrapper RecordsNext per preservare la compatibilita dei dati;
+- `fcmRecordsNext_Classics.js` e `fcmRecordsNext_RU.js` verificati byte-per-byte invariati rispetto agli output 2.1 precedenti;
+- eliminati circa 28 MiB di output legacy per sito senza modifiche al frontend.
+
 ### Configurazione storica
 
 - dopo l'aggiunta di una stagione gestita, la finestra delle associazioni storiche

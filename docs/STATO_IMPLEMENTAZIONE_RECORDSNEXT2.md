@@ -1,6 +1,6 @@
 # Stato implementazione RecordsNext 2.1
 
-Aggiornamento: 26 agosto 2026.
+Aggiornamento: 27 agosto 2026.
 
 ## Stato release 2.1.0
 
@@ -26,6 +26,10 @@ Sono implementate e operative:
 - output Matches canonico;
 - manifest;
 - link ai tabellini storici.
+
+- stagione operativa corrente verificata: `2026_2027`;
+- sito corrente configurato: `E:\\fantacalcio\\Lega2026\\js`;
+- gli output legacy `records2026.*` non fanno piu parte della pubblicazione; gli exporter legacy Classici/RU restano solo come implementazione interna di compatibilita.
 
 Output pubblico corrente:
 
@@ -72,6 +76,8 @@ Ultimo stato verificato il 26 agosto 2026:
 - BUILD SUCCESS;
 - regressione reale su 20 stagioni completata;
 - generazione reale del sito FCM completata;
+- test di bonifica publisher sui dati operativi completato: 9 output moderni validati, 0 output `records2026.*`;
+- `fcmRecordsNext_Classics.js` e `fcmRecordsNext_RU.js` confrontati SHA-256/byte-per-byte con la staging 2.1: identici;
 - aggiornamento reale 2.0 -> 2.1 completato senza perdita di configurazione.
 
 ### Release

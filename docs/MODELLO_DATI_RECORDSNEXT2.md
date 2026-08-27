@@ -892,7 +892,7 @@ Ogni famiglia può omettere sezioni non pertinenti, ma deve rispettare lo schema
 - `seasonAggregates` derivati dagli archivi Classici consolidati 1.0.2;
 - stato `GENERATED_COMPLETE`.
 
-Durante la migrazione resta generato anche il file legacy `records2026.recordstagionali.classic.js`.
+Gli exporter legacy di Classici e Riserve d'Ufficio restano utilizzati internamente come sorgente di compatibilita, ma i file pubblici `records2026.*` non vengono piu generati ne pubblicati. Il contratto pubblico del sito resta costituito dagli output `fcmRecordsNext_*`.
 
 ## 34. Cartelle pubbliche
 
