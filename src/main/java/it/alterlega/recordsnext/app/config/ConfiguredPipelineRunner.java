@@ -61,7 +61,7 @@ public final class ConfiguredPipelineRunner {
                 : ProcessingMode.FULL;
         }
 
-        System.out.println("RecordsNext 2.0 - esecuzione configurata");
+        System.out.println("RecordsNext 3.0 - esecuzione configurata");
         System.out.println("Project root : " + projectRoot);
         System.out.println("Processing   : " + processingConfig);
         System.out.println(

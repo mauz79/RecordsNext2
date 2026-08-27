@@ -1,8 +1,8 @@
-# RecordsNext 2.1.0
+# RecordsNext 3.0.0
 
-**RecordsNext by mauz79** è un'applicazione per Fantacalcio Manager che legge gli archivi FCM/FCA, consolida i dati storici della lega e genera record e viste statistiche pubblicabili sul sito FCM.
+**RecordsNext by mauz79** Ã¨ un'applicazione per Fantacalcio Manager che legge gli archivi FCM/FCA, consolida i dati storici della lega e genera record e viste statistiche pubblicabili sul sito FCM.
 
-RecordsNext 2.1 prosegue la linea 2.x con output JavaScript più completi, maggiori informazioni di dettaglio per Serie e Culometro e un flusso più rapido per la configurazione delle nuove stagioni storiche.
+RecordsNext 2.1 prosegue la linea 2.x con output JavaScript piÃ¹ completi, maggiori informazioni di dettaglio per Serie e Culometro e un flusso piÃ¹ rapido per la configurazione delle nuove stagioni storiche.
 
 ## Requisiti
 
@@ -15,7 +15,7 @@ La distribuzione include **UCanAccess 2.0.9.5** e le dipendenze necessarie alla 
 
 ## Avvio rapido
 
-1. Estrarre l'intero archivio `RecordsNext_2.1.0.zip` in una cartella.
+1. Estrarre l'intero archivio `RecordsNext_3.0.0.zip` in una cartella.
 2. Avviare `RecordsNext.bat`.
 3. Aprire **Configurazione stagioni**.
 4. Configurare la lega e almeno una stagione gestita.
@@ -30,7 +30,7 @@ La distribuzione include **UCanAccess 2.0.9.5** e le dipendenze necessarie alla 
 
 ![Dashboard](docs/screenshots/01_dashboard.png)
 
-La Dashboard è il punto di ingresso principale. Mostra lo stato della configurazione e consente di accedere a configurazione stagioni, famiglie record, strumenti e diagnostica.
+La Dashboard Ã¨ il punto di ingresso principale. Mostra lo stato della configurazione e consente di accedere a configurazione stagioni, famiglie record, strumenti e diagnostica.
 
 ## Configurazione stagioni
 
@@ -62,7 +62,7 @@ Le stagioni prive di FCM possono essere mantenute come **MANUALI**: servono alla
 
 ![Associazioni competizioni](docs/screenshots/06_associazioni_competizioni.png)
 
-Le associazioni permettono di collegare nomi stagionali differenti alla stessa identità storica/canonica.
+Le associazioni permettono di collegare nomi stagionali differenti alla stessa identitÃ  storica/canonica.
 
 ## Famiglie di record
 
@@ -85,7 +85,7 @@ Le famiglie disponibili comprendono:
 
 ## Culometro
 
-Il **Culometro** è opzionale e viene generato soltanto quando viene esplicitamente abilitato.
+Il **Culometro** Ã¨ opzionale e viene generato soltanto quando viene esplicitamente abilitato.
 
 ![Generazione Culometro](docs/screenshots/14_culometro_generazione.png)
 
@@ -95,7 +95,7 @@ La configurazione permette di scegliere un profilo semplice oppure intervenire s
 
 ![Culometro - profilo semplice](docs/screenshots/15_culometro_profilo_semplice.png)
 
-Gli slider mostrano il fondoscala e il valore selezionato, così è immediato capire quanto il parametro è vicino al minimo o al massimo ammesso.
+Gli slider mostrano il fondoscala e il valore selezionato, cosÃ¬ Ã¨ immediato capire quanto il parametro Ã¨ vicino al minimo o al massimo ammesso.
 
 ### Parametri avanzati
 
@@ -111,17 +111,17 @@ Il viewer dispone anche della vista **Eventi**, con filtro dedicato per il tipo 
 
 ![Viewer Culometro](docs/screenshots/20_culometro_viewer_eventi.png)
 
-La spiegazione completa di normalizzazione, rarità, sovrapposizioni, pesi, soglie ed etichette è in:
+La spiegazione completa di normalizzazione, raritÃ , sovrapposizioni, pesi, soglie ed etichette Ã¨ in:
 
 **[docs/CULOMETRO.md](docs/CULOMETRO.md)**
 
-## Modalità di elaborazione
+## ModalitÃ  di elaborazione
 
 ### Consolidata
 
-È la modalità normale per l'aggiornamento durante la stagione.
+Ãˆ la modalitÃ  normale per l'aggiornamento durante la stagione.
 
-![Modalità consolidata](docs/screenshots/10_modalita_consolidata.png)
+![ModalitÃ  consolidata](docs/screenshots/10_modalita_consolidata.png)
 
 ### Completa
 
@@ -164,7 +164,7 @@ Il profilo `mauzstrom` usa **Trebuchet MS**.
 
 ## Tabellini
 
-Ogni stagione può essere associata a sito locale e sito online. Sono supportate pagine risultato `ris.htm`, `ris.html` e `ris.php` quando coerenti con il sito configurato.
+Ogni stagione puÃ² essere associata a sito locale e sito online. Sono supportate pagine risultato `ris.htm`, `ris.html` e `ris.php` quando coerenti con il sito configurato.
 
 ## Aggiornamento ordinario
 
@@ -177,12 +177,12 @@ Ogni stagione può essere associata a sito locale e sito online. Sono supportate
 
 ## Documentazione
 
-- `README.md` — panoramica illustrata
-- `INSTALL.txt` — installazione e primo avvio
-- `CHANGELOG.md` — contenuti della release
-- `docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md` — pubblicazione dei visualizzatori
-- `docs\CULOMETRO.md` — funzionamento e configurazione del Culometro
-- `docs\screenshots\` — schermate di riferimento
+- `README.md` â€” panoramica illustrata
+- `INSTALL.txt` â€” installazione e primo avvio
+- `CHANGELOG.md` â€” contenuti della release
+- `docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md` â€” pubblicazione dei visualizzatori
+- `docs\CULOMETRO.md` â€” funzionamento e configurazione del Culometro
+- `docs\screenshots\` â€” schermate di riferimento
 
 ## Autore
 

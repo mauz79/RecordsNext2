@@ -11,6 +11,7 @@ import it.alterlega.recordsnext.app.model.RecordFamily;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -18,15 +19,30 @@ import java.util.Set;
 
 public final class RecordsNextPipeline {
     private static final Set<RecordFamily> IMPLEMENTED_FAMILIES = Set.copyOf(
-            EnumSet.of(RecordFamily.CLASSICS, RecordFamily.SERIES, RecordFamily.RU, RecordFamily.MODIFIERS, RecordFamily.THRESHOLDS_LUCK)
+            EnumSet.of(
+                    RecordFamily.CLASSICS,
+                    RecordFamily.SERIES,
+                    RecordFamily.RU,
+                    RecordFamily.MODIFIERS,
+                    RecordFamily.THRESHOLDS_LUCK
+            )
     );
 
     public interface Listener {
         void phase(String text, int percent);
-        default void timing(String text) { phase("TEMPO " + text, -1); }
+
+        default void timing(String text) {
+            phase("TEMPO " + text, -1);
+        }
     }
 
-    public record Result(int classicEntries, int ruSeasons, int files, int published) {}
+    public record Result(
+            int classicEntries,
+            int ruSeasons,
+            int files,
+            int published
+    ) {
+    }
 
     public Result run(
             PipelineConfig c,
@@ -35,7 +51,9 @@ public final class RecordsNextPipeline {
             Listener l
     ) throws Exception {
         PipelinePreflight.Result preflight = preflight(o);
+
         l.phase(preflight.summary(), 2);
+
         for (String message : preflight.messages()) {
             l.phase("PREFLIGHT " + message, -1);
         }
@@ -43,50 +61,158 @@ public final class RecordsNextPipeline {
         validateImplementedFamilies(o);
 
         long totalStarted = System.nanoTime();
-        Path database = c.projectRoot().resolve("data/database/recordsnext.db").normalize();
-        RecordsNextPreparationService preparation = new RecordsNextPreparationService(
-                c.projectRoot(),
-                database
-        );
+
+        Path database = c.projectRoot()
+                .resolve("data/database/recordsnext.db")
+                .normalize();
+
+        RecordsNextPreparationService preparation =
+                new RecordsNextPreparationService(
+                        c.projectRoot(),
+                        database
+                );
 
         long preparationStarted = System.nanoTime();
-        List<String> changedSeasons = preparation.prepare(mode, c.seasons(), l);
-        l.timing("preparazione complessiva: " + elapsed(preparationStarted));
+
+        List<String> changedSeasons =
+                preparation.prepare(
+                        mode,
+                        c.seasons(),
+                        l
+                );
+
+        l.timing(
+                "preparazione complessiva: "
+                        + elapsed(preparationStarted)
+        );
+
+        /*
+         * Una stagione puo' risultare modificata/elaborata senza produrre
+         * alcun season_normalized_*.json.
+         *
+         * Caso reale:
+         * 2026_2027 e' correttamente la stagione corrente, ma prima della
+         * prima partita non esiste ancora alcuna competizione testa-a-testa
+         * elaborabile.
+         *
+         * In modalita' CONSOLIDATED questo NON deve essere considerato
+         * un errore e gli archivi storici gia' consolidati non devono
+         * essere ricostruiti.
+         */
+        List<String> reportSeasons = new ArrayList<>();
+
+        for (String season : changedSeasons) {
+            Path seasonReports = c.reports()
+                    .resolve(season)
+                    .normalize();
+
+            if (!Files.isDirectory(seasonReports)) {
+                continue;
+            }
+
+            try (var files = Files.list(seasonReports)) {
+                boolean hasNormalized = files.anyMatch(path -> {
+                    if (!Files.isRegularFile(path)) {
+                        return false;
+                    }
+
+                    String name = path.getFileName().toString();
+
+                    return name.startsWith("season_normalized_")
+                            && name.endsWith(".json");
+                });
+
+                if (hasNormalized) {
+                    reportSeasons.add(season);
+                }
+            }
+        }
 
         if (mode == ProcessingMode.FULL) {
-            l.phase("Pulizia archivi derivati delle stagioni gestite", 52);
+            l.phase(
+                    "Pulizia archivi derivati delle stagioni gestite",
+                    52
+            );
+
             for (String season : changedSeasons) {
-                deleteTree(c.classicArchive().resolve(season));
-                deleteTree(c.ruArchive().resolve(season));
+                deleteTree(
+                        c.classicArchive().resolve(season)
+                );
+
+                deleteTree(
+                        c.ruArchive().resolve(season)
+                );
             }
         }
 
         if (o.familyEnabled(RecordFamily.CLASSICS)) {
-            l.phase("Generazione record classici", 55);
-            long started = System.nanoTime();
-            SeasonRecordsArchiveBuilder.build(
-                    c.reports(),
-                    c.classicArchive(),
-                    changedSeasons
-            );
-            l.timing("record classici: " + elapsed(started));
+            if (reportSeasons.isEmpty()) {
+                l.phase(
+                        "Record classici invariati: nessun nuovo report normalizzato",
+                        55
+                );
+            } else {
+                l.phase(
+                        "Generazione record classici",
+                        55
+                );
+
+                long started = System.nanoTime();
+
+                SeasonRecordsArchiveBuilder.build(
+                        c.reports(),
+                        c.classicArchive(),
+                        reportSeasons
+                );
+
+                l.timing(
+                        "record classici: "
+                                + elapsed(started)
+                );
+            }
         }
 
         if (o.familyEnabled(RecordFamily.RU)) {
-            l.phase("Generazione riserve d'ufficio", 68);
-            long started = System.nanoTime();
-            RiserveUfficioArchiveBuilder.build(
-                    c.reports(),
-                    c.ruArchive(),
-                    changedSeasons
-            );
-            l.timing("riserve d'ufficio: " + elapsed(started));
+            if (reportSeasons.isEmpty()) {
+                l.phase(
+                        "Riserve d'ufficio invariate: nessun nuovo report normalizzato",
+                        68
+                );
+            } else {
+                l.phase(
+                        "Generazione riserve d'ufficio",
+                        68
+                );
+
+                long started = System.nanoTime();
+
+                RiserveUfficioArchiveBuilder.build(
+                        c.reports(),
+                        c.ruArchive(),
+                        reportSeasons
+                );
+
+                l.timing(
+                        "riserve d'ufficio: "
+                                + elapsed(started)
+                );
+            }
         }
 
         Result result;
+
         if (!o.generateJs()) {
-            l.phase("Archivi elaborati; generazione JavaScript non richiesta", 96);
-            result = new Result(0, 0, 0, 0);
+            l.phase(
+                    "Archivi elaborati; generazione JavaScript non richiesta",
+                    96
+            );
+
+            result = new Result(
+                    0,
+                    0,
+                    0,
+                    0
+            );
         } else {
             l.phase(
                     o.publish()
@@ -94,20 +220,27 @@ public final class RecordsNextPipeline {
                             : "Generazione JavaScript",
                     82
             );
+
             long started = System.nanoTime();
-            LeagueMetadata leagueMetadata = LeagueMetadataLoader.load(
-                    c.projectRoot().resolve("config/league.json")
-            );
-            ManifestMetadata manifestMetadata = new ManifestMetadata(
-                    "RecordsNext by mauz79",
-                    "2.1.0",
-                    "2.0",
-                    OffsetDateTime.now(),
-                    leagueMetadata.leagueId(),
-                    leagueMetadata.currentSeasonId(),
-                    c.seasons(),
-                    List.of()
-            );
+
+            LeagueMetadata leagueMetadata =
+                    LeagueMetadataLoader.load(
+                            c.projectRoot()
+                                    .resolve("config/league.json")
+                    );
+
+            ManifestMetadata manifestMetadata =
+                    new ManifestMetadata(
+                            "RecordsNext by mauz79",
+                            "3.0.0",
+                            "2.0",
+                            OffsetDateTime.now(),
+                            leagueMetadata.leagueId(),
+                            leagueMetadata.currentSeasonId(),
+                            c.seasons(),
+                            List.of()
+                    );
+
             var r = Records2026SitePublisher.run(
                     c.classicArchive(),
                     c.ruArchive(),
@@ -123,12 +256,16 @@ public final class RecordsNextPipeline {
                     leagueMetadata,
                     c.reports()
             );
+
             l.timing(
-                    (o.publish()
-                            ? "generazione e pubblicazione JavaScript: "
-                            : "generazione JavaScript: ")
+                    (
+                            o.publish()
+                                    ? "generazione e pubblicazione JavaScript: "
+                                    : "generazione JavaScript: "
+                    )
                             + elapsed(started)
             );
+
             result = new Result(
                     r.classicEntries(),
                     r.ruSeasons(),
@@ -137,27 +274,54 @@ public final class RecordsNextPipeline {
             );
         }
 
-        preparation.saveConsolidation(c.seasons());
-        l.timing("totale elaborazione: " + elapsed(totalStarted));
-        l.phase("Elaborazione completata e consolidamento aggiornato", 100);
+        preparation.saveConsolidation(
+                c.seasons()
+        );
+
+        l.timing(
+                "totale elaborazione: "
+                        + elapsed(totalStarted)
+        );
+
+        l.phase(
+                "Elaborazione completata e consolidamento aggiornato",
+                100
+        );
+
         return result;
     }
 
-    public PipelinePreflight.Result preflight(ProcessingOptions options) {
+    public PipelinePreflight.Result preflight(
+            ProcessingOptions options
+    ) {
         return PipelinePreflight.evaluate(options);
     }
 
-    public boolean hasConsolidation(PipelineConfig c) {
-        Path database = c.projectRoot().resolve("data/database/recordsnext.db").normalize();
+    public boolean hasConsolidation(
+            PipelineConfig c
+    ) {
+        Path database = c.projectRoot()
+                .resolve("data/database/recordsnext.db")
+                .normalize();
+
         return new RecordsNextPreparationService(
                 c.projectRoot(),
                 database
         ).hasConsolidation();
     }
 
-    static void validateImplementedFamilies(ProcessingOptions options) {
-        Set<RecordFamily> unsupported = EnumSet.copyOf(options.selection().enabledFamilies());
-        unsupported.removeAll(IMPLEMENTED_FAMILIES);
+    static void validateImplementedFamilies(
+            ProcessingOptions options
+    ) {
+        Set<RecordFamily> unsupported =
+                EnumSet.copyOf(
+                        options.selection().enabledFamilies()
+                );
+
+        unsupported.removeAll(
+                IMPLEMENTED_FAMILIES
+        );
+
         if (!unsupported.isEmpty()) {
             throw new IllegalArgumentException(
                     "Famiglie selezionate ma non ancora collegate alla pipeline 2.0: "
@@ -166,17 +330,35 @@ public final class RecordsNextPipeline {
         }
     }
 
-    private static void deleteTree(Path root) throws Exception {
-        if (!Files.exists(root)) return;
+    private static void deleteTree(
+            Path root
+    ) throws Exception {
+        if (!Files.exists(root)) {
+            return;
+        }
+
         try (var paths = Files.walk(root)) {
-            for (Path path : paths.sorted(java.util.Comparator.reverseOrder()).toList()) {
+            for (Path path :
+                    paths.sorted(
+                            java.util.Comparator.reverseOrder()
+                    ).toList()) {
+
                 Files.deleteIfExists(path);
             }
         }
     }
 
-    private static String elapsed(long started) {
-        double seconds = (System.nanoTime() - started) / 1_000_000_000.0;
-        return String.format(Locale.ROOT, "%.3f s", seconds);
+    private static String elapsed(
+            long started
+    ) {
+        double seconds =
+                (System.nanoTime() - started)
+                        / 1_000_000_000.0;
+
+        return String.format(
+                Locale.ROOT,
+                "%.3f s",
+                seconds
+        );
     }
 }

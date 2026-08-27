@@ -1,9 +1,48 @@
 # Changelog
 
-## RecordsNext 2.1.0 — 2026-08-26
+## RecordsNext 3.0.0 — 2026-08-28
+
+### Architettura dati stagionale
+
+- introdotti shard JavaScript separati per stagione per Classics, Series, RU, Modifiers, ThresholdsLuck, Culometro e Matches;
+- ogni stagione conserva i propri sette shard nella cartella `js/recordsnext-data` del relativo sito FCM;
+- il sito corrente mantiene gli stessi nomi pubblici `fcmRecordsNext_*.js`, ora trasformati in facade leggere;
+- API JavaScript pubblica e strutture dati esposte ai visualizzatori restano compatibili con RecordsNext 2.1;
+- caricamento locale e online degli shard basato sui percorsi configurati per ciascuna stagione, senza dipendenze specifiche da Altervista;
+- introdotta la disponibilita' progressiva locale/online delle stagioni storiche;
+- introdotto lo stato persistente `data/consolidation/recordsnext-shards.properties`;
+- aggiunta `SeasonShardAvailabilityCli` per la gestione della migrazione progressiva;
+- shard invariati non vengono riscritti;
+- una stagione corrente ancora senza partite testa-a-testa non genera shard vuoti ne' riferimenti a file inesistenti.
+
+### Elaborazione consolidata
+
+- la modalita' `CONSOLIDATED` aggiorna soltanto la stagione corrente quando storico e configurazione risultano invariati;
+- corretta la gestione di una nuova stagione senza `season_normalized_*.json`: Classic e RU restano invariati invece di terminare con errore;
+- validato il passaggio da circa 103 secondi in FULL a circa 5-6 secondi in CONSOLIDATED sul dataset operativo corrente.
+
+### Pubblicazione
+
+- restano pubblicati soltanto i 9 output moderni RecordsNext;
+- gli output pubblici legacy `records2026.*` non vengono piu' generati;
+- validata la distribuzione di 20 stagioni storiche, dal 2006_2007 al 2025_2026;
+- validati 140 shard complessivi, 7 per stagione;
+- tutti i singoli shard restano sotto 1 MiB nel dataset operativo validato;
+- le sette facade del sito corrente referenziano correttamente tutte le stagioni storiche abilitate;
+- corretta la rotta online della stagione 2022_2023 verso `/lega2022/`.
+
+### Versione
+
+- versione Maven 3.0.0;
+- manifest applicativo 3.0.0;
+- runner console identificato come RecordsNext 3.0;
+- Java 21 o superiore;
+- UCanAccess 2.0.9.5 invariato.
+
+## RecordsNext 2.1.0 â€” 2026-08-26
 
 Aggiornamento della linea RecordsNext 2.x orientato alla completezza degli output,
-alla parità dei dati disponibili sul sito e alla semplificazione dell'aggiornamento
+alla paritÃ  dei dati disponibili sul sito e alla semplificazione dell'aggiornamento
 delle installazioni esistenti.
 
 ### Output e dati
@@ -38,7 +77,7 @@ delle installazioni esistenti.
 - l'aggiornamento sostituisce soltanto programma e launcher;
 - configurazione, database, stagioni e associazioni storiche vengono conservati;
 - backup automatico di sicurezza prima della sostituzione;
-- aggiornamento 2.0 -> 2.1 verificato su un'installazione reale già configurata.
+- aggiornamento 2.0 -> 2.1 verificato su un'installazione reale giÃ  configurata.
 
 ### Release e runtime
 
@@ -60,11 +99,11 @@ delle installazioni esistenti.
 - aggiornamento reale 2.0 -> 2.1 verificato senza modifica di configurazione e database;
 - generazione del sito tramite il flusso reale FCM verificata con RecordsNext 2.1.
 
-## RecordsNext 2.0.0 — 2026-08-10
+## RecordsNext 2.0.0 â€” 2026-08-10
 
 Prima release stabile della nuova linea RecordsNext 2.0.
 
-### Novità principali
+### NovitÃ  principali
 
 - nuova GUI Swing dedicata `RecordsNext by mauz79`;
 - configurazione guidata di lega e stagioni;
@@ -72,7 +111,7 @@ Prima release stabile della nuova linea RecordsNext 2.0.
 - associazioni storiche/canoniche di squadre e competizioni;
 - lettura FCM/FCA tramite UCanAccess 2.0.9.5;
 - pipeline modulare per famiglie di record;
-- modalità di elaborazione Consolidata e Completa;
+- modalitÃ  di elaborazione Consolidata e Completa;
 - output JavaScript separati per famiglia;
 - pubblicazione verso il sito FCM;
 - visualizzatori HTML statici;
@@ -133,7 +172,7 @@ Prima release stabile della nuova linea RecordsNext 2.0.
 
 - build Maven completato con successo;
 - test automatici superati;
-- audit contratto checkbox → vista superato;
+- audit contratto checkbox â†’ vista superato;
 - audit semantici Classici, Serie, RU, Modificatori, Fattore Campo, Soglie/Fortuna e Culometro superati;
 - smoke test GUI e visualizzatori superato;
 - lettura FCM dalla distribuzione di prova verificata;
@@ -141,4 +180,4 @@ Prima release stabile della nuova linea RecordsNext 2.0.
 
 ### Note
 
-Le stringhe interne che citano RecordsNext 1.0.2 negli exporter indicano la provenienza/compatibilità degli archivi normalizzati e non la versione corrente del prodotto.
+Le stringhe interne che citano RecordsNext 1.0.2 negli exporter indicano la provenienza/compatibilitÃ  degli archivi normalizzati e non la versione corrente del prodotto.

@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-27 20:35:54 +02:00
+> Data generazione: 2026-08-28 01:53:50 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Stato consolidato RecordsNext 2.1.0 - 2026-08-27
@@ -126,11 +126,11 @@ Le sezioni successive includono documentazione e codice reale del progetto. Le i
 
 File: README.md
 
-    # RecordsNext 2.1.0
+    # RecordsNext 3.0.0
 
-    **RecordsNext by mauz79** è un'applicazione per Fantacalcio Manager che legge gli archivi FCM/FCA, consolida i dati storici della lega e genera record e viste statistiche pubblicabili sul sito FCM.
+    **RecordsNext by mauz79** Ã¨ un'applicazione per Fantacalcio Manager che legge gli archivi FCM/FCA, consolida i dati storici della lega e genera record e viste statistiche pubblicabili sul sito FCM.
 
-    RecordsNext 2.1 prosegue la linea 2.x con output JavaScript più completi, maggiori informazioni di dettaglio per Serie e Culometro e un flusso più rapido per la configurazione delle nuove stagioni storiche.
+    RecordsNext 2.1 prosegue la linea 2.x con output JavaScript piÃ¹ completi, maggiori informazioni di dettaglio per Serie e Culometro e un flusso piÃ¹ rapido per la configurazione delle nuove stagioni storiche.
 
     ## Requisiti
 
@@ -143,7 +143,7 @@ File: README.md
 
     ## Avvio rapido
 
-    1. Estrarre l'intero archivio `RecordsNext_2.1.0.zip` in una cartella.
+    1. Estrarre l'intero archivio `RecordsNext_3.0.0.zip` in una cartella.
     2. Avviare `RecordsNext.bat`.
     3. Aprire **Configurazione stagioni**.
     4. Configurare la lega e almeno una stagione gestita.
@@ -158,7 +158,7 @@ File: README.md
 
     ![Dashboard](docs/screenshots/01_dashboard.png)
 
-    La Dashboard è il punto di ingresso principale. Mostra lo stato della configurazione e consente di accedere a configurazione stagioni, famiglie record, strumenti e diagnostica.
+    La Dashboard Ã¨ il punto di ingresso principale. Mostra lo stato della configurazione e consente di accedere a configurazione stagioni, famiglie record, strumenti e diagnostica.
 
     ## Configurazione stagioni
 
@@ -190,7 +190,7 @@ File: README.md
 
     ![Associazioni competizioni](docs/screenshots/06_associazioni_competizioni.png)
 
-    Le associazioni permettono di collegare nomi stagionali differenti alla stessa identità storica/canonica.
+    Le associazioni permettono di collegare nomi stagionali differenti alla stessa identitÃ  storica/canonica.
 
     ## Famiglie di record
 
@@ -213,7 +213,7 @@ File: README.md
 
     ## Culometro
 
-    Il **Culometro** è opzionale e viene generato soltanto quando viene esplicitamente abilitato.
+    Il **Culometro** Ã¨ opzionale e viene generato soltanto quando viene esplicitamente abilitato.
 
     ![Generazione Culometro](docs/screenshots/14_culometro_generazione.png)
 
@@ -223,7 +223,7 @@ File: README.md
 
     ![Culometro - profilo semplice](docs/screenshots/15_culometro_profilo_semplice.png)
 
-    Gli slider mostrano il fondoscala e il valore selezionato, così è immediato capire quanto il parametro è vicino al minimo o al massimo ammesso.
+    Gli slider mostrano il fondoscala e il valore selezionato, cosÃ¬ Ã¨ immediato capire quanto il parametro Ã¨ vicino al minimo o al massimo ammesso.
 
     ### Parametri avanzati
 
@@ -239,17 +239,17 @@ File: README.md
 
     ![Viewer Culometro](docs/screenshots/20_culometro_viewer_eventi.png)
 
-    La spiegazione completa di normalizzazione, rarità, sovrapposizioni, pesi, soglie ed etichette è in:
+    La spiegazione completa di normalizzazione, raritÃ , sovrapposizioni, pesi, soglie ed etichette Ã¨ in:
 
     **[docs/CULOMETRO.md](docs/CULOMETRO.md)**
 
-    ## Modalità di elaborazione
+    ## ModalitÃ  di elaborazione
 
     ### Consolidata
 
-    È la modalità normale per l'aggiornamento durante la stagione.
+    Ãˆ la modalitÃ  normale per l'aggiornamento durante la stagione.
 
-    ![Modalità consolidata](docs/screenshots/10_modalita_consolidata.png)
+    ![ModalitÃ  consolidata](docs/screenshots/10_modalita_consolidata.png)
 
     ### Completa
 
@@ -292,7 +292,7 @@ File: README.md
 
     ## Tabellini
 
-    Ogni stagione può essere associata a sito locale e sito online. Sono supportate pagine risultato `ris.htm`, `ris.html` e `ris.php` quando coerenti con il sito configurato.
+    Ogni stagione puÃ² essere associata a sito locale e sito online. Sono supportate pagine risultato `ris.htm`, `ris.html` e `ris.php` quando coerenti con il sito configurato.
 
     ## Aggiornamento ordinario
 
@@ -305,12 +305,12 @@ File: README.md
 
     ## Documentazione
 
-    - `README.md` — panoramica illustrata
-    - `INSTALL.txt` — installazione e primo avvio
-    - `CHANGELOG.md` — contenuti della release
-    - `docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md` — pubblicazione dei visualizzatori
-    - `docs\CULOMETRO.md` — funzionamento e configurazione del Culometro
-    - `docs\screenshots\` — schermate di riferimento
+    - `README.md` â€” panoramica illustrata
+    - `INSTALL.txt` â€” installazione e primo avvio
+    - `CHANGELOG.md` â€” contenuti della release
+    - `docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md` â€” pubblicazione dei visualizzatori
+    - `docs\CULOMETRO.md` â€” funzionamento e configurazione del Culometro
+    - `docs\screenshots\` â€” schermate di riferimento
 
     ## Autore
 
@@ -2478,10 +2478,49 @@ File: CHANGELOG.md
 
     # Changelog
 
-    ## RecordsNext 2.1.0 — 2026-08-26
+    ## RecordsNext 3.0.0 — 2026-08-28
+
+    ### Architettura dati stagionale
+
+    - introdotti shard JavaScript separati per stagione per Classics, Series, RU, Modifiers, ThresholdsLuck, Culometro e Matches;
+    - ogni stagione conserva i propri sette shard nella cartella `js/recordsnext-data` del relativo sito FCM;
+    - il sito corrente mantiene gli stessi nomi pubblici `fcmRecordsNext_*.js`, ora trasformati in facade leggere;
+    - API JavaScript pubblica e strutture dati esposte ai visualizzatori restano compatibili con RecordsNext 2.1;
+    - caricamento locale e online degli shard basato sui percorsi configurati per ciascuna stagione, senza dipendenze specifiche da Altervista;
+    - introdotta la disponibilita' progressiva locale/online delle stagioni storiche;
+    - introdotto lo stato persistente `data/consolidation/recordsnext-shards.properties`;
+    - aggiunta `SeasonShardAvailabilityCli` per la gestione della migrazione progressiva;
+    - shard invariati non vengono riscritti;
+    - una stagione corrente ancora senza partite testa-a-testa non genera shard vuoti ne' riferimenti a file inesistenti.
+
+    ### Elaborazione consolidata
+
+    - la modalita' `CONSOLIDATED` aggiorna soltanto la stagione corrente quando storico e configurazione risultano invariati;
+    - corretta la gestione di una nuova stagione senza `season_normalized_*.json`: Classic e RU restano invariati invece di terminare con errore;
+    - validato il passaggio da circa 103 secondi in FULL a circa 5-6 secondi in CONSOLIDATED sul dataset operativo corrente.
+
+    ### Pubblicazione
+
+    - restano pubblicati soltanto i 9 output moderni RecordsNext;
+    - gli output pubblici legacy `records2026.*` non vengono piu' generati;
+    - validata la distribuzione di 20 stagioni storiche, dal 2006_2007 al 2025_2026;
+    - validati 140 shard complessivi, 7 per stagione;
+    - tutti i singoli shard restano sotto 1 MiB nel dataset operativo validato;
+    - le sette facade del sito corrente referenziano correttamente tutte le stagioni storiche abilitate;
+    - corretta la rotta online della stagione 2022_2023 verso `/lega2022/`.
+
+    ### Versione
+
+    - versione Maven 3.0.0;
+    - manifest applicativo 3.0.0;
+    - runner console identificato come RecordsNext 3.0;
+    - Java 21 o superiore;
+    - UCanAccess 2.0.9.5 invariato.
+
+    ## RecordsNext 2.1.0 â€” 2026-08-26
 
     Aggiornamento della linea RecordsNext 2.x orientato alla completezza degli output,
-    alla parità dei dati disponibili sul sito e alla semplificazione dell'aggiornamento
+    alla paritÃ  dei dati disponibili sul sito e alla semplificazione dell'aggiornamento
     delle installazioni esistenti.
 
     ### Output e dati
@@ -2516,7 +2555,7 @@ File: CHANGELOG.md
     - l'aggiornamento sostituisce soltanto programma e launcher;
     - configurazione, database, stagioni e associazioni storiche vengono conservati;
     - backup automatico di sicurezza prima della sostituzione;
-    - aggiornamento 2.0 -> 2.1 verificato su un'installazione reale già configurata.
+    - aggiornamento 2.0 -> 2.1 verificato su un'installazione reale giÃ  configurata.
 
     ### Release e runtime
 
@@ -2538,11 +2577,11 @@ File: CHANGELOG.md
     - aggiornamento reale 2.0 -> 2.1 verificato senza modifica di configurazione e database;
     - generazione del sito tramite il flusso reale FCM verificata con RecordsNext 2.1.
 
-    ## RecordsNext 2.0.0 — 2026-08-10
+    ## RecordsNext 2.0.0 â€” 2026-08-10
 
     Prima release stabile della nuova linea RecordsNext 2.0.
 
-    ### Novità principali
+    ### NovitÃ  principali
 
     - nuova GUI Swing dedicata `RecordsNext by mauz79`;
     - configurazione guidata di lega e stagioni;
@@ -2550,7 +2589,7 @@ File: CHANGELOG.md
     - associazioni storiche/canoniche di squadre e competizioni;
     - lettura FCM/FCA tramite UCanAccess 2.0.9.5;
     - pipeline modulare per famiglie di record;
-    - modalità di elaborazione Consolidata e Completa;
+    - modalitÃ  di elaborazione Consolidata e Completa;
     - output JavaScript separati per famiglia;
     - pubblicazione verso il sito FCM;
     - visualizzatori HTML statici;
@@ -2611,7 +2650,7 @@ File: CHANGELOG.md
 
     - build Maven completato con successo;
     - test automatici superati;
-    - audit contratto checkbox → vista superato;
+    - audit contratto checkbox â†’ vista superato;
     - audit semantici Classici, Serie, RU, Modificatori, Fattore Campo, Soglie/Fortuna e Culometro superati;
     - smoke test GUI e visualizzatori superato;
     - lettura FCM dalla distribuzione di prova verificata;
@@ -2619,7 +2658,7 @@ File: CHANGELOG.md
 
     ### Note
 
-    Le stringhe interne che citano RecordsNext 1.0.2 negli exporter indicano la provenienza/compatibilità degli archivi normalizzati e non la versione corrente del prodotto.
+    Le stringhe interne che citano RecordsNext 1.0.2 negli exporter indicano la provenienza/compatibilitÃ  degli archivi normalizzati e non la versione corrente del prodotto.
 
 ## File reali del progetto
 
@@ -2782,7 +2821,7 @@ File: src\main\java\it\alterlega\recordsnext\app\config\ConfiguredPipelineRunner
                     : ProcessingMode.FULL;
             }
 
-            System.out.println("RecordsNext 2.0 - esecuzione configurata");
+            System.out.println("RecordsNext 3.0 - esecuzione configurata");
             System.out.println("Project root : " + projectRoot);
             System.out.println("Processing   : " + processingConfig);
             System.out.println(
@@ -5870,6 +5909,553 @@ File: src\main\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
         }
     }
 
+## src\main\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisher.java
+
+File: src\main\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisher.java
+
+    package it.alterlega.recordsnext.app.output;
+
+    import java.io.IOException;
+    import java.io.InputStream;
+    import java.io.OutputStream;
+    import java.math.BigDecimal;
+    import java.nio.charset.StandardCharsets;
+    import java.nio.file.AtomicMoveNotSupportedException;
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.nio.file.StandardCopyOption;
+    import java.security.MessageDigest;
+    import java.security.NoSuchAlgorithmException;
+    import java.time.Instant;
+    import java.util.ArrayList;
+    import java.util.Comparator;
+    import java.util.LinkedHashMap;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.Objects;
+    import java.util.Properties;
+    import java.util.UUID;
+
+    /**
+     * Trasforma gli output cumulativi RecordsNext in facade compatibili e shard stagionali.
+     *
+     * <p>Ogni shard appartiene fisicamente al sito della propria stagione. Le facade conservano
+     * gli stessi nomi file e gli stessi globali pubblici usati dal frontend corrente. Gli shard
+     * vengono caricati come normali script, quindi non richiedono PHP, rewrite, CORS o API server.
+     *
+     * <p>La disponibilita' e' progressiva: la stagione anchor corrente e' sempre caricabile;
+     * le stagioni storiche entrano nelle facade online solo quando risultano esplicitamente
+     * abilitate nello stato persistente. In questo modo un sito nuovo puo' partire con la sola
+     * stagione corrente senza produrre richieste 404 verso siti storici non ancora pubblicati.
+     */
+    public final class SeasonFamilyShardPublisher {
+        public static final long DEFAULT_MAX_SHARD_BYTES = 1024L * 1024L;
+        public static final String DATA_DIR = "recordsnext-data";
+        public static final String STATE_FILE_NAME = "recordsnext-shards.properties";
+
+        private static final List<FamilySpec> FAMILIES = List.of(
+                new FamilySpec("Classics", "fcmRecordsNext_Classics.js", "window.fcmRecordsNextClassics",
+                        "stagione", List.of("seasonAggregates")),
+                new FamilySpec("Series", "fcmRecordsNext_Series.js", "window.fcmRecordsNextSeries",
+                        "stagione", List.of("seasonAggregates")),
+                new FamilySpec("RU", "fcmRecordsNext_RU.js", "window.fcmRecordsNextRU",
+                        "stagione", List.of("seasonAggregates")),
+                new FamilySpec("Modifiers", "fcmRecordsNext_Modifiers.js", "window.fcmRecordsNextModifiers",
+                        "stagione", List.of("seasonAggregates")),
+                new FamilySpec("ThresholdsLuck", "fcmRecordsNext_ThresholdsLuck.js", "window.fcmRecordsNextThresholdsLuck",
+                        "seasonId", List.of("events", "seasonAggregates")),
+                new FamilySpec("Culometro", "fcmRecordsNext_Culometro.js", "window.fcmRecordsNextCulometro",
+                        "seasonId", List.of("events", "ranking", "competitionRanking")),
+                new FamilySpec("Matches", "fcmRecordsNext_Matches.js", "window.fcmRecordsNextMatches",
+                        "seasonId", List.of("matches"))
+        );
+
+        private SeasonFamilyShardPublisher() {}
+
+        public static Plan prepare(Path generatedDir, Path shardStagingRoot) throws IOException {
+            Path transientState = shardStagingRoot.resolve(STATE_FILE_NAME);
+            return prepare(generatedDir, shardStagingRoot, transientState, DEFAULT_MAX_SHARD_BYTES);
+        }
+
+        public static Plan prepare(Path generatedDir, Path shardStagingRoot, Path stateFile) throws IOException {
+            return prepare(generatedDir, shardStagingRoot, stateFile, DEFAULT_MAX_SHARD_BYTES);
+        }
+
+        public static Plan prepare(Path generatedDir, Path shardStagingRoot, Path stateFile, long maxShardBytes)
+                throws IOException {
+            Objects.requireNonNull(generatedDir, "generatedDir");
+            Objects.requireNonNull(shardStagingRoot, "shardStagingRoot");
+            Objects.requireNonNull(stateFile, "stateFile");
+            if (maxShardBytes < 1) throw new IllegalArgumentException("maxShardBytes deve essere positivo");
+
+            Path coreFile = generatedDir.resolve("fcmRecordsNext_Core.js");
+            if (!Files.isRegularFile(coreFile)) {
+                throw new IOException("Core richiesto per la distribuzione stagionale: " + coreFile);
+            }
+            Assignment core = readAssignment(coreFile, "window.fcmRecordsNextCore");
+            Map<String, SeasonRoute> routes = readRoutes(core.root());
+            String anchorSeasonId = routes.values().stream()
+                    .filter(SeasonRoute::anchor)
+                    .map(SeasonRoute::seasonId)
+                    .findFirst()
+                    .orElseThrow(() -> new IOException("Core senza stagione anchor"));
+            ShardState state = ShardState.load(stateFile);
+            Files.createDirectories(shardStagingRoot);
+
+            List<Shard> shards = new ArrayList<>();
+            List<Path> facades = new ArrayList<>();
+            for (FamilySpec spec : FAMILIES) {
+                Path familyFile = generatedDir.resolve(spec.fileName());
+                if (!Files.isRegularFile(familyFile)) continue;
+                Assignment assignment = readAssignment(familyFile, spec.globalName());
+                Map<String, Object> root = assignment.root();
+                Map<String, Object> facadeRoot = deepCopyMap(root);
+                for (String field : spec.shardedFields()) facadeRoot.put(field, new ArrayList<>());
+
+                Map<String, Map<String, List<Object>>> bySeason = splitBySeason(root, spec);
+                for (Map.Entry<String, Map<String, List<Object>>> entry : bySeason.entrySet()) {
+                    String seasonId = entry.getKey();
+                    SeasonRoute route = routes.get(seasonId);
+                    if (route == null) {
+                        throw new IOException("Nessun percorso sito nel Core per la stagione " + seasonId
+                                + " richiesta da " + spec.fileName());
+                    }
+                    String shardName = "fcmRecordsNext_" + spec.id() + "." + seasonId + ".js";
+                    Path staged = shardStagingRoot.resolve(seasonId).resolve(DATA_DIR).resolve(shardName);
+                    Files.createDirectories(staged.getParent());
+                    String shardJs = renderShard(spec, entry.getValue());
+                    Files.writeString(staged, shardJs, StandardCharsets.UTF_8);
+                    long bytes = Files.size(staged);
+                    if (bytes >= maxShardBytes) {
+                        throw new IOException("Shard oltre il limite di " + maxShardBytes + " byte: "
+                                + staged.getFileName() + " = " + bytes);
+                    }
+                    Path target = route.localSitePath() == null ? null
+                            : route.localSitePath().resolve("js").resolve(DATA_DIR).resolve(shardName);
+                    String onlineUrl = route.onlineSiteUrl() == null ? null
+                            : joinUrl(route.onlineSiteUrl(), "js/" + DATA_DIR + "/" + shardName);
+                    String localUrl = target == null ? null : target.toUri().toString();
+                    boolean current = seasonId.equals(anchorSeasonId);
+                    boolean localActive = current || state.localEnabled(seasonId)
+                            || (target != null && Files.isRegularFile(target));
+                    boolean onlineActive = current || state.onlineEnabled(seasonId);
+                    shards.add(new Shard(spec.id(), seasonId, staged, target, onlineUrl, localUrl, bytes,
+                            sha256(staged), current, localActive, onlineActive));
+                }
+
+                String facadeJs = renderFacade(spec, facadeRoot, shardsForFamily(shards, spec.id()));
+                Files.writeString(familyFile, facadeJs, StandardCharsets.UTF_8);
+                facades.add(familyFile);
+            }
+            return new Plan(List.copyOf(shards), List.copyOf(facades), anchorSeasonId, stateFile);
+        }
+
+        /**
+         * Pubblica solo shard attivi localmente. La stagione corrente e' sempre attiva; una storica
+         * viene attivata quando era gia' presente o quando lo stato la abilita esplicitamente.
+         */
+        public static PublishStats publishShards(Plan plan) throws IOException {
+            ShardState state = ShardState.load(plan.stateFile());
+            int written = 0;
+            int unchanged = 0;
+            int skippedUnavailable = 0;
+            for (Shard shard : plan.shards()) {
+                if (!shard.localActive() || shard.target() == null) {
+                    skippedUnavailable++;
+                    continue;
+                }
+                Path siteRoot = shard.target().getParent().getParent().getParent();
+                if (!shard.currentSeason() && !Files.isDirectory(siteRoot)) {
+                    skippedUnavailable++;
+                    continue;
+                }
+                Files.createDirectories(shard.target().getParent());
+                String stateHash = state.fingerprint(shard.familyId(), shard.seasonId());
+                if (Files.isRegularFile(shard.target())
+                        && shard.sha256().equals(stateHash)
+                        && Files.mismatch(shard.stagedFile(), shard.target()) == -1L) {
+                    unchanged++;
+                } else if (Files.isRegularFile(shard.target())
+                        && Files.mismatch(shard.stagedFile(), shard.target()) == -1L) {
+                    unchanged++;
+                } else {
+                    Path temp = shard.target().resolveSibling("." + shard.target().getFileName()
+                            + ".recordsnext-" + UUID.randomUUID() + ".tmp");
+                    Files.copy(shard.stagedFile(), temp, StandardCopyOption.REPLACE_EXISTING);
+                    moveReplace(temp, shard.target());
+                    written++;
+                }
+                state.setLocalEnabled(shard.seasonId(), true);
+                state.setFingerprint(shard.familyId(), shard.seasonId(), shard.sha256());
+                state.setBytes(shard.familyId(), shard.seasonId(), shard.bytes());
+            }
+            state.setLastAnchor(plan.anchorSeasonId());
+            state.save(plan.stateFile());
+            return new PublishStats(written, unchanged, skippedUnavailable);
+        }
+
+        /** Abilita una stagione storica nelle facade online dopo che i relativi shard sono stati caricati sul web. */
+        public static void setOnlineAvailability(Path stateFile, String seasonId, boolean available) throws IOException {
+            ShardState state = ShardState.load(stateFile);
+            state.setOnlineEnabled(seasonId, available);
+            state.save(stateFile);
+        }
+
+        /** Abilita/disabilita la materializzazione locale di una stagione storica. */
+        public static void setLocalAvailability(Path stateFile, String seasonId, boolean available) throws IOException {
+            ShardState state = ShardState.load(stateFile);
+            state.setLocalEnabled(seasonId, available);
+            state.save(stateFile);
+        }
+
+        private static List<Shard> shardsForFamily(List<Shard> shards, String familyId) {
+            return shards.stream().filter(s -> s.familyId().equals(familyId))
+                    .sorted(Comparator.comparing(Shard::seasonId)).toList();
+        }
+
+        private static Map<String, Map<String, List<Object>>> splitBySeason(Map<String, Object> root, FamilySpec spec)
+                throws IOException {
+            Map<String, Map<String, List<Object>>> out = new LinkedHashMap<>();
+            for (String field : spec.shardedFields()) {
+                Object raw = root.get(field);
+                if (!(raw instanceof List<?> list)) {
+                    throw new IOException("Campo array mancante in " + spec.fileName() + ": " + field);
+                }
+                for (int index = 0; index < list.size(); index++) {
+                    Object item = list.get(index);
+                    if (!(item instanceof Map<?, ?> map)) {
+                        throw new IOException("Riga non-oggetto in " + spec.fileName() + ": " + field);
+                    }
+                    String seasonId = text(map.get(spec.seasonField()));
+                    if (seasonId.isBlank()) {
+                        throw new IOException("Stagione mancante in " + spec.fileName() + ": " + field + "[" + index + "]");
+                    }
+                    Map<String, List<Object>> fields = out.computeIfAbsent(seasonId, ignored -> new LinkedHashMap<>());
+                    List<Object> rows = fields.computeIfAbsent(field, ignored -> new ArrayList<>());
+                    rows.add(List.of(new RawNumber(Integer.toString(index)), item));
+                }
+            }
+            for (Map<String, List<Object>> fields : out.values()) {
+                for (String field : spec.shardedFields()) fields.computeIfAbsent(field, ignored -> new ArrayList<>());
+            }
+            return out;
+        }
+
+        private static String renderShard(FamilySpec spec, Map<String, List<Object>> indexedRows) {
+            return "(function(){var q=window.__recordsNextShardQueue=window.__recordsNextShardQueue||{};"
+                    + "var f=q[\"" + spec.id() + "\"]=q[\"" + spec.id() + "\"]||{};var d="
+                    + Json.write(indexedRows) + ";"
+                    + spec.shardedFields().stream()
+                        .map(field -> "(f." + field + "=f." + field + "||[]).push.apply(f." + field + ",d." + field + ");")
+                        .reduce("", String::concat)
+                    + "})();\n";
+        }
+
+        private static String renderFacade(FamilySpec spec, Map<String, Object> facadeRoot, List<Shard> shards)
+                throws IOException {
+            List<String> online = new ArrayList<>();
+            List<String> local = new ArrayList<>();
+            for (Shard shard : shards) {
+                if (shard.onlineActive()) {
+                    if (shard.onlineUrl() == null || shard.onlineUrl().isBlank()) {
+                        throw new IOException("URL online mancante per stagione online " + shard.seasonId() + " / " + spec.id());
+                    }
+                    online.add(shard.onlineUrl());
+                }
+                if (shard.localActive()) {
+                    if (shard.localUrl() != null && !shard.localUrl().isBlank()) local.add(shard.localUrl());
+                    else if (shard.onlineUrl() != null && !shard.onlineUrl().isBlank()) local.add(shard.onlineUrl());
+                }
+            }
+            String fields = Json.write(spec.shardedFields());
+            String finalizer = "(function(){var q=window.__recordsNextShardQueue||{},f=q[\"" + spec.id()
+                    + "\"]||{},r=" + spec.globalName() + ",fields=" + fields
+                    + ";for(var x=0;x<fields.length;x++){var k=fields[x],a=f[k]||[];"
+                    + "a.sort(function(A,B){return A[0]-B[0]});r[k]=a.map(function(v){return v[1]});}"
+                    + "if(q[\"" + spec.id() + "\"])delete q[\"" + spec.id() + "\"];})();";
+            String finalizerHtml = finalizer.replace("\\", "\\\\").replace("'", "\\'");
+            return spec.globalName() + "=" + Json.write(facadeRoot) + ";\n"
+                    + "(function(){var o=" + Json.write(online) + ",l=" + Json.write(local)
+                    + ",u=(location.protocol==='file:'?l:o);"
+                    + "if(document.readyState!=='loading')throw new Error('RecordsNext shard loader deve essere caricato durante il parsing HTML');"
+                    + "for(var i=0;i<u.length;i++){var s=String(u[i]).replace(/&/g,'&amp;').replace(/\"/g,'&quot;');"
+                    + "document.write('<script src=\"'+s+'\"><\\/script>');}"
+                    + "document.write('<script>" + finalizerHtml + "<\\/script>');})();\n";
+        }
+
+        private static Map<String, SeasonRoute> readRoutes(Map<String, Object> core) throws IOException {
+            Object raw = core.get("seasons");
+            if (!(raw instanceof List<?> list)) throw new IOException("Core senza seasons");
+            Map<String, SeasonRoute> routes = new LinkedHashMap<>();
+            for (Object item : list) {
+                if (!(item instanceof Map<?, ?> map)) continue;
+                String seasonId = text(map.get("seasonId"));
+                if (seasonId.isBlank()) continue;
+                String local = text(map.get("localSitePath"));
+                String online = text(map.get("onlineSiteUrl"));
+                boolean anchor = bool(map.get("isAnchor"));
+                Path localPath = local.isBlank() ? null : Path.of(local).toAbsolutePath().normalize();
+                routes.put(seasonId, new SeasonRoute(seasonId, localPath, blankToNull(online), anchor));
+            }
+            return routes;
+        }
+
+        private static Assignment readAssignment(Path file, String expectedGlobal) throws IOException {
+            String source = Files.readString(file, StandardCharsets.UTF_8);
+            if (!source.isEmpty() && source.charAt(0) == '\uFEFF') source = source.substring(1);
+            String trimmed = source.trim();
+            String prefix = expectedGlobal + " = ";
+            if (!trimmed.startsWith(prefix)) {
+                prefix = expectedGlobal + "=";
+                if (!trimmed.startsWith(prefix)) throw new IOException("Prefisso JS inatteso: " + file);
+            }
+            if (!trimmed.endsWith(";")) throw new IOException("Terminatore JS mancante: " + file);
+            String json = trimmed.substring(prefix.length(), trimmed.length() - 1).trim();
+            Object parsed = new Json.Parser(json).parse();
+            if (!(parsed instanceof Map<?, ?> map)) throw new IOException("Radice JSON non-oggetto: " + file);
+            Map<String, Object> root = new LinkedHashMap<>();
+            for (Map.Entry<?, ?> e : map.entrySet()) root.put(String.valueOf(e.getKey()), e.getValue());
+            return new Assignment(expectedGlobal, root);
+        }
+
+        private static Map<String, Object> deepCopyMap(Map<String, Object> source) {
+            Map<String, Object> out = new LinkedHashMap<>();
+            for (Map.Entry<String, Object> e : source.entrySet()) out.put(e.getKey(), deepCopy(e.getValue()));
+            return out;
+        }
+        private static Object deepCopy(Object value) {
+            if (value instanceof Map<?, ?> map) {
+                Map<String, Object> out = new LinkedHashMap<>();
+                for (Map.Entry<?, ?> e : map.entrySet()) out.put(String.valueOf(e.getKey()), deepCopy(e.getValue()));
+                return out;
+            }
+            if (value instanceof List<?> list) {
+                List<Object> out = new ArrayList<>(list.size());
+                for (Object item : list) out.add(deepCopy(item));
+                return out;
+            }
+            return value;
+        }
+
+        private static String sha256(Path file) throws IOException {
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                try (InputStream in = Files.newInputStream(file)) {
+                    byte[] buffer = new byte[8192];
+                    for (int n; (n = in.read(buffer)) >= 0;) digest.update(buffer, 0, n);
+                }
+                StringBuilder out = new StringBuilder(64);
+                for (byte b : digest.digest()) out.append(String.format("%02x", b & 0xff));
+                return out.toString();
+            } catch (NoSuchAlgorithmException ex) {
+                throw new IllegalStateException("SHA-256 non disponibile", ex);
+            }
+        }
+
+        private static String joinUrl(String base, String relative) {
+            String b = base.endsWith("/") ? base.substring(0, base.length() - 1) : base;
+            return b + "/" + relative;
+        }
+        private static String blankToNull(String value) { return value == null || value.isBlank() ? null : value; }
+        private static String text(Object value) { return value == null ? "" : String.valueOf(value); }
+        private static boolean bool(Object value) {
+            if (value instanceof Boolean b) return b;
+            if (value instanceof Number n) return n.intValue() != 0;
+            String s = text(value);
+            return "1".equals(s) || "true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s);
+        }
+
+        private static void moveReplace(Path source, Path target) throws IOException {
+            try {
+                Files.move(source, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException ex) {
+                Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+
+        private record FamilySpec(String id, String fileName, String globalName, String seasonField, List<String> shardedFields) {}
+        private record Assignment(String globalName, Map<String, Object> root) {}
+        private record SeasonRoute(String seasonId, Path localSitePath, String onlineSiteUrl, boolean anchor) {}
+        private record RawNumber(String value) {}
+
+        public record Shard(String familyId, String seasonId, Path stagedFile, Path target,
+                            String onlineUrl, String localUrl, long bytes, String sha256,
+                            boolean currentSeason, boolean localActive, boolean onlineActive) {}
+        public record Plan(List<Shard> shards, List<Path> facades, String anchorSeasonId, Path stateFile) {
+            public long totalShardBytes() { return shards.stream().mapToLong(Shard::bytes).sum(); }
+            public long maxShardBytes() { return shards.stream().mapToLong(Shard::bytes).max().orElse(0L); }
+            public int onlineSeasonCount() { return (int) shards.stream().filter(Shard::onlineActive).map(Shard::seasonId).distinct().count(); }
+            public int localSeasonCount() { return (int) shards.stream().filter(Shard::localActive).map(Shard::seasonId).distinct().count(); }
+        }
+        public record PublishStats(int written, int unchanged, int skippedUnavailable) {}
+
+        private static final class ShardState {
+            private final Properties properties = new Properties();
+
+            static ShardState load(Path file) throws IOException {
+                ShardState state = new ShardState();
+                if (Files.isRegularFile(file)) {
+                    try (InputStream in = Files.newInputStream(file)) { state.properties.load(in); }
+                }
+                return state;
+            }
+            boolean localEnabled(String season) { return Boolean.parseBoolean(properties.getProperty("season." + season + ".local", "false")); }
+            boolean onlineEnabled(String season) { return Boolean.parseBoolean(properties.getProperty("season." + season + ".online", "false")); }
+            String fingerprint(String family, String season) { return properties.getProperty("season." + season + ".sha256." + family, ""); }
+            void setLocalEnabled(String season, boolean value) { properties.setProperty("season." + season + ".local", Boolean.toString(value)); }
+            void setOnlineEnabled(String season, boolean value) { properties.setProperty("season." + season + ".online", Boolean.toString(value)); }
+            void setFingerprint(String family, String season, String hash) { properties.setProperty("season." + season + ".sha256." + family, hash); }
+            void setBytes(String family, String season, long bytes) { properties.setProperty("season." + season + ".bytes." + family, Long.toString(bytes)); }
+            void setLastAnchor(String season) { properties.setProperty("lastAnchorSeason", season); }
+            void save(Path file) throws IOException {
+                Path parent = file.toAbsolutePath().normalize().getParent();
+                if (parent != null) Files.createDirectories(parent);
+                properties.setProperty("updatedAt", Instant.now().toString());
+                Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
+                try (OutputStream out = Files.newOutputStream(tmp)) {
+                    properties.store(out, "RecordsNext season shard state");
+                }
+                moveReplace(tmp, file);
+            }
+        }
+
+        /** Piccolo parser/writer JSON locale, per non aggiungere dipendenze al runtime. */
+        private static final class Json {
+            static String write(Object value) { StringBuilder out = new StringBuilder(); write(value, out); return out.toString(); }
+            private static void write(Object value, StringBuilder out) {
+                if (value == null) { out.append("null"); return; }
+                if (value instanceof RawNumber n) { out.append(n.value()); return; }
+                if (value instanceof String s) { string(s, out); return; }
+                if (value instanceof Number || value instanceof Boolean) { out.append(value); return; }
+                if (value instanceof Map<?, ?> map) {
+                    out.append('{'); boolean first = true;
+                    for (Map.Entry<?, ?> e : map.entrySet()) {
+                        if (!first) out.append(','); first = false; string(String.valueOf(e.getKey()), out); out.append(':'); write(e.getValue(), out);
+                    }
+                    out.append('}'); return;
+                }
+                if (value instanceof Iterable<?> iterable) {
+                    out.append('['); boolean first = true;
+                    for (Object item : iterable) { if (!first) out.append(','); first = false; write(item, out); }
+                    out.append(']'); return;
+                }
+                string(String.valueOf(value), out);
+            }
+            private static void string(String s, StringBuilder out) {
+                out.append('"');
+                for (int i = 0; i < s.length(); i++) {
+                    char c = s.charAt(i);
+                    switch (c) {
+                        case '"' -> out.append("\\\"");
+                        case '\\' -> out.append("\\\\");
+                        case '\b' -> out.append("\\b");
+                        case '\f' -> out.append("\\f");
+                        case '\n' -> out.append("\\n");
+                        case '\r' -> out.append("\\r");
+                        case '\t' -> out.append("\\t");
+                        default -> { if (c < 0x20) out.append(String.format("\\u%04x", (int)c)); else out.append(c); }
+                    }
+                }
+                out.append('"');
+            }
+
+            private static final class Parser {
+                private final String text; private int index;
+                Parser(String text) { this.text = text; }
+                Object parse() { skip(); Object v = value(); skip(); if (index != text.length()) fail(); return v; }
+                private Object value() {
+                    skip(); if (index >= text.length()) fail();
+                    return switch (text.charAt(index)) {
+                        case '{' -> object(); case '[' -> array(); case '"' -> string();
+                        case 't' -> literal("true", Boolean.TRUE); case 'f' -> literal("false", Boolean.FALSE);
+                        case 'n' -> literal("null", null); default -> number();
+                    };
+                }
+                private Map<String,Object> object() {
+                    expect('{'); Map<String,Object> out = new LinkedHashMap<>(); skip();
+                    if (peek('}')) { index++; return out; }
+                    while (true) { String k = string(); expect(':'); out.put(k, value()); skip(); if (peek('}')) { index++; return out; } expect(','); }
+                }
+                private List<Object> array() {
+                    expect('['); List<Object> out = new ArrayList<>(); skip();
+                    if (peek(']')) { index++; return out; }
+                    while (true) { out.add(value()); skip(); if (peek(']')) { index++; return out; } expect(','); }
+                }
+                private String string() {
+                    expect('"'); StringBuilder out = new StringBuilder();
+                    while (index < text.length()) {
+                        char c = text.charAt(index++); if (c == '"') return out.toString();
+                        if (c != '\\') { out.append(c); continue; }
+                        if (index >= text.length()) fail(); char e = text.charAt(index++);
+                        switch (e) {
+                            case '"' -> out.append('"'); case '\\' -> out.append('\\'); case '/' -> out.append('/');
+                            case 'b' -> out.append('\b'); case 'f' -> out.append('\f'); case 'n' -> out.append('\n');
+                            case 'r' -> out.append('\r'); case 't' -> out.append('\t');
+                            case 'u' -> { if (index + 4 > text.length()) fail(); out.append((char)Integer.parseInt(text.substring(index,index+4),16)); index += 4; }
+                            default -> fail();
+                        }
+                    }
+                    fail(); return "";
+                }
+                private Object number() {
+                    int start = index; if (peek('-')) index++;
+                    while (index < text.length() && Character.isDigit(text.charAt(index))) index++;
+                    if (index < text.length() && text.charAt(index) == '.') { index++; while (index < text.length() && Character.isDigit(text.charAt(index))) index++; }
+                    if (index < text.length() && (text.charAt(index) == 'e' || text.charAt(index) == 'E')) {
+                        index++; if (index < text.length() && (text.charAt(index) == '+' || text.charAt(index) == '-')) index++;
+                        while (index < text.length() && Character.isDigit(text.charAt(index))) index++;
+                    }
+                    String n = text.substring(start,index); try { return new BigDecimal(n); } catch (Exception ex) { fail(); return null; }
+                }
+                private Object literal(String token,Object value) { if (!text.startsWith(token,index)) fail(); index += token.length(); return value; }
+                private void skip() { while (index < text.length() && Character.isWhitespace(text.charAt(index))) index++; }
+                private boolean peek(char c) { skip(); return index < text.length() && text.charAt(index) == c; }
+                private void expect(char c) { skip(); if (index >= text.length() || text.charAt(index) != c) fail(); index++; }
+                private void fail() { throw new IllegalArgumentException("JSON non valido a " + index); }
+            }
+        }
+    }
+
+## src\main\java\it\alterlega\recordsnext\app\output\SeasonShardAvailabilityCli.java
+
+File: src\main\java\it\alterlega\recordsnext\app\output\SeasonShardAvailabilityCli.java
+
+    package it.alterlega.recordsnext.app.output;
+
+    import java.nio.file.Path;
+    import java.util.Locale;
+
+    /** Utility minima per la migrazione progressiva degli shard storici. */
+    public final class SeasonShardAvailabilityCli {
+        private SeasonShardAvailabilityCli() {}
+
+        public static void main(String[] args) throws Exception {
+            if (args.length != 4) {
+                System.err.println("Uso: SeasonShardAvailabilityCli <projectRoot> <AAAA_AAAA> <local|online|both> <true|false>");
+                System.exit(2);
+            }
+            Path root = Path.of(args[0]).toAbsolutePath().normalize();
+            String season = args[1].trim();
+            if (!season.matches("\\d{4}_\\d{4}")) {
+                throw new IllegalArgumentException("Stagione non valida: " + season);
+            }
+            String scope = args[2].trim().toLowerCase(Locale.ROOT);
+            boolean value = Boolean.parseBoolean(args[3]);
+            Path state = root.resolve("data/consolidation").resolve(SeasonFamilyShardPublisher.STATE_FILE_NAME);
+            switch (scope) {
+                case "local" -> SeasonFamilyShardPublisher.setLocalAvailability(state, season, value);
+                case "online" -> SeasonFamilyShardPublisher.setOnlineAvailability(state, season, value);
+                case "both" -> {
+                    SeasonFamilyShardPublisher.setLocalAvailability(state, season, value);
+                    SeasonFamilyShardPublisher.setOnlineAvailability(state, season, value);
+                }
+                default -> throw new IllegalArgumentException("Ambito non valido: " + scope);
+            }
+            System.out.println("Shard " + season + " " + scope + "=" + value);
+            System.out.println("Stato: " + state);
+        }
+    }
+
 ## src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
 
 File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
@@ -6253,6 +6839,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
     import java.nio.file.Files;
     import java.nio.file.Path;
     import java.time.OffsetDateTime;
+    import java.util.ArrayList;
     import java.util.EnumSet;
     import java.util.List;
     import java.util.Locale;
@@ -6260,15 +6847,30 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
 
     public final class RecordsNextPipeline {
         private static final Set<RecordFamily> IMPLEMENTED_FAMILIES = Set.copyOf(
-                EnumSet.of(RecordFamily.CLASSICS, RecordFamily.SERIES, RecordFamily.RU, RecordFamily.MODIFIERS, RecordFamily.THRESHOLDS_LUCK)
+                EnumSet.of(
+                        RecordFamily.CLASSICS,
+                        RecordFamily.SERIES,
+                        RecordFamily.RU,
+                        RecordFamily.MODIFIERS,
+                        RecordFamily.THRESHOLDS_LUCK
+                )
         );
 
         public interface Listener {
             void phase(String text, int percent);
-            default void timing(String text) { phase("TEMPO " + text, -1); }
+
+            default void timing(String text) {
+                phase("TEMPO " + text, -1);
+            }
         }
 
-        public record Result(int classicEntries, int ruSeasons, int files, int published) {}
+        public record Result(
+                int classicEntries,
+                int ruSeasons,
+                int files,
+                int published
+        ) {
+        }
 
         public Result run(
                 PipelineConfig c,
@@ -6277,7 +6879,9 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                 Listener l
         ) throws Exception {
             PipelinePreflight.Result preflight = preflight(o);
+
             l.phase(preflight.summary(), 2);
+
             for (String message : preflight.messages()) {
                 l.phase("PREFLIGHT " + message, -1);
             }
@@ -6285,50 +6889,158 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
             validateImplementedFamilies(o);
 
             long totalStarted = System.nanoTime();
-            Path database = c.projectRoot().resolve("data/database/recordsnext.db").normalize();
-            RecordsNextPreparationService preparation = new RecordsNextPreparationService(
-                    c.projectRoot(),
-                    database
-            );
+
+            Path database = c.projectRoot()
+                    .resolve("data/database/recordsnext.db")
+                    .normalize();
+
+            RecordsNextPreparationService preparation =
+                    new RecordsNextPreparationService(
+                            c.projectRoot(),
+                            database
+                    );
 
             long preparationStarted = System.nanoTime();
-            List<String> changedSeasons = preparation.prepare(mode, c.seasons(), l);
-            l.timing("preparazione complessiva: " + elapsed(preparationStarted));
+
+            List<String> changedSeasons =
+                    preparation.prepare(
+                            mode,
+                            c.seasons(),
+                            l
+                    );
+
+            l.timing(
+                    "preparazione complessiva: "
+                            + elapsed(preparationStarted)
+            );
+
+            /*
+             * Una stagione puo' risultare modificata/elaborata senza produrre
+             * alcun season_normalized_*.json.
+             *
+             * Caso reale:
+             * 2026_2027 e' correttamente la stagione corrente, ma prima della
+             * prima partita non esiste ancora alcuna competizione testa-a-testa
+             * elaborabile.
+             *
+             * In modalita' CONSOLIDATED questo NON deve essere considerato
+             * un errore e gli archivi storici gia' consolidati non devono
+             * essere ricostruiti.
+             */
+            List<String> reportSeasons = new ArrayList<>();
+
+            for (String season : changedSeasons) {
+                Path seasonReports = c.reports()
+                        .resolve(season)
+                        .normalize();
+
+                if (!Files.isDirectory(seasonReports)) {
+                    continue;
+                }
+
+                try (var files = Files.list(seasonReports)) {
+                    boolean hasNormalized = files.anyMatch(path -> {
+                        if (!Files.isRegularFile(path)) {
+                            return false;
+                        }
+
+                        String name = path.getFileName().toString();
+
+                        return name.startsWith("season_normalized_")
+                                && name.endsWith(".json");
+                    });
+
+                    if (hasNormalized) {
+                        reportSeasons.add(season);
+                    }
+                }
+            }
 
             if (mode == ProcessingMode.FULL) {
-                l.phase("Pulizia archivi derivati delle stagioni gestite", 52);
+                l.phase(
+                        "Pulizia archivi derivati delle stagioni gestite",
+                        52
+                );
+
                 for (String season : changedSeasons) {
-                    deleteTree(c.classicArchive().resolve(season));
-                    deleteTree(c.ruArchive().resolve(season));
+                    deleteTree(
+                            c.classicArchive().resolve(season)
+                    );
+
+                    deleteTree(
+                            c.ruArchive().resolve(season)
+                    );
                 }
             }
 
             if (o.familyEnabled(RecordFamily.CLASSICS)) {
-                l.phase("Generazione record classici", 55);
-                long started = System.nanoTime();
-                SeasonRecordsArchiveBuilder.build(
-                        c.reports(),
-                        c.classicArchive(),
-                        changedSeasons
-                );
-                l.timing("record classici: " + elapsed(started));
+                if (reportSeasons.isEmpty()) {
+                    l.phase(
+                            "Record classici invariati: nessun nuovo report normalizzato",
+                            55
+                    );
+                } else {
+                    l.phase(
+                            "Generazione record classici",
+                            55
+                    );
+
+                    long started = System.nanoTime();
+
+                    SeasonRecordsArchiveBuilder.build(
+                            c.reports(),
+                            c.classicArchive(),
+                            reportSeasons
+                    );
+
+                    l.timing(
+                            "record classici: "
+                                    + elapsed(started)
+                    );
+                }
             }
 
             if (o.familyEnabled(RecordFamily.RU)) {
-                l.phase("Generazione riserve d'ufficio", 68);
-                long started = System.nanoTime();
-                RiserveUfficioArchiveBuilder.build(
-                        c.reports(),
-                        c.ruArchive(),
-                        changedSeasons
-                );
-                l.timing("riserve d'ufficio: " + elapsed(started));
+                if (reportSeasons.isEmpty()) {
+                    l.phase(
+                            "Riserve d'ufficio invariate: nessun nuovo report normalizzato",
+                            68
+                    );
+                } else {
+                    l.phase(
+                            "Generazione riserve d'ufficio",
+                            68
+                    );
+
+                    long started = System.nanoTime();
+
+                    RiserveUfficioArchiveBuilder.build(
+                            c.reports(),
+                            c.ruArchive(),
+                            reportSeasons
+                    );
+
+                    l.timing(
+                            "riserve d'ufficio: "
+                                    + elapsed(started)
+                    );
+                }
             }
 
             Result result;
+
             if (!o.generateJs()) {
-                l.phase("Archivi elaborati; generazione JavaScript non richiesta", 96);
-                result = new Result(0, 0, 0, 0);
+                l.phase(
+                        "Archivi elaborati; generazione JavaScript non richiesta",
+                        96
+                );
+
+                result = new Result(
+                        0,
+                        0,
+                        0,
+                        0
+                );
             } else {
                 l.phase(
                         o.publish()
@@ -6336,20 +7048,27 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                                 : "Generazione JavaScript",
                         82
                 );
+
                 long started = System.nanoTime();
-                LeagueMetadata leagueMetadata = LeagueMetadataLoader.load(
-                        c.projectRoot().resolve("config/league.json")
-                );
-                ManifestMetadata manifestMetadata = new ManifestMetadata(
-                        "RecordsNext by mauz79",
-                        "2.1.0",
-                        "2.0",
-                        OffsetDateTime.now(),
-                        leagueMetadata.leagueId(),
-                        leagueMetadata.currentSeasonId(),
-                        c.seasons(),
-                        List.of()
-                );
+
+                LeagueMetadata leagueMetadata =
+                        LeagueMetadataLoader.load(
+                                c.projectRoot()
+                                        .resolve("config/league.json")
+                        );
+
+                ManifestMetadata manifestMetadata =
+                        new ManifestMetadata(
+                                "RecordsNext by mauz79",
+                                "3.0.0",
+                                "2.0",
+                                OffsetDateTime.now(),
+                                leagueMetadata.leagueId(),
+                                leagueMetadata.currentSeasonId(),
+                                c.seasons(),
+                                List.of()
+                        );
+
                 var r = Records2026SitePublisher.run(
                         c.classicArchive(),
                         c.ruArchive(),
@@ -6365,12 +7084,16 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                         leagueMetadata,
                         c.reports()
                 );
+
                 l.timing(
-                        (o.publish()
-                                ? "generazione e pubblicazione JavaScript: "
-                                : "generazione JavaScript: ")
+                        (
+                                o.publish()
+                                        ? "generazione e pubblicazione JavaScript: "
+                                        : "generazione JavaScript: "
+                        )
                                 + elapsed(started)
                 );
+
                 result = new Result(
                         r.classicEntries(),
                         r.ruSeasons(),
@@ -6379,27 +7102,54 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                 );
             }
 
-            preparation.saveConsolidation(c.seasons());
-            l.timing("totale elaborazione: " + elapsed(totalStarted));
-            l.phase("Elaborazione completata e consolidamento aggiornato", 100);
+            preparation.saveConsolidation(
+                    c.seasons()
+            );
+
+            l.timing(
+                    "totale elaborazione: "
+                            + elapsed(totalStarted)
+            );
+
+            l.phase(
+                    "Elaborazione completata e consolidamento aggiornato",
+                    100
+            );
+
             return result;
         }
 
-        public PipelinePreflight.Result preflight(ProcessingOptions options) {
+        public PipelinePreflight.Result preflight(
+                ProcessingOptions options
+        ) {
             return PipelinePreflight.evaluate(options);
         }
 
-        public boolean hasConsolidation(PipelineConfig c) {
-            Path database = c.projectRoot().resolve("data/database/recordsnext.db").normalize();
+        public boolean hasConsolidation(
+                PipelineConfig c
+        ) {
+            Path database = c.projectRoot()
+                    .resolve("data/database/recordsnext.db")
+                    .normalize();
+
             return new RecordsNextPreparationService(
                     c.projectRoot(),
                     database
             ).hasConsolidation();
         }
 
-        static void validateImplementedFamilies(ProcessingOptions options) {
-            Set<RecordFamily> unsupported = EnumSet.copyOf(options.selection().enabledFamilies());
-            unsupported.removeAll(IMPLEMENTED_FAMILIES);
+        static void validateImplementedFamilies(
+                ProcessingOptions options
+        ) {
+            Set<RecordFamily> unsupported =
+                    EnumSet.copyOf(
+                            options.selection().enabledFamilies()
+                    );
+
+            unsupported.removeAll(
+                    IMPLEMENTED_FAMILIES
+            );
+
             if (!unsupported.isEmpty()) {
                 throw new IllegalArgumentException(
                         "Famiglie selezionate ma non ancora collegate alla pipeline 2.0: "
@@ -6408,18 +7158,36 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
             }
         }
 
-        private static void deleteTree(Path root) throws Exception {
-            if (!Files.exists(root)) return;
+        private static void deleteTree(
+                Path root
+        ) throws Exception {
+            if (!Files.exists(root)) {
+                return;
+            }
+
             try (var paths = Files.walk(root)) {
-                for (Path path : paths.sorted(java.util.Comparator.reverseOrder()).toList()) {
+                for (Path path :
+                        paths.sorted(
+                                java.util.Comparator.reverseOrder()
+                        ).toList()) {
+
                     Files.deleteIfExists(path);
                 }
             }
         }
 
-        private static String elapsed(long started) {
-            double seconds = (System.nanoTime() - started) / 1_000_000_000.0;
-            return String.format(Locale.ROOT, "%.3f s", seconds);
+        private static String elapsed(
+                long started
+        ) {
+            double seconds =
+                    (System.nanoTime() - started)
+                            / 1_000_000_000.0;
+
+            return String.format(
+                    Locale.ROOT,
+                    "%.3f s",
+                    seconds
+            );
         }
     }
 
@@ -12696,7 +13464,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
         private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
-        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 2.1");
+        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.0");
         private final CardLayout pages = new CardLayout();
         private final JPanel pageHost = new JPanel(pages);
         private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
@@ -12728,7 +13496,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                 try {
                     new RecordsNext2Dashboard().show();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 2.1", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.0", JOptionPane.ERROR_MESSAGE);
                 }
             });
         }
@@ -12862,7 +13630,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             c.weightx = 0.0;
             header.add(leftSpacer, c);
 
-            JLabel title = new JLabel("RecordsNext 2.1", SwingConstants.CENTER);
+            JLabel title = new JLabel("RecordsNext 3.0", SwingConstants.CENTER);
             title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
             title.setForeground(RED);
             c.gridx = 1;
@@ -13848,7 +14616,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                         log.append("ERRORE: " + cause + System.lineSeparator());
                         status.setText("Errore");
                         status.setForeground(RED);
-                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 2.1", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.0", JOptionPane.ERROR_MESSAGE);
                     } finally {
                         run.setEnabled(true);
                     }
@@ -18005,6 +18773,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
     import it.alterlega.recordsnext.app.culometro.CulometroFamilyJsExporter;
     import it.alterlega.recordsnext.app.matches.MatchesJsExporter;
     import it.alterlega.recordsnext.app.model.RecordFamily;
+    import it.alterlega.recordsnext.app.output.SeasonFamilyShardPublisher;
 
     import java.io.IOException;
     import java.nio.charset.StandardCharsets;
@@ -18263,6 +19032,15 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 );
             }
 
+            SeasonFamilyShardPublisher.Plan shardPlan = null;
+            if (includeRecordsNextCore) {
+                Path shardStateFile = stagingRoot.toAbsolutePath().normalize().getParent()
+                        .resolve("consolidation").resolve(SeasonFamilyShardPublisher.STATE_FILE_NAME);
+                shardPlan = SeasonFamilyShardPublisher.prepare(
+                        generatedDir, runDir.resolve("season-shards"), shardStateFile
+                );
+            }
+
             ValidationResult validation = validateGenerated(
                     generatedDir,
                     includeClassic,
@@ -18277,6 +19055,9 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
             );
             int published = 0;
             if (!generateOnly) {
+                if (shardPlan != null) {
+                    SeasonFamilyShardPublisher.publishShards(shardPlan);
+                }
                 Files.createDirectories(siteJsDir);
                 published = publishWithRollback(generatedDir, siteJsDir, validation.files());
             }
@@ -26504,6 +27285,127 @@ File: src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
             assertFalse(js.contains("\"capitanoMax\":["));
     		assertTrue(js.contains("\"availableSections\""));
     assertTrue(js.contains("\"generatedSections\""));
+        }
+    }
+
+## src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherTest.java
+
+    package it.alterlega.recordsnext.app.output;
+
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+
+    import static org.junit.jupiter.api.Assertions.*;
+
+    class SeasonFamilyShardPublisherTest {
+        @TempDir Path temp;
+
+        @Test
+        void startsOnlineWithAnchorOnlyAndActivatesHistoryExplicitly() throws Exception {
+            Path generated = temp.resolve("generated");
+            Path site2006 = temp.resolve("Lega2006");
+            Path site2007 = temp.resolve("Lega2007");
+            Path state = temp.resolve("data/consolidation/recordsnext-shards.properties");
+            Files.createDirectories(generated);
+            Files.createDirectories(site2007);
+
+            writeCore(generated, site2006, site2007);
+            writeMatches(generated);
+
+            var initial = SeasonFamilyShardPublisher.prepare(generated, temp.resolve("shards-1"), state);
+            assertEquals("2007_2008", initial.anchorSeasonId());
+            assertEquals(1, initial.onlineSeasonCount());
+            assertEquals(1, initial.localSeasonCount());
+
+            String facade = Files.readString(generated.resolve("fcmRecordsNext_Matches.js"));
+            assertFalse(facade.contains("https://example.test/lega2006/js/recordsnext-data/"));
+            assertTrue(facade.contains("https://example.test/lega2007/js/recordsnext-data/"));
+
+            var firstPublish = SeasonFamilyShardPublisher.publishShards(initial);
+            assertEquals(1, firstPublish.written());
+            assertEquals(1, firstPublish.skippedUnavailable());
+            assertFalse(Files.exists(site2006.resolve("js/recordsnext-data/fcmRecordsNext_Matches.2006_2007.js")));
+            assertTrue(Files.isRegularFile(site2007.resolve("js/recordsnext-data/fcmRecordsNext_Matches.2007_2008.js")));
+
+            Files.createDirectories(site2006);
+            SeasonFamilyShardPublisher.setLocalAvailability(state, "2006_2007", true);
+            SeasonFamilyShardPublisher.setOnlineAvailability(state, "2006_2007", true);
+            writeMatches(generated);
+
+            var migrated = SeasonFamilyShardPublisher.prepare(generated, temp.resolve("shards-2"), state);
+            assertEquals(2, migrated.onlineSeasonCount());
+            assertEquals(2, migrated.localSeasonCount());
+            facade = Files.readString(generated.resolve("fcmRecordsNext_Matches.js"));
+            assertTrue(facade.contains("https://example.test/lega2006/js/recordsnext-data/"));
+
+            var secondPublish = SeasonFamilyShardPublisher.publishShards(migrated);
+            assertEquals(1, secondPublish.written());
+            assertEquals(1, secondPublish.unchanged());
+            assertTrue(Files.isRegularFile(site2006.resolve("js/recordsnext-data/fcmRecordsNext_Matches.2006_2007.js")));
+
+            writeMatches(generated);
+            var cached = SeasonFamilyShardPublisher.prepare(generated, temp.resolve("shards-3"), state);
+            var thirdPublish = SeasonFamilyShardPublisher.publishShards(cached);
+            assertEquals(0, thirdPublish.written());
+            assertEquals(2, thirdPublish.unchanged());
+        }
+
+        @Test
+        void keepsOriginalIndexesForGloballySortedCulometroRows() throws Exception {
+            Path generated = temp.resolve("generated-culometro");
+            Path site2006 = temp.resolve("Culo2006");
+            Path site2007 = temp.resolve("Culo2007");
+            Files.createDirectories(generated);
+            Files.createDirectories(site2007);
+            writeCore(generated, site2006, site2007);
+
+            String culometro = "window.fcmRecordsNextCulometro = {"
+                    + "\"schemaVersion\":\"2.0\",\"familyId\":\"culometro\","
+                    + "\"metadata\":{},\"configuration\":{},\"events\":["
+                    + "{\"seasonId\":\"2006_2007\",\"team\":\"A\"},"
+                    + "{\"seasonId\":\"2007_2008\",\"team\":\"B\"}],"
+                    + "\"ranking\":["
+                    + "{\"seasonId\":\"2007_2008\",\"team\":\"B\",\"index\":90},"
+                    + "{\"seasonId\":\"2006_2007\",\"team\":\"A\",\"index\":80}],"
+                    + "\"competitionRanking\":[],\"outputStatus\":[]};\n";
+            Files.writeString(generated.resolve("fcmRecordsNext_Culometro.js"), culometro);
+
+            var plan = SeasonFamilyShardPublisher.prepare(generated, temp.resolve("culometro-shards"),
+                    temp.resolve("culometro-state.properties"));
+            assertEquals(2, plan.shards().size());
+            assertTrue(plan.maxShardBytes() < SeasonFamilyShardPublisher.DEFAULT_MAX_SHARD_BYTES);
+
+            String shard2006 = Files.readString(plan.shards().stream()
+                    .filter(s -> s.seasonId().equals("2006_2007")).findFirst().orElseThrow().stagedFile());
+            String shard2007 = Files.readString(plan.shards().stream()
+                    .filter(s -> s.seasonId().equals("2007_2008")).findFirst().orElseThrow().stagedFile());
+            assertTrue(shard2006.contains("\"ranking\":[[1,"));
+            assertTrue(shard2007.contains("\"ranking\":[[0,"));
+        }
+
+        private static void writeCore(Path generated, Path site2006, Path site2007) throws Exception {
+            String core = "window.fcmRecordsNextCore = {\"seasons\":["
+                    + "{\"seasonId\":\"2006_2007\",\"isAnchor\":0,\"localSitePath\":" + q(site2006.toString())
+                    + ",\"onlineSiteUrl\":\"https://example.test/lega2006\"},"
+                    + "{\"seasonId\":\"2007_2008\",\"isAnchor\":1,\"localSitePath\":" + q(site2007.toString())
+                    + ",\"onlineSiteUrl\":\"https://example.test/lega2007\"}]};\n";
+            Files.writeString(generated.resolve("fcmRecordsNext_Core.js"), core);
+        }
+
+        private static void writeMatches(Path generated) throws Exception {
+            Files.writeString(generated.resolve("fcmRecordsNext_Matches.js"),
+                    "window.fcmRecordsNextMatches = {\"matches\":["
+                            + "{\"seasonId\":\"2006_2007\",\"x\":1},"
+                            + "{\"seasonId\":\"2007_2008\",\"x\":2}]};\n");
+        }
+
+        private static String q(String text) {
+            return "\"" + text.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
         }
     }
 
@@ -40345,6 +41247,8 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - src\main\java\it\alterlega\recordsnext\app\model\RecordDependency.java
 - src\main\java\it\alterlega\recordsnext\app\model\RecordFamily.java
 - src\main\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExporter.java
+- src\main\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisher.java
+- src\main\java\it\alterlega\recordsnext\app\output\SeasonShardAvailabilityCli.java
 - src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
 - src\main\java\it\alterlega\recordsnext\app\PipelinePreflight.java
 - src\main\java\it\alterlega\recordsnext\app\ProcessingMode.java
@@ -40397,6 +41301,7 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
 - src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTest.java
 - src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherTest.java
 - src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
 - src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 - src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTest.java

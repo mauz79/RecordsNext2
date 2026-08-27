@@ -15,6 +15,7 @@ import it.alterlega.recordsnext.app.thresholds.ThresholdsLuckFamilyJsExporter;
 import it.alterlega.recordsnext.app.culometro.CulometroFamilyJsExporter;
 import it.alterlega.recordsnext.app.matches.MatchesJsExporter;
 import it.alterlega.recordsnext.app.model.RecordFamily;
+import it.alterlega.recordsnext.app.output.SeasonFamilyShardPublisher;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -273,6 +274,15 @@ public final class Records2026SitePublisher {
             );
         }
 
+        SeasonFamilyShardPublisher.Plan shardPlan = null;
+        if (includeRecordsNextCore) {
+            Path shardStateFile = stagingRoot.toAbsolutePath().normalize().getParent()
+                    .resolve("consolidation").resolve(SeasonFamilyShardPublisher.STATE_FILE_NAME);
+            shardPlan = SeasonFamilyShardPublisher.prepare(
+                    generatedDir, runDir.resolve("season-shards"), shardStateFile
+            );
+        }
+
         ValidationResult validation = validateGenerated(
                 generatedDir,
                 includeClassic,
@@ -287,6 +297,9 @@ public final class Records2026SitePublisher {
         );
         int published = 0;
         if (!generateOnly) {
+            if (shardPlan != null) {
+                SeasonFamilyShardPublisher.publishShards(shardPlan);
+            }
             Files.createDirectories(siteJsDir);
             published = publishWithRollback(generatedDir, siteJsDir, validation.files());
         }

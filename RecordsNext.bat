@@ -16,7 +16,7 @@ if not exist "%~dp0RecordsNext.jar" (
 where java >nul 2>&1
 if errorlevel 1 (
     echo.
-    echo RecordsNext 2.1 richiede Java 21 o superiore.
+    echo RecordsNext 3.0 richiede Java 21 o superiore.
     echo Java non e' stato trovato nel PATH di Windows.
     echo.
     echo Installa Java 21 o superiore e riavvia RecordsNext.
@@ -29,7 +29,7 @@ if not exist "%~dp0runtime\ucanaccess\ucanaccess-2.0.9.5.jar" (
     echo.
     echo ERRORE: UCanAccess 2.0.9.5 non trovato.
     echo.
-    echo Reinstalla RecordsNext 2.1.
+    echo Reinstalla RecordsNext 3.0.
     echo.
     pause
     exit /b 1
