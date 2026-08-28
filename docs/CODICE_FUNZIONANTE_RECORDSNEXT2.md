@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-28 01:53:50 +02:00
+> Data generazione: 2026-08-28 01:59:36 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Stato consolidato RecordsNext 2.1.0 - 2026-08-27
