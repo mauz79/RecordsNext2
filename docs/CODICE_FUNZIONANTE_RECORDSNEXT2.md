@@ -1,12 +1,16 @@
 # Codice funzionante RecordsNext 3.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-09-02 17:57:27 +02:00
+> Data generazione: 2026-09-02 18:06:53 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
-## Stato corrente di sviluppo RecordsNext 3.1.0 - 2026-09-02
+## Stato release RecordsNext 3.1.0 - 2026-09-02
 
-RecordsNext 3.1.0 e' in sviluppo e collaudo; la release stabile precedente resta 2.1.0.
+RecordsNext 3.1.0 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.
+
+- Suite automatica: 50 test, 0 failure, 0 errori.
+- Collaudo multisito reale: 21 target, 189 file validati e 189 pubblicati.
+- Setup pubblico SHA256: C39B0EA205F7D81660CD1FF09EC3F6014090932FF3E0D4DA721870D2740CA6EB.
 
 ### Multisito 3.1
 
@@ -149,126 +153,401 @@ File: README.md
 
     # RecordsNext 3.1
 
-    **RecordsNext by mauz79** genera record e statistiche storiche multistagione per leghe gestite con Fantacalcio Manager.
+    **RecordsNext by mauz79** è il generatore di record e statistiche storiche per leghe gestite con Fantacalcio Manager.
 
-    La 3.1 separa definitivamente le **sorgenti storiche** dalle **destinazioni di pubblicazione**: FCM, FCA e calendari alimentano lo storico; ogni sito FCM è una destinazione opzionale e riceve solo i dati disponibili fino alla propria stagione.
+    RecordsNext legge i dati delle stagioni dai file FCM/FCA, mantiene uno storico normalizzato nel proprio database e genera file JavaScript pronti per essere usati dal sito della lega. La 3.1 introduce la pubblicazione multistagione/multisito: ogni vecchio sito può essere riallineato con i record disponibili **fino a quella stagione**, senza ricevere dati futuri.
 
     ![Dashboard RecordsNext 3.1](docs/screenshots/01-dashboard.png)
 
-    ## Funzioni principali
+    ## Indice
 
-    - storico multistagione con identità canoniche di squadre e competizioni;
-    - Classici, Serie, Riserve d'Ufficio, Modificatori, Soglie/Fortuna e Culometro;
-    - dataset pubblico `fcmRecordsNext_Matches.js`, con due righe per partita;
-    - link ai tabellini storici;
-    - pubblicazione nel solo sito corrente per l'uso ordinario;
-    - riallineamento di più siti storici con **Pubblica i siti delle stagioni selezionate**;
-    - ogni sito riceve esclusivamente lo storico fino alla propria stagione;
-    - calendari DataA 1991-2026 inclusi nell'installazione;
-    - sito locale opzionale per stagione.
+    - [Cosa fa RecordsNext](#cosa-fa-recordsnext)
+    - [Installazione](#installazione)
+    - [Concetti fondamentali](#concetti-fondamentali)
+    - [Prima configurazione](#prima-configurazione)
+    - [Schermate e funzioni della GUI](#schermate-e-funzioni-della-gui)
+    - [Famiglie di record](#famiglie-di-record)
+    - [Culometro](#culometro)
+    - [Elaborazione completa e consolidata](#elaborazione-completa-e-consolidata)
+    - [Pubblicazione](#pubblicazione)
+    - [Output JavaScript](#output-javascript)
+    - [Calendari DataA](#calendari-dataa)
+    - [Tabellini storici](#tabellini-storici)
+    - [Flusso d'uso consigliato](#flusso-duso-consigliato)
+    - [Stato della release 3.1](#stato-della-release-31)
+
+    ## Cosa fa RecordsNext
+
+    RecordsNext centralizza e rende riutilizzabile lo storico della lega. In particolare:
+
+    - importa le stagioni gestite da FCM/FCA;
+    - mantiene identità canoniche di squadre e competizioni anche quando i nomi cambiano negli anni;
+    - usa calendari DataA canonici interni;
+    - genera record classici e serie statistiche;
+    - genera statistiche sulle Riserve d'Ufficio;
+    - genera record e serie sui Modificatori;
+    - genera Soglie e indicatori di Fortuna;
+    - genera il Culometro, quando attivato;
+    - esporta un dataset partita-per-partita in `fcmRecordsNext_Matches.js`;
+    - collega i record ai tabellini storici quando disponibili;
+    - pubblica i JavaScript nel sito FCM corrente;
+    - può riallineare contemporaneamente più siti storici.
+
+    Il principio architetturale della 3.1 è:
+
+    > **FCM, FCA e DataA definiscono lo storico. I siti sono destinazioni opzionali di pubblicazione.**
+
+    Un vecchio sito quindi non deve esistere perché una stagione resti valida nello storico di RecordsNext.
 
     ## Installazione
 
-    Scaricare dalla release il solo file:
+    La release pubblica 3.1 viene distribuita come **installazione pulita** tramite:
 
     `RecordsNext_3.1.0_SETUP.exe`
 
-    Avviarlo con doppio click e scegliere la cartella di installazione. Convenzione consigliata:
+    Requisiti:
+
+    - Windows;
+    - Java 21 o superiore;
+    - Fantacalcio Manager;
+    - file FCM/FCA delle stagioni da importare.
+
+    Durante il setup viene sempre mostrata la cartella di destinazione. La convenzione consigliata è:
 
     `<cartella FCM>\plugin\RecordsNext`
 
-    Requisito: **Java 21 o superiore**.
+    L'installazione include programma, runtime necessario, visualizzatori e archivio calendari DataA 1991-2026.
 
-    Il setup non installa database personali, non copia FCM/FCA e non pubblica automaticamente nei siti.
+    Non include:
 
-    ## Prima configurazione
+    - database personali;
+    - file FCM/FCA dell'utente;
+    - configurazioni della lega;
+    - pubblicazioni automatiche nei siti.
 
-    Aprire **Configurazione stagioni** e aggiungere almeno una stagione gestita indicando FCM e FCA.
+    Per i dettagli vedere [INSTALL.md](INSTALL.md).
 
-    ![Configurazione stagione](docs/screenshots/02-configurazione-stagione.png)
+    ## Concetti fondamentali
 
-    Per una stagione **Gestita**:
+    ### Stagione gestita
 
-    - FCM obbligatorio;
-    - FCA obbligatorio;
-    - sito locale opzionale;
-    - sito online opzionale;
-    - calendario recuperato dall'archivio interno RecordsNext.
+    Una stagione **Gestita** è alimentata dai file FCM/FCA.
 
-    Per una stagione **Manuale** servono soltanto anni e numero stagione.
+    Richiede:
 
-    Il nome lega può essere lasciato vuoto: RecordsNext prova a ricavarlo dal primo FCM. L'identificativo interno della lega non viene richiesto all'utente.
+    - FCM;
+    - FCA.
 
-    ### URL del sito online
+    Può avere, ma non deve avere:
 
-    Usare un URL completo, per esempio:
+    - sito locale;
+    - sito online.
+
+    Il sito locale serve solo come destinazione di pubblicazione. La sua cartella `js` deriva sempre da:
+
+    `<cartella sito>\js`
+
+    ### Stagione manuale
+
+    Una stagione **Manuale** serve a rappresentare una stagione che deve esistere nello storico/configurazione ma non è importabile tramite FCM/FCA.
+
+    Richiede soltanto:
+
+    - anni stagione nel formato `AAAA/AAAA`;
+    - numero stagione.
+
+    ### Stagione corrente
+
+    La stagione corrente è l'ancora operativa del sito. Nell'uso normale RecordsNext pubblica solo nel sito associato a questa stagione.
+
+    ### Sito locale
+
+    È la root del sito FCM sul disco. Esempio:
+
+    `E:\fantacalcio\Lega2026`
+
+    RecordsNext pubblicherà i JS in:
+
+    `E:\fantacalcio\Lega2026\js`
+
+    ### Sito online
+
+    Serve a costruire collegamenti web, in particolare verso i tabellini.
+
+    RecordsNext normalizza l'URL:
+
+    - converte `\` in `/`;
+    - se il protocollo manca aggiunge `http://`;
+    - conserva un eventuale `https://` inserito esplicitamente;
+    - rimuove slash finali inutili.
+
+    Esempio:
+
+    `www.example.org\lega2026`
+
+    diventa:
 
     `http://www.example.org/lega2026`
 
-    RecordsNext normalizza automaticamente slash e protocollo; se il protocollo manca viene aggiunto `http://`.
+    ## Prima configurazione
 
-    ## Elaborazione
+    Aprire **Configurazione stagioni**.
 
-    Per l'uso giornata per giornata:
+    ![Configurazione stagione](docs/screenshots/02-configurazione-stagione.png)
 
-    1. selezionare **Consolidata** quando disponibile;
-    2. lasciare selezionate le stagioni da elaborare;
-    3. spuntare **Pubblica nel sito della stagione corrente al termine**;
-    4. premere **Elabora**.
+    Per ogni stagione gestita indicare FCM e FCA. Il sito locale può essere lasciato vuoto se quella stagione deve contribuire allo storico ma non deve ricevere file pubblicati.
 
-    Per ricostruzioni integrali usare **Completa**.
+    Il nome lega può essere lasciato vuoto: RecordsNext prova a ricavarlo dal primo FCM gestito. L'identificativo tecnico della lega resta interno e non viene richiesto all'utente.
 
-    ## Pubblicazione storica
+    La GUI mostra anche lo stato del calendario e dei tabellini disponibili.
 
-    La funzione **Pubblica i siti delle stagioni selezionate** serve per riallineamenti dopo modifiche globali, nuove versioni o correzioni dello storico.
+    ## Schermate e funzioni della GUI
 
-    Ogni sito riceve soltanto le stagioni fino al proprio `sort_order`: nessun sito storico riceve dati futuri.
+    ### Panoramica
 
-    ![Pubblicazione multisito](docs/screenshots/06-pubblicazione-multisito.png)
+    La dashboard riassume:
 
-    ## Famiglie record
+    - lega corrente;
+    - numero di stagioni configurate;
+    - famiglie abilitate;
+    - stato di Soglie/Fortuna;
+    - stato del Culometro;
+    - modalità di elaborazione;
+    - opzioni di pubblicazione.
 
-    ![Classici](docs/screenshots/03-famiglia-classici.png)
+    ### Configurazione stagioni
 
-    Sono disponibili:
+    Serve per:
 
-    - Classici;
-    - Serie;
-    - Riserve d'Ufficio;
-    - Modificatori;
-    - Soglie e Fortuna.
+    - aggiungere stagioni gestite;
+    - aggiungere stagioni manuali;
+    - modificare sorgenti e siti;
+    - scegliere la stagione corrente;
+    - verificare calendario e tabellini;
+    - eliminare una stagione con pulizia coerente dei dati collegati.
 
-    Il Culometro è opzionale e configurabile separatamente.
+    La cancellazione di una stagione non è una semplice rimozione dalla GUI: RecordsNext elimina i dati stagionali collegati e riancora, quando necessario, le identità canoniche condivise.
+
+    ### Famiglie record
+
+    La pagina consente di attivare o disattivare intere famiglie e, dove previsto, i singoli sottorecord.
+
+    ![Famiglia Classici](docs/screenshots/03-famiglia-classici.png)
+
+    ### Modificatori
+
+    La sezione Modificatori permette di configurare i nomi dei modificatori personalizzati e scegliere quali elaborazioni produrre, tra cui massimo, totale, media, utilizzi e relative serie quando disponibili.
+
+    ### Soglie e Fortuna
+
+    Questa pagina abilita le elaborazioni basate sulle soglie dei punteggi e gli indicatori di fortuna.
 
     ![Soglie e Fortuna](docs/screenshots/04-soglie-fortuna.png)
 
+    ### Debug / Pubblicazione
+
+    Questa pagina raccoglie le funzioni operative e di verifica, comprese le azioni di pubblicazione corrente e multisito.
+
+    ![Pubblicazione multisito](docs/screenshots/06-pubblicazione-multisito.png)
+
+    ## Famiglie di record
+
+    RecordsNext 3.1 produce le seguenti famiglie canoniche.
+
+    ### Classici
+
+    Record tradizionali ricavati dalle partite e dai punteggi storici. La selezione è granulare: è possibile abilitare solo i record che interessano.
+
+    ### Serie
+
+    Serie positive e negative ricavate dalla successione delle partite e dai risultati. Le serie relative ai modificatori seguono la configurazione della famiglia Modificatori.
+
+    ### Riserve d'Ufficio
+
+    Statistiche e record relativi all'impiego delle RU. La famiglia mantiene una propria configurazione granulare.
+
+    ### Modificatori
+
+    Record aggregati e serie sui modificatori disponibili nei dati FCM/FCA. I modificatori personalizzati possono essere rinominati in GUI.
+
+    ### Soglie e Fortuna
+
+    Raggruppa elaborazioni che confrontano punteggi, esiti e soglie per evidenziare situazioni statisticamente favorevoli o sfavorevoli.
+
+    ## Culometro
+
+    Il Culometro è un'elaborazione separata e opzionale.
+
     ![Configurazione Culometro](docs/screenshots/05-culometro-configurazione.png)
+
+    La configurazione permette di scegliere quali componenti partecipano al calcolo e con quale peso. I dettagli esportati comprendono, per ogni evento disponibile, i valori necessari alla spiegazione del risultato, comprese frequenze storiche e impatto.
+
+    Il Culometro può risultare **parziale** se mancano dipendenze opzionali. Questo non equivale a un errore dell'intera elaborazione.
+
+    ## Elaborazione completa e consolidata
+
+    ### Completa
+
+    Ricostruisce i dati gestiti e gli archivi derivati. È la modalità da usare:
+
+    - alla prima importazione;
+    - dopo modifiche strutturali;
+    - dopo cambi importanti nella configurazione;
+    - quando si vuole ricostruire integralmente lo storico.
+
+    ### Consolidata
+
+    È la modalità ordinaria dopo un aggiornamento del sito/FCM. Riutilizza ciò che non è cambiato e aggiorna ciò che serve.
+
+    È la modalità consigliata per l'uso giornata per giornata.
+
+    ## Pubblicazione
+
+    RecordsNext 3.1 distingue due operazioni.
+
+    ### Pubblica nel sito della stagione corrente al termine
+
+    È l'opzione normale.
+
+    Usarla quando si aggiorna la stagione corrente dopo una nuova giornata. Al termine dell'elaborazione RecordsNext pubblica i JS nel solo sito configurato come corrente.
+
+    ### Pubblica i siti delle stagioni selezionate
+
+    È un'operazione di manutenzione/riallineamento storico.
+
+    Usarla quando:
+
+    - cambia una logica globale;
+    - vengono corrette identità o competizioni;
+    - viene introdotto un nuovo dataset;
+    - si vuole riallineare lo storico dopo un aggiornamento di RecordsNext.
+
+    Le checkbox delle stagioni determinano i target da pubblicare.
+
+    La regola fondamentale è il **cutoff storico**: ogni sito riceve soltanto le stagioni con `sort_order` minore o uguale al proprio.
+
+    Esempio:
+
+    - sito 2024/25 → dati fino al 2024/25;
+    - sito 2025/26 → dati fino al 2025/26;
+    - sito 2026/27 → dati fino al 2026/27.
+
+    Un sito storico non può quindi ricevere squadre, competizioni o risultati futuri.
 
     ## Output JavaScript
 
-    RecordsNext pubblica nella cartella `js` del sito:
+    RecordsNext pubblica nove dataset canonici:
 
-    - `fcmRecordsNext_Core.js`
-    - `fcmRecordsNext_Classics.js`
-    - `fcmRecordsNext_Series.js`
-    - `fcmRecordsNext_RU.js`
-    - `fcmRecordsNext_Modifiers.js`
-    - `fcmRecordsNext_ThresholdsLuck.js`
-    - `fcmRecordsNext_Culometro.js`
-    - `fcmRecordsNext_Matches.js`
-    - `fcmRecordsNext_Manifest.js`
+    | File | Contenuto |
+    | --- | --- |
+    | `fcmRecordsNext_Core.js` | metadati, stagioni, squadre, competizioni, identità canoniche e mapping |
+    | `fcmRecordsNext_Classics.js` | record classici |
+    | `fcmRecordsNext_Series.js` | serie statistiche |
+    | `fcmRecordsNext_RU.js` | record Riserve d'Ufficio |
+    | `fcmRecordsNext_Modifiers.js` | record e statistiche Modificatori |
+    | `fcmRecordsNext_ThresholdsLuck.js` | Soglie e indicatori di Fortuna |
+    | `fcmRecordsNext_Culometro.js` | dati del Culometro |
+    | `fcmRecordsNext_Matches.js` | dataset partita-per-partita |
+    | `fcmRecordsNext_Manifest.js` | manifest della pubblicazione e stagione target |
 
-    ## Stato 3.1
+    ### Matches
 
-    La pubblicazione multisito è stata verificata su 21 stagioni gestite, da `2006_2007` a `2026_2027`: 189 file validati e 189 pubblicati senza errori.
+    `fcmRecordsNext_Matches.js` contiene una riga per squadra per incontro, quindi normalmente **due righe per partita**.
 
-    UCanAccess utilizzato: `2.0.9.5`.
+    Tra i campi canonici sono previsti:
+
+    - stagione;
+    - competizione;
+    - match;
+    - giornata/round;
+    - squadra;
+    - avversario;
+    - gol fatti/subiti;
+    - risultato standardizzato `V/N/P`;
+    - informazioni necessarie ai record;
+    - collegamento al tabellino quando disponibile.
+
+    I turni di riposo non vengono rappresentati come partite.
+
+    ## Calendari DataA
+
+    L'archivio canonico è interno a RecordsNext:
+
+    `data\calendars\DataA-YYYY.js`
+
+    La release 3.1 include i calendari:
+
+    `DataA-1991.js` … `DataA-2026.js`
+
+    I formati storici non vengono distruttivamente uniformati: RecordsNext conserva i file originali compatibili con le varie stagioni.
+
+    Se il DataA canonico manca e per quella stagione è configurato un sito locale con `js\DataA.js`, RecordsNext può recuperarlo e copiarlo nell'archivio interno.
+
+    ## Tabellini storici
+
+    I tabellini possono essere individuati nei formati compatibili con i siti FCM, tra cui:
+
+    - `ris*.htm`;
+    - `ris*.html`;
+    - `ris*.php`.
+
+    Il collegamento online usa il sito online configurato per la stagione corretta, evitando che un risultato storico venga aperto sotto la cartella della stagione corrente.
+
+    ## Flusso d'uso consigliato
+
+    ### Prima installazione
+
+    1. Installare RecordsNext.
+    2. Avviare `RecordsNext.bat`.
+    3. Configurare la lega.
+    4. Aggiungere le stagioni gestite con FCM/FCA.
+    5. Associare i siti locali solo alle stagioni che devono essere pubblicate.
+    6. Configurare le famiglie record.
+    7. Eseguire una elaborazione **Completa**.
+    8. Verificare l'output.
+    9. Se necessario, pubblicare i siti storici selezionati.
+
+    ### Aggiornamento dopo una giornata
+
+    1. Aggiornare normalmente FCM e il sito.
+    2. Avviare RecordsNext.
+    3. Usare **Consolidata**.
+    4. Selezionare **Pubblica nel sito della stagione corrente al termine**.
+    5. Premere **Elabora**.
+
+    ### Dopo una modifica strutturale
+
+    1. Eseguire una elaborazione completa.
+    2. Verificare preflight e output.
+    3. Selezionare le stagioni che hanno un sito da riallineare.
+    4. Premere **Pubblica i siti delle stagioni selezionate**.
+
+    ## Stato della release 3.1
+
+    La 3.1.0 è stata verificata con:
+
+    - suite automatica: **50 test, 0 failure, 0 errori**;
+    - build Maven completata con successo;
+    - pubblicazione multisito reale sulle stagioni gestite dal 2006/07 al 2026/27;
+    - **21 siti target**;
+    - **189 file validati e 189 pubblicati**;
+    - verifica del cutoff storico senza contaminazione da stagioni future;
+    - setup Windows compilato con Inno Setup 7.
+
+    SHA256 del setup 3.1.0 pubblicato:
+
+    `C39B0EA205F7D81660CD1FF09EC3F6014090932FF3E0D4DA721870D2740CA6EB`
+
+    ## Versione
+
+    RecordsNext 3.1.0
+    RecordsNext by mauz79
 
 ## Architettura
 
 File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
-    # Architettura RecordsNext 3.1
+    # Architettura RecordsNext 3.1.0
 
     ## Architettura multisito 3.1
 
@@ -545,6 +824,20 @@ File: docs\ARCHITETTURA_RECORDSNEXT2.md
     Soglie e Fortuna resta una famiglia dati autonoma. Nella GUI viene raggruppata con il Culometro perche il Culometro dipende da questi indicatori e puo dipendere anche da componenti delle Riserve d'Ufficio.
 
     Il Culometro resta opzionale e viene generato soltanto quando selezionato esplicitamente. Anche `culometro.html` resta un visualizzatore statico senza dati incorporati.
+
+
+    ## Stato finale della release 3.1.0
+
+    L'architettura multisito descritta in questo documento è stata validata anche su siti reali:
+
+    - 21 target, da `2006_2007` a `2026_2027`;
+    - 9 file JavaScript canonici per target;
+    - 189 file validati;
+    - 189 file pubblicati;
+    - nessun errore di pubblicazione;
+    - cutoff storico verificato.
+
+    La distribuzione pubblica della 3.1.0 avviene esclusivamente tramite installer clean-install Inno Setup. Il pacchetto UPDATE non fa parte dell'architettura di rilascio 3.1.
 
 ## Architettura visualizzatori HTML
 
@@ -1052,7 +1345,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     ## 1. Scopo
 
-    Questo documento definisce il modello dati comune di RecordsNext 2.0.
+    Questo documento definisce il modello dati comune di RecordsNext, aggiornato alla release 3.1.0.
 
     Il modello deve sostenere:
 
@@ -2087,6 +2380,17 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - eventuali dipendenze mancanti;
     - link ai tabellini quando la riga rappresenta una partita.
 
+
+    ## Validazione del modello 3.1.0
+
+    Il modello di scope stagionale è stato verificato in una pubblicazione reale su 21 target. Ogni target ha ricevuto i nove dataset canonici, per un totale di 189 file validati e pubblicati.
+
+    Il vincolo applicato rimane:
+
+    `sourceSeason.sort_order <= targetSeason.sort_order`
+
+    Questo vincolo governa sia i dataset record sia il Core, comprese identità e anchor canoniche.
+
 ## Configurazione
 
 File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
@@ -2132,8 +2436,8 @@ File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
 
     La GUI segnala separatamente:
 
-    - `DataA archivio trovato`;
-    - `DataA archivio non trovato`.
+    - `Calendario disponibile`;
+    - `Calendario non disponibile`.
 
     ### Pubblicazione
 
@@ -2254,15 +2558,53 @@ File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
 
     Non deve copiare i file dati `fcmRecordsNext_*.js`, che vengono generati dalla pipeline.
 
+
+    ## Configurazione GUI finale 3.1.0
+
+    ### Nome lega
+
+    Il campo Nome lega non è obbligatorio. Se lasciato vuoto, RecordsNext prova a ricavarlo dal primo FCM gestito; se non è possibile viene usato un fallback interno. L'ID tecnico della lega non è esposto come campo di configurazione utente.
+
+    ### URL online
+
+    Il valore viene normalizzato al salvataggio:
+
+    1. trim;
+    2. conversione `\` -> `/`;
+    3. se manca `http://` o `https://`, aggiunta di `http://`;
+    4. rimozione degli slash finali.
+
+    Un protocollo `https://` inserito esplicitamente non viene sostituito.
+
+    ### Aggiunta stagione Manuale
+
+    In modalità Manuale la finestra mostra soltanto i dati realmente necessari: anni della stagione e numero stagione. I controlli FCM/FCA non fanno parte del form manuale.
+
+    ### Archivio calendari distribuito
+
+    La release 3.1.0 include `DataA-1991.js` ... `DataA-2026.js` in `data/calendars`.
+
 ## Stato implementazione
 
 File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
     # Stato implementazione RecordsNext 3.1
 
-    ## Sviluppo RecordsNext 3.1.0 - multisito - 2026-09-02
+    ## Release RecordsNext 3.1.0 - 2026-09-02
 
-    RecordsNext 3.1.0 e' attualmente in sviluppo e collaudo. La release stabile precedente resta `2.1.0`; la 3.1 non e' ancora stata installata nell'ambiente operativo e i siti reali non sono ancora stati modificati.
+    RecordsNext 3.1.0 è stato completato, collaudato, versionato e pubblicato. La 3.1 sostituisce il modello precedente in cui il sito storico tendeva a essere trattato come parte necessaria della sorgente.
+
+    Verifiche finali della release:
+
+    - suite automatica: 50 test, 0 failure, 0 errori;
+    - build Maven completata con successo;
+    - pubblicazione reale su 21 siti, da 2006_2007 a 2026_2027;
+    - 189 file validati e 189 pubblicati;
+    - installer Windows Inno Setup compilato;
+    - distribuzione pubblica clean-install-only.
+
+    SHA256 setup:
+    `C39B0EA205F7D81660CD1FF09EC3F6014090932FF3E0D4DA721870D2740CA6EB`
 
     ### Architettura multisito consolidata
 
@@ -2275,7 +2617,7 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     - ogni stagione GESTITA continua a richiedere FCM e FCA;
     - la cartella del sito locale e' opzionale;
     - una stagione senza sito resta parte dello storico e puo' contribuire ai record;
-    - `DataA` non viene piu' ricercato nel sito storico: il calendario canonico e' `data/calendars/DataA-YYYY.js`;
+    - `DataA` canonico e' `data/calendars/DataA-YYYY.js`; se manca, la GUI può recuperare `<sito>/js/DataA.js` come fallback e archiviarlo internamente;
     - ogni stagione puo' avere una propria destinazione `local_site_path`;
     - la cartella `js` non viene configurata separatamente, ma deriva sempre da `<local_site_path>/js`;
     - la pubblicazione multisito usa come cutoff `rn_season.sort_order`, non il confronto lessicografico del `season_id`;
@@ -2697,6 +3039,19 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     5. implementare l'installer nella GUI;
     6. aggiungere test automatici per struttura, riferimenti e assenza di dati negli HTML.
 
+
+    ## Chiusura release 3.1.0
+
+    La release 3.1.0 è considerata funzionalmente chiusa.
+
+    Distribuzione pubblica:
+    - `RecordsNext_3.1.0_SETUP.exe`;
+    - nessun pacchetto UPDATE pubblico;
+    - installazione in directory scelta dall'utente;
+    - convenzione consigliata `<FCM>\plugin\RecordsNext`.
+
+    La documentazione utente di riferimento è `README.md` e `INSTALL.md`. La continuità tecnica è mantenuta da `docs/CODICE_FUNZIONANTE_RECORDSNEXT2.md`, generato dallo script dedicato.
+
 ## Changelog
 
 File: CHANGELOG.md
@@ -2705,30 +3060,66 @@ File: CHANGELOG.md
 
     ## RecordsNext 3.1.0 — 2026-09-02
 
-    ### Multisito
+    ### Architettura e storico
+    - separazione definitiva tra sorgenti storiche e destinazioni di pubblicazione;
+    - FCM/FCA/DataA definiscono lo storico;
     - sito locale opzionale per stagione;
-    - FCM/FCA/DataA definiscono lo storico, i siti sono destinazioni opzionali;
-    - DataA canonico in `data/calendars/DataA-YYYY.js`;
-    - pubblicazione ordinaria nel solo sito corrente;
+    - `DataA` canonico in `data/calendars/DataA-YYYY.js`;
+    - archivio calendari 1991-2026 incluso nella distribuzione;
+    - fallback da `<sito>\js\DataA.js` solo quando il calendario canonico manca;
+    - nessuna normalizzazione distruttiva dei diversi formati DataA storici.
+
+    ### Pubblicazione multisito
+    - pubblicazione ordinaria nel solo sito della stagione corrente;
     - comando `Pubblica i siti delle stagioni selezionate`;
     - ogni target riceve esclusivamente lo storico fino al proprio `sort_order`;
-    - Core e Manifest coerenti con la stagione target;
+    - `Core` e `Manifest` coerenti con la stagione target;
+    - identità canoniche riancorate allo scope storico disponibile;
+    - Classici, Serie, RU, Modificatori, Soglie/Fortuna, Culometro e Matches generati nello scope del target;
     - rimosso il fallback hardcoded verso `E:/fantacalcio/Lega2025/js`;
-    - corretto il path di `culometro.json` nello staging multisito.
+    - corretto lo staging di `culometro.json` nel flusso multisito.
+
+    ### GUI
+    - versione GUI 3.1;
+    - semantica distinta fra pubblicazione corrente e pubblicazione multisito;
+    - sito locale non più obbligatorio;
+    - stato calendario mostrato esplicitamente;
+    - recupero automatico del DataA dal sito quando l'archivio canonico è assente;
+    - ID lega rimosso dai campi richiesti all'utente;
+    - nome lega opzionale, con tentativo di derivazione dal primo FCM;
+    - modalità di aggiunta stagione Manuale semplificata, senza controlli FCM/FCA inutili;
+    - testo informativo stagioni aggiornato al modello 3.1;
+    - normalizzazione URL online con `http://` come protocollo predefinito quando assente.
+
+    ### Modello dati e robustezza
+    - introdotto `SeasonPublicationTargetRepository`;
+    - scope di pubblicazione basato su `sort_order`;
+    - cancellazione stagioni transazionale e coerente con foreign key;
+    - riancoraggio delle identità canoniche dopo cancellazione;
+    - promozione della stagione gestita più recente rimasta come anchor;
+    - `fcmRecordsNext_Matches.js` mantenuto come dataset canonico partita-per-partita.
 
     ### Packaging
     - versione Maven 3.1.0;
-    - launcher RecordsNext 3.1;
-    - pacchetto FULL con installer guidato;
-    - installer senza dati personali e senza pubblicazione automatica;
-    - UPDATE con backup e conservazione di `config` e `data`;
-    - UCanAccess 2.0.9.5 invariato.
+    - installer Windows realizzato con Inno Setup 7;
+    - scelta della directory sempre visibile;
+    - convenzione pubblica `<cartella FCM>\plugin\RecordsNext`;
+    - distribuzione pubblica **solo clean install**;
+    - eliminato il flusso UPDATE pubblico;
+    - UCanAccess 2.0.9.5 mantenuto nel runtime;
+    - setup senza database personali, FCM/FCA o configurazioni utente.
 
-    ### Verifiche
-    - suite automatica: 50 test, 0 failure, 0 errori;
-    - collaudo multisito sandbox riuscito;
-    - 9 JS canonici per target;
-    - verificata assenza di stagioni future nei siti storici.
+    ### Verifiche finali
+    - suite automatica: **50 test, 0 failure, 0 errori**;
+    - build Maven completata con successo;
+    - pubblicazione multisito reale verificata su **21 siti**, dalle stagioni 2006/07 a 2026/27;
+    - **189 file validati e 189 pubblicati**;
+    - verificato il cutoff storico senza contaminazione da stagioni future;
+    - setup finale compilato con successo.
+
+    SHA256 `RecordsNext_3.1.0_SETUP.exe`:
+
+    `C39B0EA205F7D81660CD1FF09EC3F6014090932FF3E0D4DA721870D2740CA6EB`
 
     ## RecordsNext 3.0.0 — 2026-08-28
 
@@ -30394,173 +30785,6 @@ File: tools\Audit-RecordsNext2Js.js
     fs.writeFileSync(path.join(outDir,'RecordsNext2_JS_AUDIT.md'),md,'utf8');
     console.log(JSON.stringify({files:rows.length,expectedSeasons:expectedSeasons.length,output:outDir},null,2));
 
-## tools\Build_RecordsNext2_Release_v4.ps1
-
-File: tools\Build_RecordsNext2_Release_v4.ps1
-
-    param(
-        [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
-        [string]$ReleaseVersion = "3.1.0",
-        [string]$DownloadsDir = "D:\DEV_APPS\downloads",
-        [string]$UCanAccessRoot = ""
-    )
-
-    $ErrorActionPreference = "Stop"
-    Set-StrictMode -Version Latest
-
-    if ([string]::IsNullOrWhiteSpace($UCanAccessRoot)) {
-        $maintainerRuntime = "E:\FCM\plugin\Mauz_strom2026\RecordsNext\runtime\ucanaccess"
-        if (Test-Path -LiteralPath (Join-Path $maintainerRuntime "ucanaccess-2.0.9.5.jar")) {
-            $UCanAccessRoot = $maintainerRuntime
-        }
-        else {
-            throw "Specificare -UCanAccessRoot con la cartella runtime\ucanaccess di una installazione RecordsNext valida."
-        }
-    }
-
-    $releaseName = "RecordsNext_${ReleaseVersion}_FULL"
-    $releaseDir = Join-Path $ProjectRoot ("release\" + $releaseName)
-    $payloadDir = Join-Path $releaseDir "payload"
-    $zipPath = Join-Path $DownloadsDir ($releaseName + ".zip")
-    $shaPath = Join-Path $DownloadsDir ($releaseName + "_SHA256.txt")
-
-    $requiredFiles = @(
-        "target\RecordsNext.jar",
-        "RecordsNext.bat",
-        "README.md",
-        "INSTALL.txt",
-        "CHANGELOG.md",
-        "tools\Installa-RecordsNext-3.1.ps1",
-        "tools\INSTALLA_RECORDSNEXT.bat",
-        "config\competitions.json",
-        "config\teams.json",
-        "config\culometro.json",
-        "config\manifest.example.json",
-        "release\visualizzatori\recordsnext.html",
-        "release\visualizzatori\js\fcmRecordsNextFunzioni_common.js",
-        "release\visualizzatori\js\fcmRecordsNextFunzioni_viewer.js",
-        "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md",
-        "docs\CULOMETRO.md",
-        "tools\Install-RecordsNextVisualizzatori_v2.ps1"
-    )
-
-    foreach ($relative in $requiredFiles) {
-        $file = Join-Path $ProjectRoot $relative
-        if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
-            throw "File richiesto mancante: $file"
-        }
-    }
-
-    if (-not (Test-Path -LiteralPath (Join-Path $UCanAccessRoot "ucanaccess-2.0.9.5.jar"))) {
-        throw "Runtime UCanAccess non trovato: $UCanAccessRoot"
-    }
-
-    Remove-Item -LiteralPath $releaseDir -Recurse -Force -ErrorAction SilentlyContinue
-    New-Item -ItemType Directory -Path $payloadDir -Force | Out-Null
-
-    Copy-Item (Join-Path $ProjectRoot "tools\Installa-RecordsNext-3.1.ps1") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "tools\INSTALLA_RECORDSNEXT.bat") $releaseDir -Force
-
-    $readmeInstaller = @"
-    RecordsNext $ReleaseVersion - INSTALLAZIONE
-
-    1. Estrarre completamente lo ZIP.
-    2. Eseguire INSTALLA_RECORDSNEXT.bat.
-    3. Indicare la cartella di installazione quando richiesto.
-    4. L'installer verifica Java 21+, runtime e integrita minima del payload.
-
-    L'installazione NON pubblica file nei siti FCM.
-    L'installazione NON contiene database, FCM/FCA o configurazioni personali.
-    "@
-    [IO.File]::WriteAllText(
-        (Join-Path $releaseDir "LEGGIMI.txt"),
-        $readmeInstaller,
-        (New-Object System.Text.UTF8Encoding($false))
-    )
-
-    @("RecordsNext.bat","README.md","INSTALL.txt","CHANGELOG.md") | ForEach-Object {
-        Copy-Item (Join-Path $ProjectRoot $_) $payloadDir -Force
-    }
-    Copy-Item (Join-Path $ProjectRoot "target\RecordsNext.jar") $payloadDir -Force
-
-    $runtimeDst = Join-Path $payloadDir "runtime\ucanaccess"
-    New-Item -ItemType Directory -Path $runtimeDst -Force | Out-Null
-    Copy-Item (Join-Path $UCanAccessRoot "*") $runtimeDst -Recurse -Force
-    Remove-Item (Join-Path $runtimeDst "console.bat") -Force -ErrorAction SilentlyContinue
-    Remove-Item (Join-Path $runtimeDst "console.sh") -Force -ErrorAction SilentlyContinue
-
-    $configDst = Join-Path $payloadDir "config"
-    New-Item -ItemType Directory -Path $configDst -Force | Out-Null
-    @("competitions.json","teams.json","culometro.json","manifest.example.json") | ForEach-Object {
-        Copy-Item (Join-Path $ProjectRoot ("config\" + $_)) $configDst -Force
-    }
-
-    $visSrc = Join-Path $ProjectRoot "release\visualizzatori"
-    $visDst = Join-Path $payloadDir "visualizzatori"
-    New-Item -ItemType Directory -Path $visDst -Force | Out-Null
-    Copy-Item (Join-Path $visSrc "recordsnext.html") $visDst -Force
-    Copy-Item (Join-Path $visSrc "RecordsNext") $visDst -Recurse -Force
-    Copy-Item (Join-Path $visSrc "profiles") $visDst -Recurse -Force
-    New-Item -ItemType Directory -Path (Join-Path $visDst "js") -Force | Out-Null
-    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_common.js") (Join-Path $visDst "js") -Force
-    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_viewer.js") (Join-Path $visDst "js") -Force
-
-    $docsDst = Join-Path $payloadDir "docs"
-    New-Item -ItemType Directory -Path $docsDst -Force | Out-Null
-    Copy-Item (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md") $docsDst -Force
-    Copy-Item (Join-Path $ProjectRoot "docs\CULOMETRO.md") $docsDst -Force
-    if (Test-Path -LiteralPath (Join-Path $ProjectRoot "docs\screenshots")) {
-        Copy-Item (Join-Path $ProjectRoot "docs\screenshots") $docsDst -Recurse -Force
-    }
-
-    $toolsDst = Join-Path $payloadDir "tools"
-    New-Item -ItemType Directory -Path $toolsDst -Force | Out-Null
-    Copy-Item (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1") `
-        (Join-Path $toolsDst "Install_RecordsNextVisualizzatori.ps1") -Force
-
-    $forbiddenNames = @(
-        "recordsnext.db",
-        "recordsnext-gui.properties",
-        "league.json",
-        "seasons.json",
-        "processing.json"
-    )
-
-    $bad = Get-ChildItem $releaseDir -Recurse -File | Where-Object {
-        $forbiddenNames -contains $_.Name -or
-        $_.Extension -in @(".fcm", ".fca") -or
-        $_.Name -like "fcmRecordsNext_Core.js" -or
-        $_.Name -like "fcmRecordsNext_Manifest.js" -or
-        $_.Name -like "fcmRecordsNext_Classics.js" -or
-        $_.Name -like "fcmRecordsNext_Series.js" -or
-        $_.Name -like "fcmRecordsNext_RU.js" -or
-        $_.Name -like "fcmRecordsNext_Modifiers.js" -or
-        $_.Name -like "fcmRecordsNext_ThresholdsLuck.js" -or
-        $_.Name -like "fcmRecordsNext_Culometro.js" -or
-        $_.Name -like "fcmRecordsNext_Matches.js"
-    }
-
-    if ($bad) {
-        $bad | ForEach-Object { Write-Host $_.FullName }
-        throw "Release FULL non pulita."
-    }
-
-    New-Item -ItemType Directory -Path $DownloadsDir -Force | Out-Null
-    Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $shaPath -Force -ErrorAction SilentlyContinue
-
-    Compress-Archive -Path $releaseDir -DestinationPath $zipPath -CompressionLevel Optimal -Force
-    $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
-    Set-Content -LiteralPath $shaPath `
-        -Value ("SHA256  " + $hash + "  " + [IO.Path]::GetFileName($zipPath)) `
-        -Encoding ASCII
-
-    Write-Host ""
-    Write-Host "FULL 3.1 creato:"
-    Write-Host "  $zipPath"
-    Write-Host "SHA256:"
-    Write-Host "  $hash"
-
 ## tools\Build_RecordsNext2_Release_v5.ps1
 
 File: tools\Build_RecordsNext2_Release_v5.ps1
@@ -30904,9 +31128,13 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     [void]$Builder.AppendLine("> Directory progetto: " + $ProjectDir)
     [void]$Builder.AppendLine("")
 
-    [void]$Builder.AppendLine("## Stato corrente di sviluppo RecordsNext 3.1.0 - 2026-09-02")
+    [void]$Builder.AppendLine("## Stato release RecordsNext 3.1.0 - 2026-09-02")
     [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("RecordsNext 3.1.0 e' in sviluppo e collaudo; la release stabile precedente resta 2.1.0.")
+    [void]$Builder.AppendLine("RecordsNext 3.1.0 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("- Suite automatica: 50 test, 0 failure, 0 errori.")
+    [void]$Builder.AppendLine("- Collaudo multisito reale: 21 target, 189 file validati e 189 pubblicati.")
+    [void]$Builder.AppendLine("- Setup pubblico SHA256: C39B0EA205F7D81660CD1FF09EC3F6014090932FF3E0D4DA721870D2740CA6EB.")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("### Multisito 3.1")
     [void]$Builder.AppendLine("")
@@ -31174,187 +31402,6 @@ File: tools\Initialize-RecordsNext2Project.ps1
         New-Item -ItemType Directory -Path (Join-Path $ProjectDir $relativePath) -Force | Out-Null
     }
     Write-Host "Struttura RecordsNext 2.0 pronta: $ProjectDir" -ForegroundColor Green
-
-## tools\Installa-RecordsNext-3.1.ps1
-
-File: tools\Installa-RecordsNext-3.1.ps1
-
-    param(
-        [string]$InstallDir = ""
-    )
-
-    $ErrorActionPreference = "Stop"
-    Set-StrictMode -Version Latest
-
-    $Version = "3.1.0"
-    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-    $payload = Join-Path $scriptDir "payload"
-
-    function Fail([string]$Message) {
-        Write-Host ""
-        Write-Host "ERRORE: $Message" -ForegroundColor Red
-        Write-Host ""
-        throw $Message
-    }
-
-    function Get-JavaMajor {
-        $java = Get-Command java -ErrorAction SilentlyContinue
-        if ($null -eq $java) { return $null }
-
-        $line = (& java -version 2>&1 | Select-Object -First 1)
-        if ($line -notmatch '"([^"]+)"') { return $null }
-
-        $version = $Matches[1]
-        if ($version -match '^1\.(\d+)') { return [int]$Matches[1] }
-        if ($version -match '^(\d+)') { return [int]$Matches[1] }
-        return $null
-    }
-
-    Write-Host ""
-    Write-Host "========================================="
-    Write-Host " RecordsNext $Version - INSTALLAZIONE"
-    Write-Host "========================================="
-    Write-Host ""
-
-    $requiredPayload = @(
-        "RecordsNext.jar",
-        "RecordsNext.bat",
-        "README.md",
-        "INSTALL.txt",
-        "CHANGELOG.md",
-        "runtime\ucanaccess\ucanaccess-2.0.9.5.jar",
-        "runtime\ucanaccess\lib\jackcess-2.1.0.jar",
-        "runtime\ucanaccess\lib\hsqldb.jar",
-        "runtime\ucanaccess\lib\commons-lang-2.6.jar",
-        "runtime\ucanaccess\lib\commons-logging-1.1.1.jar",
-        "config\competitions.json",
-        "config\teams.json",
-        "config\culometro.json",
-        "visualizzatori\recordsnext.html"
-    )
-
-    foreach ($relative in $requiredPayload) {
-        $path = Join-Path $payload $relative
-        if (-not (Test-Path -LiteralPath $path)) {
-            Fail "Payload incompleto. File mancante: $relative"
-        }
-    }
-
-    $javaMajor = Get-JavaMajor
-    if ($null -eq $javaMajor) {
-        Fail "Java non trovato o versione non leggibile. Installare Java 21 o superiore."
-    }
-    if ($javaMajor -lt 21) {
-        Fail "Java $javaMajor non compatibile. RecordsNext richiede Java 21 o superiore."
-    }
-
-    if ([string]::IsNullOrWhiteSpace($InstallDir)) {
-        Write-Host "Indicare la cartella in cui installare RecordsNext."
-        Write-Host "Convenzione consigliata:"
-        Write-Host "  <cartella FCM>\plugin\RecordsNext"
-        Write-Host ""
-        $InstallDir = Read-Host "Cartella di installazione completa"
-    }
-
-    if ([string]::IsNullOrWhiteSpace($InstallDir)) {
-        Fail "Cartella di installazione non specificata."
-    }
-
-    $InstallDir = [IO.Path]::GetFullPath($InstallDir)
-
-    if ($InstallDir.StartsWith($scriptDir, [StringComparison]::OrdinalIgnoreCase)) {
-        Fail "La destinazione non puo' essere dentro la cartella del pacchetto estratto."
-    }
-    if ($scriptDir.StartsWith($InstallDir, [StringComparison]::OrdinalIgnoreCase)) {
-        Fail "La destinazione non puo' contenere la cartella del pacchetto estratto."
-    }
-
-    if (Test-Path -LiteralPath $InstallDir) {
-        $existing = @(Get-ChildItem -LiteralPath $InstallDir -Force -ErrorAction SilentlyContinue)
-        if ($existing.Count -gt 0) {
-            Write-Host ""
-            Write-Host "La cartella non e' vuota:"
-            Write-Host "  $InstallDir"
-            Write-Host ""
-            $answer = Read-Host "Continuare e sovrascrivere i file applicativi? [S/N]"
-            if ($answer -notmatch '^[sS]$') {
-                Write-Host "Installazione annullata."
-                exit 0
-            }
-        }
-    } else {
-        New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
-    }
-
-    $forbiddenPayloadNames = @(
-        "recordsnext.db",
-        "recordsnext-gui.properties",
-        "league.json",
-        "seasons.json",
-        "processing.json"
-    )
-
-    $bad = Get-ChildItem -LiteralPath $payload -Recurse -File | Where-Object {
-        $forbiddenPayloadNames -contains $_.Name -or
-        $_.Extension -in @(".fcm", ".fca")
-    }
-
-    if ($bad) {
-        $bad | ForEach-Object { Write-Host $_.FullName }
-        Fail "Il payload contiene dati/configurazioni personali vietati."
-    }
-
-    Write-Host ""
-    Write-Host "Installazione in:"
-    Write-Host "  $InstallDir"
-    Write-Host ""
-
-    Get-ChildItem -LiteralPath $payload -Force | ForEach-Object {
-        Copy-Item -LiteralPath $_.FullName -Destination $InstallDir -Recurse -Force
-    }
-
-    @(
-        "data",
-        "data\database",
-        "data\calendars",
-        "data\reports",
-        "data\records-archive",
-        "data\site-export-staging",
-        "data\consolidation"
-    ) | ForEach-Object {
-        New-Item -ItemType Directory -Path (Join-Path $InstallDir $_) -Force | Out-Null
-    }
-
-    $requiredInstalled = @(
-        "RecordsNext.jar",
-        "RecordsNext.bat",
-        "runtime\ucanaccess\ucanaccess-2.0.9.5.jar",
-        "runtime\ucanaccess\lib\jackcess-2.1.0.jar",
-        "runtime\ucanaccess\lib\hsqldb.jar",
-        "runtime\ucanaccess\lib\commons-lang-2.6.jar",
-        "runtime\ucanaccess\lib\commons-logging-1.1.1.jar"
-    )
-
-    foreach ($relative in $requiredInstalled) {
-        if (-not (Test-Path -LiteralPath (Join-Path $InstallDir $relative) -PathType Leaf)) {
-            Fail "Verifica post-installazione fallita: $relative"
-        }
-    }
-
-    Write-Host ""
-    Write-Host "Installazione RecordsNext $Version completata." -ForegroundColor Green
-    Write-Host ""
-    Write-Host "Nessun sito FCM e' stato modificato."
-    Write-Host "Nessun database personale e' stato installato."
-    Write-Host ""
-    Write-Host "Avvio:"
-    Write-Host "  $(Join-Path $InstallDir 'RecordsNext.bat')"
-    Write-Host ""
-
-    $answer = Read-Host "Avviare RecordsNext adesso? [S/N]"
-    if ($answer -match '^[sS]$') {
-        Start-Process -FilePath (Join-Path $InstallDir "RecordsNext.bat") -WorkingDirectory $InstallDir
-    }
 
 ## tools\Install-RecordsNextVisualizzatori_v1.ps1
 
@@ -42613,12 +42660,10 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - config\teams.json
 - tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
 - tools\Audit-RecordsNext2Js.js
-- tools\Build_RecordsNext2_Release_v4.ps1
 - tools\Build_RecordsNext2_Release_v5.ps1
 - tools\Create-RecordsNext2RealJsZip.ps1
 - tools\Create-RecordsNext2WorkingCodeMd.ps1
 - tools\Initialize-RecordsNext2Project.ps1
-- tools\Installa-RecordsNext-3.1.ps1
 - tools\Install-RecordsNextVisualizzatori_v1.ps1
 - tools\Install-RecordsNextVisualizzatori_v2.ps1
 - tools\Prepare-RecordsNextVisualizzatoriPreview_v2.ps1

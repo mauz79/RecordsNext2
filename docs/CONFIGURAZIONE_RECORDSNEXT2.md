@@ -39,8 +39,8 @@ Esempi:
 
 La GUI segnala separatamente:
 
-- `DataA archivio trovato`;
-- `DataA archivio non trovato`.
+- `Calendario disponibile`;
+- `Calendario non disponibile`.
 
 ### Pubblicazione
 
@@ -160,3 +160,29 @@ js\fcmRecordsNextFunzioni_viewer.js    -> js della skin
 ```
 
 Non deve copiare i file dati `fcmRecordsNext_*.js`, che vengono generati dalla pipeline.
+
+
+## Configurazione GUI finale 3.1.0
+
+### Nome lega
+
+Il campo Nome lega non è obbligatorio. Se lasciato vuoto, RecordsNext prova a ricavarlo dal primo FCM gestito; se non è possibile viene usato un fallback interno. L'ID tecnico della lega non è esposto come campo di configurazione utente.
+
+### URL online
+
+Il valore viene normalizzato al salvataggio:
+
+1. trim;
+2. conversione `\` -> `/`;
+3. se manca `http://` o `https://`, aggiunta di `http://`;
+4. rimozione degli slash finali.
+
+Un protocollo `https://` inserito esplicitamente non viene sostituito.
+
+### Aggiunta stagione Manuale
+
+In modalità Manuale la finestra mostra soltanto i dati realmente necessari: anni della stagione e numero stagione. I controlli FCM/FCA non fanno parte del form manuale.
+
+### Archivio calendari distribuito
+
+La release 3.1.0 include `DataA-1991.js` ... `DataA-2026.js` in `data/calendars`.

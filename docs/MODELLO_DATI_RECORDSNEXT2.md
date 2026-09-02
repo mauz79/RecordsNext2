@@ -48,7 +48,7 @@ Le identita canoniche condivise con altre stagioni devono sopravvivere alla canc
 
 ## 1. Scopo
 
-Questo documento definisce il modello dati comune di RecordsNext 2.0.
+Questo documento definisce il modello dati comune di RecordsNext, aggiornato alla release 3.1.0.
 
 Il modello deve sostenere:
 
@@ -1082,3 +1082,14 @@ Ogni dataset pubblico deve dichiarare almeno:
 - dati completi necessari ai filtri;
 - eventuali dipendenze mancanti;
 - link ai tabellini quando la riga rappresenta una partita.
+
+
+## Validazione del modello 3.1.0
+
+Il modello di scope stagionale è stato verificato in una pubblicazione reale su 21 target. Ogni target ha ricevuto i nove dataset canonici, per un totale di 189 file validati e pubblicati.
+
+Il vincolo applicato rimane:
+
+`sourceSeason.sort_order <= targetSeason.sort_order`
+
+Questo vincolo governa sia i dataset record sia il Core, comprese identità e anchor canoniche.

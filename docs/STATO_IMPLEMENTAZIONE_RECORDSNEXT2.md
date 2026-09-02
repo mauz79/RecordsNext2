@@ -1,8 +1,20 @@
 # Stato implementazione RecordsNext 3.1
 
-## Sviluppo RecordsNext 3.1.0 - multisito - 2026-09-02
+## Release RecordsNext 3.1.0 - 2026-09-02
 
-RecordsNext 3.1.0 e' attualmente in sviluppo e collaudo. La release stabile precedente resta `2.1.0`; la 3.1 non e' ancora stata installata nell'ambiente operativo e i siti reali non sono ancora stati modificati.
+RecordsNext 3.1.0 è stato completato, collaudato, versionato e pubblicato. La 3.1 sostituisce il modello precedente in cui il sito storico tendeva a essere trattato come parte necessaria della sorgente.
+
+Verifiche finali della release:
+
+- suite automatica: 50 test, 0 failure, 0 errori;
+- build Maven completata con successo;
+- pubblicazione reale su 21 siti, da 2006_2007 a 2026_2027;
+- 189 file validati e 189 pubblicati;
+- installer Windows Inno Setup compilato;
+- distribuzione pubblica clean-install-only.
+
+SHA256 setup:
+`C39B0EA205F7D81660CD1FF09EC3F6014090932FF3E0D4DA721870D2740CA6EB`
 
 ### Architettura multisito consolidata
 
@@ -15,7 +27,7 @@ Comportamento implementato e verificato:
 - ogni stagione GESTITA continua a richiedere FCM e FCA;
 - la cartella del sito locale e' opzionale;
 - una stagione senza sito resta parte dello storico e puo' contribuire ai record;
-- `DataA` non viene piu' ricercato nel sito storico: il calendario canonico e' `data/calendars/DataA-YYYY.js`;
+- `DataA` canonico e' `data/calendars/DataA-YYYY.js`; se manca, la GUI può recuperare `<sito>/js/DataA.js` come fallback e archiviarlo internamente;
 - ogni stagione puo' avere una propria destinazione `local_site_path`;
 - la cartella `js` non viene configurata separatamente, ma deriva sempre da `<local_site_path>/js`;
 - la pubblicazione multisito usa come cutoff `rn_season.sort_order`, non il confronto lessicografico del `season_id`;
@@ -436,3 +448,16 @@ Prossima fase:
 4. creare e verificare i tre profili CSS;
 5. implementare l'installer nella GUI;
 6. aggiungere test automatici per struttura, riferimenti e assenza di dati negli HTML.
+
+
+## Chiusura release 3.1.0
+
+La release 3.1.0 è considerata funzionalmente chiusa.
+
+Distribuzione pubblica:
+- `RecordsNext_3.1.0_SETUP.exe`;
+- nessun pacchetto UPDATE pubblico;
+- installazione in directory scelta dall'utente;
+- convenzione consigliata `<FCM>\plugin\RecordsNext`.
+
+La documentazione utente di riferimento è `README.md` e `INSTALL.md`. La continuità tecnica è mantenuta da `docs/CODICE_FUNZIONANTE_RECORDSNEXT2.md`, generato dallo script dedicato.

@@ -2,30 +2,66 @@
 
 ## RecordsNext 3.1.0 — 2026-09-02
 
-### Multisito
+### Architettura e storico
+- separazione definitiva tra sorgenti storiche e destinazioni di pubblicazione;
+- FCM/FCA/DataA definiscono lo storico;
 - sito locale opzionale per stagione;
-- FCM/FCA/DataA definiscono lo storico, i siti sono destinazioni opzionali;
-- DataA canonico in `data/calendars/DataA-YYYY.js`;
-- pubblicazione ordinaria nel solo sito corrente;
+- `DataA` canonico in `data/calendars/DataA-YYYY.js`;
+- archivio calendari 1991-2026 incluso nella distribuzione;
+- fallback da `<sito>\js\DataA.js` solo quando il calendario canonico manca;
+- nessuna normalizzazione distruttiva dei diversi formati DataA storici.
+
+### Pubblicazione multisito
+- pubblicazione ordinaria nel solo sito della stagione corrente;
 - comando `Pubblica i siti delle stagioni selezionate`;
 - ogni target riceve esclusivamente lo storico fino al proprio `sort_order`;
-- Core e Manifest coerenti con la stagione target;
+- `Core` e `Manifest` coerenti con la stagione target;
+- identità canoniche riancorate allo scope storico disponibile;
+- Classici, Serie, RU, Modificatori, Soglie/Fortuna, Culometro e Matches generati nello scope del target;
 - rimosso il fallback hardcoded verso `E:/fantacalcio/Lega2025/js`;
-- corretto il path di `culometro.json` nello staging multisito.
+- corretto lo staging di `culometro.json` nel flusso multisito.
+
+### GUI
+- versione GUI 3.1;
+- semantica distinta fra pubblicazione corrente e pubblicazione multisito;
+- sito locale non più obbligatorio;
+- stato calendario mostrato esplicitamente;
+- recupero automatico del DataA dal sito quando l'archivio canonico è assente;
+- ID lega rimosso dai campi richiesti all'utente;
+- nome lega opzionale, con tentativo di derivazione dal primo FCM;
+- modalità di aggiunta stagione Manuale semplificata, senza controlli FCM/FCA inutili;
+- testo informativo stagioni aggiornato al modello 3.1;
+- normalizzazione URL online con `http://` come protocollo predefinito quando assente.
+
+### Modello dati e robustezza
+- introdotto `SeasonPublicationTargetRepository`;
+- scope di pubblicazione basato su `sort_order`;
+- cancellazione stagioni transazionale e coerente con foreign key;
+- riancoraggio delle identità canoniche dopo cancellazione;
+- promozione della stagione gestita più recente rimasta come anchor;
+- `fcmRecordsNext_Matches.js` mantenuto come dataset canonico partita-per-partita.
 
 ### Packaging
 - versione Maven 3.1.0;
-- launcher RecordsNext 3.1;
-- pacchetto FULL con installer guidato;
-- installer senza dati personali e senza pubblicazione automatica;
-- UPDATE con backup e conservazione di `config` e `data`;
-- UCanAccess 2.0.9.5 invariato.
+- installer Windows realizzato con Inno Setup 7;
+- scelta della directory sempre visibile;
+- convenzione pubblica `<cartella FCM>\plugin\RecordsNext`;
+- distribuzione pubblica **solo clean install**;
+- eliminato il flusso UPDATE pubblico;
+- UCanAccess 2.0.9.5 mantenuto nel runtime;
+- setup senza database personali, FCM/FCA o configurazioni utente.
 
-### Verifiche
-- suite automatica: 50 test, 0 failure, 0 errori;
-- collaudo multisito sandbox riuscito;
-- 9 JS canonici per target;
-- verificata assenza di stagioni future nei siti storici.
+### Verifiche finali
+- suite automatica: **50 test, 0 failure, 0 errori**;
+- build Maven completata con successo;
+- pubblicazione multisito reale verificata su **21 siti**, dalle stagioni 2006/07 a 2026/27;
+- **189 file validati e 189 pubblicati**;
+- verificato il cutoff storico senza contaminazione da stagioni future;
+- setup finale compilato con successo.
+
+SHA256 `RecordsNext_3.1.0_SETUP.exe`:
+
+`C39B0EA205F7D81660CD1FF09EC3F6014090932FF3E0D4DA721870D2740CA6EB`
 
 ## RecordsNext 3.0.0 — 2026-08-28
 

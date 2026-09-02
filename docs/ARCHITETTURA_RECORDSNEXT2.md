@@ -1,4 +1,4 @@
-# Architettura RecordsNext 3.1
+# Architettura RecordsNext 3.1.0
 
 ## Architettura multisito 3.1
 
@@ -275,3 +275,17 @@ La presenza di una pagina HTML non implica la presenza del relativo output dati.
 Soglie e Fortuna resta una famiglia dati autonoma. Nella GUI viene raggruppata con il Culometro perche il Culometro dipende da questi indicatori e puo dipendere anche da componenti delle Riserve d'Ufficio.
 
 Il Culometro resta opzionale e viene generato soltanto quando selezionato esplicitamente. Anche `culometro.html` resta un visualizzatore statico senza dati incorporati.
+
+
+## Stato finale della release 3.1.0
+
+L'architettura multisito descritta in questo documento è stata validata anche su siti reali:
+
+- 21 target, da `2006_2007` a `2026_2027`;
+- 9 file JavaScript canonici per target;
+- 189 file validati;
+- 189 file pubblicati;
+- nessun errore di pubblicazione;
+- cutoff storico verificato.
+
+La distribuzione pubblica della 3.1.0 avviene esclusivamente tramite installer clean-install Inno Setup. Il pacchetto UPDATE non fa parte dell'architettura di rilascio 3.1.
