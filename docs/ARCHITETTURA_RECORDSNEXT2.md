@@ -1,5 +1,33 @@
 # Architettura RecordsNext 2.1
 
+## Ciclo di vita delle stagioni
+
+Una stagione RecordsNext e una entita persistente del database e non coincide con i soli parametri della GUI.
+
+La cancellazione di una stagione deve quindi essere transazionale e coinvolgere tutti i dati interni collegati.
+
+Principi consolidati:
+
+1. eliminare i mapping appartenenti alla stagione;
+2. eliminare team e competizioni stagionali;
+3. eliminare calendario e sorgenti associate alla stagione;
+4. eliminare registrazioni FCM/FCA interne (`rn_source_file`);
+5. eliminare la configurazione della stagione;
+6. eliminare infine `rn_season`.
+
+Le identita canoniche di squadra e competizione non devono essere distrutte se sono utilizzate da altre stagioni.
+
+Quando una identita canonica e ancorata alla stagione eliminata:
+
+- viene cercata la stagione mappata piu recente ancora esistente;
+- `anchor_season_id` e l'anchor stagionale dell'identita vengono spostati su tale stagione;
+- se non esiste alcuna altra occorrenza, l'identita viene eliminata.
+
+Dopo la cancellazione viene inoltre ricalcolata l'anchor globale: la stagione gestita piu recente rimasta diventa `rn_season.is_anchor = 1`.
+
+La rimozione dal database RecordsNext non comporta la cancellazione dei file sorgente FCM/FCA/DataA dal filesystem ne delle directory dei siti FCM.
+
+
 ## Scopo
 
 RecordsNext 2.1 genera viste dati tematiche complete e filtrabili, non semplici classifiche finali.
@@ -69,7 +97,7 @@ RecordsNext 2.1 introduce:
 
 `fcmRecordsNext_Matches.js`
 
-È il dataset pubblico canonico delle partite.
+Ãˆ il dataset pubblico canonico delle partite.
 
 Per ogni incontro reale contiene esattamente due righe:
 

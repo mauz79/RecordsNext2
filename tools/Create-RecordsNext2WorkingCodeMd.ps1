@@ -168,7 +168,8 @@ $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 [void]$Builder.AppendLine("")
 [void]$Builder.AppendLine("- Base funzionante RecordsNext 1.0.2 importata nella linea RecordsNext 2.x.")
 [void]$Builder.AppendLine("- Accesso ai database FCM e FCA tramite UCanAccess.")
-[void]$Builder.AppendLine("- Configurazione delle stagioni gestite e manuali.")
+[void]$Builder.AppendLine("- Configurazione delle stagioni gestite e manuali.
+- Eliminazione completa e transazionale delle stagioni verificata anche sul database operativo copiato: pulizia dei dati stagionali, riancoraggio delle identita canoniche e promozione automatica della nuova anchor.")
 [void]$Builder.AppendLine("- Importazione, normalizzazione e consolidamento storico delle stagioni gestite.")
 [void]$Builder.AppendLine("- Modello modulare con famiglie, figli, dipendenze, planner e preflight.")
 [void]$Builder.AppendLine("- GUI RecordsNext 2.1 con configurazione granulare delle famiglie.")
@@ -179,7 +180,7 @@ $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 [void]$Builder.AppendLine("- Statistiche Massimo, Totale, Media e Utilizzi per i modificatori selezionati.")
 [void]$Builder.AppendLine("- Esportazione verificata del MODDIFESA FCM della stagione 2006_2007.")
 [void]$Builder.AppendLine("- Metadati availableSections e generatedSections distinti.")
-[void]$Builder.AppendLine("- Test automatici: 41 eseguiti, 0 failure, 0 errori.")
+[void]$Builder.AppendLine("- Test automatici: 44 eseguiti, 0 failure, 0 errori.")
 [void]$Builder.AppendLine("- Gli output legacy records2026.* non vengono piu pubblicati; gli exporter legacy Classici/RU restano solo come sorgente interna di compatibilita.")
 [void]$Builder.AppendLine("- Bonifica publisher verificata sui dati operativi: 9 output moderni, 0 output legacy; Classics e RU invariati byte-per-byte.")
 [void]$Builder.AppendLine("- Verifica reale del JS Modificatori completata con tutte le sezioni selezionate presenti.")

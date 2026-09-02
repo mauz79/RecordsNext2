@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 2.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-08-28 01:59:36 +02:00
+> Data generazione: 2026-09-02 13:49:18 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Stato consolidato RecordsNext 2.1.0 - 2026-08-27
@@ -103,6 +103,7 @@ Le sezioni successive includono documentazione e codice reale del progetto. Le i
 - Base funzionante RecordsNext 1.0.2 importata nella linea RecordsNext 2.x.
 - Accesso ai database FCM e FCA tramite UCanAccess.
 - Configurazione delle stagioni gestite e manuali.
+- Eliminazione completa e transazionale delle stagioni verificata anche sul database operativo copiato: pulizia dei dati stagionali, riancoraggio delle identita canoniche e promozione automatica della nuova anchor.
 - Importazione, normalizzazione e consolidamento storico delle stagioni gestite.
 - Modello modulare con famiglie, figli, dipendenze, planner e preflight.
 - GUI RecordsNext 2.1 con configurazione granulare delle famiglie.
@@ -113,7 +114,7 @@ Le sezioni successive includono documentazione e codice reale del progetto. Le i
 - Statistiche Massimo, Totale, Media e Utilizzi per i modificatori selezionati.
 - Esportazione verificata del MODDIFESA FCM della stagione 2006_2007.
 - Metadati availableSections e generatedSections distinti.
-- Test automatici: 41 eseguiti, 0 failure, 0 errori.
+- Test automatici: 44 eseguiti, 0 failure, 0 errori.
 - Gli output legacy records2026.* non vengono piu pubblicati; gli exporter legacy Classici/RU restano solo come sorgente interna di compatibilita.
 - Bonifica publisher verificata sui dati operativi: 9 output moderni, 0 output legacy; Classics e RU invariati byte-per-byte.
 - Verifica reale del JS Modificatori completata con tutte le sezioni selezionate presenti.
@@ -322,6 +323,34 @@ File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
     # Architettura RecordsNext 2.1
 
+    ## Ciclo di vita delle stagioni
+
+    Una stagione RecordsNext e una entita persistente del database e non coincide con i soli parametri della GUI.
+
+    La cancellazione di una stagione deve quindi essere transazionale e coinvolgere tutti i dati interni collegati.
+
+    Principi consolidati:
+
+    1. eliminare i mapping appartenenti alla stagione;
+    2. eliminare team e competizioni stagionali;
+    3. eliminare calendario e sorgenti associate alla stagione;
+    4. eliminare registrazioni FCM/FCA interne (`rn_source_file`);
+    5. eliminare la configurazione della stagione;
+    6. eliminare infine `rn_season`.
+
+    Le identita canoniche di squadra e competizione non devono essere distrutte se sono utilizzate da altre stagioni.
+
+    Quando una identita canonica e ancorata alla stagione eliminata:
+
+    - viene cercata la stagione mappata piu recente ancora esistente;
+    - `anchor_season_id` e l'anchor stagionale dell'identita vengono spostati su tale stagione;
+    - se non esiste alcuna altra occorrenza, l'identita viene eliminata.
+
+    Dopo la cancellazione viene inoltre ricalcolata l'anchor globale: la stagione gestita piu recente rimasta diventa `rn_season.is_anchor = 1`.
+
+    La rimozione dal database RecordsNext non comporta la cancellazione dei file sorgente FCM/FCA/DataA dal filesystem ne delle directory dei siti FCM.
+
+
     ## Scopo
 
     RecordsNext 2.1 genera viste dati tematiche complete e filtrabili, non semplici classifiche finali.
@@ -391,7 +420,7 @@ File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
     `fcmRecordsNext_Matches.js`
 
-    È il dataset pubblico canonico delle partite.
+    Ãˆ il dataset pubblico canonico delle partite.
 
     Per ogni incontro reale contiene esattamente due righe:
 
@@ -984,6 +1013,27 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     # Modello dati RecordsNext 2.0
 
+    ## Regole di eliminazione di una stagione
+
+    La cancellazione di una stagione deve rispettare le foreign key del modello dati.
+
+    Ordine logico:
+
+    - riancoraggio o eliminazione delle `rn_team_identity` ancorate alla stagione;
+    - riancoraggio o eliminazione delle `rn_competition_identity` ancorate alla stagione;
+    - cancellazione dei mapping della stagione;
+    - cancellazione di `rn_team_season`;
+    - cancellazione di `rn_competition_season`;
+    - cancellazione di `rn_matchday_date`;
+    - cancellazione di `rn_calendar_source`;
+    - cancellazione di `rn_season_configuration`;
+    - cancellazione di `rn_source_file`;
+    - cancellazione di `rn_season`;
+    - promozione della stagione gestita piu recente rimasta come nuova anchor.
+
+    Le identita canoniche condivise con altre stagioni devono sopravvivere alla cancellazione.
+
+
     ## 1. Scopo
 
     Questo documento definisce il modello dati comune di RecordsNext 2.0.
@@ -1008,7 +1058,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     ### 2.1 Dati completi, non classifiche finali
 
-    Gli output non devono contenere soltanto top 10 o classifiche già tagliate.
+    Gli output non devono contenere soltanto top 10 o classifiche giÃ  tagliate.
 
     Devono contenere dati sufficientemente completi da permettere alle viste HTML di ricavare:
 
@@ -1025,14 +1075,14 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     I limiti di visualizzazione appartengono alla vista, non al dataset.
 
-    ### 2.2 Identità stagionale e identità canonica
+    ### 2.2 IdentitÃ  stagionale e identitÃ  canonica
 
-    Ogni squadra e competizione deve conservare due livelli di identità:
+    Ogni squadra e competizione deve conservare due livelli di identitÃ :
 
-    - identità originale della stagione;
-    - identità canonica storica.
+    - identitÃ  originale della stagione;
+    - identitÃ  canonica storica.
 
-    Questo permette di mantenere i nomi realmente usati nella stagione e, nello stesso tempo, aggregare correttamente tutta la storia della stessa entità.
+    Questo permette di mantenere i nomi realmente usati nella stagione e, nello stesso tempo, aggregare correttamente tutta la storia della stessa entitÃ .
 
     ### 2.3 Dipendenze locali
 
@@ -1057,7 +1107,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - eventuale fallback;
     - eventuale simulazione.
 
-    ## 3. Entità principali
+    ## 3. EntitÃ  principali
 
     Il modello comune iniziale comprende:
 
@@ -1139,15 +1189,15 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     Regole:
 
-    - una stagione MANAGED può essere elaborata da FCM/FCA;
+    - una stagione MANAGED puÃ² essere elaborata da FCM/FCA;
     - una stagione MANUAL resta nello storico ma non viene elaborata da FCM;
-    - una stagione MANUAL può avere classifiche o albo d'oro manuali;
-    - una stagione MANUAL può non avere tabellini;
-    - l'ultimo FCM disponibile rappresenta la stagione attuale del sito, anche quando cronologicamente non è l'anno corrente reale.
+    - una stagione MANUAL puÃ² avere classifiche o albo d'oro manuali;
+    - una stagione MANUAL puÃ² non avere tabellini;
+    - l'ultimo FCM disponibile rappresenta la stagione attuale del sito, anche quando cronologicamente non Ã¨ l'anno corrente reale.
 
     ## 6. Sito della stagione
 
-    Ogni stagione può avere:
+    Ogni stagione puÃ² avere:
 
     - sito locale;
     - sito online.
@@ -1175,7 +1225,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     Regole:
 
-    - la cartella `js` è interna alla root del sito;
+    - la cartella `js` Ã¨ interna alla root del sito;
     - il formato `.htm` o `.php` non deve essere dedotto genericamente;
     - il formato deve derivare dalla configurazione della stagione;
     - il link online e il link locale devono essere costruiti separatamente;
@@ -1206,7 +1256,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     | sourceTeamId | ID originale FCM/FCA |
     | seasonName | Nome usato nella stagione |
     | shortName | Nome abbreviato |
-    | canonicalTeamId | Identità storica |
+    | canonicalTeamId | IdentitÃ  storica |
     | associationStatus | Stato associazione |
     | isCurrent | Squadra presente nell'ultimo FCM |
 
@@ -1236,7 +1286,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     Regole:
 
     - il canonicalTeamId deve essere stabile;
-    - il nome canonico è distinto dal nome storico;
+    - il nome canonico Ã¨ distinto dal nome storico;
     - l'associazione parte dalla squadra attuale;
     - le squadre delle stagioni precedenti vengono collegate alla squadra attuale;
     - gli aggregati globali usano il canonicalTeamId;
@@ -1272,7 +1322,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - una competizione assente non deve essere inventata;
     - Play Off e Play Out restano fuori dai gruppi principali;
     - competizioni presenti in una sola stagione sono ammesse;
-    - i gruppi predefiniti devono rispettare l'ordine canonico già stabilito nel progetto storico.
+    - i gruppi predefiniti devono rispettare l'ordine canonico giÃ  stabilito nel progetto storico.
 
     ## 10. Competizione canonica
 
@@ -1290,7 +1340,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     Regole:
 
-    - competizioni con nomi diversi possono condividere la stessa identità canonica;
+    - competizioni con nomi diversi possono condividere la stessa identitÃ  canonica;
     - il nome originale della stagione deve essere conservato;
     - gli aggregati storici per competizione usano il canonicalCompetitionId.
 
@@ -1316,7 +1366,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     ## 12. Partita normalizzata
 
-    La partita è l'entità centrale del modello.
+    La partita Ã¨ l'entitÃ  centrale del modello.
 
     Struttura concettuale:
 
@@ -1348,9 +1398,9 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     | Gruppo | Campi |
     |---|---|
-    | Identità | matchId, seasonId, competitionId, roundId |
+    | IdentitÃ  | matchId, seasonId, competitionId, roundId |
     | Squadre | homeSeasonTeamId, awaySeasonTeamId |
-    | Identità canoniche | homeCanonicalTeamId, awayCanonicalTeamId |
+    | IdentitÃ  canoniche | homeCanonicalTeamId, awayCanonicalTeamId |
     | Punteggi | homeScore, awayScore |
     | Gol | homeGoals, awayGoals |
     | Gol regolamentari | homeRegulationGoals, awayRegulationGoals |
@@ -1392,7 +1442,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     Vantaggi:
 
-    - aggregazioni più semplici;
+    - aggregazioni piÃ¹ semplici;
     - filtri per squadra;
     - record personali;
     - medie;
@@ -1418,7 +1468,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     Esempi:
 
     - maggior punteggio: SINGLE_MATCH;
-    - partita con più gol regolamentari: SINGLE_MATCH;
+    - partita con piÃ¹ gol regolamentari: SINGLE_MATCH;
     - serie positiva: MATCH_RANGE o MULTIPLE_MATCHES;
     - totale punti stagionale: NOT_APPLICABLE;
     - sequenza storica: MULTIPLE_MATCHES.
@@ -1451,7 +1501,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - A;
     - UNKNOWN.
 
-    L'identità storica del giocatore sarà approfondita solo se necessaria per aggregati pluristagionali affidabili.
+    L'identitÃ  storica del giocatore sarÃ  approfondita solo se necessaria per aggregati pluristagionali affidabili.
 
     ## 16. Presenza giocatore
 
@@ -1528,7 +1578,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - HOME_FIELD;
     - CUSTOM.
 
-    Ogni modificatore può essere elaborato o escluso indipendentemente.
+    Ogni modificatore puÃ² essere elaborato o escluso indipendentemente.
 
     ## 19. Fattore Campo
 
@@ -1653,7 +1703,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - i pesi devono essere dichiarati;
     - le componenti mancanti devono essere segnalate;
     - la mancata generazione non rende incompleta Soglie e Fortuna;
-    - l'output dedicato è separato.
+    - l'output dedicato Ã¨ separato.
 
     ## 24. Serie
 
@@ -1682,7 +1732,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - ABSOLUTE;
     - HISTORICAL_CONTINUOUS.
 
-    Ogni tipo di serie deve dichiarare se può attraversare il confine stagionale.
+    Ogni tipo di serie deve dichiarare se puÃ² attraversare il confine stagionale.
 
     ## 25. Aggregato stagionale
 
@@ -1726,7 +1776,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "average": 72.2310
         }
 
-    Il globale somma o media tutte le stagioni della stessa identità canonica.
+    Il globale somma o media tutte le stagioni della stessa identitÃ  canonica.
 
     Non va confuso con l'assoluto.
 
@@ -1747,7 +1797,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     L'assoluto individua la migliore o peggiore occorrenza fra stagioni.
 
-    Non è la somma della carriera.
+    Non Ã¨ la somma della carriera.
 
     ## 28. Ex aequo
 
@@ -1832,7 +1882,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
           "culometroGenerated": false
         }
 
-    Il manifest deve descrivere ciò che è stato realmente elaborato.
+    Il manifest deve descrivere ciÃ² che Ã¨ stato realmente elaborato.
 
     ## 32. Output JavaScript
 
@@ -1864,11 +1914,11 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
             outputStatus: []
         };
 
-    Ogni famiglia può omettere sezioni non pertinenti, ma deve rispettare lo schema comune di metadata e stato.
+    Ogni famiglia puÃ² omettere sezioni non pertinenti, ma deve rispettare lo schema comune di metadata e stato.
 
     ### Stato implementato Classici
 
-    `fcmRecordsNext_Classics.js` è generato dalla pipeline e pubblica:
+    `fcmRecordsNext_Classics.js` Ã¨ generato dalla pipeline e pubblica:
 
     - `schemaVersion: "2.0"`;
     - `familyId: "classics"`;
@@ -1905,7 +1955,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
     ## 36. Validazione
 
-    Ogni entità deve poter essere validata.
+    Ogni entitÃ  deve poter essere validata.
 
     Controlli minimi:
 
@@ -1949,7 +1999,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - cinque famiglie;
     - output modulari;
     - dati completi e filtrabili;
-    - identità canoniche di squadre e competizioni;
+    - identitÃ  canoniche di squadre e competizioni;
     - link ai tabellini per record di partita;
     - dipendenze a livello di figlio;
     - Fattore Campo nei Modificatori;
@@ -1971,7 +2021,7 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
     - regole precise degli ex aequo;
     - soglie minime per medie e percentuali;
     - aggregazione fra gruppi di competizioni;
-    - identità storica dei giocatori;
+    - identitÃ  storica dei giocatori;
     - formato finale della configurazione Culometro;
     - struttura definitiva della GUI;
     - strategia di migrazione o confronto con RecordsNext 1.0.2.
@@ -2140,11 +2190,38 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
     # Stato implementazione RecordsNext 2.1
 
+    ## Correzione eliminazione stagioni - 2026-09-02
+
+    Implementata e verificata la cancellazione reale di una stagione dalla configurazione RecordsNext.
+
+    Comportamento consolidato:
+
+    - la rimozione non elimina soltanto `rn_season_configuration`;
+    - vengono rimossi i dati interni RecordsNext appartenenti alla stagione;
+    - vengono rimossi i riferimenti in `rn_source_file`;
+    - vengono rimossi team e competizioni stagionali e i relativi mapping;
+    - vengono rimossi calendario e sorgente calendario della stagione;
+    - le identita canoniche condivise con altre stagioni vengono conservate;
+    - se una identita era ancorata alla stagione eliminata, viene riancorata alla stagione mappata piu recente ancora disponibile;
+    - se una identita esisteva esclusivamente nella stagione eliminata, viene eliminata;
+    - se viene eliminata la stagione anchor, la stagione gestita piu recente rimasta viene promossa automaticamente ad anchor;
+    - i file fisici FCM/FCA/DataA e le directory dei siti non vengono cancellati.
+
+    Verifica effettuata anche su una copia del database operativo reale:
+
+    - eliminata `2026_2027`;
+    - nessun residuo nelle principali tabelle stagionali;
+    - nessuna identita rimasta ancorata a `2026_2027`;
+    - `2025_2026` promossa automaticamente a nuova anchor.
+
+    Suite automatica consolidata: 44 test, 0 failure, 0 errori, 0 skipped.
+
+
     Aggiornamento: 27 agosto 2026.
 
     ## Stato release 2.1.0
 
-    RecordsNext 2.1.0 è completato, testato, taggato e pubblicato nel repository.
+    RecordsNext 2.1.0 Ã¨ completato, testato, taggato e pubblicato nel repository.
 
     Sono implementate e operative:
 
@@ -2153,7 +2230,7 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     - stagioni GESTITE e MANUALI;
     - associazioni storiche di squadre e competizioni;
     - normalizzazione e consolidamento multistagione;
-    - modalità Completa e Consolidata;
+    - modalitÃ  Completa e Consolidata;
     - Classici;
     - Serie;
     - Riserve d'Ufficio;
@@ -2183,7 +2260,7 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     - `fcmRecordsNext_Matches.js`;
     - `fcmRecordsNext_Manifest.js`.
 
-    ### Novità specifiche 2.1
+    ### NovitÃ  specifiche 2.1
 
     `fcmRecordsNext_Matches.js` espone il dataset canonico delle gare,
     con due righe per ogni partita reale e una riga per squadra.
@@ -2281,9 +2358,9 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
     Il Culometro resta un easter egg opzionale, non selezionato automaticamente.
 
-    ## Compatibilità con la pipeline 1.0.2
+    ## CompatibilitÃ  con la pipeline 1.0.2
 
-    ProcessingOptions e RecordsNextPipeline sono stati estesi mantenendo la compatibilità con il costruttore legacy basato su:
+    ProcessingOptions e RecordsNextPipeline sono stati estesi mantenendo la compatibilitÃ  con il costruttore legacy basato su:
 
     - Classici;
     - Riserve d'Ufficio;
@@ -2298,7 +2375,7 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
     Sono implementati:
 
-    - inventario delle capacità disponibili;
+    - inventario delle capacitÃ  disponibili;
     - piano di esecuzione;
     - valutazione preventiva delle dipendenze;
     - conteggio di figli completi, parziali e saltati;
@@ -2367,11 +2444,11 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     - 0 test saltati;
     - BUILD SUCCESS.
 
-    La verifica è stata eseguita anche sull’elaborazione reale delle stagioni configurate.
+    La verifica Ã¨ stata eseguita anche sullâ€™elaborazione reale delle stagioni configurate.
 
     ## Famiglia Modificatori
 
-    La famiglia Modificatori è implementata e verificata.
+    La famiglia Modificatori Ã¨ implementata e verificata.
 
     La configurazione GUI permette di selezionare separatamente, per ciascun modificatore:
 
@@ -2394,14 +2471,14 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
     - `MODATTACCO`;
     - `MODMODULO`.
 
-    Il file `fcmRecordsNext_Modifiers.js` viene costruito direttamente dagli archivi `season_records_*.json`, senza dipendere dall’esportatore Classici legacy.
+    Il file `fcmRecordsNext_Modifiers.js` viene costruito direttamente dagli archivi `season_records_*.json`, senza dipendere dallâ€™esportatore Classici legacy.
 
     I metadati distinguono:
 
-    - `availableSections`: sezioni supportate dall’esportatore;
+    - `availableSections`: sezioni supportate dallâ€™esportatore;
     - `generatedSections`: sezioni effettivamente prodotte in base alla configurazione e ai dati disponibili.
 
-    È stata verificata nell’output reale la presenza di:
+    Ãˆ stata verificata nellâ€™output reale la presenza di:
 
     - Massimo, Totale, Media e Utilizzi per `MODM1PERS`;
     - Massimo, Totale, Media e Utilizzi per `MODM2PERS`;
@@ -2429,13 +2506,13 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
     ## Regole da non perdere
 
-    - Non riscrivere accesso FCM/FCA, mapping, normalizzazione e consolidamento senza una necessità verificata.
+    - Non riscrivere accesso FCM/FCA, mapping, normalizzazione e consolidamento senza una necessitÃ  verificata.
     - Basarsi sul codice reale di RecordsNext 1.0.2.
     - Tutti i JavaScript pubblici vanno nella cartella js del sito FCM.
     - Nella root del sito deve esserci un solo HTML indice.
     - Le viste e gli asset vanno nella cartella RecordsNext.
     - Ogni record riferito a una partita specifica conserva il link al tabellino.
-    - Squadre e competizioni conservano identità stagionale e canonica.
+    - Squadre e competizioni conservano identitÃ  stagionale e canonica.
     - Gli output devono essere viste dati complete, non top list tagliate.
     - Gli ZIP temporanei applicati, testati e committati vanno eliminati periodicamente da D:\DEV_APPS\downloads.
 
@@ -16178,18 +16255,341 @@ File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.j
         }
 
         void removeConfiguration(String seasonId) throws Exception {
-            try (Connection c=open()) {
+            Class.forName("org.sqlite.JDBC");
+
+            try (Connection c = open()) {
                 ensureSchema(c);
-                try (PreparedStatement p=c.prepareStatement("DELETE FROM rn_season_configuration WHERE season_id=?")) {
-                    p.setString(1,seasonId); p.executeUpdate();
-                }
-                try (PreparedStatement p=c.prepareStatement("""
-                    DELETE FROM rn_season WHERE season_id=?
-                      AND NOT EXISTS(SELECT 1 FROM rn_source_file WHERE season_id=?)
-                    """)) {
-                    p.setString(1,seasonId); p.setString(2,seasonId); p.executeUpdate();
+                c.setAutoCommit(false);
+
+                try {
+                    deleteSeasonRows(c, seasonId);
+                    c.commit();
+                } catch (Exception ex) {
+                    c.rollback();
+                    throw ex;
                 }
             }
+        }
+
+        private static void deleteSeasonRows(Connection c, String seasonId) throws Exception {
+            reanchorOrDeleteTeamIdentities(c, seasonId);
+            reanchorOrDeleteCompetitionIdentities(c, seasonId);
+
+            executeIfTableExists(c, """
+                DELETE FROM rn_team_mapping
+                WHERE team_season_id IN (
+                    SELECT team_season_id
+                    FROM rn_team_season
+                    WHERE season_id = ?
+                )
+                """, seasonId);
+
+            executeIfTableExists(c, """
+                DELETE FROM rn_competition_mapping
+                WHERE competition_season_id IN (
+                    SELECT competition_season_id
+                    FROM rn_competition_season
+                    WHERE season_id = ?
+                )
+                """, seasonId);
+
+            executeIfTableExists(c,
+                "DELETE FROM rn_team_season WHERE season_id = ?",
+                seasonId);
+
+            executeIfTableExists(c,
+                "DELETE FROM rn_competition_season WHERE season_id = ?",
+                seasonId);
+
+            executeIfTableExists(c,
+                "DELETE FROM rn_matchday_date WHERE season_id = ?",
+                seasonId);
+
+            executeIfTableExists(c,
+                "DELETE FROM rn_calendar_source WHERE season_id = ?",
+                seasonId);
+
+            executeIfTableExists(c,
+                "DELETE FROM rn_season_configuration WHERE season_id = ?",
+                seasonId);
+
+            executeIfTableExists(c,
+                "DELETE FROM rn_source_file WHERE season_id = ?",
+                seasonId);
+
+            try (PreparedStatement p = c.prepareStatement(
+                    "DELETE FROM rn_season WHERE season_id = ?")) {
+                p.setString(1, seasonId);
+
+                int deleted = p.executeUpdate();
+                if (deleted != 1) {
+                    throw new IllegalStateException(
+                        "Stagione non trovata o non eliminata: " + seasonId
+                    );
+                }
+            }
+
+            promoteLatestManagedSeasonAsAnchor(c);
+        }
+
+        private static void promoteLatestManagedSeasonAsAnchor(
+                Connection c) throws Exception {
+
+            try (Statement s = c.createStatement()) {
+                s.executeUpdate("UPDATE rn_season SET is_anchor = 0");
+            }
+
+            try (PreparedStatement p = c.prepareStatement("""
+                UPDATE rn_season
+                SET is_anchor = 1
+                WHERE season_id = (
+                    SELECT s.season_id
+                    FROM rn_season s
+                    LEFT JOIN rn_season_configuration cfg
+                      ON cfg.season_id = s.season_id
+                    WHERE COALESCE(cfg.management_type, 'GESTITA') = 'GESTITA'
+                    ORDER BY CAST(SUBSTR(s.season_id,1,4) AS INTEGER) DESC,
+                             s.season_id DESC
+                    LIMIT 1
+                )
+                """)) {
+                p.executeUpdate();
+            }
+        }
+
+        private static void reanchorOrDeleteTeamIdentities(
+                Connection c,
+                String seasonId) throws Exception {
+
+            if (!tableExists(c, "rn_team_identity")
+                    || !tableExists(c, "rn_team_season")
+                    || !tableExists(c, "rn_team_mapping")) {
+                return;
+            }
+
+            List<Long> identities = new ArrayList<>();
+
+            try (PreparedStatement p = c.prepareStatement("""
+                SELECT team_identity_id
+                FROM rn_team_identity
+                WHERE anchor_season_id = ?
+                """)) {
+                p.setString(1, seasonId);
+
+                try (ResultSet rs = p.executeQuery()) {
+                    while (rs.next()) {
+                        identities.add(rs.getLong(1));
+                    }
+                }
+            }
+
+            for (long identityId : identities) {
+                Long newTeamSeasonId = null;
+                String newSeasonId = null;
+
+                try (PreparedStatement p = c.prepareStatement("""
+                    SELECT ts.team_season_id, ts.season_id
+                    FROM rn_team_mapping tm
+                    JOIN rn_team_season ts
+                      ON ts.team_season_id = tm.team_season_id
+                    WHERE tm.team_identity_id = ?
+                      AND ts.season_id <> ?
+                    ORDER BY CAST(SUBSTR(ts.season_id,1,4) AS INTEGER) DESC,
+                             ts.team_season_id DESC
+                    LIMIT 1
+                    """)) {
+                    p.setLong(1, identityId);
+                    p.setString(2, seasonId);
+
+                    try (ResultSet rs = p.executeQuery()) {
+                        if (rs.next()) {
+                            newTeamSeasonId = rs.getLong(1);
+                            newSeasonId = rs.getString(2);
+                        }
+                    }
+                }
+
+                if (newTeamSeasonId != null) {
+                    try (PreparedStatement p = c.prepareStatement("""
+                        UPDATE rn_team_identity
+                        SET anchor_season_id = ?,
+                            anchor_team_season_id = ?
+                        WHERE team_identity_id = ?
+                        """)) {
+                        p.setString(1, newSeasonId);
+                        p.setLong(2, newTeamSeasonId);
+                        p.setLong(3, identityId);
+                        p.executeUpdate();
+                    }
+                } else {
+                    try (PreparedStatement p = c.prepareStatement("""
+                        DELETE FROM rn_team_mapping
+                        WHERE team_identity_id = ?
+                        """)) {
+                        p.setLong(1, identityId);
+                        p.executeUpdate();
+                    }
+
+                    try (PreparedStatement p = c.prepareStatement("""
+                        DELETE FROM rn_team_identity
+                        WHERE team_identity_id = ?
+                        """)) {
+                        p.setLong(1, identityId);
+                        p.executeUpdate();
+                    }
+                }
+            }
+        }
+
+        private static void reanchorOrDeleteCompetitionIdentities(
+                Connection c,
+                String seasonId) throws Exception {
+
+            if (!tableExists(c, "rn_competition_identity")
+                    || !tableExists(c, "rn_competition_season")
+                    || !tableExists(c, "rn_competition_mapping")) {
+                return;
+            }
+
+            List<Long> identities = new ArrayList<>();
+
+            try (PreparedStatement p = c.prepareStatement("""
+                SELECT competition_identity_id
+                FROM rn_competition_identity
+                WHERE anchor_season_id = ?
+                """)) {
+                p.setString(1, seasonId);
+
+                try (ResultSet rs = p.executeQuery()) {
+                    while (rs.next()) {
+                        identities.add(rs.getLong(1));
+                    }
+                }
+            }
+
+            for (long identityId : identities) {
+                Long newCompetitionSeasonId = null;
+                String newSeasonId = null;
+
+                try (PreparedStatement p = c.prepareStatement("""
+                    SELECT cs.competition_season_id, cs.season_id
+                    FROM rn_competition_mapping cm
+                    JOIN rn_competition_season cs
+                      ON cs.competition_season_id = cm.competition_season_id
+                    WHERE cm.competition_identity_id = ?
+                      AND cs.season_id <> ?
+                    ORDER BY CAST(SUBSTR(cs.season_id,1,4) AS INTEGER) DESC,
+                             cs.competition_season_id DESC
+                    LIMIT 1
+                    """)) {
+                    p.setLong(1, identityId);
+                    p.setString(2, seasonId);
+
+                    try (ResultSet rs = p.executeQuery()) {
+                        if (rs.next()) {
+                            newCompetitionSeasonId = rs.getLong(1);
+                            newSeasonId = rs.getString(2);
+                        }
+                    }
+                }
+
+                if (newCompetitionSeasonId != null) {
+                    try (PreparedStatement p = c.prepareStatement("""
+                        UPDATE rn_competition_identity
+                        SET anchor_season_id = ?,
+                            anchor_competition_season_id = ?
+                        WHERE competition_identity_id = ?
+                        """)) {
+                        p.setString(1, newSeasonId);
+                        p.setLong(2, newCompetitionSeasonId);
+                        p.setLong(3, identityId);
+                        p.executeUpdate();
+                    }
+                } else {
+                    try (PreparedStatement p = c.prepareStatement("""
+                        DELETE FROM rn_competition_mapping
+                        WHERE competition_identity_id = ?
+                        """)) {
+                        p.setLong(1, identityId);
+                        p.executeUpdate();
+                    }
+
+                    try (PreparedStatement p = c.prepareStatement("""
+                        DELETE FROM rn_competition_identity
+                        WHERE competition_identity_id = ?
+                        """)) {
+                        p.setLong(1, identityId);
+                        p.executeUpdate();
+                    }
+                }
+            }
+        }
+
+        private static boolean tableExists(
+                Connection c,
+                String table) throws Exception {
+
+            try (PreparedStatement p = c.prepareStatement("""
+                SELECT COUNT(*)
+                FROM sqlite_master
+                WHERE type = 'table' AND name = ?
+                """)) {
+                p.setString(1, table);
+
+                try (ResultSet rs = p.executeQuery()) {
+                    rs.next();
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+
+        private static void executeIfTableExists(
+                Connection c,
+                String sql,
+                String seasonId) throws Exception {
+
+            String table = tableNameFromSql(sql);
+
+            try (PreparedStatement check = c.prepareStatement("""
+                SELECT COUNT(*)
+                FROM sqlite_master
+                WHERE type = 'table' AND name = ?
+                """)) {
+                check.setString(1, table);
+
+                try (ResultSet rs = check.executeQuery()) {
+                    rs.next();
+                    if (rs.getInt(1) == 0) {
+                        return;
+                    }
+                }
+            }
+
+            try (PreparedStatement p = c.prepareStatement(sql)) {
+                p.setString(1, seasonId);
+                p.executeUpdate();
+            }
+        }
+
+        private static String tableNameFromSql(String sql) {
+            String normalized = sql
+                .replaceAll("\\s+", " ")
+                .trim()
+                .toLowerCase(Locale.ROOT);
+
+            if (normalized.startsWith("delete from ")) {
+                return normalized.substring("delete from ".length())
+                    .split(" ")[0];
+            }
+
+            if (normalized.startsWith("update ")) {
+                return normalized.substring("update ".length())
+                    .split(" ")[0];
+            }
+
+            throw new IllegalArgumentException(
+                "SQL non supportato per deleteSeasonRows: " + sql
+            );
         }
 
         private Connection open() throws Exception {
@@ -27791,6 +28191,119 @@ File: src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamily
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepositoryTest.java
+
+File: src\test\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepositoryTest.java
+
+    package it.alterlega.recordsnext.gui;
+
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+
+    import java.nio.file.Path;
+    import java.sql.Connection;
+    import java.sql.DriverManager;
+    import java.sql.PreparedStatement;
+    import java.sql.ResultSet;
+    import java.sql.Statement;
+
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+
+    class SeasonConfigurationRepositoryTest {
+
+        @TempDir
+        Path tempDir;
+
+        @Test
+        void removeConfigurationDeletesImportedSeasonCompletely() throws Exception {
+            Class.forName("org.sqlite.JDBC");
+
+            Path db = tempDir.resolve("recordsnext.db");
+
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db)) {
+                try (Statement s = c.createStatement()) {
+                    s.execute("PRAGMA foreign_keys=ON");
+
+                    s.execute("""
+                        CREATE TABLE rn_season(
+                          season_id TEXT PRIMARY KEY,
+                          display_name TEXT,
+                          sort_order INTEGER,
+                          is_anchor INTEGER,
+                          created_at TEXT,
+                          updated_at TEXT
+                        )
+                        """);
+
+                    s.execute("""
+                        CREATE TABLE rn_source_file(
+                          source_file_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                          season_id TEXT NOT NULL,
+                          source_type TEXT NOT NULL,
+                          source_path TEXT NOT NULL,
+                          FOREIGN KEY(season_id) REFERENCES rn_season(season_id)
+                        )
+                        """);
+                }
+
+                try (PreparedStatement p = c.prepareStatement("""
+                    INSERT INTO rn_season(
+                      season_id, display_name, sort_order,
+                      is_anchor, created_at, updated_at
+                    )
+                    VALUES('2025_2026','2025_2026',21,1,'now','now')
+                    """)) {
+                    p.executeUpdate();
+                }
+
+                try (PreparedStatement p = c.prepareStatement("""
+                    INSERT INTO rn_source_file(
+                      season_id, source_type, source_path
+                    )
+                    VALUES('2025_2026','FCM','E:\\FCM\\data\\Archivio2026.fcm')
+                    """)) {
+                    p.executeUpdate();
+                }
+            }
+
+            SeasonConfigurationRepository repository =
+                new SeasonConfigurationRepository(db);
+
+            repository.save(repository.load());
+
+            assertEquals(1, count(db,
+                "SELECT COUNT(*) FROM rn_season WHERE season_id='2025_2026'"));
+
+            assertEquals(1, count(db,
+                "SELECT COUNT(*) FROM rn_source_file WHERE season_id='2025_2026'"));
+
+            assertEquals(1, count(db,
+                "SELECT COUNT(*) FROM rn_season_configuration WHERE season_id='2025_2026'"));
+
+            repository.removeConfiguration("2025_2026");
+
+            assertEquals(0, count(db,
+                "SELECT COUNT(*) FROM rn_season WHERE season_id='2025_2026'"));
+
+            assertEquals(0, count(db,
+                "SELECT COUNT(*) FROM rn_source_file WHERE season_id='2025_2026'"));
+
+            assertEquals(0, count(db,
+                "SELECT COUNT(*) FROM rn_season_configuration WHERE season_id='2025_2026'"));
+
+            assertEquals(0, repository.load().size());
+        }
+
+        private static int count(Path db, String sql) throws Exception {
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db);
+                 Statement s = c.createStatement();
+                 ResultSet r = s.executeQuery(sql)) {
+                r.next();
+                return r.getInt(1);
+            }
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
 
 File: src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
@@ -29421,7 +29934,8 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("- Base funzionante RecordsNext 1.0.2 importata nella linea RecordsNext 2.x.")
     [void]$Builder.AppendLine("- Accesso ai database FCM e FCA tramite UCanAccess.")
-    [void]$Builder.AppendLine("- Configurazione delle stagioni gestite e manuali.")
+    [void]$Builder.AppendLine("- Configurazione delle stagioni gestite e manuali.
+    - Eliminazione completa e transazionale delle stagioni verificata anche sul database operativo copiato: pulizia dei dati stagionali, riancoraggio delle identita canoniche e promozione automatica della nuova anchor.")
     [void]$Builder.AppendLine("- Importazione, normalizzazione e consolidamento storico delle stagioni gestite.")
     [void]$Builder.AppendLine("- Modello modulare con famiglie, figli, dipendenze, planner e preflight.")
     [void]$Builder.AppendLine("- GUI RecordsNext 2.1 con configurazione granulare delle famiglie.")
@@ -29432,7 +29946,7 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     [void]$Builder.AppendLine("- Statistiche Massimo, Totale, Media e Utilizzi per i modificatori selezionati.")
     [void]$Builder.AppendLine("- Esportazione verificata del MODDIFESA FCM della stagione 2006_2007.")
     [void]$Builder.AppendLine("- Metadati availableSections e generatedSections distinti.")
-    [void]$Builder.AppendLine("- Test automatici: 41 eseguiti, 0 failure, 0 errori.")
+    [void]$Builder.AppendLine("- Test automatici: 44 eseguiti, 0 failure, 0 errori.")
     [void]$Builder.AppendLine("- Gli output legacy records2026.* non vengono piu pubblicati; gli exporter legacy Classici/RU restano solo come sorgente interna di compatibilita.")
     [void]$Builder.AppendLine("- Bonifica publisher verificata sui dati operativi: 9 output moderni, 0 output legacy; Classics e RU invariati byte-per-byte.")
     [void]$Builder.AppendLine("- Verifica reale del JS Modificatori completata con tutte le sezioni selezionate presenti.")
@@ -41309,6 +41823,7 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - src\test\java\it\alterlega\recordsnext\app\series\SeriesCompleteIntegrationTest.java
 - src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\thresholds\ThresholdsLuckFamilyJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepositoryTest.java
 - src\test\java\it\alterlega\recordsnext\RecordsNextApplicationTest.java
 - src\test\java\it\alterlega\recordsnext\SeasonRecordsArchiveBuilderPareggiTest.java
 - config\competitions.json

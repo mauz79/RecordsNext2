@@ -1,5 +1,26 @@
 # Modello dati RecordsNext 2.0
 
+## Regole di eliminazione di una stagione
+
+La cancellazione di una stagione deve rispettare le foreign key del modello dati.
+
+Ordine logico:
+
+- riancoraggio o eliminazione delle `rn_team_identity` ancorate alla stagione;
+- riancoraggio o eliminazione delle `rn_competition_identity` ancorate alla stagione;
+- cancellazione dei mapping della stagione;
+- cancellazione di `rn_team_season`;
+- cancellazione di `rn_competition_season`;
+- cancellazione di `rn_matchday_date`;
+- cancellazione di `rn_calendar_source`;
+- cancellazione di `rn_season_configuration`;
+- cancellazione di `rn_source_file`;
+- cancellazione di `rn_season`;
+- promozione della stagione gestita piu recente rimasta come nuova anchor.
+
+Le identita canoniche condivise con altre stagioni devono sopravvivere alla cancellazione.
+
+
 ## 1. Scopo
 
 Questo documento definisce il modello dati comune di RecordsNext 2.0.
@@ -24,7 +45,7 @@ Il modello comune deve essere indipendente dalla singola famiglia di record.
 
 ### 2.1 Dati completi, non classifiche finali
 
-Gli output non devono contenere soltanto top 10 o classifiche già tagliate.
+Gli output non devono contenere soltanto top 10 o classifiche giÃ  tagliate.
 
 Devono contenere dati sufficientemente completi da permettere alle viste HTML di ricavare:
 
@@ -41,14 +62,14 @@ Devono contenere dati sufficientemente completi da permettere alle viste HTML di
 
 I limiti di visualizzazione appartengono alla vista, non al dataset.
 
-### 2.2 Identità stagionale e identità canonica
+### 2.2 IdentitÃ  stagionale e identitÃ  canonica
 
-Ogni squadra e competizione deve conservare due livelli di identità:
+Ogni squadra e competizione deve conservare due livelli di identitÃ :
 
-- identità originale della stagione;
-- identità canonica storica.
+- identitÃ  originale della stagione;
+- identitÃ  canonica storica.
 
-Questo permette di mantenere i nomi realmente usati nella stagione e, nello stesso tempo, aggregare correttamente tutta la storia della stessa entità.
+Questo permette di mantenere i nomi realmente usati nella stagione e, nello stesso tempo, aggregare correttamente tutta la storia della stessa entitÃ .
 
 ### 2.3 Dipendenze locali
 
@@ -73,7 +94,7 @@ Ogni dato derivato deve poter dichiarare:
 - eventuale fallback;
 - eventuale simulazione.
 
-## 3. Entità principali
+## 3. EntitÃ  principali
 
 Il modello comune iniziale comprende:
 
@@ -155,15 +176,15 @@ Stati ammessi:
 
 Regole:
 
-- una stagione MANAGED può essere elaborata da FCM/FCA;
+- una stagione MANAGED puÃ² essere elaborata da FCM/FCA;
 - una stagione MANUAL resta nello storico ma non viene elaborata da FCM;
-- una stagione MANUAL può avere classifiche o albo d'oro manuali;
-- una stagione MANUAL può non avere tabellini;
-- l'ultimo FCM disponibile rappresenta la stagione attuale del sito, anche quando cronologicamente non è l'anno corrente reale.
+- una stagione MANUAL puÃ² avere classifiche o albo d'oro manuali;
+- una stagione MANUAL puÃ² non avere tabellini;
+- l'ultimo FCM disponibile rappresenta la stagione attuale del sito, anche quando cronologicamente non Ã¨ l'anno corrente reale.
 
 ## 6. Sito della stagione
 
-Ogni stagione può avere:
+Ogni stagione puÃ² avere:
 
 - sito locale;
 - sito online.
@@ -191,7 +212,7 @@ Campi minimi:
 
 Regole:
 
-- la cartella `js` è interna alla root del sito;
+- la cartella `js` Ã¨ interna alla root del sito;
 - il formato `.htm` o `.php` non deve essere dedotto genericamente;
 - il formato deve derivare dalla configurazione della stagione;
 - il link online e il link locale devono essere costruiti separatamente;
@@ -222,7 +243,7 @@ Campi minimi:
 | sourceTeamId | ID originale FCM/FCA |
 | seasonName | Nome usato nella stagione |
 | shortName | Nome abbreviato |
-| canonicalTeamId | Identità storica |
+| canonicalTeamId | IdentitÃ  storica |
 | associationStatus | Stato associazione |
 | isCurrent | Squadra presente nell'ultimo FCM |
 
@@ -252,7 +273,7 @@ Struttura concettuale:
 Regole:
 
 - il canonicalTeamId deve essere stabile;
-- il nome canonico è distinto dal nome storico;
+- il nome canonico Ã¨ distinto dal nome storico;
 - l'associazione parte dalla squadra attuale;
 - le squadre delle stagioni precedenti vengono collegate alla squadra attuale;
 - gli aggregati globali usano il canonicalTeamId;
@@ -288,7 +309,7 @@ Regole:
 - una competizione assente non deve essere inventata;
 - Play Off e Play Out restano fuori dai gruppi principali;
 - competizioni presenti in una sola stagione sono ammesse;
-- i gruppi predefiniti devono rispettare l'ordine canonico già stabilito nel progetto storico.
+- i gruppi predefiniti devono rispettare l'ordine canonico giÃ  stabilito nel progetto storico.
 
 ## 10. Competizione canonica
 
@@ -306,7 +327,7 @@ Struttura concettuale:
 
 Regole:
 
-- competizioni con nomi diversi possono condividere la stessa identità canonica;
+- competizioni con nomi diversi possono condividere la stessa identitÃ  canonica;
 - il nome originale della stagione deve essere conservato;
 - gli aggregati storici per competizione usano il canonicalCompetitionId.
 
@@ -332,7 +353,7 @@ Regole:
 
 ## 12. Partita normalizzata
 
-La partita è l'entità centrale del modello.
+La partita Ã¨ l'entitÃ  centrale del modello.
 
 Struttura concettuale:
 
@@ -364,9 +385,9 @@ Campi principali:
 
 | Gruppo | Campi |
 |---|---|
-| Identità | matchId, seasonId, competitionId, roundId |
+| IdentitÃ  | matchId, seasonId, competitionId, roundId |
 | Squadre | homeSeasonTeamId, awaySeasonTeamId |
-| Identità canoniche | homeCanonicalTeamId, awayCanonicalTeamId |
+| IdentitÃ  canoniche | homeCanonicalTeamId, awayCanonicalTeamId |
 | Punteggi | homeScore, awayScore |
 | Gol | homeGoals, awayGoals |
 | Gol regolamentari | homeRegulationGoals, awayRegulationGoals |
@@ -408,7 +429,7 @@ Struttura concettuale:
 
 Vantaggi:
 
-- aggregazioni più semplici;
+- aggregazioni piÃ¹ semplici;
 - filtri per squadra;
 - record personali;
 - medie;
@@ -434,7 +455,7 @@ Tipi di collegamento:
 Esempi:
 
 - maggior punteggio: SINGLE_MATCH;
-- partita con più gol regolamentari: SINGLE_MATCH;
+- partita con piÃ¹ gol regolamentari: SINGLE_MATCH;
 - serie positiva: MATCH_RANGE o MULTIPLE_MATCHES;
 - totale punti stagionale: NOT_APPLICABLE;
 - sequenza storica: MULTIPLE_MATCHES.
@@ -467,7 +488,7 @@ Ruoli preliminari:
 - A;
 - UNKNOWN.
 
-L'identità storica del giocatore sarà approfondita solo se necessaria per aggregati pluristagionali affidabili.
+L'identitÃ  storica del giocatore sarÃ  approfondita solo se necessaria per aggregati pluristagionali affidabili.
 
 ## 16. Presenza giocatore
 
@@ -544,7 +565,7 @@ Tipi iniziali:
 - HOME_FIELD;
 - CUSTOM.
 
-Ogni modificatore può essere elaborato o escluso indipendentemente.
+Ogni modificatore puÃ² essere elaborato o escluso indipendentemente.
 
 ## 19. Fattore Campo
 
@@ -669,7 +690,7 @@ Regole:
 - i pesi devono essere dichiarati;
 - le componenti mancanti devono essere segnalate;
 - la mancata generazione non rende incompleta Soglie e Fortuna;
-- l'output dedicato è separato.
+- l'output dedicato Ã¨ separato.
 
 ## 24. Serie
 
@@ -698,7 +719,7 @@ Ambiti:
 - ABSOLUTE;
 - HISTORICAL_CONTINUOUS.
 
-Ogni tipo di serie deve dichiarare se può attraversare il confine stagionale.
+Ogni tipo di serie deve dichiarare se puÃ² attraversare il confine stagionale.
 
 ## 25. Aggregato stagionale
 
@@ -742,7 +763,7 @@ Struttura concettuale:
       "average": 72.2310
     }
 
-Il globale somma o media tutte le stagioni della stessa identità canonica.
+Il globale somma o media tutte le stagioni della stessa identitÃ  canonica.
 
 Non va confuso con l'assoluto.
 
@@ -763,7 +784,7 @@ Struttura concettuale:
 
 L'assoluto individua la migliore o peggiore occorrenza fra stagioni.
 
-Non è la somma della carriera.
+Non Ã¨ la somma della carriera.
 
 ## 28. Ex aequo
 
@@ -848,7 +869,7 @@ Struttura concettuale:
       "culometroGenerated": false
     }
 
-Il manifest deve descrivere ciò che è stato realmente elaborato.
+Il manifest deve descrivere ciÃ² che Ã¨ stato realmente elaborato.
 
 ## 32. Output JavaScript
 
@@ -880,11 +901,11 @@ Schema concettuale:
         outputStatus: []
     };
 
-Ogni famiglia può omettere sezioni non pertinenti, ma deve rispettare lo schema comune di metadata e stato.
+Ogni famiglia puÃ² omettere sezioni non pertinenti, ma deve rispettare lo schema comune di metadata e stato.
 
 ### Stato implementato Classici
 
-`fcmRecordsNext_Classics.js` è generato dalla pipeline e pubblica:
+`fcmRecordsNext_Classics.js` Ã¨ generato dalla pipeline e pubblica:
 
 - `schemaVersion: "2.0"`;
 - `familyId: "classics"`;
@@ -921,7 +942,7 @@ Questi file non sono necessariamente pubblici.
 
 ## 36. Validazione
 
-Ogni entità deve poter essere validata.
+Ogni entitÃ  deve poter essere validata.
 
 Controlli minimi:
 
@@ -965,7 +986,7 @@ Sono consolidate:
 - cinque famiglie;
 - output modulari;
 - dati completi e filtrabili;
-- identità canoniche di squadre e competizioni;
+- identitÃ  canoniche di squadre e competizioni;
 - link ai tabellini per record di partita;
 - dipendenze a livello di figlio;
 - Fattore Campo nei Modificatori;
@@ -987,7 +1008,7 @@ Restano da definire:
 - regole precise degli ex aequo;
 - soglie minime per medie e percentuali;
 - aggregazione fra gruppi di competizioni;
-- identità storica dei giocatori;
+- identitÃ  storica dei giocatori;
 - formato finale della configurazione Culometro;
 - struttura definitiva della GUI;
 - strategia di migrazione o confronto con RecordsNext 1.0.2.

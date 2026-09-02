@@ -106,18 +106,341 @@ final class SeasonConfigurationRepository {
     }
 
     void removeConfiguration(String seasonId) throws Exception {
-        try (Connection c=open()) {
+        Class.forName("org.sqlite.JDBC");
+
+        try (Connection c = open()) {
             ensureSchema(c);
-            try (PreparedStatement p=c.prepareStatement("DELETE FROM rn_season_configuration WHERE season_id=?")) {
-                p.setString(1,seasonId); p.executeUpdate();
-            }
-            try (PreparedStatement p=c.prepareStatement("""
-                DELETE FROM rn_season WHERE season_id=?
-                  AND NOT EXISTS(SELECT 1 FROM rn_source_file WHERE season_id=?)
-                """)) {
-                p.setString(1,seasonId); p.setString(2,seasonId); p.executeUpdate();
+            c.setAutoCommit(false);
+
+            try {
+                deleteSeasonRows(c, seasonId);
+                c.commit();
+            } catch (Exception ex) {
+                c.rollback();
+                throw ex;
             }
         }
+    }
+
+    private static void deleteSeasonRows(Connection c, String seasonId) throws Exception {
+        reanchorOrDeleteTeamIdentities(c, seasonId);
+        reanchorOrDeleteCompetitionIdentities(c, seasonId);
+
+        executeIfTableExists(c, """
+            DELETE FROM rn_team_mapping
+            WHERE team_season_id IN (
+                SELECT team_season_id
+                FROM rn_team_season
+                WHERE season_id = ?
+            )
+            """, seasonId);
+
+        executeIfTableExists(c, """
+            DELETE FROM rn_competition_mapping
+            WHERE competition_season_id IN (
+                SELECT competition_season_id
+                FROM rn_competition_season
+                WHERE season_id = ?
+            )
+            """, seasonId);
+
+        executeIfTableExists(c,
+            "DELETE FROM rn_team_season WHERE season_id = ?",
+            seasonId);
+
+        executeIfTableExists(c,
+            "DELETE FROM rn_competition_season WHERE season_id = ?",
+            seasonId);
+
+        executeIfTableExists(c,
+            "DELETE FROM rn_matchday_date WHERE season_id = ?",
+            seasonId);
+
+        executeIfTableExists(c,
+            "DELETE FROM rn_calendar_source WHERE season_id = ?",
+            seasonId);
+
+        executeIfTableExists(c,
+            "DELETE FROM rn_season_configuration WHERE season_id = ?",
+            seasonId);
+
+        executeIfTableExists(c,
+            "DELETE FROM rn_source_file WHERE season_id = ?",
+            seasonId);
+
+        try (PreparedStatement p = c.prepareStatement(
+                "DELETE FROM rn_season WHERE season_id = ?")) {
+            p.setString(1, seasonId);
+
+            int deleted = p.executeUpdate();
+            if (deleted != 1) {
+                throw new IllegalStateException(
+                    "Stagione non trovata o non eliminata: " + seasonId
+                );
+            }
+        }
+
+        promoteLatestManagedSeasonAsAnchor(c);
+    }
+
+    private static void promoteLatestManagedSeasonAsAnchor(
+            Connection c) throws Exception {
+
+        try (Statement s = c.createStatement()) {
+            s.executeUpdate("UPDATE rn_season SET is_anchor = 0");
+        }
+
+        try (PreparedStatement p = c.prepareStatement("""
+            UPDATE rn_season
+            SET is_anchor = 1
+            WHERE season_id = (
+                SELECT s.season_id
+                FROM rn_season s
+                LEFT JOIN rn_season_configuration cfg
+                  ON cfg.season_id = s.season_id
+                WHERE COALESCE(cfg.management_type, 'GESTITA') = 'GESTITA'
+                ORDER BY CAST(SUBSTR(s.season_id,1,4) AS INTEGER) DESC,
+                         s.season_id DESC
+                LIMIT 1
+            )
+            """)) {
+            p.executeUpdate();
+        }
+    }
+
+    private static void reanchorOrDeleteTeamIdentities(
+            Connection c,
+            String seasonId) throws Exception {
+
+        if (!tableExists(c, "rn_team_identity")
+                || !tableExists(c, "rn_team_season")
+                || !tableExists(c, "rn_team_mapping")) {
+            return;
+        }
+
+        List<Long> identities = new ArrayList<>();
+
+        try (PreparedStatement p = c.prepareStatement("""
+            SELECT team_identity_id
+            FROM rn_team_identity
+            WHERE anchor_season_id = ?
+            """)) {
+            p.setString(1, seasonId);
+
+            try (ResultSet rs = p.executeQuery()) {
+                while (rs.next()) {
+                    identities.add(rs.getLong(1));
+                }
+            }
+        }
+
+        for (long identityId : identities) {
+            Long newTeamSeasonId = null;
+            String newSeasonId = null;
+
+            try (PreparedStatement p = c.prepareStatement("""
+                SELECT ts.team_season_id, ts.season_id
+                FROM rn_team_mapping tm
+                JOIN rn_team_season ts
+                  ON ts.team_season_id = tm.team_season_id
+                WHERE tm.team_identity_id = ?
+                  AND ts.season_id <> ?
+                ORDER BY CAST(SUBSTR(ts.season_id,1,4) AS INTEGER) DESC,
+                         ts.team_season_id DESC
+                LIMIT 1
+                """)) {
+                p.setLong(1, identityId);
+                p.setString(2, seasonId);
+
+                try (ResultSet rs = p.executeQuery()) {
+                    if (rs.next()) {
+                        newTeamSeasonId = rs.getLong(1);
+                        newSeasonId = rs.getString(2);
+                    }
+                }
+            }
+
+            if (newTeamSeasonId != null) {
+                try (PreparedStatement p = c.prepareStatement("""
+                    UPDATE rn_team_identity
+                    SET anchor_season_id = ?,
+                        anchor_team_season_id = ?
+                    WHERE team_identity_id = ?
+                    """)) {
+                    p.setString(1, newSeasonId);
+                    p.setLong(2, newTeamSeasonId);
+                    p.setLong(3, identityId);
+                    p.executeUpdate();
+                }
+            } else {
+                try (PreparedStatement p = c.prepareStatement("""
+                    DELETE FROM rn_team_mapping
+                    WHERE team_identity_id = ?
+                    """)) {
+                    p.setLong(1, identityId);
+                    p.executeUpdate();
+                }
+
+                try (PreparedStatement p = c.prepareStatement("""
+                    DELETE FROM rn_team_identity
+                    WHERE team_identity_id = ?
+                    """)) {
+                    p.setLong(1, identityId);
+                    p.executeUpdate();
+                }
+            }
+        }
+    }
+
+    private static void reanchorOrDeleteCompetitionIdentities(
+            Connection c,
+            String seasonId) throws Exception {
+
+        if (!tableExists(c, "rn_competition_identity")
+                || !tableExists(c, "rn_competition_season")
+                || !tableExists(c, "rn_competition_mapping")) {
+            return;
+        }
+
+        List<Long> identities = new ArrayList<>();
+
+        try (PreparedStatement p = c.prepareStatement("""
+            SELECT competition_identity_id
+            FROM rn_competition_identity
+            WHERE anchor_season_id = ?
+            """)) {
+            p.setString(1, seasonId);
+
+            try (ResultSet rs = p.executeQuery()) {
+                while (rs.next()) {
+                    identities.add(rs.getLong(1));
+                }
+            }
+        }
+
+        for (long identityId : identities) {
+            Long newCompetitionSeasonId = null;
+            String newSeasonId = null;
+
+            try (PreparedStatement p = c.prepareStatement("""
+                SELECT cs.competition_season_id, cs.season_id
+                FROM rn_competition_mapping cm
+                JOIN rn_competition_season cs
+                  ON cs.competition_season_id = cm.competition_season_id
+                WHERE cm.competition_identity_id = ?
+                  AND cs.season_id <> ?
+                ORDER BY CAST(SUBSTR(cs.season_id,1,4) AS INTEGER) DESC,
+                         cs.competition_season_id DESC
+                LIMIT 1
+                """)) {
+                p.setLong(1, identityId);
+                p.setString(2, seasonId);
+
+                try (ResultSet rs = p.executeQuery()) {
+                    if (rs.next()) {
+                        newCompetitionSeasonId = rs.getLong(1);
+                        newSeasonId = rs.getString(2);
+                    }
+                }
+            }
+
+            if (newCompetitionSeasonId != null) {
+                try (PreparedStatement p = c.prepareStatement("""
+                    UPDATE rn_competition_identity
+                    SET anchor_season_id = ?,
+                        anchor_competition_season_id = ?
+                    WHERE competition_identity_id = ?
+                    """)) {
+                    p.setString(1, newSeasonId);
+                    p.setLong(2, newCompetitionSeasonId);
+                    p.setLong(3, identityId);
+                    p.executeUpdate();
+                }
+            } else {
+                try (PreparedStatement p = c.prepareStatement("""
+                    DELETE FROM rn_competition_mapping
+                    WHERE competition_identity_id = ?
+                    """)) {
+                    p.setLong(1, identityId);
+                    p.executeUpdate();
+                }
+
+                try (PreparedStatement p = c.prepareStatement("""
+                    DELETE FROM rn_competition_identity
+                    WHERE competition_identity_id = ?
+                    """)) {
+                    p.setLong(1, identityId);
+                    p.executeUpdate();
+                }
+            }
+        }
+    }
+
+    private static boolean tableExists(
+            Connection c,
+            String table) throws Exception {
+
+        try (PreparedStatement p = c.prepareStatement("""
+            SELECT COUNT(*)
+            FROM sqlite_master
+            WHERE type = 'table' AND name = ?
+            """)) {
+            p.setString(1, table);
+
+            try (ResultSet rs = p.executeQuery()) {
+                rs.next();
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    private static void executeIfTableExists(
+            Connection c,
+            String sql,
+            String seasonId) throws Exception {
+
+        String table = tableNameFromSql(sql);
+
+        try (PreparedStatement check = c.prepareStatement("""
+            SELECT COUNT(*)
+            FROM sqlite_master
+            WHERE type = 'table' AND name = ?
+            """)) {
+            check.setString(1, table);
+
+            try (ResultSet rs = check.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    return;
+                }
+            }
+        }
+
+        try (PreparedStatement p = c.prepareStatement(sql)) {
+            p.setString(1, seasonId);
+            p.executeUpdate();
+        }
+    }
+
+    private static String tableNameFromSql(String sql) {
+        String normalized = sql
+            .replaceAll("\\s+", " ")
+            .trim()
+            .toLowerCase(Locale.ROOT);
+
+        if (normalized.startsWith("delete from ")) {
+            return normalized.substring("delete from ".length())
+                .split(" ")[0];
+        }
+
+        if (normalized.startsWith("update ")) {
+            return normalized.substring("update ".length())
+                .split(" ")[0];
+        }
+
+        throw new IllegalArgumentException(
+            "SQL non supportato per deleteSeasonRows: " + sql
+        );
     }
 
     private Connection open() throws Exception {

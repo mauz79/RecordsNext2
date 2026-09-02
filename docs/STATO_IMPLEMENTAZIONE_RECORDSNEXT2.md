@@ -1,10 +1,37 @@
 # Stato implementazione RecordsNext 2.1
 
+## Correzione eliminazione stagioni - 2026-09-02
+
+Implementata e verificata la cancellazione reale di una stagione dalla configurazione RecordsNext.
+
+Comportamento consolidato:
+
+- la rimozione non elimina soltanto `rn_season_configuration`;
+- vengono rimossi i dati interni RecordsNext appartenenti alla stagione;
+- vengono rimossi i riferimenti in `rn_source_file`;
+- vengono rimossi team e competizioni stagionali e i relativi mapping;
+- vengono rimossi calendario e sorgente calendario della stagione;
+- le identita canoniche condivise con altre stagioni vengono conservate;
+- se una identita era ancorata alla stagione eliminata, viene riancorata alla stagione mappata piu recente ancora disponibile;
+- se una identita esisteva esclusivamente nella stagione eliminata, viene eliminata;
+- se viene eliminata la stagione anchor, la stagione gestita piu recente rimasta viene promossa automaticamente ad anchor;
+- i file fisici FCM/FCA/DataA e le directory dei siti non vengono cancellati.
+
+Verifica effettuata anche su una copia del database operativo reale:
+
+- eliminata `2026_2027`;
+- nessun residuo nelle principali tabelle stagionali;
+- nessuna identita rimasta ancorata a `2026_2027`;
+- `2025_2026` promossa automaticamente a nuova anchor.
+
+Suite automatica consolidata: 44 test, 0 failure, 0 errori, 0 skipped.
+
+
 Aggiornamento: 27 agosto 2026.
 
 ## Stato release 2.1.0
 
-RecordsNext 2.1.0 è completato, testato, taggato e pubblicato nel repository.
+RecordsNext 2.1.0 Ã¨ completato, testato, taggato e pubblicato nel repository.
 
 Sono implementate e operative:
 
@@ -13,7 +40,7 @@ Sono implementate e operative:
 - stagioni GESTITE e MANUALI;
 - associazioni storiche di squadre e competizioni;
 - normalizzazione e consolidamento multistagione;
-- modalità Completa e Consolidata;
+- modalitÃ  Completa e Consolidata;
 - Classici;
 - Serie;
 - Riserve d'Ufficio;
@@ -43,7 +70,7 @@ Output pubblico corrente:
 - `fcmRecordsNext_Matches.js`;
 - `fcmRecordsNext_Manifest.js`.
 
-### Novità specifiche 2.1
+### NovitÃ  specifiche 2.1
 
 `fcmRecordsNext_Matches.js` espone il dataset canonico delle gare,
 con due righe per ogni partita reale e una riga per squadra.
@@ -141,9 +168,9 @@ Famiglie:
 
 Il Culometro resta un easter egg opzionale, non selezionato automaticamente.
 
-## Compatibilità con la pipeline 1.0.2
+## CompatibilitÃ  con la pipeline 1.0.2
 
-ProcessingOptions e RecordsNextPipeline sono stati estesi mantenendo la compatibilità con il costruttore legacy basato su:
+ProcessingOptions e RecordsNextPipeline sono stati estesi mantenendo la compatibilitÃ  con il costruttore legacy basato su:
 
 - Classici;
 - Riserve d'Ufficio;
@@ -158,7 +185,7 @@ Le famiglie non ancora dotate di elaboratore non vengono ignorate silenziosament
 
 Sono implementati:
 
-- inventario delle capacità disponibili;
+- inventario delle capacitÃ  disponibili;
 - piano di esecuzione;
 - valutazione preventiva delle dipendenze;
 - conteggio di figli completi, parziali e saltati;
@@ -227,11 +254,11 @@ Ultimo stato verificato il 6 agosto 2026:
 - 0 test saltati;
 - BUILD SUCCESS.
 
-La verifica è stata eseguita anche sull’elaborazione reale delle stagioni configurate.
+La verifica Ã¨ stata eseguita anche sullâ€™elaborazione reale delle stagioni configurate.
 
 ## Famiglia Modificatori
 
-La famiglia Modificatori è implementata e verificata.
+La famiglia Modificatori Ã¨ implementata e verificata.
 
 La configurazione GUI permette di selezionare separatamente, per ciascun modificatore:
 
@@ -254,14 +281,14 @@ Modificatori standard FCM gestiti separatamente:
 - `MODATTACCO`;
 - `MODMODULO`.
 
-Il file `fcmRecordsNext_Modifiers.js` viene costruito direttamente dagli archivi `season_records_*.json`, senza dipendere dall’esportatore Classici legacy.
+Il file `fcmRecordsNext_Modifiers.js` viene costruito direttamente dagli archivi `season_records_*.json`, senza dipendere dallâ€™esportatore Classici legacy.
 
 I metadati distinguono:
 
-- `availableSections`: sezioni supportate dall’esportatore;
+- `availableSections`: sezioni supportate dallâ€™esportatore;
 - `generatedSections`: sezioni effettivamente prodotte in base alla configurazione e ai dati disponibili.
 
-È stata verificata nell’output reale la presenza di:
+Ãˆ stata verificata nellâ€™output reale la presenza di:
 
 - Massimo, Totale, Media e Utilizzi per `MODM1PERS`;
 - Massimo, Totale, Media e Utilizzi per `MODM2PERS`;
@@ -289,13 +316,13 @@ Gli esportatori Classici e RU della 1.0.2 restano operativi come ponte.
 
 ## Regole da non perdere
 
-- Non riscrivere accesso FCM/FCA, mapping, normalizzazione e consolidamento senza una necessità verificata.
+- Non riscrivere accesso FCM/FCA, mapping, normalizzazione e consolidamento senza una necessitÃ  verificata.
 - Basarsi sul codice reale di RecordsNext 1.0.2.
 - Tutti i JavaScript pubblici vanno nella cartella js del sito FCM.
 - Nella root del sito deve esserci un solo HTML indice.
 - Le viste e gli asset vanno nella cartella RecordsNext.
 - Ogni record riferito a una partita specifica conserva il link al tabellino.
-- Squadre e competizioni conservano identità stagionale e canonica.
+- Squadre e competizioni conservano identitÃ  stagionale e canonica.
 - Gli output devono essere viste dati complete, non top list tagliate.
 - Gli ZIP temporanei applicati, testati e committati vanno eliminati periodicamente da D:\DEV_APPS\downloads.
 
