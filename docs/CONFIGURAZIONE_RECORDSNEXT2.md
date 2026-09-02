@@ -1,4 +1,58 @@
-# Configurazione RecordsNext 2.0
+# Configurazione RecordsNext 3.1
+
+## Aggiornamento configurazione 3.1
+
+### Sito locale opzionale
+
+Per ogni stagione gestita:
+
+- FCM: obbligatorio;
+- FCA: obbligatorio;
+- sito locale: opzionale;
+- sito online: opzionale.
+
+Se `local_site_path` e' valorizzato deve indicare una directory esistente. Se e' vuoto la stagione resta valida e continua a partecipare allo storico, ma non costituisce un target di pubblicazione.
+
+La cartella JS e' sempre derivata da:
+
+```text
+<local_site_path>/js
+```
+
+### Calendari DataA
+
+Il DataA storico non dipende piu' dalla presenza del sito.
+
+Percorso canonico:
+
+```text
+data/calendars/DataA-YYYY.js
+```
+
+Esempi:
+
+```text
+2024_2025 -> data/calendars/DataA-2024.js
+2025_2026 -> data/calendars/DataA-2025.js
+2026_2027 -> data/calendars/DataA-2026.js
+```
+
+La GUI segnala separatamente:
+
+- `DataA archivio trovato`;
+- `DataA archivio non trovato`.
+
+### Pubblicazione
+
+La GUI 3.1 espone:
+
+- `Pubblica nel sito della stagione corrente al termine`;
+- `Pubblica i siti delle stagioni selezionate`.
+
+La seconda azione usa le checkbox `Elabora` come ambito esplicito dei target storici da pubblicare. Una stagione selezionata ma senza sito continua a contribuire ai dati; semplicemente non produce una pubblicazione propria.
+
+E' stato rimosso il fallback hardcoded verso `E:/fantacalcio/Lega2025/js`. In assenza di un target configurato, RecordsNext non deve scegliere autonomamente un sito reale.
+
 
 ## Scopo
 

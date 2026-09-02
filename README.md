@@ -1,189 +1,116 @@
-# RecordsNext 3.0.0
+# RecordsNext 3.1
 
-**RecordsNext by mauz79** Ã¨ un'applicazione per Fantacalcio Manager che legge gli archivi FCM/FCA, consolida i dati storici della lega e genera record e viste statistiche pubblicabili sul sito FCM.
+**RecordsNext by mauz79** genera record e statistiche storiche multistagione per leghe gestite con Fantacalcio Manager.
 
-RecordsNext 2.1 prosegue la linea 2.x con output JavaScript piÃ¹ completi, maggiori informazioni di dettaglio per Serie e Culometro e un flusso piÃ¹ rapido per la configurazione delle nuove stagioni storiche.
+La 3.1 separa definitivamente le **sorgenti storiche** dalle **destinazioni di pubblicazione**: FCM, FCA e calendari alimentano lo storico; ogni sito FCM è una destinazione opzionale e riceve solo i dati disponibili fino alla propria stagione.
 
-## Requisiti
+![Dashboard RecordsNext 3.1](docs/screenshots/01-dashboard.png)
 
-- Windows
-- Java 21 o superiore
-- Fantacalcio Manager e relativi file `.fcm` / `.fca`
-- per la pubblicazione: cartella del sito FCM locale
+## Funzioni principali
 
-La distribuzione include **UCanAccess 2.0.9.5** e le dipendenze necessarie alla lettura dei database FCM/FCA.
+- storico multistagione con identità canoniche di squadre e competizioni;
+- Classici, Serie, Riserve d'Ufficio, Modificatori, Soglie/Fortuna e Culometro;
+- dataset pubblico `fcmRecordsNext_Matches.js`, con due righe per partita;
+- link ai tabellini storici;
+- pubblicazione nel solo sito corrente per l'uso ordinario;
+- riallineamento di più siti storici con **Pubblica i siti delle stagioni selezionate**;
+- ogni sito riceve esclusivamente lo storico fino alla propria stagione;
+- calendari DataA 1991-2026 inclusi nell'installazione;
+- sito locale opzionale per stagione.
 
-## Avvio rapido
+## Installazione
 
-1. Estrarre l'intero archivio `RecordsNext_3.0.0.zip` in una cartella.
-2. Avviare `RecordsNext.bat`.
-3. Aprire **Configurazione stagioni**.
-4. Configurare la lega e almeno una stagione gestita.
-5. Salvare la configurazione.
-6. Completare le associazioni storiche quando richiesto.
-7. Configurare le famiglie di record.
-8. Avviare l'elaborazione.
+Scaricare dalla release il solo file:
 
-`RecordsNext.bat`, `RecordsNext.jar` e la directory `runtime` devono restare nella struttura fornita dalla release.
+`RecordsNext_3.1.0_SETUP.exe`
 
-## Dashboard
+Avviarlo con doppio click e scegliere la cartella di installazione. Convenzione consigliata:
 
-![Dashboard](docs/screenshots/01_dashboard.png)
+`<cartella FCM>\plugin\RecordsNext`
 
-La Dashboard Ã¨ il punto di ingresso principale. Mostra lo stato della configurazione e consente di accedere a configurazione stagioni, famiglie record, strumenti e diagnostica.
+Requisito: **Java 21 o superiore**.
 
-## Configurazione stagioni
+Il setup non installa database personali, non copia FCM/FCA e non pubblica automaticamente nei siti.
 
-![Configurazione stagioni](docs/screenshots/02_configurazione_stagioni.png)
+## Prima configurazione
 
-Per la lega vengono definiti **Nome lega** e **ID lega**.
+Aprire **Configurazione stagioni** e aggiungere almeno una stagione gestita indicando FCM e FCA.
 
-Per ogni stagione gestita possono essere configurati file FCM/FCA, sito locale, sito online, DataA.js, tabellini e associazioni storiche.
+![Configurazione stagione](docs/screenshots/02-configurazione-stagione.png)
 
-![Stagioni configurate](docs/screenshots/12_stagioni_configurate.png)
+Per una stagione **Gestita**:
 
-### Aggiungere una stagione
+- FCM obbligatorio;
+- FCA obbligatorio;
+- sito locale opzionale;
+- sito online opzionale;
+- calendario recuperato dall'archivio interno RecordsNext.
 
-![Aggiunta stagione](docs/screenshots/03_aggiungi_stagione.png)
+Per una stagione **Manuale** servono soltanto anni e numero stagione.
 
-Per una stagione gestita selezionare FCM e FCA. Quando disponibili, stagione e numero vengono letti dal file FCM.
+Il nome lega può essere lasciato vuoto: RecordsNext prova a ricavarlo dal primo FCM. L'identificativo interno della lega non viene richiesto all'utente.
 
-![Aggiunta stagione compilata](docs/screenshots/04_aggiungi_stagione_compilata.png)
+### URL del sito online
 
-Le stagioni prive di FCM possono essere mantenute come **MANUALI**: servono alla successione storica ma non vengono elaborate come stagioni FCM.
+Usare un URL completo, per esempio:
 
-## Associazioni storiche
+`http://www.example.org/lega2026`
 
-### Squadre
+RecordsNext normalizza automaticamente slash e protocollo; se il protocollo manca viene aggiunto `http://`.
 
-![Associazioni squadre](docs/screenshots/05_associazioni_squadre.png)
+## Elaborazione
 
-### Competizioni
+Per l'uso giornata per giornata:
 
-![Associazioni competizioni](docs/screenshots/06_associazioni_competizioni.png)
+1. selezionare **Consolidata** quando disponibile;
+2. lasciare selezionate le stagioni da elaborare;
+3. spuntare **Pubblica nel sito della stagione corrente al termine**;
+4. premere **Elabora**.
 
-Le associazioni permettono di collegare nomi stagionali differenti alla stessa identitÃ  storica/canonica.
+Per ricostruzioni integrali usare **Completa**.
 
-## Famiglie di record
+## Pubblicazione storica
 
-### Classici
+La funzione **Pubblica i siti delle stagioni selezionate** serve per riallineamenti dopo modifiche globali, nuove versioni o correzioni dello storico.
 
-![Famiglia Classici](docs/screenshots/07_famiglia_classici.png)
+Ogni sito riceve soltanto le stagioni fino al proprio `sort_order`: nessun sito storico riceve dati futuri.
 
-### Modificatori
+![Pubblicazione multisito](docs/screenshots/06-pubblicazione-multisito.png)
 
-![Famiglia Modificatori](docs/screenshots/08_famiglia_modificatori.png)
+## Famiglie record
 
-Le famiglie disponibili comprendono:
+![Classici](docs/screenshots/03-famiglia-classici.png)
 
-- Classici
-- Serie
-- Riserve d'Ufficio
-- Modificatori
-- Soglie e Fortuna
-- Culometro
+Sono disponibili:
 
-## Culometro
+- Classici;
+- Serie;
+- Riserve d'Ufficio;
+- Modificatori;
+- Soglie e Fortuna.
 
-Il **Culometro** Ã¨ opzionale e viene generato soltanto quando viene esplicitamente abilitato.
+Il Culometro è opzionale e configurabile separatamente.
 
-![Generazione Culometro](docs/screenshots/14_culometro_generazione.png)
+![Soglie e Fortuna](docs/screenshots/04-soglie-fortuna.png)
 
-La configurazione permette di scegliere un profilo semplice oppure intervenire sui parametri avanzati, sui pesi dei singoli fattori e sulle etichette.
+![Configurazione Culometro](docs/screenshots/05-culometro-configurazione.png)
 
-### Profilo semplice e slider principali
+## Output JavaScript
 
-![Culometro - profilo semplice](docs/screenshots/15_culometro_profilo_semplice.png)
+RecordsNext pubblica nella cartella `js` del sito:
 
-Gli slider mostrano il fondoscala e il valore selezionato, cosÃ¬ Ã¨ immediato capire quanto il parametro Ã¨ vicino al minimo o al massimo ammesso.
+- `fcmRecordsNext_Core.js`
+- `fcmRecordsNext_Classics.js`
+- `fcmRecordsNext_Series.js`
+- `fcmRecordsNext_RU.js`
+- `fcmRecordsNext_Modifiers.js`
+- `fcmRecordsNext_ThresholdsLuck.js`
+- `fcmRecordsNext_Culometro.js`
+- `fcmRecordsNext_Matches.js`
+- `fcmRecordsNext_Manifest.js`
 
-### Parametri avanzati
+## Stato 3.1
 
-![Culometro - parametri avanzati](docs/screenshots/16_culometro_avanzato.png)
+La pubblicazione multisito è stata verificata su 21 stagioni gestite, da `2006_2007` a `2026_2027`: 189 file validati e 189 pubblicati senza errori.
 
-Anche i parametri avanzati mostrano minimo, massimo e valore corrente.
-
-### Pesi dei fattori
-
-![Pesi Culometro](docs/screenshots/17_culometro_pesi_fattori.png)
-
-Il viewer dispone anche della vista **Eventi**, con filtro dedicato per il tipo di evento.
-
-![Viewer Culometro](docs/screenshots/20_culometro_viewer_eventi.png)
-
-La spiegazione completa di normalizzazione, raritÃ , sovrapposizioni, pesi, soglie ed etichette Ã¨ in:
-
-**[docs/CULOMETRO.md](docs/CULOMETRO.md)**
-
-## ModalitÃ  di elaborazione
-
-### Consolidata
-
-Ãˆ la modalitÃ  normale per l'aggiornamento durante la stagione.
-
-![ModalitÃ  consolidata](docs/screenshots/10_modalita_consolidata.png)
-
-### Completa
-
-Rigenera i dati derivati di tutte le stagioni gestite usando la logica corrente. Le stagioni manuali non vengono elaborate come FCM.
-
-## Log e diagnostica
-
-![Log e diagnostica](docs/screenshots/11_log_diagnostica.png)
-
-La pagina mostra fasi della pipeline, tempi e messaggi utili alla diagnosi.
-
-## Pubblicazione e visualizzatori HTML
-
-![Installazione HTML](docs/screenshots/09_debug_installazione_html.png)
-
-I visualizzatori sono statici e caricano i dati JavaScript generati da RecordsNext.
-
-Gli output principali sono:
-
-```text
-fcmRecordsNext_Core.js
-fcmRecordsNext_Manifest.js
-fcmRecordsNext_Classics.js
-fcmRecordsNext_Series.js
-fcmRecordsNext_RU.js
-fcmRecordsNext_Modifiers.js
-fcmRecordsNext_ThresholdsLuck.js
-fcmRecordsNext_Culometro.js
-```
-
-I JS pubblici sono destinati alla cartella `js` del sito FCM.
-
-Sono inclusi i profili:
-
-- `mauzstrom`
-- `fantablue2`
-- `neutral`
-
-Il profilo `mauzstrom` usa **Trebuchet MS**.
-
-## Tabellini
-
-Ogni stagione puÃ² essere associata a sito locale e sito online. Sono supportate pagine risultato `ris.htm`, `ris.html` e `ris.php` quando coerenti con il sito configurato.
-
-## Aggiornamento ordinario
-
-1. aggiornare Fantacalcio Manager;
-2. avviare RecordsNext;
-3. scegliere **Consolidata**;
-4. elaborare;
-5. generare/pubblicare i JS;
-6. controllare i visualizzatori.
-
-## Documentazione
-
-- `README.md` â€” panoramica illustrata
-- `INSTALL.txt` â€” installazione e primo avvio
-- `CHANGELOG.md` â€” contenuti della release
-- `docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md` â€” pubblicazione dei visualizzatori
-- `docs\CULOMETRO.md` â€” funzionamento e configurazione del Culometro
-- `docs\screenshots\` â€” schermate di riferimento
-
-## Autore
-
-**RecordsNext by mauz79**
+UCanAccess utilizzato: `2.0.9.5`.

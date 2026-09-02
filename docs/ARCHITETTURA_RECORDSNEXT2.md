@@ -1,4 +1,48 @@
-# Architettura RecordsNext 2.1
+# Architettura RecordsNext 3.1
+
+## Architettura multisito 3.1
+
+La 3.1 separa definitivamente le sorgenti storiche dalle destinazioni di pubblicazione.
+
+```text
+FCM / FCA / DataA canonico
+            |
+            v
+database + report + archivi RecordsNext
+            |
+            v
+scope per stagione target
+            |
+            +--> sito stagione corrente
+            |
+            +--> siti storici selezionati
+```
+
+Regole:
+
+- FCM/FCA/DataA descrivono i dati storici;
+- il sito locale e' opzionale e non e' una sorgente necessaria dello storico;
+- `DataA` canonico: `data/calendars/DataA-YYYY.js`;
+- un sito configurato e disponibile e' soltanto una destinazione;
+- una stagione senza sito continua a contribuire allo storico;
+- il cutoff temporale usa `rn_season.sort_order`;
+- un target non puo' ricevere stagioni successive alla propria;
+- Core e Manifest vengono rigenerati coerentemente con il target;
+- gli altri dataset vengono generati da viste temporanee contenenti soltanto le stagioni ammesse;
+- il publisher non deve creare interi siti FCM mancanti: pubblica soltanto dove esiste una destinazione configurata.
+
+### Modalita di pubblicazione
+
+`CURRENT_SITE`:
+- usata dall'elaborazione normale quando e' selezionata la pubblicazione;
+- aggiorna soltanto il sito associato alla stagione corrente.
+
+`ALL_CONFIGURED_SITES`:
+- esposta in GUI come `Pubblica i siti delle stagioni selezionate`;
+- considera soltanto i target delle stagioni selezionate;
+- salta le destinazioni configurate ma non disponibili;
+- per ogni target costruisce lo scope storico fino a quel `sort_order`.
+
 
 ## Ciclo di vita delle stagioni
 

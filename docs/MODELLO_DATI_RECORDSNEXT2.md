@@ -1,4 +1,29 @@
-# Modello dati RecordsNext 2.0
+# Modello dati RecordsNext 3.1
+
+## Estensione 3.1: stagione, calendario e destinazione sito
+
+Nella 3.1 la configurazione di una stagione distingue esplicitamente:
+
+- sorgenti dati della stagione (`FCM`, `FCA`);
+- calendario canonico (`DataA-YYYY.js`) nell'archivio interno RecordsNext;
+- destinazione locale opzionale del sito (`local_site_path`);
+- eventuale URL online (`online_site_url`).
+
+La presenza del sito non determina piu' se una stagione e' completa.
+
+Per una stagione `GESTITA`, la completezza operativa richiede FCM e FCA validi; il sito puo' restare vuoto.
+
+La destinazione di pubblicazione e' derivata come:
+
+```text
+local_site_path
+    -> local_site_path/js
+```
+
+Per la pubblicazione storica, `sort_order` e' il riferimento canonico per stabilire quali stagioni appartengono allo scope di un sito. Il `season_id` resta identificativo leggibile e stabile, ma non e' usato come ordinamento temporale primario.
+
+Le identita canoniche esportate nel Core di un sito storico devono essere limitate alle occorrenze disponibili fino alla stagione target. Se l'anchor globale dell'identita appartiene a una stagione futura rispetto al target, il Core pubblicato deve usare come anchor la piu recente occorrenza disponibile nello scope.
+
 
 ## Regole di eliminazione di una stagione
 

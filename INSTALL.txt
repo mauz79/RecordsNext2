@@ -1,332 +1,66 @@
-RecordsNext 2.1.0
+RecordsNext 3.1.0
 INSTALLAZIONE E PRIMO AVVIO
 ===========================
 
 RecordsNext by mauz79
 
-Questa guida descrive l'installazione della release RecordsNext 2.1.0 su Windows,
-il primo avvio, la configurazione iniziale, l'elaborazione e la pubblicazione.
-
-Per una panoramica illustrata vedere anche README.md e la cartella:
-
-docs\screenshots\
-
-
 1. REQUISITI
 ============
-
 - Windows
 - Java 21 o superiore
 - Fantacalcio Manager
 - file FCM/FCA della lega
-- per la pubblicazione HTML: una cartella sito FCM locale
 
-La release include UCanAccess 2.0.9.5 e le dipendenze necessarie alla lettura
-dei file FCM/FCA.
+UCanAccess 2.0.9.5 e le dipendenze necessarie sono inclusi nel pacchetto FULL.
 
-Non è necessario installare separatamente UCanAccess.
+2. PRIMA INSTALLAZIONE
+======================
+1. Estrarre completamente RecordsNext_3.1.0_FULL.zip.
+2. Eseguire INSTALLA_RECORDSNEXT.bat.
+3. Indicare la cartella di installazione, ad esempio:
+   <cartella FCM>\plugin\RecordsNext
+4. L'installer verifica Java 21+, runtime e integrita minima del payload.
 
-
-2. INSTALLAZIONE
-================
-
-1. Scaricare RecordsNext_2.1.0.zip.
-
-2. Estrarre TUTTO il contenuto in una cartella scrivibile, ad esempio:
-
-   C:\RecordsNext_2.1.0
-
-3. Non spostare singolarmente RecordsNext.jar o RecordsNext.bat.
-
-La struttura minima deve rimanere simile a:
-
-RecordsNext_2.1.0\
-|
-|-- RecordsNext.jar
-|-- RecordsNext.bat
-|-- README.md
-|-- INSTALL.txt
-|-- CHANGELOG.md
-|
-|-- runtime\
-|   `-- ucanaccess\
-|
-|-- config\
-|-- visualizzatori\
-|-- docs\
-`-- tools\
-
+L'installer NON installa database personali, NON copia FCM/FCA e NON pubblica file nei siti FCM.
 
 3. AVVIO
 ========
+Eseguire RecordsNext.bat.
 
-Avviare:
-
-RecordsNext.bat
-
-Il launcher controlla la presenza di Java e avvia RecordsNext con il runtime
-UCanAccess incluso nella release.
-
-Se Java non viene trovato o la versione non è compatibile, viene mostrato
-un messaggio di errore.
-
-RecordsNext 2.1 richiede Java 21 o superiore.
-
-
-4. DASHBOARD
-============
-
-All'avvio viene mostrata la Dashboard principale.
-
-Screenshot di riferimento:
-
-docs\screenshots\01_dashboard.png
-
-La Dashboard permette di accedere a:
-
-- Configurazione stagioni
-- Progetto e motore / Famiglie record
-- Debug e strumenti
-- Log e diagnostica
-- modalità di elaborazione Consolidata / Completa
-
-
-5. CONFIGURAZIONE DELLA LEGA
-============================
-
-Aprire:
-
-Configurazione stagioni
-
-Screenshot:
-
-docs\screenshots\02_configurazione_stagioni.png
-
-Nella parte superiore inserire:
-
-- Nome lega
-- ID lega
-
-L'ID lega può essere lasciato vuoto: RecordsNext può derivarlo dal nome.
-
-Quando la configurazione viene salvata, RecordsNext crea o aggiorna:
-
-config\league.json
-
-contenente:
-
-- leagueId
-- leagueName
-- currentSeasonId
-
-
-6. AGGIUNGERE UNA STAGIONE
+4. CONFIGURAZIONE STAGIONI
 ==========================
-
-Premere:
-
-Aggiungi stagione
-
-Screenshot:
-
-docs\screenshots\03_aggiungi_stagione.png
-
-Per una stagione GESTITA indicare almeno:
-
-- File FCM
-- File FCA
-
-Screenshot di esempio:
-
-docs\screenshots\04_aggiungi_stagione_compilata.png
-
-Quando possibile, stagione e numero vengono ricavati dal file FCM.
-
-Dopo l'aggiunta, completare:
-
-- Cartella sito locale
-- Sito online, quando disponibile
-
-RecordsNext usa la cartella js interna al sito locale.
-Non va configurata separatamente.
-
-
-7. STAGIONI MANUALI
-===================
-
-Una stagione priva di file FCM può essere inserita come MANUALE.
-
-Per una stagione manuale servono soltanto:
-
-- anni stagione in formato YYYY/YYYY
-- numero stagione
-
-Una stagione manuale:
-
-- mantiene corretta la successione storica;
-- non viene elaborata come FCM;
-- non usa FCM/FCA;
-- non ha tabellini;
-- non richiede sito locale o online.
-
-
-8. DATAA.JS E TABELLINI
-=======================
-
-Per le stagioni gestite RecordsNext utilizza i dati del sito FCM per ricavare
-le informazioni utili ai tabellini.
-
-Nella configurazione viene mostrato lo stato di DataA.js e del file risultati.
-
-Screenshot:
-
-docs\screenshots\12_stagioni_configurate.png
-
-Sono supportati file risultati del tipo:
-
-ris.htm
-ris.html
-ris.php
-
-purché coerenti con il sito configurato per quella stagione.
-
-
-9. ASSOCIAZIONI STORICHE
-========================
-
-Aprire:
-
-Configura associazioni storiche...
-
-Le squadre e le competizioni possono cambiare nome nel corso degli anni.
-RecordsNext permette di collegare ogni entità stagionale a una identità
-storica/canonica.
-
-Squadre:
-
-docs\screenshots\05_associazioni_squadre.png
-
-Competizioni:
-
-docs\screenshots\06_associazioni_competizioni.png
-
-Completare le associazioni prima di elaborare lo storico definitivo.
-
-
-10. FAMIGLIE DI RECORD
-======================
-
-Aprire la sezione Famiglie record / Progetto e motore.
-
-È possibile scegliere quali famiglie elaborare e quali record produrre.
-
-Classici:
-
-docs\screenshots\07_famiglia_classici.png
-
-Modificatori:
-
-docs\screenshots\08_famiglia_modificatori.png
-
-Le famiglie principali sono:
-
-- Classici
-- Serie
-- Riserve d'Ufficio
-- Modificatori
-- Soglie e Fortuna
-- Culometro
-
-Il Culometro è opzionale e non viene prodotto automaticamente se non abilitato.
-
-
-11. MODIFICATORI PERSONALI
-==========================
-
-I modificatori personali restano generici.
-
-Sono disponibili:
-
-- MODM1PERS
-- MODM2PERS
-- MODM3PERS
-
-Per ogni lega è possibile assegnare un nome leggibile e scegliere
-separatamente quali statistiche generare.
-
-Non esiste una semantica fissa obbligatoria per questi campi.
-
-
-12. MODALITA DI ELABORAZIONE
-============================
-
-CONSOLIDATA
-
-È la modalità consigliata per l'uso normale durante la stagione.
-
-Usa gli archivi già costruiti e aggiorna ciò che è necessario.
-
-Screenshot:
-
-docs\screenshots\10_modalita_consolidata.png
-
-
-COMPLETA
-
-Rigenera i dati derivati di tutte le stagioni GESTITE usando la logica corrente.
-
-Le stagioni MANUALI non vengono elaborate come FCM.
-
-Usare la modalità Completa per:
-
-- prima ricostruzione;
-- cambi importanti alla logica;
-- rigenerazioni dello storico;
-- ricostruzione integrale dei dati.
-
-
-13. ELABORAZIONE
+Per una stagione GESTITA:
+- FCM obbligatorio;
+- FCA obbligatorio;
+- sito locale opzionale;
+- sito online opzionale.
+
+La cartella js deriva da <cartella sito>\js.
+Una stagione senza sito resta comunque parte dello storico.
+
+5. DATAA
+========
+Il DataA canonico e':
+data\calendars\DataA-YYYY.js
+
+Esempio:
+2025_2026 -> data\calendars\DataA-2025.js
+
+6. PUBBLICAZIONE
 ================
+Uso normale:
+- Consolidata;
+- Elabora;
+- "Pubblica nel sito della stagione corrente al termine".
 
-Dopo aver configurato stagioni, associazioni e famiglie:
+Riallineamento storico:
+- selezionare le stagioni interessate;
+- usare "Pubblica i siti delle stagioni selezionate".
 
-1. scegliere Consolidata oppure Completa;
-2. premere Salva;
-3. premere Elabora.
+Ogni sito riceve soltanto lo storico fino alla propria stagione.
 
-La pipeline esegue le fasi necessarie di importazione, normalizzazione,
-consolidamento e generazione degli output.
-
-
-14. LOG E DIAGNOSTICA
-=====================
-
-Aprire:
-
-Log e diagnostica
-
-Screenshot:
-
-docs\screenshots\11_log_diagnostica.png
-
-Qui vengono mostrati:
-
-- fasi della pipeline;
-- stagioni elaborate;
-- tempi di elaborazione;
-- messaggi di generazione;
-- eventuali errori.
-
-In caso di problema, questa è la prima schermata da controllare.
-
-
-15. OUTPUT JAVASCRIPT
-=====================
-
-RecordsNext genera file JavaScript separati per famiglia.
-
-Tra gli output previsti:
-
+7. OUTPUT
+=========
 fcmRecordsNext_Core.js
 fcmRecordsNext_Manifest.js
 fcmRecordsNext_Classics.js
@@ -335,158 +69,9 @@ fcmRecordsNext_RU.js
 fcmRecordsNext_Modifiers.js
 fcmRecordsNext_ThresholdsLuck.js
 fcmRecordsNext_Culometro.js
-
-Vengono generati solo gli output previsti dalla configurazione attiva.
-
-
-16. PUBBLICAZIONE SUL SITO FCM
-==============================
-
-I JS pubblici RecordsNext devono essere copiati nella cartella:
-
-<cartella sito FCM>\js
-
-Esempio:
-
-C:\MioSitoFCM\js
-
-La pagina indice RecordsNext deve stare nella root del sito:
-
-recordsnext.html
-
-Le pagine HTML specifiche devono stare nella cartella:
-
-RecordsNext\
-
-La struttura è descritta nel README.md.
-
-
-17. VISUALIZZATORI HTML
-=======================
-
-La release include visualizzatori statici.
-
-I visualizzatori NON contengono i dati della lega.
-I dati vengono caricati dai JS generati da RecordsNext.
-
-Per i dettagli vedere:
-
-docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md
-
-Schermata di riferimento degli strumenti di installazione/pubblicazione:
-
-docs\screenshots\09_debug_installazione_html.png
-
-
-18. PROFILI GRAFICI
-===================
-
-Sono inclusi i profili:
-
-- mauzstrom
-- fantablue2
-- neutral
-
-Il profilo mauzstrom usa Trebuchet MS.
-
-
-19. AGGIORNAMENTO DOPO UNA GIORNATA
-===================================
-
-Durante la stagione il flusso normale è:
-
-1. aggiornare i dati in Fantacalcio Manager;
-2. avviare RecordsNext;
-3. scegliere Consolidata;
-4. premere Elabora;
-5. generare/pubblicare i JS;
-6. controllare il visualizzatore.
-
-Non è necessario eseguire ogni volta una rigenerazione Completa.
-
-
-20. FILE DA CONSERVARE
-======================
-
-Per non perdere la configurazione dell'installazione, conservare almeno:
-
-- config\
-- data\database\
-- eventuali archivi dati generati dall'applicazione
-
-Prima di sostituire una installazione già configurata con una nuova versione,
-fare una copia di sicurezza di questi dati.
-
-
-21. UCanAccess
-==============
-
-RecordsNext 2.1.0 distribuisce UCanAccess 2.0.9.5 in:
-
-runtime\ucanaccess\
-
-La directory contiene anche:
-
-- Jackcess
-- HSQLDB
-- Commons Lang
-- Commons Logging
-- licenze dei componenti
-
-Non eliminare o spostare questi file.
-
-
-22. RISOLUZIONE PROBLEMI
-========================
-
-RECORDSNEXT NON PARTE
-
-- verificare Java 21 o superiore;
-- avviare RecordsNext.bat;
-- non spostare RecordsNext.jar fuori dalla cartella della release.
-
-
-I FILE FCM/FCA NON VENGONO LETTI
-
-- verificare che runtime\ucanaccess sia completo;
-- verificare i percorsi selezionati;
-- controllare Log e diagnostica.
-
-
-LA GENERAZIONE JS FALLISCE
-
-- verificare che la lega sia stata salvata;
-- verificare Configurazione stagioni;
-- controllare associazioni storiche;
-- aprire Log e diagnostica.
-
-
-I VISUALIZZATORI NON MOSTRANO DATI
-
-- verificare che i JS siano stati generati;
-- verificare che siano presenti nella cartella js del sito;
-- verificare fcmRecordsNext_Core.js e fcmRecordsNext_Manifest.js;
-- verificare che i visualizzatori statici siano installati nella struttura corretta.
-
-
-23. DOCUMENTAZIONE
-==================
-
-README.md
-    panoramica generale e descrizione illustrata del funzionamento
-
-INSTALL.txt
-    questa guida
-
-CHANGELOG.md
-    modifiche e contenuti della release
-
-docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md
-    guida specifica ai visualizzatori
-
-docs\screenshots\
-    schermate di riferimento
-
-
-RecordsNext by mauz79
-Versione 2.1.0
+fcmRecordsNext_Matches.js
+
+8. AGGIORNAMENTO
+================
+Usare RecordsNext_3.1.0_UPDATE.zip ed eseguire Aggiorna-RecordsNext-3.1.bat.
+L'updater crea un backup e conserva config e data.

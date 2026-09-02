@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$RecordsNextRoot = "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2",
     [string]$FcmRoot = "E:\FCM\data"
 )

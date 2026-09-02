@@ -22,8 +22,8 @@ final class RecordsNextConfigurationDialog extends JDialog {
     private final Properties properties = new Properties();
     private final JPanel seasonsPanel = new JPanel();
     private final List<SeasonEditor> editors = new ArrayList<>();
-    private final JTextField leagueName = new JTextField(24);
-    private final JTextField leagueId = new JTextField(20);
+    private final JTextField leagueName = new JTextField(28);
+    private String leagueIdValue = "";
     private final SeasonConfigurationRepository repository;
     private boolean saved;
 
@@ -45,23 +45,39 @@ final class RecordsNextConfigurationDialog extends JDialog {
         header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
 
         JPanel leaguePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        leaguePanel.setBorder(new TitledBorder("Identità lega"));
+        leaguePanel.setBorder(new TitledBorder("Lega"));
         leaguePanel.add(new JLabel("Nome lega:"));
         leaguePanel.add(leagueName);
-        leaguePanel.add(new JLabel("ID lega:"));
-        leaguePanel.add(leagueId);
+        JLabel leagueHint = new JLabel("Se vuoto, RecordsNext prova a ricavarlo dal primo FCM.");
+        leagueHint.setForeground(Color.GRAY);
+        leaguePanel.add(leagueHint);
         header.add(leaguePanel);
         header.add(Box.createVerticalStrut(8));
 
-        JPanel top=new JPanel(new BorderLayout());
-        JLabel info=new JLabel("Configurare stagioni gestite e manuali. Le manuali richiedono solo anni e numero stagione.");
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel infoLine1 = new JLabel("Configurare stagioni gestite e manuali.");
+        JLabel infoLine2 = new JLabel("Il sito locale è opzionale e serve solo come destinazione di pubblicazione.");
+        infoLine1.setAlignmentX(Component.LEFT_ALIGNMENT);
+        infoLine2.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        infoPanel.add(infoLine1);
+        infoPanel.add(Box.createVerticalStrut(2));
+        infoPanel.add(infoLine2);
+        header.add(infoPanel);
+        header.add(Box.createVerticalStrut(8));
+
         JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        topButtons.setAlignmentX(Component.LEFT_ALIGNMENT);
         JButton mappings = new JButton("Configura associazioni storiche...");
         mappings.addActionListener(e -> openMappings());
-        JButton add=new JButton("Aggiungi stagione"); add.addActionListener(e->addSeason());
-        topButtons.add(mappings); topButtons.add(add);
-        top.add(info,BorderLayout.WEST); top.add(topButtons,BorderLayout.EAST);
-        header.add(top);
+        JButton add=new JButton("Aggiungi stagione");
+        add.addActionListener(e->addSeason());
+        topButtons.add(mappings);
+        topButtons.add(add);
+        header.add(topButtons);
         root.add(header,BorderLayout.NORTH);
         seasonsPanel.setLayout(new BoxLayout(seasonsPanel,BoxLayout.Y_AXIS)); seasonsPanel.setBorder(new EmptyBorder(4,4,4,4));
         JScrollPane scroll=new JScrollPane(seasonsPanel); scroll.getVerticalScrollBar().setUnitIncrement(20); root.add(scroll,BorderLayout.CENTER);
@@ -82,7 +98,7 @@ final class RecordsNextConfigurationDialog extends JDialog {
         try {
             LeagueMetadata metadata = LeagueMetadataLoader.load(leagueFile);
             leagueName.setText(metadata.leagueName());
-            leagueId.setText(metadata.leagueId());
+            leagueIdValue = metadata.leagueId();
         } catch (Exception ex) {
             error("Lettura identità lega", ex);
         }
@@ -105,6 +121,50 @@ final class RecordsNextConfigurationDialog extends JDialog {
                 .toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9]+", "-")
                 .replaceAll("^-+|-+$", "");
+        return normalized;
+    }
+
+    private static String deriveLeagueNameFromFcm(Path fcm) {
+        if (fcm == null) return "";
+        String name = fcm.getFileName().toString();
+        name = name.replaceFirst("(?i)\\.fcm$", "");
+        name = name.replaceFirst("\\s+\\d{4}_\\d{4}.*$", "");
+        name = name.replaceFirst("\\s+\\d{4}/\\d{4}.*$", "");
+        name = name.replaceFirst("[-_ ]+\\d{4}.*$", "");
+        name = name.trim();
+        return name;
+    }
+
+    private String effectiveLeagueName(List<SeasonConfigurationRepository.SeasonRow> rows) {
+        String value = leagueName.getText().trim();
+        if (!value.isEmpty()) return value;
+
+        for (SeasonConfigurationRepository.SeasonRow row : rows) {
+            if (!"GESTITA".equals(row.managementType()) || row.fcmPath().isBlank()) continue;
+            String detected = deriveLeagueNameFromFcm(Path.of(row.fcmPath()));
+            if (!detected.isEmpty()) {
+                leagueName.setText(detected);
+                return detected;
+            }
+        }
+
+        leagueName.setText("RecordsNext League");
+        return "RecordsNext League";
+    }
+
+    private static String normalizeOnlineUrl(String value) {
+        if (value == null) return "";
+        String normalized = value.trim().replace('\\', '/');
+        if (normalized.isEmpty()) return "";
+
+        while (normalized.endsWith("/")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+
+        if (!normalized.matches("(?i)^https?://.*")) {
+            normalized = "http://" + normalized;
+        }
+
         return normalized;
     }
 
@@ -182,6 +242,12 @@ final class RecordsNextConfigurationDialog extends JDialog {
             selectSeasonByDefault(row.seasonId());
 
             if ("GESTITA".equals(row.managementType())) {
+                if (leagueName.getText().trim().isEmpty()) {
+                    String detectedLeagueName = deriveLeagueNameFromFcm(Path.of(row.fcmPath()));
+                    if (!detectedLeagueName.isEmpty()) {
+                        leagueName.setText(detectedLeagueName);
+                    }
+                }
                 importForConfiguration(row, rows);
             }
 
@@ -243,19 +309,14 @@ final class RecordsNextConfigurationDialog extends JDialog {
     private void refresh(){seasonsPanel.revalidate();seasonsPanel.repaint();}
 
     private void saveConfiguration(){
-        String leagueNameValue = leagueName.getText().trim();
-        if (leagueNameValue.isEmpty()) { warn("Inserire il nome della lega."); return; }
-
-        String leagueIdValue = leagueId.getText().trim();
-        if (leagueIdValue.isEmpty()) {
-            leagueIdValue = slug(leagueNameValue);
-            leagueId.setText(leagueIdValue);
-        }
-        if (leagueIdValue.isEmpty()) { warn("Inserire un ID lega valido."); return; }
-
         if(editors.isEmpty()){warn("Aggiungere almeno una stagione.");return;}
         List<SeasonConfigurationRepository.SeasonRow> rows=new ArrayList<>();
         for(SeasonEditor e:editors){String problem=e.validateFields(); if(problem!=null){warn(problem);return;} rows.add(e.value());}
+        String leagueNameValue = effectiveLeagueName(rows);
+        String effectiveLeagueId = leagueIdValue == null ? "" : leagueIdValue.trim();
+        if (effectiveLeagueId.isEmpty()) effectiveLeagueId = slug(leagueNameValue);
+        if (effectiveLeagueId.isEmpty()) effectiveLeagueId = "recordsnext";
+        leagueIdValue = effectiveLeagueId;
         List<String> selected=editors.stream().filter(e->e.include.isSelected()).map(e->e.row.seasonId()).toList();
         if(selected.isEmpty()){warn("Selezionare almeno una stagione da elaborare.");return;}
         try {
@@ -275,8 +336,17 @@ final class RecordsNextConfigurationDialog extends JDialog {
         }
         properties.setProperty("seasons",String.join(",",selected));
         properties.setProperty("seasonsSelectionInitialized", "true");
-        rows.stream().filter(r->"GESTITA".equals(r.managementType())).max(Comparator.comparing(r->r.seasonId())).ifPresent(current->
-            properties.setProperty("siteJs",Path.of(current.localSitePath()).resolve("js").toString()));
+        rows.stream()
+            .filter(r->"GESTITA".equals(r.managementType()))
+            .max(Comparator.comparing(r->r.seasonId()))
+            .ifPresent(current->{
+                String currentSite=current.localSitePath().trim();
+                if(currentSite.isEmpty()){
+                    properties.remove("siteJs");
+                }else{
+                    properties.setProperty("siteJs",Path.of(currentSite).resolve("js").toString());
+                }
+            });
         try{
             repository.save(rows);
             String currentSeasonId = rows.stream()
@@ -284,7 +354,7 @@ final class RecordsNextConfigurationDialog extends JDialog {
                     .max(Comparator.comparing(r -> r.seasonId()))
                     .map(SeasonConfigurationRepository.SeasonRow::seasonId)
                     .orElseThrow(() -> new IllegalStateException("Configurare almeno una stagione gestita."));
-            writeLeagueIdentity(leagueIdValue, leagueNameValue, currentSeasonId);
+            writeLeagueIdentity(effectiveLeagueId, leagueNameValue, currentSeasonId);
             Files.createDirectories(configPath.getParent());
             try(OutputStream out=Files.newOutputStream(configPath)){properties.store(out,"RecordsNext configuration");}
             saved=true;dispose();
@@ -292,7 +362,7 @@ final class RecordsNextConfigurationDialog extends JDialog {
     }
 
     private void remove(SeasonEditor e){
-        int x=JOptionPane.showConfirmDialog(this,"Rimuovere "+e.row.seasonId()+" dalla configurazione?\nI dati già importati non saranno cancellati.","RecordsNext",JOptionPane.YES_NO_OPTION);
+        int x=JOptionPane.showConfirmDialog(this,"Rimuovere completamente "+e.row.seasonId()+" da RecordsNext?\nVerranno eliminati i dati interni della stagione, ma non i file FCM/FCA/DataA né il sito sul disco.","RecordsNext",JOptionPane.YES_NO_OPTION);
         if(x!=JOptionPane.YES_OPTION)return;
         try{repository.removeConfiguration(e.row.seasonId());}catch(Exception ex){error("Rimozione stagione",ex);return;}
         int i=editors.indexOf(e); editors.remove(e); seasonsPanel.remove(e.panel); if(i<seasonsPanel.getComponentCount()) seasonsPanel.remove(i); refresh();
@@ -383,14 +453,14 @@ final class RecordsNextConfigurationDialog extends JDialog {
             if("GESTITA".equals(row.managementType())) {
                 addPath("File FCM",fcm,1,JFileChooser.FILES_ONLY,".fcm");
                 addPath("File FCA",fca,2,JFileChooser.FILES_ONLY,".fca");
-                addPath("Cartella sito locale",site,3,JFileChooser.DIRECTORIES_ONLY,null);
+                addPath("Cartella sito locale (opzionale)",site,3,JFileChooser.DIRECTORIES_ONLY,null);
                 addText("Sito online",online,4);
                 site.getDocument().addDocumentListener(new javax.swing.event.DocumentListener(){public void insertUpdate(javax.swing.event.DocumentEvent e){updateDerived();}public void removeUpdate(javax.swing.event.DocumentEvent e){updateDerived();}public void changedUpdate(javax.swing.event.DocumentEvent e){updateDerived();}});
                 addLabel("Cartella JS",js,5);
-                addLabel("DataA.js e tabellini",dataa,6);
+                addLabel("Calendario e tabellini",dataa,6);
             } else {
                 addReadOnly("Configurazione", "Solo riferimento storico: " + row.seasonId().replace('_','/') + " · stagione n. " + row.seasonNumber(), 1);
-                addReadOnly("Dati gara", "FCM, FCA, sito, DataA.js e tabellini non previsti", 2);
+                addReadOnly("Dati gara", "FCM, FCA, sito, calendario e tabellini non previsti", 2);
             }
             if ("GESTITA".equals(row.managementType()) && !row.anchor()) {
                 JLabel mappingStatus = new JLabel();
@@ -424,14 +494,82 @@ final class RecordsNextConfigurationDialog extends JDialog {
         void addLabel(String label,JLabel value,int y){GridBagConstraints g=base(label,y);g.gridx=1;g.gridwidth=3;g.weightx=1;g.fill=GridBagConstraints.HORIZONTAL;panel.add(value,g);}
         GridBagConstraints base(String label,int y){GridBagConstraints g=new GridBagConstraints();g.gridy=y;g.gridx=0;g.anchor=GridBagConstraints.WEST;g.insets=new Insets(3,2,3,8);panel.add(new JLabel(label+":"),g);return g;}
         void updateDerived(){
+
+            String startYear=row.seasonId().substring(0,4);
+
+            Path archivedDataA=projectRoot.resolve("data/calendars/DataA-"+startYear+".js").normalize();
+
+
+
             String s=site.getText().trim();
-            if(s.isEmpty()){js.setText("-");dataa.setText("-");return;}
-            Path rootSite=Path.of(s); Path j=rootSite.resolve("js"); Path d=j.resolve("DataA.js");
+
+            boolean recoveredFromSite=false;
+
+
+
+            if(!Files.isRegularFile(archivedDataA) && !s.isEmpty()){
+
+                Path siteDataA=Path.of(s).resolve("js").resolve("DataA.js").normalize();
+
+                if(Files.isRegularFile(siteDataA)){
+
+                    try{
+
+                        Files.createDirectories(archivedDataA.getParent());
+
+                        Files.copy(siteDataA,archivedDataA,StandardCopyOption.REPLACE_EXISTING);
+
+                        recoveredFromSite=true;
+
+                    }catch(IOException ignored){ }
+
+                }
+
+            }
+
+
+
+            boolean dataAFound=Files.isRegularFile(archivedDataA);
+
+            String calendarStatus=dataAFound
+
+                ? (recoveredFromSite?"Calendario disponibile (recuperato dal sito)":"Calendario disponibile")
+
+                : "Calendario non disponibile";
+
+
+
+            if(s.isEmpty()){
+
+                js.setText("-");
+
+                dataa.setText(calendarStatus+" · sito non configurato");
+
+                dataa.setForeground(dataAFound?new Color(20,120,55):new Color(170,55,35));
+
+                return;
+
+            }
+
+
+
+            Path rootSite=Path.of(s);
+
+            Path j=rootSite.resolve("js");
+
             js.setText(j.toString());
+
+
+
             String matchPage=detectMatchPage(rootSite);
-            dataa.setText((Files.isRegularFile(d)?"DataA trovato":"DataA non trovato")+" · tabellini: "+matchPage);
-            dataa.setForeground(Files.isRegularFile(d)?new Color(20,120,55):new Color(170,55,35));
+
+            dataa.setText(calendarStatus+" · tabellini: "+matchPage);
+
+            dataa.setForeground(dataAFound?new Color(20,120,55):new Color(170,55,35));
+
         }
+
+
         String detectMatchPage(Path siteRoot){
             if(!Files.isDirectory(siteRoot)) return "sito non disponibile";
             try(var files=Files.list(siteRoot)){
@@ -445,12 +583,25 @@ final class RecordsNextConfigurationDialog extends JDialog {
             if("MANUALE".equals(row.managementType())) return null;
             if(fcm.getText().trim().isEmpty()||!Files.isRegularFile(Path.of(fcm.getText().trim())))return row.seasonId()+": selezionare un file FCM esistente.";
             if(fca.getText().trim().isEmpty()||!Files.isRegularFile(Path.of(fca.getText().trim())))return row.seasonId()+": selezionare un file FCA esistente.";
-            if(site.getText().trim().isEmpty()||!Files.isDirectory(Path.of(site.getText().trim())))return row.seasonId()+": selezionare una cartella sito esistente.";
+            String sitePath=site.getText().trim();
+            if(!sitePath.isEmpty()&&!Files.isDirectory(Path.of(sitePath)))return row.seasonId()+": la cartella sito indicata non esiste; correggerla oppure lasciare il campo vuoto.";
             return null;
         }
         SeasonConfigurationRepository.SeasonRow value(){
             boolean managed="GESTITA".equals(row.managementType());
-            return new SeasonConfigurationRepository.SeasonRow(row.seasonId(),row.seasonNumber(),row.anchor(),row.managementType(),row.status(),managed?fcm.getText().trim():"",managed?fca.getText().trim():"",managed?site.getText().trim():"",managed?online.getText().trim():"");
+            String normalizedOnline = managed ? normalizeOnlineUrl(online.getText()) : "";
+            if (managed) online.setText(normalizedOnline);
+            return new SeasonConfigurationRepository.SeasonRow(
+                row.seasonId(),
+                row.seasonNumber(),
+                row.anchor(),
+                row.managementType(),
+                row.status(),
+                managed?fcm.getText().trim():"",
+                managed?fca.getText().trim():"",
+                managed?site.getText().trim():"",
+                normalizedOnline
+            );
         }
     }
 
@@ -488,61 +639,129 @@ final class RecordsNextConfigurationDialog extends JDialog {
             return result;
         }
 
+        private final CardLayout modeCards = new CardLayout();
+
+        private final JPanel modePanel = new JPanel(modeCards);
+
+
+
         private void build() {
+
             setLayout(new BorderLayout(10, 10));
+
             ((JComponent) getContentPane()).setBorder(new EmptyBorder(14, 16, 12, 16));
 
+
+
             ButtonGroup group = new ButtonGroup();
+
             group.add(managed);
+
             group.add(manual);
 
-            JPanel form = new JPanel(new GridBagLayout());
-            form.setBorder(new TitledBorder("Tipo e sorgenti della stagione"));
 
-            GridBagConstraints g = new GridBagConstraints();
-            g.insets = new Insets(5, 5, 5, 5);
-            g.anchor = GridBagConstraints.WEST;
-            g.gridx = 0;
-            g.gridy = 0;
-            form.add(managed, g);
-            g.gridx = 1;
-            form.add(manual, g);
 
-            addChooser(form, "File FCM", fcm, 1, ".fcm");
-            addChooser(form, "File FCA", fca, 2, ".fca");
-            addField(form, "Anni stagione manuale (AAAA/AAAA)", manualSeason, 3);
-            addField(form, "Numero stagione", manualNumber, 4);
-            addValue(form, "Dati rilevati", detected, 5);
+            JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+
+            typePanel.setBorder(new TitledBorder("Tipo di stagione"));
+
+            typePanel.add(managed);
+
+            typePanel.add(manual);
+
+            add(typePanel, BorderLayout.NORTH);
+
+
+
+            JPanel managedPanel = new JPanel(new GridBagLayout());
+
+            managedPanel.setBorder(new TitledBorder("Sorgenti stagione gestita"));
+
+            addChooser(managedPanel, "File FCM", fcm, 0, ".fcm");
+
+            addChooser(managedPanel, "File FCA", fca, 1, ".fca");
+
+            addValue(managedPanel, "Dati rilevati", detected, 2);
+
+
+
+            JPanel manualPanel = new JPanel(new GridBagLayout());
+
+            manualPanel.setBorder(new TitledBorder("Dati stagione manuale"));
+
+            addField(manualPanel, "Anni stagione (AAAA/AAAA)", manualSeason, 0);
+
+            addField(manualPanel, "Numero stagione", manualNumber, 1);
+
+            JLabel manualHint = new JLabel("Le stagioni manuali non richiedono file FCM/FCA, sito o tabellini.");
+
+            manualHint.setForeground(Color.GRAY);
+
+            addValue(manualPanel, "Nota", manualHint, 2);
+
+
+
+            modePanel.add(managedPanel, "GESTITA");
+
+            modePanel.add(manualPanel, "MANUALE");
+
+            add(modePanel, BorderLayout.CENTER);
+
+
 
             managed.addActionListener(e -> updateMode());
+
             manual.addActionListener(e -> updateMode());
+
             updateMode();
 
-            add(form, BorderLayout.CENTER);
+
 
             JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
             JButton add = new JButton("Aggiungi stagione");
+
             JButton cancel = new JButton("Annulla");
+
             add.addActionListener(e -> finish());
+
             cancel.addActionListener(e -> dispose());
+
             buttons.add(add);
+
             buttons.add(cancel);
+
             add(buttons, BorderLayout.SOUTH);
 
-            setSize(720, 390);
+
+
+            setSize(720, 330);
+
             setLocationRelativeTo(getOwner());
+
         }
 
+
+
         private void updateMode() {
+
             boolean isManaged = managed.isSelected();
-            fca.setEnabled(isManaged);
-            fcm.setEnabled(isManaged);
-            manualSeason.setEnabled(!isManaged);
-            manualNumber.setEnabled(!isManaged);
+
+            modeCards.show(modePanel, isManaged ? "GESTITA" : "MANUALE");
+
             detected.setText(isManaged
+
                 ? "Stagione e numero saranno letti dal file FCM."
-                : "Inserire stagione e numero manualmente.");
+
+                : " ");
+
+            revalidate();
+
+            repaint();
+
         }
+
+
 
         private void finish() {
             try {

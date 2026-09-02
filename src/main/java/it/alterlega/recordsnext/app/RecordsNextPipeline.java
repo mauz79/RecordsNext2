@@ -7,14 +7,18 @@ import it.alterlega.recordsnext.app.manifest.ManifestMetadata;
 import it.alterlega.recordsnext.app.core.LeagueMetadata;
 import it.alterlega.recordsnext.app.core.LeagueMetadataLoader;
 import it.alterlega.recordsnext.app.model.RecordFamily;
+import it.alterlega.recordsnext.app.core.CoreJsExporter;
+import it.alterlega.recordsnext.app.output.SeasonPublicationTargetRepository;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Comparator;
 import java.util.Set;
 
 public final class RecordsNextPipeline {
@@ -44,11 +48,26 @@ public final class RecordsNextPipeline {
     ) {
     }
 
+    public enum PublicationMode {
+        CURRENT_SITE,
+        ALL_CONFIGURED_SITES
+    }
+
     public Result run(
             PipelineConfig c,
             ProcessingOptions o,
             ProcessingMode mode,
             Listener l
+    ) throws Exception {
+        return run(c, o, mode, l, PublicationMode.CURRENT_SITE);
+    }
+
+    public Result run(
+            PipelineConfig c,
+            ProcessingOptions o,
+            ProcessingMode mode,
+            Listener l,
+            PublicationMode publicationMode
     ) throws Exception {
         PipelinePreflight.Result preflight = preflight(o);
 
@@ -229,48 +248,234 @@ public final class RecordsNextPipeline {
                                     .resolve("config/league.json")
                     );
 
-            ManifestMetadata manifestMetadata =
-                    new ManifestMetadata(
-                            "RecordsNext by mauz79",
-                            "3.0.0",
-                            "2.0",
-                            OffsetDateTime.now(),
-                            leagueMetadata.leagueId(),
-                            leagueMetadata.currentSeasonId(),
-                            c.seasons(),
-                            List.of()
-                    );
+            if (!o.publish()) {
+                ManifestMetadata manifestMetadata =
+                        new ManifestMetadata(
+                                "RecordsNext by mauz79",
+                                "3.1.0",
+                                "2.0",
+                                OffsetDateTime.now(),
+                                leagueMetadata.leagueId(),
+                                leagueMetadata.currentSeasonId(),
+                                c.seasons(),
+                                List.of()
+                        );
 
-            var r = Records2026SitePublisher.run(
-                    c.classicArchive(),
-                    c.ruArchive(),
-                    c.staging(),
-                    c.siteJs(),
-                    !o.publish(),
-                    o.familyEnabled(RecordFamily.CLASSICS),
-                    o.familyEnabled(RecordFamily.RU),
-                    o,
-                    preflight,
-                    manifestMetadata,
-                    database,
-                    leagueMetadata,
-                    c.reports()
-            );
+                var r = Records2026SitePublisher.run(
+                        c.classicArchive(),
+                        c.ruArchive(),
+                        c.staging(),
+                        c.siteJs(),
+                        true,
+                        o.familyEnabled(RecordFamily.CLASSICS),
+                        o.familyEnabled(RecordFamily.RU),
+                        o,
+                        preflight,
+                        manifestMetadata,
+                        database,
+                        leagueMetadata,
+                        c.reports()
+                );
+
+                result = new Result(
+                        r.classicEntries(),
+                        r.ruSeasons(),
+                        r.validatedFiles(),
+                        0
+                );
+            } else {
+                SeasonPublicationTargetRepository targetRepository =
+                        new SeasonPublicationTargetRepository(database);
+
+                List<SeasonPublicationTargetRepository.Target> targets =
+                        targetRepository.load(c.seasons());
+
+                List<SeasonPublicationTargetRepository.Target> selectedTargets =
+                        selectPublicationTargets(
+                                targets,
+                                leagueMetadata.currentSeasonId(),
+                                publicationMode
+                        );
+
+                List<SeasonPublicationTargetRepository.Target> availableTargets =
+                        selectedTargets.stream()
+                                .filter(SeasonPublicationTargetRepository.Target::available)
+                                .toList();
+
+                for (SeasonPublicationTargetRepository.Target target : selectedTargets) {
+                    if (!target.available()) {
+                        l.phase(
+                                "PUBBLICAZIONE saltata per "
+                                        + target.seasonId()
+                                        + ": sito locale non disponibile: "
+                                        + target.siteRoot(),
+                                -1
+                        );
+                    }
+                }
+
+                if (availableTargets.isEmpty()) {
+                    if (publicationMode == PublicationMode.CURRENT_SITE) {
+                        throw new IllegalStateException(
+                                "Nessun sito locale configurato e disponibile per la stagione corrente "
+                                        + leagueMetadata.currentSeasonId()
+                                        + ". Configurare il sito della stagione oppure disattivare la pubblicazione."
+                        );
+                    }
+                    throw new IllegalStateException(
+                            "Nessun sito locale configurato e disponibile per la pubblicazione multisito."
+                    );
+                }
+
+                int totalClassicEntries = 0;
+                int totalRuSeasons = 0;
+                int totalFiles = 0;
+                int totalPublished = 0;
+
+                Path scopesRoot = c.staging()
+                        .resolve("multisite-scopes")
+                        .normalize();
+
+                deleteTree(scopesRoot);
+                Files.createDirectories(scopesRoot);
+
+                Path culometroConfig = c.projectRoot()
+                        .resolve("config/culometro.json")
+                        .normalize();
+
+                if (o.culometroEnabled()) {
+                    if (!Files.isRegularFile(culometroConfig)) {
+                        throw new IllegalStateException(
+                                "Configurazione Culometro non trovata: "
+                                        + culometroConfig
+                        );
+                    }
+
+                    Path scopedConfigDir = scopesRoot.resolve("config");
+                    Files.createDirectories(scopedConfigDir);
+                    Files.copy(
+                            culometroConfig,
+                            scopedConfigDir.resolve("culometro.json"),
+                            StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.COPY_ATTRIBUTES
+                    );
+                }
+
+                try {
+                    for (SeasonPublicationTargetRepository.Target target : availableTargets) {
+                        List<String> targetSeasons =
+                                targetRepository.scope(
+                                        c.seasons(),
+                                        target
+                                );
+
+                        if (targetSeasons.isEmpty()) {
+                            l.phase(
+                                    "PUBBLICAZIONE saltata per "
+                                            + target.seasonId()
+                                            + ": nessuna stagione selezionata nello scope.",
+                                    -1
+                            );
+                            continue;
+                        }
+
+                        l.phase(
+                                "Pubblicazione sito "
+                                        + target.seasonId()
+                                        + " -> "
+                                        + target.siteJs(),
+                                84
+                        );
+
+                        Path targetScope = scopesRoot.resolve(target.seasonId());
+                        Path scopedClassic = targetScope.resolve("classic");
+                        Path scopedRu = targetScope.resolve("ru");
+                        Path scopedReports = targetScope.resolve("reports");
+
+                        createSeasonScopedView(
+                                c.classicArchive(),
+                                scopedClassic,
+                                targetSeasons
+                        );
+                        createSeasonScopedView(
+                                c.ruArchive(),
+                                scopedRu,
+                                targetSeasons
+                        );
+                        createSeasonScopedView(
+                                c.reports(),
+                                scopedReports,
+                                targetSeasons
+                        );
+
+                        ManifestMetadata targetManifest =
+                                new ManifestMetadata(
+                                        "RecordsNext by mauz79",
+                                        "3.1.0",
+                                        "2.0",
+                                        OffsetDateTime.now(),
+                                        leagueMetadata.leagueId(),
+                                        target.seasonId(),
+                                        targetSeasons,
+                                        List.of()
+                                );
+
+                        var generated = Records2026SitePublisher.run(
+                                scopedClassic,
+                                scopedRu,
+                                c.staging(),
+                                target.siteJs(),
+                                true,
+                                o.familyEnabled(RecordFamily.CLASSICS),
+                                o.familyEnabled(RecordFamily.RU),
+                                o,
+                                preflight,
+                                targetManifest,
+                                null,
+                                null,
+                                scopedReports
+                        );
+
+                        Path generatedDir =
+                                generated.stagingDirectory().resolve("js");
+
+                        CoreJsExporter.export(
+                                database,
+                                generatedDir.resolve("fcmRecordsNext_Core.js"),
+                                leagueMetadata.leagueId(),
+                                leagueMetadata.leagueName(),
+                                target.seasonId()
+                        );
+
+                        int published = publishGeneratedDirectory(
+                                generatedDir,
+                                target.siteJs()
+                        );
+
+                        totalClassicEntries += generated.classicEntries();
+                        totalRuSeasons += generated.ruSeasons();
+                        totalFiles += published;
+                        totalPublished += published;
+                    }
+                } finally {
+                    deleteTree(scopesRoot);
+                }
+
+                result = new Result(
+                        totalClassicEntries,
+                        totalRuSeasons,
+                        totalFiles,
+                        totalPublished
+                );
+            }
 
             l.timing(
                     (
                             o.publish()
-                                    ? "generazione e pubblicazione JavaScript: "
+                                    ? "generazione e pubblicazione JavaScript multisito: "
                                     : "generazione JavaScript: "
                     )
                             + elapsed(started)
-            );
-
-            result = new Result(
-                    r.classicEntries(),
-                    r.ruSeasons(),
-                    r.validatedFiles(),
-                    r.publishedFiles()
             );
         }
 
@@ -328,6 +533,148 @@ public final class RecordsNextPipeline {
                             + unsupported
             );
         }
+    }
+
+    static List<SeasonPublicationTargetRepository.Target> selectPublicationTargets(
+            List<SeasonPublicationTargetRepository.Target> targets,
+            String currentSeasonId,
+            PublicationMode mode) {
+
+        if (mode == PublicationMode.ALL_CONFIGURED_SITES) {
+            return List.copyOf(targets);
+        }
+
+        return targets.stream()
+                .filter(target -> target.seasonId().equals(currentSeasonId))
+                .toList();
+    }
+
+    private static void createSeasonScopedView(
+            Path sourceRoot,
+            Path targetRoot,
+            List<String> seasons) throws Exception {
+
+        Files.createDirectories(targetRoot);
+
+        for (String season : seasons) {
+            Path source = sourceRoot.resolve(season).normalize();
+            if (!Files.isDirectory(source)) {
+                continue;
+            }
+
+            copyTree(source, targetRoot.resolve(season));
+        }
+    }
+
+    private static void copyTree(
+            Path source,
+            Path target) throws Exception {
+
+        try (var paths = Files.walk(source)) {
+            for (Path path : paths.toList()) {
+                Path relative = source.relativize(path);
+                Path destination = target.resolve(relative);
+
+                if (Files.isDirectory(path)) {
+                    Files.createDirectories(destination);
+                } else {
+                    Files.createDirectories(destination.getParent());
+                    Files.copy(
+                            path,
+                            destination,
+                            StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.COPY_ATTRIBUTES
+                    );
+                }
+            }
+        }
+    }
+
+    private static int publishGeneratedDirectory(
+            Path generatedDir,
+            Path siteJsDir) throws Exception {
+
+        Files.createDirectories(siteJsDir);
+
+        List<Path> files;
+        try (var stream = Files.list(generatedDir)) {
+            files = stream
+                    .filter(Files::isRegularFile)
+                    .sorted(Comparator.comparing(
+                            path -> path.getFileName().toString()
+                    ))
+                    .toList();
+        }
+
+        Path backupRoot = generatedDir.getParent()
+                .resolve("multisite-publish-backup");
+        Files.createDirectories(backupRoot);
+
+        List<Path> replaced = new ArrayList<>();
+        List<Path> created = new ArrayList<>();
+
+        try {
+            for (Path source : files) {
+                Path target = siteJsDir.resolve(source.getFileName());
+
+                if (Files.exists(target)) {
+                    Files.copy(
+                            target,
+                            backupRoot.resolve(source.getFileName()),
+                            StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.COPY_ATTRIBUTES
+                    );
+                    replaced.add(target);
+                } else {
+                    created.add(target);
+                }
+
+                Path temp = siteJsDir.resolve(
+                        "." + source.getFileName()
+                                + ".recordsnext-multisite.tmp"
+                );
+
+                Files.copy(
+                        source,
+                        temp,
+                        StandardCopyOption.REPLACE_EXISTING
+                );
+
+                try {
+                    Files.move(
+                            temp,
+                            target,
+                            StandardCopyOption.ATOMIC_MOVE,
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
+                } catch (java.nio.file.AtomicMoveNotSupportedException ex) {
+                    Files.move(
+                            temp,
+                            target,
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
+                }
+            }
+        } catch (Exception ex) {
+            for (Path target : created) {
+                Files.deleteIfExists(target);
+            }
+
+            for (Path target : replaced) {
+                Path backup = backupRoot.resolve(target.getFileName());
+                if (Files.isRegularFile(backup)) {
+                    Files.copy(
+                            backup,
+                            target,
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
+                }
+            }
+
+            throw ex;
+        }
+
+        return files.size();
     }
 
     private static void deleteTree(

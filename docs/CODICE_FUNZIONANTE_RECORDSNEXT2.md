@@ -1,8 +1,28 @@
-# Codice funzionante RecordsNext 2.1
+# Codice funzionante RecordsNext 3.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-09-02 13:49:18 +02:00
+> Data generazione: 2026-09-02 17:57:27 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
+
+## Stato corrente di sviluppo RecordsNext 3.1.0 - 2026-09-02
+
+RecordsNext 3.1.0 e' in sviluppo e collaudo; la release stabile precedente resta 2.1.0.
+
+### Multisito 3.1
+
+- FCM/FCA/DataA definiscono lo storico; i siti sono destinazioni opzionali di pubblicazione;
+- il sito locale per stagione e' opzionale; una stagione senza sito resta nello storico;
+- DataA canonico: `data/calendars/DataA-YYYY.js`;
+- la cartella JS deriva sempre da `<local_site_path>/js`;
+- cutoff multisito basato su `rn_season.sort_order`;
+- ogni sito riceve solo lo storico fino alla propria stagione;
+- Core e Manifest vengono filtrati/coerenti con la stagione target;
+- la GUI distingue pubblicazione nel sito corrente e pubblicazione dei siti delle stagioni selezionate;
+- rimosso il fallback hardcoded verso `E:/fantacalcio/Lega2025/js`;
+- fix multisito Culometro: `config/culometro.json` disponibile nello scope di staging;
+- collaudo sandbox: 18 file pubblicati su due target selezionati; nessuna stagione futura rilevata nei JS;
+- suite verificata: 50 test, 0 failure, 0 errori;
+- la 3.1 non e' ancora installata nell'ambiente operativo e i siti reali non sono ancora stati modificati.
 
 ## Stato consolidato RecordsNext 2.1.0 - 2026-08-27
 
@@ -127,201 +147,172 @@ Le sezioni successive includono documentazione e codice reale del progetto. Le i
 
 File: README.md
 
-    # RecordsNext 3.0.0
+    # RecordsNext 3.1
 
-    **RecordsNext by mauz79** Ã¨ un'applicazione per Fantacalcio Manager che legge gli archivi FCM/FCA, consolida i dati storici della lega e genera record e viste statistiche pubblicabili sul sito FCM.
+    **RecordsNext by mauz79** genera record e statistiche storiche multistagione per leghe gestite con Fantacalcio Manager.
 
-    RecordsNext 2.1 prosegue la linea 2.x con output JavaScript piÃ¹ completi, maggiori informazioni di dettaglio per Serie e Culometro e un flusso piÃ¹ rapido per la configurazione delle nuove stagioni storiche.
+    La 3.1 separa definitivamente le **sorgenti storiche** dalle **destinazioni di pubblicazione**: FCM, FCA e calendari alimentano lo storico; ogni sito FCM è una destinazione opzionale e riceve solo i dati disponibili fino alla propria stagione.
 
-    ## Requisiti
+    ![Dashboard RecordsNext 3.1](docs/screenshots/01-dashboard.png)
 
-    - Windows
-    - Java 21 o superiore
-    - Fantacalcio Manager e relativi file `.fcm` / `.fca`
-    - per la pubblicazione: cartella del sito FCM locale
+    ## Funzioni principali
 
-    La distribuzione include **UCanAccess 2.0.9.5** e le dipendenze necessarie alla lettura dei database FCM/FCA.
+    - storico multistagione con identità canoniche di squadre e competizioni;
+    - Classici, Serie, Riserve d'Ufficio, Modificatori, Soglie/Fortuna e Culometro;
+    - dataset pubblico `fcmRecordsNext_Matches.js`, con due righe per partita;
+    - link ai tabellini storici;
+    - pubblicazione nel solo sito corrente per l'uso ordinario;
+    - riallineamento di più siti storici con **Pubblica i siti delle stagioni selezionate**;
+    - ogni sito riceve esclusivamente lo storico fino alla propria stagione;
+    - calendari DataA 1991-2026 inclusi nell'installazione;
+    - sito locale opzionale per stagione.
 
-    ## Avvio rapido
+    ## Installazione
 
-    1. Estrarre l'intero archivio `RecordsNext_3.0.0.zip` in una cartella.
-    2. Avviare `RecordsNext.bat`.
-    3. Aprire **Configurazione stagioni**.
-    4. Configurare la lega e almeno una stagione gestita.
-    5. Salvare la configurazione.
-    6. Completare le associazioni storiche quando richiesto.
-    7. Configurare le famiglie di record.
-    8. Avviare l'elaborazione.
+    Scaricare dalla release il solo file:
 
-    `RecordsNext.bat`, `RecordsNext.jar` e la directory `runtime` devono restare nella struttura fornita dalla release.
+    `RecordsNext_3.1.0_SETUP.exe`
 
-    ## Dashboard
+    Avviarlo con doppio click e scegliere la cartella di installazione. Convenzione consigliata:
 
-    ![Dashboard](docs/screenshots/01_dashboard.png)
+    `<cartella FCM>\plugin\RecordsNext`
 
-    La Dashboard Ã¨ il punto di ingresso principale. Mostra lo stato della configurazione e consente di accedere a configurazione stagioni, famiglie record, strumenti e diagnostica.
+    Requisito: **Java 21 o superiore**.
 
-    ## Configurazione stagioni
+    Il setup non installa database personali, non copia FCM/FCA e non pubblica automaticamente nei siti.
 
-    ![Configurazione stagioni](docs/screenshots/02_configurazione_stagioni.png)
+    ## Prima configurazione
 
-    Per la lega vengono definiti **Nome lega** e **ID lega**.
+    Aprire **Configurazione stagioni** e aggiungere almeno una stagione gestita indicando FCM e FCA.
 
-    Per ogni stagione gestita possono essere configurati file FCM/FCA, sito locale, sito online, DataA.js, tabellini e associazioni storiche.
+    ![Configurazione stagione](docs/screenshots/02-configurazione-stagione.png)
 
-    ![Stagioni configurate](docs/screenshots/12_stagioni_configurate.png)
+    Per una stagione **Gestita**:
 
-    ### Aggiungere una stagione
+    - FCM obbligatorio;
+    - FCA obbligatorio;
+    - sito locale opzionale;
+    - sito online opzionale;
+    - calendario recuperato dall'archivio interno RecordsNext.
 
-    ![Aggiunta stagione](docs/screenshots/03_aggiungi_stagione.png)
+    Per una stagione **Manuale** servono soltanto anni e numero stagione.
 
-    Per una stagione gestita selezionare FCM e FCA. Quando disponibili, stagione e numero vengono letti dal file FCM.
+    Il nome lega può essere lasciato vuoto: RecordsNext prova a ricavarlo dal primo FCM. L'identificativo interno della lega non viene richiesto all'utente.
 
-    ![Aggiunta stagione compilata](docs/screenshots/04_aggiungi_stagione_compilata.png)
+    ### URL del sito online
 
-    Le stagioni prive di FCM possono essere mantenute come **MANUALI**: servono alla successione storica ma non vengono elaborate come stagioni FCM.
+    Usare un URL completo, per esempio:
 
-    ## Associazioni storiche
+    `http://www.example.org/lega2026`
 
-    ### Squadre
+    RecordsNext normalizza automaticamente slash e protocollo; se il protocollo manca viene aggiunto `http://`.
 
-    ![Associazioni squadre](docs/screenshots/05_associazioni_squadre.png)
+    ## Elaborazione
 
-    ### Competizioni
+    Per l'uso giornata per giornata:
 
-    ![Associazioni competizioni](docs/screenshots/06_associazioni_competizioni.png)
+    1. selezionare **Consolidata** quando disponibile;
+    2. lasciare selezionate le stagioni da elaborare;
+    3. spuntare **Pubblica nel sito della stagione corrente al termine**;
+    4. premere **Elabora**.
 
-    Le associazioni permettono di collegare nomi stagionali differenti alla stessa identitÃ  storica/canonica.
+    Per ricostruzioni integrali usare **Completa**.
 
-    ## Famiglie di record
+    ## Pubblicazione storica
 
-    ### Classici
+    La funzione **Pubblica i siti delle stagioni selezionate** serve per riallineamenti dopo modifiche globali, nuove versioni o correzioni dello storico.
 
-    ![Famiglia Classici](docs/screenshots/07_famiglia_classici.png)
+    Ogni sito riceve soltanto le stagioni fino al proprio `sort_order`: nessun sito storico riceve dati futuri.
 
-    ### Modificatori
+    ![Pubblicazione multisito](docs/screenshots/06-pubblicazione-multisito.png)
 
-    ![Famiglia Modificatori](docs/screenshots/08_famiglia_modificatori.png)
+    ## Famiglie record
 
-    Le famiglie disponibili comprendono:
+    ![Classici](docs/screenshots/03-famiglia-classici.png)
 
-    - Classici
-    - Serie
-    - Riserve d'Ufficio
-    - Modificatori
-    - Soglie e Fortuna
-    - Culometro
+    Sono disponibili:
 
-    ## Culometro
+    - Classici;
+    - Serie;
+    - Riserve d'Ufficio;
+    - Modificatori;
+    - Soglie e Fortuna.
 
-    Il **Culometro** Ã¨ opzionale e viene generato soltanto quando viene esplicitamente abilitato.
+    Il Culometro è opzionale e configurabile separatamente.
 
-    ![Generazione Culometro](docs/screenshots/14_culometro_generazione.png)
+    ![Soglie e Fortuna](docs/screenshots/04-soglie-fortuna.png)
 
-    La configurazione permette di scegliere un profilo semplice oppure intervenire sui parametri avanzati, sui pesi dei singoli fattori e sulle etichette.
+    ![Configurazione Culometro](docs/screenshots/05-culometro-configurazione.png)
 
-    ### Profilo semplice e slider principali
+    ## Output JavaScript
 
-    ![Culometro - profilo semplice](docs/screenshots/15_culometro_profilo_semplice.png)
+    RecordsNext pubblica nella cartella `js` del sito:
 
-    Gli slider mostrano il fondoscala e il valore selezionato, cosÃ¬ Ã¨ immediato capire quanto il parametro Ã¨ vicino al minimo o al massimo ammesso.
+    - `fcmRecordsNext_Core.js`
+    - `fcmRecordsNext_Classics.js`
+    - `fcmRecordsNext_Series.js`
+    - `fcmRecordsNext_RU.js`
+    - `fcmRecordsNext_Modifiers.js`
+    - `fcmRecordsNext_ThresholdsLuck.js`
+    - `fcmRecordsNext_Culometro.js`
+    - `fcmRecordsNext_Matches.js`
+    - `fcmRecordsNext_Manifest.js`
 
-    ### Parametri avanzati
+    ## Stato 3.1
 
-    ![Culometro - parametri avanzati](docs/screenshots/16_culometro_avanzato.png)
+    La pubblicazione multisito è stata verificata su 21 stagioni gestite, da `2006_2007` a `2026_2027`: 189 file validati e 189 pubblicati senza errori.
 
-    Anche i parametri avanzati mostrano minimo, massimo e valore corrente.
-
-    ### Pesi dei fattori
-
-    ![Pesi Culometro](docs/screenshots/17_culometro_pesi_fattori.png)
-
-    Il viewer dispone anche della vista **Eventi**, con filtro dedicato per il tipo di evento.
-
-    ![Viewer Culometro](docs/screenshots/20_culometro_viewer_eventi.png)
-
-    La spiegazione completa di normalizzazione, raritÃ , sovrapposizioni, pesi, soglie ed etichette Ã¨ in:
-
-    **[docs/CULOMETRO.md](docs/CULOMETRO.md)**
-
-    ## ModalitÃ  di elaborazione
-
-    ### Consolidata
-
-    Ãˆ la modalitÃ  normale per l'aggiornamento durante la stagione.
-
-    ![ModalitÃ  consolidata](docs/screenshots/10_modalita_consolidata.png)
-
-    ### Completa
-
-    Rigenera i dati derivati di tutte le stagioni gestite usando la logica corrente. Le stagioni manuali non vengono elaborate come FCM.
-
-    ## Log e diagnostica
-
-    ![Log e diagnostica](docs/screenshots/11_log_diagnostica.png)
-
-    La pagina mostra fasi della pipeline, tempi e messaggi utili alla diagnosi.
-
-    ## Pubblicazione e visualizzatori HTML
-
-    ![Installazione HTML](docs/screenshots/09_debug_installazione_html.png)
-
-    I visualizzatori sono statici e caricano i dati JavaScript generati da RecordsNext.
-
-    Gli output principali sono:
-
-    ```text
-    fcmRecordsNext_Core.js
-    fcmRecordsNext_Manifest.js
-    fcmRecordsNext_Classics.js
-    fcmRecordsNext_Series.js
-    fcmRecordsNext_RU.js
-    fcmRecordsNext_Modifiers.js
-    fcmRecordsNext_ThresholdsLuck.js
-    fcmRecordsNext_Culometro.js
-    ```
-
-    I JS pubblici sono destinati alla cartella `js` del sito FCM.
-
-    Sono inclusi i profili:
-
-    - `mauzstrom`
-    - `fantablue2`
-    - `neutral`
-
-    Il profilo `mauzstrom` usa **Trebuchet MS**.
-
-    ## Tabellini
-
-    Ogni stagione puÃ² essere associata a sito locale e sito online. Sono supportate pagine risultato `ris.htm`, `ris.html` e `ris.php` quando coerenti con il sito configurato.
-
-    ## Aggiornamento ordinario
-
-    1. aggiornare Fantacalcio Manager;
-    2. avviare RecordsNext;
-    3. scegliere **Consolidata**;
-    4. elaborare;
-    5. generare/pubblicare i JS;
-    6. controllare i visualizzatori.
-
-    ## Documentazione
-
-    - `README.md` â€” panoramica illustrata
-    - `INSTALL.txt` â€” installazione e primo avvio
-    - `CHANGELOG.md` â€” contenuti della release
-    - `docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md` â€” pubblicazione dei visualizzatori
-    - `docs\CULOMETRO.md` â€” funzionamento e configurazione del Culometro
-    - `docs\screenshots\` â€” schermate di riferimento
-
-    ## Autore
-
-    **RecordsNext by mauz79**
+    UCanAccess utilizzato: `2.0.9.5`.
 
 ## Architettura
 
 File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
-    # Architettura RecordsNext 2.1
+    # Architettura RecordsNext 3.1
+
+    ## Architettura multisito 3.1
+
+    La 3.1 separa definitivamente le sorgenti storiche dalle destinazioni di pubblicazione.
+
+    ```text
+    FCM / FCA / DataA canonico
+                |
+                v
+    database + report + archivi RecordsNext
+                |
+                v
+    scope per stagione target
+                |
+                +--> sito stagione corrente
+                |
+                +--> siti storici selezionati
+    ```
+
+    Regole:
+
+    - FCM/FCA/DataA descrivono i dati storici;
+    - il sito locale e' opzionale e non e' una sorgente necessaria dello storico;
+    - `DataA` canonico: `data/calendars/DataA-YYYY.js`;
+    - un sito configurato e disponibile e' soltanto una destinazione;
+    - una stagione senza sito continua a contribuire allo storico;
+    - il cutoff temporale usa `rn_season.sort_order`;
+    - un target non puo' ricevere stagioni successive alla propria;
+    - Core e Manifest vengono rigenerati coerentemente con il target;
+    - gli altri dataset vengono generati da viste temporanee contenenti soltanto le stagioni ammesse;
+    - il publisher non deve creare interi siti FCM mancanti: pubblica soltanto dove esiste una destinazione configurata.
+
+    ### Modalita di pubblicazione
+
+    `CURRENT_SITE`:
+    - usata dall'elaborazione normale quando e' selezionata la pubblicazione;
+    - aggiorna soltanto il sito associato alla stagione corrente.
+
+    `ALL_CONFIGURED_SITES`:
+    - esposta in GUI come `Pubblica i siti delle stagioni selezionate`;
+    - considera soltanto i target delle stagioni selezionate;
+    - salta le destinazioni configurate ma non disponibili;
+    - per ogni target costruisce lo scope storico fino a quel `sort_order`.
+
 
     ## Ciclo di vita delle stagioni
 
@@ -1011,7 +1002,32 @@ File: docs\DECISIONI_APERTE.md
 
 File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
-    # Modello dati RecordsNext 2.0
+    # Modello dati RecordsNext 3.1
+
+    ## Estensione 3.1: stagione, calendario e destinazione sito
+
+    Nella 3.1 la configurazione di una stagione distingue esplicitamente:
+
+    - sorgenti dati della stagione (`FCM`, `FCA`);
+    - calendario canonico (`DataA-YYYY.js`) nell'archivio interno RecordsNext;
+    - destinazione locale opzionale del sito (`local_site_path`);
+    - eventuale URL online (`online_site_url`).
+
+    La presenza del sito non determina piu' se una stagione e' completa.
+
+    Per una stagione `GESTITA`, la completezza operativa richiede FCM e FCA validi; il sito puo' restare vuoto.
+
+    La destinazione di pubblicazione e' derivata come:
+
+    ```text
+    local_site_path
+        -> local_site_path/js
+    ```
+
+    Per la pubblicazione storica, `sort_order` e' il riferimento canonico per stabilire quali stagioni appartengono allo scope di un sito. Il `season_id` resta identificativo leggibile e stabile, ma non e' usato come ordinamento temporale primario.
+
+    Le identita canoniche esportate nel Core di un sito storico devono essere limitate alle occorrenze disponibili fino alla stagione target. Se l'anchor globale dell'identita appartiene a una stagione futura rispetto al target, il Core pubblicato deve usare come anchor la piu recente occorrenza disponibile nello scope.
+
 
     ## Regole di eliminazione di una stagione
 
@@ -2075,7 +2091,61 @@ File: docs\MODELLO_DATI_RECORDSNEXT2.md
 
 File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
 
-    # Configurazione RecordsNext 2.0
+    # Configurazione RecordsNext 3.1
+
+    ## Aggiornamento configurazione 3.1
+
+    ### Sito locale opzionale
+
+    Per ogni stagione gestita:
+
+    - FCM: obbligatorio;
+    - FCA: obbligatorio;
+    - sito locale: opzionale;
+    - sito online: opzionale.
+
+    Se `local_site_path` e' valorizzato deve indicare una directory esistente. Se e' vuoto la stagione resta valida e continua a partecipare allo storico, ma non costituisce un target di pubblicazione.
+
+    La cartella JS e' sempre derivata da:
+
+    ```text
+    <local_site_path>/js
+    ```
+
+    ### Calendari DataA
+
+    Il DataA storico non dipende piu' dalla presenza del sito.
+
+    Percorso canonico:
+
+    ```text
+    data/calendars/DataA-YYYY.js
+    ```
+
+    Esempi:
+
+    ```text
+    2024_2025 -> data/calendars/DataA-2024.js
+    2025_2026 -> data/calendars/DataA-2025.js
+    2026_2027 -> data/calendars/DataA-2026.js
+    ```
+
+    La GUI segnala separatamente:
+
+    - `DataA archivio trovato`;
+    - `DataA archivio non trovato`.
+
+    ### Pubblicazione
+
+    La GUI 3.1 espone:
+
+    - `Pubblica nel sito della stagione corrente al termine`;
+    - `Pubblica i siti delle stagioni selezionate`.
+
+    La seconda azione usa le checkbox `Elabora` come ambito esplicito dei target storici da pubblicare. Una stagione selezionata ma senza sito continua a contribuire ai dati; semplicemente non produce una pubblicazione propria.
+
+    E' stato rimosso il fallback hardcoded verso `E:/fantacalcio/Lega2025/js`. In assenza di un target configurato, RecordsNext non deve scegliere autonomamente un sito reale.
+
 
     ## Scopo
 
@@ -2188,7 +2258,85 @@ File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
 
 File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
-    # Stato implementazione RecordsNext 2.1
+    # Stato implementazione RecordsNext 3.1
+
+    ## Sviluppo RecordsNext 3.1.0 - multisito - 2026-09-02
+
+    RecordsNext 3.1.0 e' attualmente in sviluppo e collaudo. La release stabile precedente resta `2.1.0`; la 3.1 non e' ancora stata installata nell'ambiente operativo e i siti reali non sono ancora stati modificati.
+
+    ### Architettura multisito consolidata
+
+    Principio vincolante:
+
+    > FCM/FCA/DataA definiscono lo storico; i siti sono destinazioni opzionali di pubblicazione.
+
+    Comportamento implementato e verificato:
+
+    - ogni stagione GESTITA continua a richiedere FCM e FCA;
+    - la cartella del sito locale e' opzionale;
+    - una stagione senza sito resta parte dello storico e puo' contribuire ai record;
+    - `DataA` non viene piu' ricercato nel sito storico: il calendario canonico e' `data/calendars/DataA-YYYY.js`;
+    - ogni stagione puo' avere una propria destinazione `local_site_path`;
+    - la cartella `js` non viene configurata separatamente, ma deriva sempre da `<local_site_path>/js`;
+    - la pubblicazione multisito usa come cutoff `rn_season.sort_order`, non il confronto lessicografico del `season_id`;
+    - ogni sito riceve soltanto le stagioni fino alla propria stagione target;
+    - `fcmRecordsNext_Core.js` viene filtrato per il target, comprese identita canoniche, mapping e anchor coerenti con lo storico disponibile a quella data;
+    - `fcmRecordsNext_Manifest.js` usa come `currentSeasonId` la stagione del sito target;
+    - Classici, Serie, RU, Modificatori, Soglie/Fortuna, Matches e Culometro vengono generati su uno scope stagionale limitato al target;
+    - il Culometro multisito usa una copia controllata di `config/culometro.json` nello staging di scope;
+    - il fallback hardcoded a `E:/fantacalcio/Lega2025/js` e' stato eliminato: in assenza di una destinazione reale la pipeline non deve inventare un sito esterno.
+
+    ### Semantica GUI 3.1
+
+    La GUI distingue due casi:
+
+    - `Pubblica nel sito della stagione corrente al termine`: uso normale, tipicamente dopo ogni aggiornamento FCM; aggiorna soltanto il sito della stagione corrente;
+    - `Pubblica i siti delle stagioni selezionate`: manutenzione/riallineamento storico; pubblica i siti configurati delle sole stagioni selezionate. Ogni sito riceve comunque solo lo storico disponibile fino alla propria stagione.
+
+    Le checkbox `Elabora` restano quindi anche un controllo esplicito dell'ambito della pubblicazione storica.
+
+    ### Collaudo sandbox
+
+    Il multisito e' stato provato in una working copy isolata, senza scrivere nei siti reali.
+
+    Target sandbox verificati:
+
+    - `2024_2025` -> `data/test-sites/Lega2024`;
+    - `2025_2026` -> `data/test-sites/Lega2025`;
+    - `2026_2027` -> `data/test-sites/Lega2026` quando la stagione e' selezionata.
+
+    Risultato del primo collaudo completo sulle stagioni selezionate:
+
+    - pubblicazione riuscita su Lega2024 e Lega2025;
+    - 9 file JS canonici per sito;
+    - 18 file complessivamente pubblicati;
+    - nessun errore di pubblicazione;
+    - Lega2024 verificata senza `2025_2026` e `2026_2027`;
+    - Lega2025 verificata senza `2026_2027`.
+
+    La mancata pubblicazione di `2026_2027` nel primo test era dovuta alla checkbox `Elabora` non selezionata ed e' coerente con la semantica scelta per `Pubblica i siti delle stagioni selezionate`.
+
+    ### Runtime e test
+
+    - Maven: `3.1.0`;
+    - Java: 21 o superiore;
+    - UCanAccess operativo: `2.0.9.5`, caricato dal runtime distribuito (`runtime/ucanaccess` e `runtime/ucanaccess/lib`);
+    - avviare la GUI di sviluppo con il launcher/script che include il runtime UCanAccess: l'avvio tramite solo `mvn exec:java` non rappresenta il classpath dell'installazione completa;
+    - suite automatica verificata prima dell'aggiornamento documentale: 50 test, 0 failure, 0 errori, BUILD SUCCESS;
+    - test specifici aggiunti per eliminazione stagione, target di pubblicazione, cutoff `sort_order`, Core stagionale e modalita di pubblicazione.
+
+    ### Stato release
+
+    La 3.1.0 non deve ancora essere considerata rilasciata.
+
+    Prima della release restano da completare:
+
+    - pulizia finale di packaging e launcher alla versione 3.1;
+    - verifica dei file statici/visualizzatori e della decisione definitiva sugli shard `recordsnext-data`;
+    - generazione dei pacchetti FULL e UPDATE 3.1;
+    - installazione della nuova GUI nell'ambiente operativo;
+    - primo collaudo controllato sui siti reali.
+
 
     ## Correzione eliminazione stagioni - 2026-09-02
 
@@ -2554,6 +2702,33 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 File: CHANGELOG.md
 
     # Changelog
+
+    ## RecordsNext 3.1.0 — 2026-09-02
+
+    ### Multisito
+    - sito locale opzionale per stagione;
+    - FCM/FCA/DataA definiscono lo storico, i siti sono destinazioni opzionali;
+    - DataA canonico in `data/calendars/DataA-YYYY.js`;
+    - pubblicazione ordinaria nel solo sito corrente;
+    - comando `Pubblica i siti delle stagioni selezionate`;
+    - ogni target riceve esclusivamente lo storico fino al proprio `sort_order`;
+    - Core e Manifest coerenti con la stagione target;
+    - rimosso il fallback hardcoded verso `E:/fantacalcio/Lega2025/js`;
+    - corretto il path di `culometro.json` nello staging multisito.
+
+    ### Packaging
+    - versione Maven 3.1.0;
+    - launcher RecordsNext 3.1;
+    - pacchetto FULL con installer guidato;
+    - installer senza dati personali e senza pubblicazione automatica;
+    - UPDATE con backup e conservazione di `config` e `data`;
+    - UCanAccess 2.0.9.5 invariato.
+
+    ### Verifiche
+    - suite automatica: 50 test, 0 failure, 0 errori;
+    - collaudo multisito sandbox riuscito;
+    - 9 JS canonici per target;
+    - verificata assenza di stagioni future nei siti storici.
 
     ## RecordsNext 3.0.0 — 2026-08-28
 
@@ -3500,6 +3675,15 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                 Path outputFile,
                 String leagueId,
                 String leagueName) throws Exception {
+            return export(database, outputFile, leagueId, leagueName, null);
+        }
+
+        public static ExportResult export(
+                Path database,
+                Path outputFile,
+                String leagueId,
+                String leagueName,
+                String maxSeasonId) throws Exception {
 
             Path db = database.toAbsolutePath().normalize();
             Path out = outputFile.toAbsolutePath().normalize();
@@ -3516,7 +3700,7 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
             Class.forName("org.sqlite.JDBC");
             CoreData data;
             try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db)) {
-                data = read(c, leagueId.trim(), leagueName.trim());
+                data = read(c, leagueId.trim(), leagueName.trim(), maxSeasonId);
             }
 
             Path parent = out.getParent();
@@ -3534,14 +3718,27 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
             );
         }
 
-        private static CoreData read(Connection c, String leagueId, String leagueName)
-                throws Exception {
+        private static CoreData read(
+                Connection c,
+                String leagueId,
+                String leagueName,
+                String maxSeasonId) throws Exception {
+
+            boolean scoped = maxSeasonId != null && !maxSeasonId.isBlank();
+            String seasonFilter = scoped ? " WHERE s.season_id <= ?" : "";
+            String configuredTeamFilter = scoped ? " WHERE season_id <= ?" : "";
+            String configuredCompetitionFilter = scoped ? " WHERE season_id <= ?" : "";
+
             List<Map<String, Object>> seasons = readRows(c, """
                 SELECT
                     s.season_id,
                     s.display_name,
                     s.sort_order,
-                    s.is_anchor,
+                    CASE
+                        WHEN ? IS NOT NULL AND s.season_id = ? THEN 1
+                        WHEN ? IS NOT NULL THEN 0
+                        ELSE s.is_anchor
+                    END AS is_anchor,
                     COALESCE(sc.management_type, 'NON_CONFIGURATA') AS management_type,
                     COALESCE(sc.configuration_status, 'DA_CONFIGURARE') AS configuration_status,
                     sc.local_site_path,
@@ -3550,18 +3747,61 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                 FROM rn_season s
                 LEFT JOIN rn_season_configuration sc
                   ON sc.season_id = s.season_id
+                """ + seasonFilter + """
                 ORDER BY COALESCE(s.sort_order, 999999), s.season_id
-                """);
+                """,
+                scoped
+                    ? List.of(maxSeasonId, maxSeasonId, maxSeasonId, maxSeasonId)
+                    : java.util.Arrays.asList(null, null, null));
 
-            List<Map<String, Object>> canonicalTeams = readRows(c, """
-                SELECT
-                    team_identity_id AS canonical_team_id,
-                    canonical_name,
-                    anchor_season_id,
-                    anchor_team_season_id
-                FROM rn_team_identity
-                ORDER BY canonical_name COLLATE NOCASE, team_identity_id
-                """);
+            List<Map<String, Object>> canonicalTeams;
+            if (scoped) {
+                canonicalTeams = readRows(c, """
+                    SELECT
+                        i.team_identity_id AS canonical_team_id,
+                        i.canonical_name,
+                        (
+                            SELECT ts.season_id
+                            FROM rn_team_mapping tm
+                            JOIN rn_team_season ts
+                              ON ts.team_season_id = tm.team_season_id
+                            WHERE tm.team_identity_id = i.team_identity_id
+                              AND ts.season_id <= ?
+                            ORDER BY ts.season_id DESC, ts.team_season_id DESC
+                            LIMIT 1
+                        ) AS anchor_season_id,
+                        (
+                            SELECT ts.team_season_id
+                            FROM rn_team_mapping tm
+                            JOIN rn_team_season ts
+                              ON ts.team_season_id = tm.team_season_id
+                            WHERE tm.team_identity_id = i.team_identity_id
+                              AND ts.season_id <= ?
+                            ORDER BY ts.season_id DESC, ts.team_season_id DESC
+                            LIMIT 1
+                        ) AS anchor_team_season_id
+                    FROM rn_team_identity i
+                    WHERE EXISTS (
+                        SELECT 1
+                        FROM rn_team_mapping tm
+                        JOIN rn_team_season ts
+                          ON ts.team_season_id = tm.team_season_id
+                        WHERE tm.team_identity_id = i.team_identity_id
+                          AND ts.season_id <= ?
+                    )
+                    ORDER BY i.canonical_name COLLATE NOCASE, i.team_identity_id
+                    """, List.of(maxSeasonId, maxSeasonId, maxSeasonId));
+            } else {
+                canonicalTeams = readRows(c, """
+                    SELECT
+                        team_identity_id AS canonical_team_id,
+                        canonical_name,
+                        anchor_season_id,
+                        anchor_team_season_id
+                    FROM rn_team_identity
+                    ORDER BY canonical_name COLLATE NOCASE, team_identity_id
+                    """);
+            }
 
             List<Map<String, Object>> seasonTeams = readRows(c, """
                 SELECT
@@ -3579,18 +3819,58 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                     mapping_method,
                     notes
                 FROM rn_configured_team
+                """ + configuredTeamFilter + """
                 ORDER BY season_id, canonical_name COLLATE NOCASE, source_name COLLATE NOCASE
-                """);
+                """, scoped ? List.of(maxSeasonId) : List.of());
 
-            List<Map<String, Object>> canonicalCompetitions = readRows(c, """
-                SELECT
-                    competition_identity_id AS canonical_competition_id,
-                    canonical_name,
-                    anchor_season_id,
-                    anchor_competition_season_id
-                FROM rn_competition_identity
-                ORDER BY canonical_name COLLATE NOCASE, competition_identity_id
-                """);
+            List<Map<String, Object>> canonicalCompetitions;
+            if (scoped) {
+                canonicalCompetitions = readRows(c, """
+                    SELECT
+                        i.competition_identity_id AS canonical_competition_id,
+                        i.canonical_name,
+                        (
+                            SELECT cs.season_id
+                            FROM rn_competition_mapping cm
+                            JOIN rn_competition_season cs
+                              ON cs.competition_season_id = cm.competition_season_id
+                            WHERE cm.competition_identity_id = i.competition_identity_id
+                              AND cs.season_id <= ?
+                            ORDER BY cs.season_id DESC, cs.competition_season_id DESC
+                            LIMIT 1
+                        ) AS anchor_season_id,
+                        (
+                            SELECT cs.competition_season_id
+                            FROM rn_competition_mapping cm
+                            JOIN rn_competition_season cs
+                              ON cs.competition_season_id = cm.competition_season_id
+                            WHERE cm.competition_identity_id = i.competition_identity_id
+                              AND cs.season_id <= ?
+                            ORDER BY cs.season_id DESC, cs.competition_season_id DESC
+                            LIMIT 1
+                        ) AS anchor_competition_season_id
+                    FROM rn_competition_identity i
+                    WHERE EXISTS (
+                        SELECT 1
+                        FROM rn_competition_mapping cm
+                        JOIN rn_competition_season cs
+                          ON cs.competition_season_id = cm.competition_season_id
+                        WHERE cm.competition_identity_id = i.competition_identity_id
+                          AND cs.season_id <= ?
+                    )
+                    ORDER BY i.canonical_name COLLATE NOCASE, i.competition_identity_id
+                    """, List.of(maxSeasonId, maxSeasonId, maxSeasonId));
+            } else {
+                canonicalCompetitions = readRows(c, """
+                    SELECT
+                        competition_identity_id AS canonical_competition_id,
+                        canonical_name,
+                        anchor_season_id,
+                        anchor_competition_season_id
+                    FROM rn_competition_identity
+                    ORDER BY canonical_name COLLATE NOCASE, competition_identity_id
+                    """);
+            }
 
             List<Map<String, Object>> seasonCompetitions = readRows(c, """
                 SELECT
@@ -3606,8 +3886,9 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
                     mapping_method,
                     notes
                 FROM rn_configured_competition
+                """ + configuredCompetitionFilter + """
                 ORDER BY season_id, canonical_name COLLATE NOCASE, source_name COLLATE NOCASE
-                """);
+                """, scoped ? List.of(maxSeasonId) : List.of());
 
             return new CoreData(
                 "2.0",
@@ -3624,17 +3905,29 @@ File: src\main\java\it\alterlega\recordsnext\app\core\CoreJsExporter.java
 
         private static List<Map<String, Object>> readRows(Connection c, String sql)
                 throws Exception {
+            return readRows(c, sql, List.of());
+        }
+
+        private static List<Map<String, Object>> readRows(
+                Connection c,
+                String sql,
+                List<?> parameters) throws Exception {
             List<Map<String, Object>> rows = new ArrayList<>();
-            try (Statement s = c.createStatement(); ResultSet rs = s.executeQuery(sql)) {
-                int columns = rs.getMetaData().getColumnCount();
-                while (rs.next()) {
-                    Map<String, Object> row = new LinkedHashMap<>();
-                    for (int i = 1; i <= columns; i++) {
-                        String name = rs.getMetaData().getColumnLabel(i);
-                        Object value = rs.getObject(i);
-                        row.put(toCamelCase(name), value);
+            try (java.sql.PreparedStatement s = c.prepareStatement(sql)) {
+                for (int i = 0; i < parameters.size(); i++) {
+                    s.setObject(i + 1, parameters.get(i));
+                }
+                try (ResultSet rs = s.executeQuery()) {
+                    int columns = rs.getMetaData().getColumnCount();
+                    while (rs.next()) {
+                        Map<String, Object> row = new LinkedHashMap<>();
+                        for (int i = 1; i <= columns; i++) {
+                            String name = rs.getMetaData().getColumnLabel(i);
+                            Object value = rs.getObject(i);
+                            row.put(toCamelCase(name), value);
+                        }
+                        rows.add(row);
                     }
-                    rows.add(row);
                 }
             }
             return rows;
@@ -6493,6 +6786,139 @@ File: src\main\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublish
         }
     }
 
+## src\main\java\it\alterlega\recordsnext\app\output\SeasonPublicationTargetRepository.java
+
+File: src\main\java\it\alterlega\recordsnext\app\output\SeasonPublicationTargetRepository.java
+
+    package it.alterlega.recordsnext.app.output;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.sql.Connection;
+    import java.sql.DriverManager;
+    import java.sql.PreparedStatement;
+    import java.sql.ResultSet;
+    import java.util.ArrayList;
+    import java.util.HashSet;
+    import java.util.List;
+    import java.util.Set;
+
+    /**
+     * Risolve le destinazioni sito configurate per le stagioni RecordsNext.
+     * Una stagione puo' partecipare allo storico anche senza un sito locale.
+     */
+    public final class SeasonPublicationTargetRepository {
+        private final Path database;
+
+        public SeasonPublicationTargetRepository(Path database) {
+            this.database = database.toAbsolutePath().normalize();
+        }
+
+        public List<Target> load(List<String> selectedSeasons) throws Exception {
+            if (!Files.isRegularFile(database)) {
+                return List.of();
+            }
+
+            Set<String> selected = selectedSeasons == null
+                    ? Set.of()
+                    : new HashSet<>(selectedSeasons);
+
+            String sql = """
+                SELECT s.season_id, COALESCE(s.sort_order, 0), c.local_site_path
+                FROM rn_season s
+                JOIN rn_season_configuration c ON c.season_id = s.season_id
+                WHERE COALESCE(c.management_type, 'GESTITA') = 'GESTITA'
+                  AND c.local_site_path IS NOT NULL
+                  AND TRIM(c.local_site_path) <> ''
+                ORDER BY COALESCE(s.sort_order, 0), s.season_id
+                """;
+
+            Class.forName("org.sqlite.JDBC");
+            List<Target> result = new ArrayList<>();
+
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + database);
+                 PreparedStatement p = c.prepareStatement(sql);
+                 ResultSet rs = p.executeQuery()) {
+
+                while (rs.next()) {
+                    String seasonId = rs.getString(1);
+                    if (!selected.isEmpty() && !selected.contains(seasonId)) {
+                        continue;
+                    }
+
+                    Path siteRoot = Path.of(rs.getString(3)).toAbsolutePath().normalize();
+                    result.add(new Target(
+                            seasonId,
+                            rs.getInt(2),
+                            siteRoot,
+                            siteRoot.resolve("js").normalize(),
+                            Files.isDirectory(siteRoot)
+                    ));
+                }
+            }
+
+            return List.copyOf(result);
+        }
+
+
+        /**
+         * Restituisce le stagioni selezionate che appartengono allo storico
+         * disponibile fino al target incluso. Il cutoff usa sort_order del DB,
+         * non il confronto testuale del season_id.
+         */
+        public List<String> scope(
+                List<String> selectedSeasons,
+                Target target) throws Exception {
+
+            if (target == null) {
+                return List.of();
+            }
+            if (!Files.isRegularFile(database)) {
+                return List.of();
+            }
+
+            Set<String> selected = selectedSeasons == null
+                    ? Set.of()
+                    : new HashSet<>(selectedSeasons);
+
+            String sql = """
+                SELECT season_id
+                FROM rn_season
+                WHERE COALESCE(sort_order, 0) <= ?
+                ORDER BY COALESCE(sort_order, 0) DESC, season_id DESC
+                """;
+
+            Class.forName("org.sqlite.JDBC");
+            List<String> result = new ArrayList<>();
+
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + database);
+                 PreparedStatement p = c.prepareStatement(sql)) {
+
+                p.setInt(1, target.sortOrder());
+
+                try (ResultSet rs = p.executeQuery()) {
+                    while (rs.next()) {
+                        String seasonId = rs.getString(1);
+                        if (!selected.isEmpty() && !selected.contains(seasonId)) {
+                            continue;
+                        }
+                        result.add(seasonId);
+                    }
+                }
+            }
+
+            return List.copyOf(result);
+        }
+
+        public record Target(
+                String seasonId,
+                int sortOrder,
+                Path siteRoot,
+                Path siteJs,
+                boolean available) {
+        }
+    }
+
 ## src\main\java\it\alterlega\recordsnext\app\output\SeasonShardAvailabilityCli.java
 
 File: src\main\java\it\alterlega\recordsnext\app\output\SeasonShardAvailabilityCli.java
@@ -6636,10 +7062,16 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
                 }
             }
 
-            return resolve(
-                projectRoot,
-                properties.getProperty("siteJs", "E:/fantacalcio/Lega2025/js")
-            );
+            String legacySiteJs = properties.getProperty("siteJs", "").trim();
+            if (!legacySiteJs.isEmpty()) {
+                return resolve(projectRoot, legacySiteJs);
+            }
+
+            // In generate-only serve comunque un Path, ma non deve mai
+            // inventare una destinazione esterna.
+            return projectRoot.resolve("data/site-export-unused/js")
+                    .toAbsolutePath()
+                    .normalize();
         }
 
         private static Path resolve(Path root, String value) {
@@ -6912,14 +7344,18 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
     import it.alterlega.recordsnext.app.core.LeagueMetadata;
     import it.alterlega.recordsnext.app.core.LeagueMetadataLoader;
     import it.alterlega.recordsnext.app.model.RecordFamily;
+    import it.alterlega.recordsnext.app.core.CoreJsExporter;
+    import it.alterlega.recordsnext.app.output.SeasonPublicationTargetRepository;
 
     import java.nio.file.Files;
     import java.nio.file.Path;
+    import java.nio.file.StandardCopyOption;
     import java.time.OffsetDateTime;
     import java.util.ArrayList;
     import java.util.EnumSet;
     import java.util.List;
     import java.util.Locale;
+    import java.util.Comparator;
     import java.util.Set;
 
     public final class RecordsNextPipeline {
@@ -6949,11 +7385,26 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
         ) {
         }
 
+        public enum PublicationMode {
+            CURRENT_SITE,
+            ALL_CONFIGURED_SITES
+        }
+
         public Result run(
                 PipelineConfig c,
                 ProcessingOptions o,
                 ProcessingMode mode,
                 Listener l
+        ) throws Exception {
+            return run(c, o, mode, l, PublicationMode.CURRENT_SITE);
+        }
+
+        public Result run(
+                PipelineConfig c,
+                ProcessingOptions o,
+                ProcessingMode mode,
+                Listener l,
+                PublicationMode publicationMode
         ) throws Exception {
             PipelinePreflight.Result preflight = preflight(o);
 
@@ -7134,48 +7585,234 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                                         .resolve("config/league.json")
                         );
 
-                ManifestMetadata manifestMetadata =
-                        new ManifestMetadata(
-                                "RecordsNext by mauz79",
-                                "3.0.0",
-                                "2.0",
-                                OffsetDateTime.now(),
-                                leagueMetadata.leagueId(),
-                                leagueMetadata.currentSeasonId(),
-                                c.seasons(),
-                                List.of()
-                        );
+                if (!o.publish()) {
+                    ManifestMetadata manifestMetadata =
+                            new ManifestMetadata(
+                                    "RecordsNext by mauz79",
+                                    "3.1.0",
+                                    "2.0",
+                                    OffsetDateTime.now(),
+                                    leagueMetadata.leagueId(),
+                                    leagueMetadata.currentSeasonId(),
+                                    c.seasons(),
+                                    List.of()
+                            );
 
-                var r = Records2026SitePublisher.run(
-                        c.classicArchive(),
-                        c.ruArchive(),
-                        c.staging(),
-                        c.siteJs(),
-                        !o.publish(),
-                        o.familyEnabled(RecordFamily.CLASSICS),
-                        o.familyEnabled(RecordFamily.RU),
-                        o,
-                        preflight,
-                        manifestMetadata,
-                        database,
-                        leagueMetadata,
-                        c.reports()
-                );
+                    var r = Records2026SitePublisher.run(
+                            c.classicArchive(),
+                            c.ruArchive(),
+                            c.staging(),
+                            c.siteJs(),
+                            true,
+                            o.familyEnabled(RecordFamily.CLASSICS),
+                            o.familyEnabled(RecordFamily.RU),
+                            o,
+                            preflight,
+                            manifestMetadata,
+                            database,
+                            leagueMetadata,
+                            c.reports()
+                    );
+
+                    result = new Result(
+                            r.classicEntries(),
+                            r.ruSeasons(),
+                            r.validatedFiles(),
+                            0
+                    );
+                } else {
+                    SeasonPublicationTargetRepository targetRepository =
+                            new SeasonPublicationTargetRepository(database);
+
+                    List<SeasonPublicationTargetRepository.Target> targets =
+                            targetRepository.load(c.seasons());
+
+                    List<SeasonPublicationTargetRepository.Target> selectedTargets =
+                            selectPublicationTargets(
+                                    targets,
+                                    leagueMetadata.currentSeasonId(),
+                                    publicationMode
+                            );
+
+                    List<SeasonPublicationTargetRepository.Target> availableTargets =
+                            selectedTargets.stream()
+                                    .filter(SeasonPublicationTargetRepository.Target::available)
+                                    .toList();
+
+                    for (SeasonPublicationTargetRepository.Target target : selectedTargets) {
+                        if (!target.available()) {
+                            l.phase(
+                                    "PUBBLICAZIONE saltata per "
+                                            + target.seasonId()
+                                            + ": sito locale non disponibile: "
+                                            + target.siteRoot(),
+                                    -1
+                            );
+                        }
+                    }
+
+                    if (availableTargets.isEmpty()) {
+                        if (publicationMode == PublicationMode.CURRENT_SITE) {
+                            throw new IllegalStateException(
+                                    "Nessun sito locale configurato e disponibile per la stagione corrente "
+                                            + leagueMetadata.currentSeasonId()
+                                            + ". Configurare il sito della stagione oppure disattivare la pubblicazione."
+                            );
+                        }
+                        throw new IllegalStateException(
+                                "Nessun sito locale configurato e disponibile per la pubblicazione multisito."
+                        );
+                    }
+
+                    int totalClassicEntries = 0;
+                    int totalRuSeasons = 0;
+                    int totalFiles = 0;
+                    int totalPublished = 0;
+
+                    Path scopesRoot = c.staging()
+                            .resolve("multisite-scopes")
+                            .normalize();
+
+                    deleteTree(scopesRoot);
+                    Files.createDirectories(scopesRoot);
+
+                    Path culometroConfig = c.projectRoot()
+                            .resolve("config/culometro.json")
+                            .normalize();
+
+                    if (o.culometroEnabled()) {
+                        if (!Files.isRegularFile(culometroConfig)) {
+                            throw new IllegalStateException(
+                                    "Configurazione Culometro non trovata: "
+                                            + culometroConfig
+                            );
+                        }
+
+                        Path scopedConfigDir = scopesRoot.resolve("config");
+                        Files.createDirectories(scopedConfigDir);
+                        Files.copy(
+                                culometroConfig,
+                                scopedConfigDir.resolve("culometro.json"),
+                                StandardCopyOption.REPLACE_EXISTING,
+                                StandardCopyOption.COPY_ATTRIBUTES
+                        );
+                    }
+
+                    try {
+                        for (SeasonPublicationTargetRepository.Target target : availableTargets) {
+                            List<String> targetSeasons =
+                                    targetRepository.scope(
+                                            c.seasons(),
+                                            target
+                                    );
+
+                            if (targetSeasons.isEmpty()) {
+                                l.phase(
+                                        "PUBBLICAZIONE saltata per "
+                                                + target.seasonId()
+                                                + ": nessuna stagione selezionata nello scope.",
+                                        -1
+                                );
+                                continue;
+                            }
+
+                            l.phase(
+                                    "Pubblicazione sito "
+                                            + target.seasonId()
+                                            + " -> "
+                                            + target.siteJs(),
+                                    84
+                            );
+
+                            Path targetScope = scopesRoot.resolve(target.seasonId());
+                            Path scopedClassic = targetScope.resolve("classic");
+                            Path scopedRu = targetScope.resolve("ru");
+                            Path scopedReports = targetScope.resolve("reports");
+
+                            createSeasonScopedView(
+                                    c.classicArchive(),
+                                    scopedClassic,
+                                    targetSeasons
+                            );
+                            createSeasonScopedView(
+                                    c.ruArchive(),
+                                    scopedRu,
+                                    targetSeasons
+                            );
+                            createSeasonScopedView(
+                                    c.reports(),
+                                    scopedReports,
+                                    targetSeasons
+                            );
+
+                            ManifestMetadata targetManifest =
+                                    new ManifestMetadata(
+                                            "RecordsNext by mauz79",
+                                            "3.1.0",
+                                            "2.0",
+                                            OffsetDateTime.now(),
+                                            leagueMetadata.leagueId(),
+                                            target.seasonId(),
+                                            targetSeasons,
+                                            List.of()
+                                    );
+
+                            var generated = Records2026SitePublisher.run(
+                                    scopedClassic,
+                                    scopedRu,
+                                    c.staging(),
+                                    target.siteJs(),
+                                    true,
+                                    o.familyEnabled(RecordFamily.CLASSICS),
+                                    o.familyEnabled(RecordFamily.RU),
+                                    o,
+                                    preflight,
+                                    targetManifest,
+                                    null,
+                                    null,
+                                    scopedReports
+                            );
+
+                            Path generatedDir =
+                                    generated.stagingDirectory().resolve("js");
+
+                            CoreJsExporter.export(
+                                    database,
+                                    generatedDir.resolve("fcmRecordsNext_Core.js"),
+                                    leagueMetadata.leagueId(),
+                                    leagueMetadata.leagueName(),
+                                    target.seasonId()
+                            );
+
+                            int published = publishGeneratedDirectory(
+                                    generatedDir,
+                                    target.siteJs()
+                            );
+
+                            totalClassicEntries += generated.classicEntries();
+                            totalRuSeasons += generated.ruSeasons();
+                            totalFiles += published;
+                            totalPublished += published;
+                        }
+                    } finally {
+                        deleteTree(scopesRoot);
+                    }
+
+                    result = new Result(
+                            totalClassicEntries,
+                            totalRuSeasons,
+                            totalFiles,
+                            totalPublished
+                    );
+                }
 
                 l.timing(
                         (
                                 o.publish()
-                                        ? "generazione e pubblicazione JavaScript: "
+                                        ? "generazione e pubblicazione JavaScript multisito: "
                                         : "generazione JavaScript: "
                         )
                                 + elapsed(started)
-                );
-
-                result = new Result(
-                        r.classicEntries(),
-                        r.ruSeasons(),
-                        r.validatedFiles(),
-                        r.publishedFiles()
                 );
             }
 
@@ -7233,6 +7870,148 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                                 + unsupported
                 );
             }
+        }
+
+        static List<SeasonPublicationTargetRepository.Target> selectPublicationTargets(
+                List<SeasonPublicationTargetRepository.Target> targets,
+                String currentSeasonId,
+                PublicationMode mode) {
+
+            if (mode == PublicationMode.ALL_CONFIGURED_SITES) {
+                return List.copyOf(targets);
+            }
+
+            return targets.stream()
+                    .filter(target -> target.seasonId().equals(currentSeasonId))
+                    .toList();
+        }
+
+        private static void createSeasonScopedView(
+                Path sourceRoot,
+                Path targetRoot,
+                List<String> seasons) throws Exception {
+
+            Files.createDirectories(targetRoot);
+
+            for (String season : seasons) {
+                Path source = sourceRoot.resolve(season).normalize();
+                if (!Files.isDirectory(source)) {
+                    continue;
+                }
+
+                copyTree(source, targetRoot.resolve(season));
+            }
+        }
+
+        private static void copyTree(
+                Path source,
+                Path target) throws Exception {
+
+            try (var paths = Files.walk(source)) {
+                for (Path path : paths.toList()) {
+                    Path relative = source.relativize(path);
+                    Path destination = target.resolve(relative);
+
+                    if (Files.isDirectory(path)) {
+                        Files.createDirectories(destination);
+                    } else {
+                        Files.createDirectories(destination.getParent());
+                        Files.copy(
+                                path,
+                                destination,
+                                StandardCopyOption.REPLACE_EXISTING,
+                                StandardCopyOption.COPY_ATTRIBUTES
+                        );
+                    }
+                }
+            }
+        }
+
+        private static int publishGeneratedDirectory(
+                Path generatedDir,
+                Path siteJsDir) throws Exception {
+
+            Files.createDirectories(siteJsDir);
+
+            List<Path> files;
+            try (var stream = Files.list(generatedDir)) {
+                files = stream
+                        .filter(Files::isRegularFile)
+                        .sorted(Comparator.comparing(
+                                path -> path.getFileName().toString()
+                        ))
+                        .toList();
+            }
+
+            Path backupRoot = generatedDir.getParent()
+                    .resolve("multisite-publish-backup");
+            Files.createDirectories(backupRoot);
+
+            List<Path> replaced = new ArrayList<>();
+            List<Path> created = new ArrayList<>();
+
+            try {
+                for (Path source : files) {
+                    Path target = siteJsDir.resolve(source.getFileName());
+
+                    if (Files.exists(target)) {
+                        Files.copy(
+                                target,
+                                backupRoot.resolve(source.getFileName()),
+                                StandardCopyOption.REPLACE_EXISTING,
+                                StandardCopyOption.COPY_ATTRIBUTES
+                        );
+                        replaced.add(target);
+                    } else {
+                        created.add(target);
+                    }
+
+                    Path temp = siteJsDir.resolve(
+                            "." + source.getFileName()
+                                    + ".recordsnext-multisite.tmp"
+                    );
+
+                    Files.copy(
+                            source,
+                            temp,
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
+
+                    try {
+                        Files.move(
+                                temp,
+                                target,
+                                StandardCopyOption.ATOMIC_MOVE,
+                                StandardCopyOption.REPLACE_EXISTING
+                        );
+                    } catch (java.nio.file.AtomicMoveNotSupportedException ex) {
+                        Files.move(
+                                temp,
+                                target,
+                                StandardCopyOption.REPLACE_EXISTING
+                        );
+                    }
+                }
+            } catch (Exception ex) {
+                for (Path target : created) {
+                    Files.deleteIfExists(target);
+                }
+
+                for (Path target : replaced) {
+                    Path backup = backupRoot.resolve(target.getFileName());
+                    if (Files.isRegularFile(backup)) {
+                        Files.copy(
+                                backup,
+                                target,
+                                StandardCopyOption.REPLACE_EXISTING
+                        );
+                    }
+                }
+
+                throw ex;
+            }
+
+            return files.size();
         }
 
         private static void deleteTree(
@@ -13541,7 +14320,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
         private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
-        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.0");
+        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.1");
         private final CardLayout pages = new CardLayout();
         private final JPanel pageHost = new JPanel(pages);
         private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
@@ -13551,7 +14330,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         private final Map<String, JTextField> modifierNameFields = new LinkedHashMap<>();
 
         private final JCheckBox culometro = new JCheckBox("Genera Culometro");
-        private final JCheckBox publish = new JCheckBox("Pubblica nel sito al termine");
+        private final JCheckBox publish = new JCheckBox("Pubblica nel sito della stagione corrente al termine");
         private final JRadioButton full = new JRadioButton("Completa");
         private final JRadioButton consolidated = new JRadioButton("Consolidata");
         private final JTextArea log = new JTextArea();
@@ -13559,6 +14338,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         private final JLabel status = new JLabel("Pronto");
         private final JLabel phase = new JLabel("Nessuna elaborazione in corso");
         private final JButton run = new JButton("Elabora");
+        private final JButton publishAllSites = new JButton("Pubblica i siti delle stagioni selezionate");
         private final JTextField exampleSiteDirectory = new JTextField();
         private final JLabel exampleRootTarget = new JLabel("Non selezionata");
         private final JLabel exampleViewsTarget = new JLabel("Non selezionata");
@@ -13573,7 +14353,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                 try {
                     new RecordsNext2Dashboard().show();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.0", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.1", JOptionPane.ERROR_MESSAGE);
                 }
             });
         }
@@ -13633,7 +14413,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             brand.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
             brand.setForeground(Color.WHITE);
             side.add(brand);
-            JLabel version = new JLabel("by mauz79 · 2.1");
+            JLabel version = new JLabel("by mauz79 · 3.1");
             version.setAlignmentX(Component.LEFT_ALIGNMENT);
             version.setForeground(new Color(174, 192, 224));
             version.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -13707,7 +14487,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             c.weightx = 0.0;
             header.add(leftSpacer, c);
 
-            JLabel title = new JLabel("RecordsNext 3.0", SwingConstants.CENTER);
+            JLabel title = new JLabel("RecordsNext 3.1", SwingConstants.CENTER);
             title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
             title.setForeground(RED);
             c.gridx = 1;
@@ -13831,7 +14611,8 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             page.add(pageHeader("Configurazione stagioni",
                     "Stagioni, sorgenti, siti e collegamenti storici", true));
             JPanel card = cardPanel(new BorderLayout(10, 10));
-            JLabel text = new JLabel("<html><b>Gestita:</b> FCM/FCA, sito locale e online, DataA.js e tabellini.<br>"
+            JLabel text = new JLabel("<html><b>Gestita:</b> FCM e FCA obbligatori; sito locale e online opzionali.<br>"
+                    + "<b>Calendario:</b> gestito automaticamente dall'archivio interno RecordsNext.<br>"
                     + "<b>Manuale:</b> solo anni nel formato YYYY/YYYY e numero stagione.<br>"
                     + "Tabellini compatibili: <b>ris*.htm</b>, <b>ris*.html</b> e <b>ris*.php</b>.</html>");
             card.add(text, BorderLayout.CENTER);
@@ -14124,12 +14905,21 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                     "Diagnostica della pubblicazione e utilità per la skin FCM", true));
 
             JPanel publishCard = cardPanel(new BorderLayout(8, 8));
-            JLabel text = new JLabel("<html>Gli output vengono prima validati nello staging. La pubblicazione nel sito "
-                    + "avviene solo quando l'opzione è attiva e usa il rollback del publisher.</html>");
+            JLabel text = new JLabel("<html>L'elaborazione normale pubblica, se richiesto, solo nel sito "
+                    + "della stagione corrente. La pubblicazione di tutti i siti storici è un'azione separata: "
+                    + "ogni sito riceve esclusivamente lo storico disponibile fino alla propria stagione.</html>");
             publishCard.add(text, BorderLayout.CENTER);
-            JPanel options = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            JPanel options = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
             options.setOpaque(false);
             options.add(publish);
+            publishAllSites.setToolTipText(
+                    "Rigenera e pubblica RecordsNext nei siti configurati delle stagioni selezionate"
+            );
+            publishAllSites.addActionListener(e -> runPipeline(
+                    RecordsNextPipeline.PublicationMode.ALL_CONFIGURED_SITES,
+                    true
+            ));
+            options.add(publishAllSites);
             publishCard.add(options, BorderLayout.SOUTH);
             page.add(publishCard);
             page.add(Box.createVerticalStrut(10));
@@ -14374,7 +15164,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             });
             run.setBackground(BLUE);
             run.setForeground(Color.WHITE);
-            run.addActionListener(e -> runPipeline());
+            run.addActionListener(e -> runPipeline(RecordsNextPipeline.PublicationMode.CURRENT_SITE, false));
             JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
             actions.setOpaque(false);
             actions.add(save);
@@ -14645,9 +15435,15 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             return (int) childChecks.values().stream().filter(AbstractButton::isSelected).count();
         }
 
-        private void runPipeline() {
+        private void runPipeline(
+                RecordsNextPipeline.PublicationMode publicationMode,
+                boolean forcePublish) {
+            if (forcePublish && !publish.isSelected()) {
+                publish.setSelected(true);
+            }
             saveState();
             run.setEnabled(false);
+            publishAllSites.setEnabled(false);
             log.setText("");
             progress.setValue(0);
             phase.setText("Preparazione");
@@ -14662,7 +15458,11 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                             : PipelineConfig.defaults(root);
                     ProcessingOptions options = ProcessingConfigLoader.load(processingFile);
                     ProcessingMode mode = consolidated.isSelected() ? ProcessingMode.CONSOLIDATED : ProcessingMode.FULL;
-                    return new RecordsNextPipeline().run(cfg, options, mode, new RecordsNextPipeline.Listener() {
+                    return new RecordsNextPipeline().run(
+                            cfg,
+                            options,
+                            mode,
+                            new RecordsNextPipeline.Listener() {
                         @Override public void phase(String text, int percent) {
                             publish(text);
                             SwingUtilities.invokeLater(() -> {
@@ -14671,7 +15471,9 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                             });
                         }
                         @Override public void timing(String text) { publish("TEMPO  " + text); }
-                    });
+                    },
+                            publicationMode
+                    );
                 }
 
                 @Override protected void process(java.util.List<String> chunks) {
@@ -14693,9 +15495,10 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                         log.append("ERRORE: " + cause + System.lineSeparator());
                         status.setText("Errore");
                         status.setForeground(RED);
-                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.0", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.1", JOptionPane.ERROR_MESSAGE);
                     } finally {
                         run.setEnabled(true);
+                        publishAllSites.setEnabled(true);
                     }
                 }
             }.execute();
@@ -15455,8 +16258,8 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
         private final Properties properties = new Properties();
         private final JPanel seasonsPanel = new JPanel();
         private final List<SeasonEditor> editors = new ArrayList<>();
-        private final JTextField leagueName = new JTextField(24);
-        private final JTextField leagueId = new JTextField(20);
+        private final JTextField leagueName = new JTextField(28);
+        private String leagueIdValue = "";
         private final SeasonConfigurationRepository repository;
         private boolean saved;
 
@@ -15478,23 +16281,39 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
 
             JPanel leaguePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-            leaguePanel.setBorder(new TitledBorder("Identità lega"));
+            leaguePanel.setBorder(new TitledBorder("Lega"));
             leaguePanel.add(new JLabel("Nome lega:"));
             leaguePanel.add(leagueName);
-            leaguePanel.add(new JLabel("ID lega:"));
-            leaguePanel.add(leagueId);
+            JLabel leagueHint = new JLabel("Se vuoto, RecordsNext prova a ricavarlo dal primo FCM.");
+            leagueHint.setForeground(Color.GRAY);
+            leaguePanel.add(leagueHint);
             header.add(leaguePanel);
             header.add(Box.createVerticalStrut(8));
 
-            JPanel top=new JPanel(new BorderLayout());
-            JLabel info=new JLabel("Configurare stagioni gestite e manuali. Le manuali richiedono solo anni e numero stagione.");
+            JPanel infoPanel = new JPanel();
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            infoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JLabel infoLine1 = new JLabel("Configurare stagioni gestite e manuali.");
+            JLabel infoLine2 = new JLabel("Il sito locale è opzionale e serve solo come destinazione di pubblicazione.");
+            infoLine1.setAlignmentX(Component.LEFT_ALIGNMENT);
+            infoLine2.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            infoPanel.add(infoLine1);
+            infoPanel.add(Box.createVerticalStrut(2));
+            infoPanel.add(infoLine2);
+            header.add(infoPanel);
+            header.add(Box.createVerticalStrut(8));
+
             JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+            topButtons.setAlignmentX(Component.LEFT_ALIGNMENT);
             JButton mappings = new JButton("Configura associazioni storiche...");
             mappings.addActionListener(e -> openMappings());
-            JButton add=new JButton("Aggiungi stagione"); add.addActionListener(e->addSeason());
-            topButtons.add(mappings); topButtons.add(add);
-            top.add(info,BorderLayout.WEST); top.add(topButtons,BorderLayout.EAST);
-            header.add(top);
+            JButton add=new JButton("Aggiungi stagione");
+            add.addActionListener(e->addSeason());
+            topButtons.add(mappings);
+            topButtons.add(add);
+            header.add(topButtons);
             root.add(header,BorderLayout.NORTH);
             seasonsPanel.setLayout(new BoxLayout(seasonsPanel,BoxLayout.Y_AXIS)); seasonsPanel.setBorder(new EmptyBorder(4,4,4,4));
             JScrollPane scroll=new JScrollPane(seasonsPanel); scroll.getVerticalScrollBar().setUnitIncrement(20); root.add(scroll,BorderLayout.CENTER);
@@ -15515,7 +16334,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             try {
                 LeagueMetadata metadata = LeagueMetadataLoader.load(leagueFile);
                 leagueName.setText(metadata.leagueName());
-                leagueId.setText(metadata.leagueId());
+                leagueIdValue = metadata.leagueId();
             } catch (Exception ex) {
                 error("Lettura identità lega", ex);
             }
@@ -15538,6 +16357,50 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                     .toLowerCase(Locale.ROOT)
                     .replaceAll("[^a-z0-9]+", "-")
                     .replaceAll("^-+|-+$", "");
+            return normalized;
+        }
+
+        private static String deriveLeagueNameFromFcm(Path fcm) {
+            if (fcm == null) return "";
+            String name = fcm.getFileName().toString();
+            name = name.replaceFirst("(?i)\\.fcm$", "");
+            name = name.replaceFirst("\\s+\\d{4}_\\d{4}.*$", "");
+            name = name.replaceFirst("\\s+\\d{4}/\\d{4}.*$", "");
+            name = name.replaceFirst("[-_ ]+\\d{4}.*$", "");
+            name = name.trim();
+            return name;
+        }
+
+        private String effectiveLeagueName(List<SeasonConfigurationRepository.SeasonRow> rows) {
+            String value = leagueName.getText().trim();
+            if (!value.isEmpty()) return value;
+
+            for (SeasonConfigurationRepository.SeasonRow row : rows) {
+                if (!"GESTITA".equals(row.managementType()) || row.fcmPath().isBlank()) continue;
+                String detected = deriveLeagueNameFromFcm(Path.of(row.fcmPath()));
+                if (!detected.isEmpty()) {
+                    leagueName.setText(detected);
+                    return detected;
+                }
+            }
+
+            leagueName.setText("RecordsNext League");
+            return "RecordsNext League";
+        }
+
+        private static String normalizeOnlineUrl(String value) {
+            if (value == null) return "";
+            String normalized = value.trim().replace('\\', '/');
+            if (normalized.isEmpty()) return "";
+
+            while (normalized.endsWith("/")) {
+                normalized = normalized.substring(0, normalized.length() - 1);
+            }
+
+            if (!normalized.matches("(?i)^https?://.*")) {
+                normalized = "http://" + normalized;
+            }
+
             return normalized;
         }
 
@@ -15615,6 +16478,12 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 selectSeasonByDefault(row.seasonId());
 
                 if ("GESTITA".equals(row.managementType())) {
+                    if (leagueName.getText().trim().isEmpty()) {
+                        String detectedLeagueName = deriveLeagueNameFromFcm(Path.of(row.fcmPath()));
+                        if (!detectedLeagueName.isEmpty()) {
+                            leagueName.setText(detectedLeagueName);
+                        }
+                    }
                     importForConfiguration(row, rows);
                 }
 
@@ -15676,19 +16545,14 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
         private void refresh(){seasonsPanel.revalidate();seasonsPanel.repaint();}
 
         private void saveConfiguration(){
-            String leagueNameValue = leagueName.getText().trim();
-            if (leagueNameValue.isEmpty()) { warn("Inserire il nome della lega."); return; }
-
-            String leagueIdValue = leagueId.getText().trim();
-            if (leagueIdValue.isEmpty()) {
-                leagueIdValue = slug(leagueNameValue);
-                leagueId.setText(leagueIdValue);
-            }
-            if (leagueIdValue.isEmpty()) { warn("Inserire un ID lega valido."); return; }
-
             if(editors.isEmpty()){warn("Aggiungere almeno una stagione.");return;}
             List<SeasonConfigurationRepository.SeasonRow> rows=new ArrayList<>();
             for(SeasonEditor e:editors){String problem=e.validateFields(); if(problem!=null){warn(problem);return;} rows.add(e.value());}
+            String leagueNameValue = effectiveLeagueName(rows);
+            String effectiveLeagueId = leagueIdValue == null ? "" : leagueIdValue.trim();
+            if (effectiveLeagueId.isEmpty()) effectiveLeagueId = slug(leagueNameValue);
+            if (effectiveLeagueId.isEmpty()) effectiveLeagueId = "recordsnext";
+            leagueIdValue = effectiveLeagueId;
             List<String> selected=editors.stream().filter(e->e.include.isSelected()).map(e->e.row.seasonId()).toList();
             if(selected.isEmpty()){warn("Selezionare almeno una stagione da elaborare.");return;}
             try {
@@ -15708,8 +16572,17 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             }
             properties.setProperty("seasons",String.join(",",selected));
             properties.setProperty("seasonsSelectionInitialized", "true");
-            rows.stream().filter(r->"GESTITA".equals(r.managementType())).max(Comparator.comparing(r->r.seasonId())).ifPresent(current->
-                properties.setProperty("siteJs",Path.of(current.localSitePath()).resolve("js").toString()));
+            rows.stream()
+                .filter(r->"GESTITA".equals(r.managementType()))
+                .max(Comparator.comparing(r->r.seasonId()))
+                .ifPresent(current->{
+                    String currentSite=current.localSitePath().trim();
+                    if(currentSite.isEmpty()){
+                        properties.remove("siteJs");
+                    }else{
+                        properties.setProperty("siteJs",Path.of(currentSite).resolve("js").toString());
+                    }
+                });
             try{
                 repository.save(rows);
                 String currentSeasonId = rows.stream()
@@ -15717,7 +16590,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                         .max(Comparator.comparing(r -> r.seasonId()))
                         .map(SeasonConfigurationRepository.SeasonRow::seasonId)
                         .orElseThrow(() -> new IllegalStateException("Configurare almeno una stagione gestita."));
-                writeLeagueIdentity(leagueIdValue, leagueNameValue, currentSeasonId);
+                writeLeagueIdentity(effectiveLeagueId, leagueNameValue, currentSeasonId);
                 Files.createDirectories(configPath.getParent());
                 try(OutputStream out=Files.newOutputStream(configPath)){properties.store(out,"RecordsNext configuration");}
                 saved=true;dispose();
@@ -15725,7 +16598,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
         }
 
         private void remove(SeasonEditor e){
-            int x=JOptionPane.showConfirmDialog(this,"Rimuovere "+e.row.seasonId()+" dalla configurazione?\nI dati già importati non saranno cancellati.","RecordsNext",JOptionPane.YES_NO_OPTION);
+            int x=JOptionPane.showConfirmDialog(this,"Rimuovere completamente "+e.row.seasonId()+" da RecordsNext?\nVerranno eliminati i dati interni della stagione, ma non i file FCM/FCA/DataA né il sito sul disco.","RecordsNext",JOptionPane.YES_NO_OPTION);
             if(x!=JOptionPane.YES_OPTION)return;
             try{repository.removeConfiguration(e.row.seasonId());}catch(Exception ex){error("Rimozione stagione",ex);return;}
             int i=editors.indexOf(e); editors.remove(e); seasonsPanel.remove(e.panel); if(i<seasonsPanel.getComponentCount()) seasonsPanel.remove(i); refresh();
@@ -15816,14 +16689,14 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 if("GESTITA".equals(row.managementType())) {
                     addPath("File FCM",fcm,1,JFileChooser.FILES_ONLY,".fcm");
                     addPath("File FCA",fca,2,JFileChooser.FILES_ONLY,".fca");
-                    addPath("Cartella sito locale",site,3,JFileChooser.DIRECTORIES_ONLY,null);
+                    addPath("Cartella sito locale (opzionale)",site,3,JFileChooser.DIRECTORIES_ONLY,null);
                     addText("Sito online",online,4);
                     site.getDocument().addDocumentListener(new javax.swing.event.DocumentListener(){public void insertUpdate(javax.swing.event.DocumentEvent e){updateDerived();}public void removeUpdate(javax.swing.event.DocumentEvent e){updateDerived();}public void changedUpdate(javax.swing.event.DocumentEvent e){updateDerived();}});
                     addLabel("Cartella JS",js,5);
-                    addLabel("DataA.js e tabellini",dataa,6);
+                    addLabel("Calendario e tabellini",dataa,6);
                 } else {
                     addReadOnly("Configurazione", "Solo riferimento storico: " + row.seasonId().replace('_','/') + " · stagione n. " + row.seasonNumber(), 1);
-                    addReadOnly("Dati gara", "FCM, FCA, sito, DataA.js e tabellini non previsti", 2);
+                    addReadOnly("Dati gara", "FCM, FCA, sito, calendario e tabellini non previsti", 2);
                 }
                 if ("GESTITA".equals(row.managementType()) && !row.anchor()) {
                     JLabel mappingStatus = new JLabel();
@@ -15857,14 +16730,82 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
             void addLabel(String label,JLabel value,int y){GridBagConstraints g=base(label,y);g.gridx=1;g.gridwidth=3;g.weightx=1;g.fill=GridBagConstraints.HORIZONTAL;panel.add(value,g);}
             GridBagConstraints base(String label,int y){GridBagConstraints g=new GridBagConstraints();g.gridy=y;g.gridx=0;g.anchor=GridBagConstraints.WEST;g.insets=new Insets(3,2,3,8);panel.add(new JLabel(label+":"),g);return g;}
             void updateDerived(){
+
+                String startYear=row.seasonId().substring(0,4);
+
+                Path archivedDataA=projectRoot.resolve("data/calendars/DataA-"+startYear+".js").normalize();
+
+
+
                 String s=site.getText().trim();
-                if(s.isEmpty()){js.setText("-");dataa.setText("-");return;}
-                Path rootSite=Path.of(s); Path j=rootSite.resolve("js"); Path d=j.resolve("DataA.js");
+
+                boolean recoveredFromSite=false;
+
+
+
+                if(!Files.isRegularFile(archivedDataA) && !s.isEmpty()){
+
+                    Path siteDataA=Path.of(s).resolve("js").resolve("DataA.js").normalize();
+
+                    if(Files.isRegularFile(siteDataA)){
+
+                        try{
+
+                            Files.createDirectories(archivedDataA.getParent());
+
+                            Files.copy(siteDataA,archivedDataA,StandardCopyOption.REPLACE_EXISTING);
+
+                            recoveredFromSite=true;
+
+                        }catch(IOException ignored){ }
+
+                    }
+
+                }
+
+
+
+                boolean dataAFound=Files.isRegularFile(archivedDataA);
+
+                String calendarStatus=dataAFound
+
+                    ? (recoveredFromSite?"Calendario disponibile (recuperato dal sito)":"Calendario disponibile")
+
+                    : "Calendario non disponibile";
+
+
+
+                if(s.isEmpty()){
+
+                    js.setText("-");
+
+                    dataa.setText(calendarStatus+" · sito non configurato");
+
+                    dataa.setForeground(dataAFound?new Color(20,120,55):new Color(170,55,35));
+
+                    return;
+
+                }
+
+
+
+                Path rootSite=Path.of(s);
+
+                Path j=rootSite.resolve("js");
+
                 js.setText(j.toString());
+
+
+
                 String matchPage=detectMatchPage(rootSite);
-                dataa.setText((Files.isRegularFile(d)?"DataA trovato":"DataA non trovato")+" · tabellini: "+matchPage);
-                dataa.setForeground(Files.isRegularFile(d)?new Color(20,120,55):new Color(170,55,35));
+
+                dataa.setText(calendarStatus+" · tabellini: "+matchPage);
+
+                dataa.setForeground(dataAFound?new Color(20,120,55):new Color(170,55,35));
+
             }
+
+
             String detectMatchPage(Path siteRoot){
                 if(!Files.isDirectory(siteRoot)) return "sito non disponibile";
                 try(var files=Files.list(siteRoot)){
@@ -15878,12 +16819,25 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 if("MANUALE".equals(row.managementType())) return null;
                 if(fcm.getText().trim().isEmpty()||!Files.isRegularFile(Path.of(fcm.getText().trim())))return row.seasonId()+": selezionare un file FCM esistente.";
                 if(fca.getText().trim().isEmpty()||!Files.isRegularFile(Path.of(fca.getText().trim())))return row.seasonId()+": selezionare un file FCA esistente.";
-                if(site.getText().trim().isEmpty()||!Files.isDirectory(Path.of(site.getText().trim())))return row.seasonId()+": selezionare una cartella sito esistente.";
+                String sitePath=site.getText().trim();
+                if(!sitePath.isEmpty()&&!Files.isDirectory(Path.of(sitePath)))return row.seasonId()+": la cartella sito indicata non esiste; correggerla oppure lasciare il campo vuoto.";
                 return null;
             }
             SeasonConfigurationRepository.SeasonRow value(){
                 boolean managed="GESTITA".equals(row.managementType());
-                return new SeasonConfigurationRepository.SeasonRow(row.seasonId(),row.seasonNumber(),row.anchor(),row.managementType(),row.status(),managed?fcm.getText().trim():"",managed?fca.getText().trim():"",managed?site.getText().trim():"",managed?online.getText().trim():"");
+                String normalizedOnline = managed ? normalizeOnlineUrl(online.getText()) : "";
+                if (managed) online.setText(normalizedOnline);
+                return new SeasonConfigurationRepository.SeasonRow(
+                    row.seasonId(),
+                    row.seasonNumber(),
+                    row.anchor(),
+                    row.managementType(),
+                    row.status(),
+                    managed?fcm.getText().trim():"",
+                    managed?fca.getText().trim():"",
+                    managed?site.getText().trim():"",
+                    normalizedOnline
+                );
             }
         }
 
@@ -15921,61 +16875,129 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNextConfigurationDialog.
                 return result;
             }
 
+            private final CardLayout modeCards = new CardLayout();
+
+            private final JPanel modePanel = new JPanel(modeCards);
+
+
+
             private void build() {
+
                 setLayout(new BorderLayout(10, 10));
+
                 ((JComponent) getContentPane()).setBorder(new EmptyBorder(14, 16, 12, 16));
 
+
+
                 ButtonGroup group = new ButtonGroup();
+
                 group.add(managed);
+
                 group.add(manual);
 
-                JPanel form = new JPanel(new GridBagLayout());
-                form.setBorder(new TitledBorder("Tipo e sorgenti della stagione"));
 
-                GridBagConstraints g = new GridBagConstraints();
-                g.insets = new Insets(5, 5, 5, 5);
-                g.anchor = GridBagConstraints.WEST;
-                g.gridx = 0;
-                g.gridy = 0;
-                form.add(managed, g);
-                g.gridx = 1;
-                form.add(manual, g);
 
-                addChooser(form, "File FCM", fcm, 1, ".fcm");
-                addChooser(form, "File FCA", fca, 2, ".fca");
-                addField(form, "Anni stagione manuale (AAAA/AAAA)", manualSeason, 3);
-                addField(form, "Numero stagione", manualNumber, 4);
-                addValue(form, "Dati rilevati", detected, 5);
+                JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+
+                typePanel.setBorder(new TitledBorder("Tipo di stagione"));
+
+                typePanel.add(managed);
+
+                typePanel.add(manual);
+
+                add(typePanel, BorderLayout.NORTH);
+
+
+
+                JPanel managedPanel = new JPanel(new GridBagLayout());
+
+                managedPanel.setBorder(new TitledBorder("Sorgenti stagione gestita"));
+
+                addChooser(managedPanel, "File FCM", fcm, 0, ".fcm");
+
+                addChooser(managedPanel, "File FCA", fca, 1, ".fca");
+
+                addValue(managedPanel, "Dati rilevati", detected, 2);
+
+
+
+                JPanel manualPanel = new JPanel(new GridBagLayout());
+
+                manualPanel.setBorder(new TitledBorder("Dati stagione manuale"));
+
+                addField(manualPanel, "Anni stagione (AAAA/AAAA)", manualSeason, 0);
+
+                addField(manualPanel, "Numero stagione", manualNumber, 1);
+
+                JLabel manualHint = new JLabel("Le stagioni manuali non richiedono file FCM/FCA, sito o tabellini.");
+
+                manualHint.setForeground(Color.GRAY);
+
+                addValue(manualPanel, "Nota", manualHint, 2);
+
+
+
+                modePanel.add(managedPanel, "GESTITA");
+
+                modePanel.add(manualPanel, "MANUALE");
+
+                add(modePanel, BorderLayout.CENTER);
+
+
 
                 managed.addActionListener(e -> updateMode());
+
                 manual.addActionListener(e -> updateMode());
+
                 updateMode();
 
-                add(form, BorderLayout.CENTER);
+
 
                 JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
                 JButton add = new JButton("Aggiungi stagione");
+
                 JButton cancel = new JButton("Annulla");
+
                 add.addActionListener(e -> finish());
+
                 cancel.addActionListener(e -> dispose());
+
                 buttons.add(add);
+
                 buttons.add(cancel);
+
                 add(buttons, BorderLayout.SOUTH);
 
-                setSize(720, 390);
+
+
+                setSize(720, 330);
+
                 setLocationRelativeTo(getOwner());
+
             }
 
+
+
             private void updateMode() {
+
                 boolean isManaged = managed.isSelected();
-                fca.setEnabled(isManaged);
-                fcm.setEnabled(isManaged);
-                manualSeason.setEnabled(!isManaged);
-                manualNumber.setEnabled(!isManaged);
+
+                modeCards.show(modePanel, isManaged ? "GESTITA" : "MANUALE");
+
                 detected.setText(isManaged
+
                     ? "Stagione e numero saranno letti dal file FCM."
-                    : "Inserire stagione e numero manualmente.");
+
+                    : " ");
+
+                revalidate();
+
+                repaint();
+
             }
+
+
 
             private void finish() {
                 try {
@@ -16626,7 +17648,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\SeasonConfigurationRepository.j
             if ("MANUALE".equals(r.managementType())) {
                 return "COMPLETA";
             }
-            return !r.fcmPath().isBlank() && !r.fcaPath().isBlank() && !r.localSitePath().isBlank()
+            return !r.fcmPath().isBlank() && !r.fcaPath().isBlank()
                     ? "COMPLETA" : "DA_CONFIGURARE";
         }
 
@@ -27067,6 +28089,193 @@ File: src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterTe
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterSeasonScopeTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterSeasonScopeTest.java
+
+    package it.alterlega.recordsnext.app.core;
+
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.sql.Connection;
+    import java.sql.DriverManager;
+    import java.sql.Statement;
+
+    import static org.junit.jupiter.api.Assertions.assertFalse;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+
+    class CoreJsExporterSeasonScopeTest {
+
+        @TempDir
+        Path tempDir;
+
+        @Test
+        void exportScopedCoreExcludesFutureSeasons() throws Exception {
+            Path db = tempDir.resolve("recordsnext.db");
+            Path out = tempDir.resolve("fcmRecordsNext_Core.js");
+
+            Class.forName("org.sqlite.JDBC");
+
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db);
+                 Statement s = c.createStatement()) {
+
+                s.execute("""
+                    CREATE TABLE rn_season (
+                        season_id TEXT PRIMARY KEY,
+                        display_name TEXT,
+                        sort_order INTEGER,
+                        is_anchor INTEGER NOT NULL DEFAULT 0
+                    )
+                    """);
+
+                s.execute("""
+                    CREATE TABLE rn_season_configuration (
+                        season_id TEXT PRIMARY KEY,
+                        management_type TEXT,
+                        configuration_status TEXT,
+                        local_site_path TEXT,
+                        online_site_url TEXT,
+                        dataa_path TEXT
+                    )
+                    """);
+
+                s.execute("""
+                    CREATE TABLE rn_team_identity (
+                        team_identity_id INTEGER PRIMARY KEY,
+                        canonical_name TEXT,
+                        anchor_season_id TEXT,
+                        anchor_team_season_id INTEGER
+                    )
+                    """);
+
+                s.execute("""
+                    CREATE TABLE rn_team_season (
+                        team_season_id INTEGER PRIMARY KEY,
+                        season_id TEXT
+                    )
+                    """);
+
+                s.execute("""
+                    CREATE TABLE rn_team_mapping (
+                        team_identity_id INTEGER,
+                        team_season_id INTEGER
+                    )
+                    """);
+
+                s.execute("""
+                    CREATE VIEW rn_configured_team AS
+                    SELECT
+                        ts.team_season_id,
+                        ts.season_id,
+                        NULL AS source_file_id,
+                        NULL AS source_team_id,
+                        i.canonical_name AS source_name,
+                        i.canonical_name AS normalized_name,
+                        NULL AS source_division_id,
+                        NULL AS source_team_number,
+                        i.team_identity_id,
+                        i.canonical_name,
+                        'MAPPED' AS mapping_status,
+                        'TEST' AS mapping_method,
+                        NULL AS notes
+                    FROM rn_team_season ts
+                    JOIN rn_team_mapping tm ON tm.team_season_id = ts.team_season_id
+                    JOIN rn_team_identity i ON i.team_identity_id = tm.team_identity_id
+                    """);
+
+                s.execute("""
+                    CREATE TABLE rn_competition_identity (
+                        competition_identity_id INTEGER PRIMARY KEY,
+                        canonical_name TEXT,
+                        anchor_season_id TEXT,
+                        anchor_competition_season_id INTEGER
+                    )
+                    """);
+
+                s.execute("""
+                    CREATE TABLE rn_competition_season (
+                        competition_season_id INTEGER PRIMARY KEY,
+                        season_id TEXT
+                    )
+                    """);
+
+                s.execute("""
+                    CREATE TABLE rn_competition_mapping (
+                        competition_identity_id INTEGER,
+                        competition_season_id INTEGER
+                    )
+                    """);
+
+                s.execute("""
+                    CREATE VIEW rn_configured_competition AS
+                    SELECT
+                        cs.competition_season_id,
+                        cs.season_id,
+                        NULL AS source_file_id,
+                        NULL AS source_competition_id,
+                        i.canonical_name AS source_name,
+                        i.canonical_name AS normalized_name,
+                        i.competition_identity_id,
+                        i.canonical_name,
+                        'MAPPED' AS mapping_status,
+                        'TEST' AS mapping_method,
+                        NULL AS notes
+                    FROM rn_competition_season cs
+                    JOIN rn_competition_mapping cm
+                      ON cm.competition_season_id = cs.competition_season_id
+                    JOIN rn_competition_identity i
+                      ON i.competition_identity_id = cm.competition_identity_id
+                    """);
+
+                for (String season : new String[]{"2024_2025", "2025_2026", "2026_2027"}) {
+                    int order = Integer.parseInt(season.substring(0, 4));
+                    s.execute("INSERT INTO rn_season VALUES ('" + season + "','" + season + "'," + order + ",0)");
+                    s.execute("INSERT INTO rn_season_configuration VALUES ('" + season + "','GESTITA','COMPLETA',NULL,NULL,NULL)");
+                }
+
+                s.execute("""
+                    INSERT INTO rn_team_identity
+                    VALUES (1,'Squadra Storica','2026_2027',3)
+                    """);
+                s.execute("INSERT INTO rn_team_season VALUES (1,'2024_2025')");
+                s.execute("INSERT INTO rn_team_season VALUES (2,'2025_2026')");
+                s.execute("INSERT INTO rn_team_season VALUES (3,'2026_2027')");
+                s.execute("INSERT INTO rn_team_mapping VALUES (1,1)");
+                s.execute("INSERT INTO rn_team_mapping VALUES (1,2)");
+                s.execute("INSERT INTO rn_team_mapping VALUES (1,3)");
+
+                s.execute("""
+                    INSERT INTO rn_competition_identity
+                    VALUES (1,'Serie A','2026_2027',3)
+                    """);
+                s.execute("INSERT INTO rn_competition_season VALUES (1,'2024_2025')");
+                s.execute("INSERT INTO rn_competition_season VALUES (2,'2025_2026')");
+                s.execute("INSERT INTO rn_competition_season VALUES (3,'2026_2027')");
+                s.execute("INSERT INTO rn_competition_mapping VALUES (1,1)");
+                s.execute("INSERT INTO rn_competition_mapping VALUES (1,2)");
+                s.execute("INSERT INTO rn_competition_mapping VALUES (1,3)");
+            }
+
+            CoreJsExporter.export(
+                    db,
+                    out,
+                    "alterlega",
+                    "AlterLega",
+                    "2024_2025"
+            );
+
+            String js = Files.readString(out);
+
+            assertTrue(js.contains("2024_2025"));
+            assertFalse(js.contains("2025_2026"));
+            assertFalse(js.contains("2026_2027"));
+            assertTrue(js.contains("\"isAnchor\":1"));
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
@@ -27809,6 +29018,150 @@ File: src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublish
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\output\SeasonPublicationScopeRepositoryTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\output\SeasonPublicationScopeRepositoryTest.java
+
+    package it.alterlega.recordsnext.app.output;
+
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+
+    import java.nio.file.Path;
+    import java.sql.Connection;
+    import java.sql.DriverManager;
+    import java.sql.Statement;
+    import java.util.List;
+
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+
+    class SeasonPublicationScopeRepositoryTest {
+
+        @TempDir
+        Path tempDir;
+
+        @Test
+        void scopeUsesSortOrderInsteadOfSeasonIdTextOrder() throws Exception {
+            Path db = tempDir.resolve("recordsnext.db");
+
+            Class.forName("org.sqlite.JDBC");
+
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db);
+                 Statement s = c.createStatement()) {
+
+                s.execute("""
+                    CREATE TABLE rn_season (
+                        season_id TEXT PRIMARY KEY,
+                        sort_order INTEGER
+                    )
+                    """);
+
+                s.execute("""
+                    CREATE TABLE rn_season_configuration (
+                        season_id TEXT PRIMARY KEY,
+                        management_type TEXT,
+                        local_site_path TEXT
+                    )
+                    """);
+
+                s.execute("INSERT INTO rn_season VALUES ('FUTURE_TEXT_SMALL', 30)");
+                s.execute("INSERT INTO rn_season VALUES ('TARGET_ZZZ', 20)");
+                s.execute("INSERT INTO rn_season VALUES ('OLD_TEXT_LARGE', 10)");
+
+                s.execute("""
+                    INSERT INTO rn_season_configuration
+                    VALUES ('TARGET_ZZZ','GESTITA','C:/site-target')
+                    """);
+            }
+
+            SeasonPublicationTargetRepository repository =
+                    new SeasonPublicationTargetRepository(db);
+
+            SeasonPublicationTargetRepository.Target target =
+                    repository.load(List.of(
+                            "FUTURE_TEXT_SMALL",
+                            "TARGET_ZZZ",
+                            "OLD_TEXT_LARGE"
+                    )).get(0);
+
+            List<String> scoped = repository.scope(
+                    List.of(
+                            "FUTURE_TEXT_SMALL",
+                            "TARGET_ZZZ",
+                            "OLD_TEXT_LARGE"
+                    ),
+                    target
+            );
+
+            assertEquals(
+                    List.of("TARGET_ZZZ", "OLD_TEXT_LARGE"),
+                    scoped
+            );
+        }
+    }
+
+## src\test\java\it\alterlega\recordsnext\app\output\SeasonPublicationTargetRepositoryTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\output\SeasonPublicationTargetRepositoryTest.java
+
+    package it.alterlega.recordsnext.app.output;
+
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.sql.Connection;
+    import java.sql.DriverManager;
+    import java.sql.Statement;
+    import java.util.List;
+
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+    import static org.junit.jupiter.api.Assertions.assertFalse;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+
+    class SeasonPublicationTargetRepositoryTest {
+        @TempDir
+        Path tempDir;
+
+        @Test
+        void returnsOnlyConfiguredSelectedSitesAndMarksMissingDirectories() throws Exception {
+            Path db = tempDir.resolve("recordsnext.db");
+            Path site2025 = tempDir.resolve("Lega2025");
+            Files.createDirectories(site2025);
+            Path missing2026 = tempDir.resolve("Lega2026");
+
+            Class.forName("org.sqlite.JDBC");
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db);
+                 Statement s = c.createStatement()) {
+                s.execute("CREATE TABLE rn_season(season_id TEXT PRIMARY KEY, sort_order INTEGER)");
+                s.execute("CREATE TABLE rn_season_configuration(season_id TEXT PRIMARY KEY, management_type TEXT, local_site_path TEXT)");
+
+                s.execute("INSERT INTO rn_season VALUES('2023_2024',19)");
+                s.execute("INSERT INTO rn_season VALUES('2024_2025',20)");
+                s.execute("INSERT INTO rn_season VALUES('2025_2026',21)");
+
+                s.execute("INSERT INTO rn_season_configuration VALUES('2023_2024','GESTITA',NULL)");
+                s.execute("INSERT INTO rn_season_configuration VALUES('2024_2025','GESTITA','" + sql(site2025) + "')");
+                s.execute("INSERT INTO rn_season_configuration VALUES('2025_2026','GESTITA','" + sql(missing2026) + "')");
+            }
+
+            var repo = new SeasonPublicationTargetRepository(db);
+            var targets = repo.load(List.of("2023_2024", "2024_2025", "2025_2026"));
+
+            assertEquals(2, targets.size());
+            assertEquals("2024_2025", targets.get(0).seasonId());
+            assertEquals(site2025.toAbsolutePath().normalize(), targets.get(0).siteRoot());
+            assertTrue(targets.get(0).available());
+            assertEquals("2025_2026", targets.get(1).seasonId());
+            assertFalse(targets.get(1).available());
+        }
+
+        private static String sql(Path path) {
+            return path.toAbsolutePath().normalize().toString().replace("'", "''");
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
@@ -27936,6 +29289,107 @@ File: src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTes
         @Test void pipelineAcceptsAllFiveImplementedFamilies(){ProcessingOptions o=ProcessingOptions.modular(new ProcessingSelection(Set.of(RecordFamily.CLASSICS,RecordFamily.RU,RecordFamily.SERIES,RecordFamily.MODIFIERS,RecordFamily.THRESHOLDS_LUCK),Set.of(),false,true,false));RecordsNextPipeline.validateImplementedFamilies(o);}
         @Test void pipelineAcceptsConfiguredCulometro(){ProcessingOptions o=ProcessingOptions.modular(new ProcessingSelection(Set.of(RecordFamily.THRESHOLDS_LUCK),Set.of("easter-egg.culometro"),true,true,false));RecordsNextPipeline.validateImplementedFamilies(o);assertTrue(o.culometroEnabled());}
         @Test void thresholdsFamilyDoesNotImplicitlyEnableCulometro(){ProcessingOptions o=ProcessingOptions.modular(new ProcessingSelection(Set.of(RecordFamily.THRESHOLDS_LUCK),Set.of(),false,true,false));RecordsNextPipeline.validateImplementedFamilies(o);assertFalse(o.culometroEnabled());}
+    }
+
+## src\test\java\it\alterlega\recordsnext\app\RecordsNextPipelinePublicationModeTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\RecordsNextPipelinePublicationModeTest.java
+
+    package it.alterlega.recordsnext.app;
+
+    import it.alterlega.recordsnext.app.output.SeasonPublicationTargetRepository;
+    import org.junit.jupiter.api.Test;
+
+    import java.nio.file.Path;
+    import java.util.List;
+
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+
+    class RecordsNextPipelinePublicationModeTest {
+
+        private static SeasonPublicationTargetRepository.Target target(String season) {
+            Path root = Path.of("C:/test/" + season);
+            return new SeasonPublicationTargetRepository.Target(
+                    season,
+                    Integer.parseInt(season.substring(0, 4)),
+                    root,
+                    root.resolve("js"),
+                    true
+            );
+        }
+
+        @Test
+        void currentSiteModeSelectsOnlyCurrentSeasonTarget() {
+            List<SeasonPublicationTargetRepository.Target> targets = List.of(
+                    target("2024_2025"),
+                    target("2025_2026"),
+                    target("2026_2027")
+            );
+
+            var selected = RecordsNextPipeline.selectPublicationTargets(
+                    targets,
+                    "2025_2026",
+                    RecordsNextPipeline.PublicationMode.CURRENT_SITE
+            );
+
+            assertEquals(
+                    List.of("2025_2026"),
+                    selected.stream()
+                            .map(SeasonPublicationTargetRepository.Target::seasonId)
+                            .toList()
+            );
+        }
+
+        @Test
+        void allSitesModeSelectsEveryConfiguredTarget() {
+            List<SeasonPublicationTargetRepository.Target> targets = List.of(
+                    target("2024_2025"),
+                    target("2025_2026"),
+                    target("2026_2027")
+            );
+
+            var selected = RecordsNextPipeline.selectPublicationTargets(
+                    targets,
+                    "2026_2027",
+                    RecordsNextPipeline.PublicationMode.ALL_CONFIGURED_SITES
+            );
+
+            assertEquals(3, selected.size());
+        }
+    }
+
+## src\test\java\it\alterlega\recordsnext\app\RecordsNextPipelineSeasonScopeTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\RecordsNextPipelineSeasonScopeTest.java
+
+    package it.alterlega.recordsnext.app;
+
+    import org.junit.jupiter.api.Test;
+
+    import java.util.List;
+
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+
+    class RecordsNextPipelineSeasonScopeTest {
+
+        @Test
+        void seasonsUpToTargetExcludesFutureSeasons() {
+            List<String> selected = List.of(
+                    "2026_2027",
+                    "2025_2026",
+                    "2024_2025",
+                    "2023_2024"
+            );
+
+            List<String> scoped = selected.stream()
+                    .filter(season -> season.compareTo("2024_2025") <= 0)
+                    .toList();
+
+            assertEquals(
+                    List.of("2024_2025", "2023_2024"),
+                    scoped
+            );
+        }
     }
 
 ## src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
@@ -28710,123 +30164,6 @@ File: config\teams.json
       ]
     }
 
-## tools\Aggiorna-RecordsNext-2.1.ps1
-
-File: tools\Aggiorna-RecordsNext-2.1.ps1
-
-    param(
-        [string]$InstallDir = ""
-    )
-
-    $ErrorActionPreference = "Stop"
-
-    Write-Host ""
-    Write-Host "========================================="
-    Write-Host " RecordsNext 2.0 -> 2.1"
-    Write-Host "========================================="
-    Write-Host ""
-
-    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-    $payload = Join-Path $scriptDir "payload"
-
-    if ([string]::IsNullOrWhiteSpace($InstallDir)) {
-        $candidates = @(
-            "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext2",
-            "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext-2.0.0",
-            "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext"
-        )
-
-        $InstallDir = $candidates |
-            Where-Object {
-                Test-Path (Join-Path $_ "RecordsNext.jar")
-            } |
-            Select-Object -First 1
-    }
-
-    if ([string]::IsNullOrWhiteSpace($InstallDir)) {
-        Write-Host "Installazione RecordsNext non trovata automaticamente."
-        Write-Host ""
-        $InstallDir = Read-Host "Inserisci il percorso della cartella RecordsNext 2.0"
-    }
-
-    $InstallDir = [IO.Path]::GetFullPath($InstallDir)
-
-    if (-not (Test-Path (Join-Path $InstallDir "RecordsNext.jar"))) {
-        throw "RecordsNext.jar non trovato in: $InstallDir"
-    }
-
-    if (-not (Test-Path (Join-Path $payload "RecordsNext.jar"))) {
-        throw "Payload non valido: RecordsNext.jar mancante."
-    }
-
-    $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-    $backupDir = Join-Path $InstallDir ("backup_update_2.0_to_2.1_" + $timestamp)
-
-    Write-Host "Installazione: $InstallDir"
-    Write-Host "Backup       : $backupDir"
-    Write-Host ""
-
-    New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
-
-    # Backup del vecchio programma.
-    Copy-Item `
-        (Join-Path $InstallDir "RecordsNext.jar") `
-        $backupDir `
-        -Force
-
-    if (Test-Path (Join-Path $InstallDir "RecordsNext.bat")) {
-        Copy-Item `
-            (Join-Path $InstallDir "RecordsNext.bat") `
-            $backupDir `
-            -Force
-    }
-
-    # Backup dei dati NON rigenerabili.
-    if (Test-Path (Join-Path $InstallDir "config")) {
-        Copy-Item `
-            (Join-Path $InstallDir "config") `
-            $backupDir `
-            -Recurse `
-            -Force
-    }
-
-    $db = Join-Path $InstallDir "data\database\recordsnext.db"
-
-    if (Test-Path $db) {
-        $dbBackup = Join-Path $backupDir "data\database"
-        New-Item -ItemType Directory -Path $dbBackup -Force | Out-Null
-        Copy-Item $db $dbBackup -Force
-    }
-
-    Write-Host "Backup completato."
-    Write-Host ""
-
-    # Aggiornamento applicazione.
-    Copy-Item `
-        (Join-Path $payload "RecordsNext.jar") `
-        (Join-Path $InstallDir "RecordsNext.jar") `
-        -Force
-
-    if (Test-Path (Join-Path $payload "RecordsNext.bat")) {
-        Copy-Item `
-            (Join-Path $payload "RecordsNext.bat") `
-            (Join-Path $InstallDir "RecordsNext.bat") `
-            -Force
-    }
-
-    Write-Host "RecordsNext aggiornato alla versione 2.1."
-    Write-Host ""
-    Write-Host "NON sono stati modificati:"
-    Write-Host "  config\"
-    Write-Host "  data\"
-    Write-Host "  associazioni storiche"
-    Write-Host "  configurazione delle stagioni"
-    Write-Host ""
-    Write-Host "Backup disponibile in:"
-    Write-Host "  $backupDir"
-    Write-Host ""
-    Write-Host "Aggiornamento completato."
-
 ## tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
 
 File: tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
@@ -29057,618 +30394,352 @@ File: tools\Audit-RecordsNext2Js.js
     fs.writeFileSync(path.join(outDir,'RecordsNext2_JS_AUDIT.md'),md,'utf8');
     console.log(JSON.stringify({files:rows.length,expectedSeasons:expectedSeasons.length,output:outDir},null,2));
 
-## tools\Build_RecordsNext2_Release_v2.ps1
+## tools\Build_RecordsNext2_Release_v4.ps1
 
-File: tools\Build_RecordsNext2_Release_v2.ps1
+File: tools\Build_RecordsNext2_Release_v4.ps1
 
     param(
         [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
-        [string]$ReleaseVersion = "2.0.0",
+        [string]$ReleaseVersion = "3.1.0",
         [string]$DownloadsDir = "D:\DEV_APPS\downloads",
-        [string]$UCanAccessRoot = "D:\DEV_APPS\RecordsNext\tools\ucanaccess\2.0.9.5\UCanAccess-2.0.9.5-bin"
+        [string]$UCanAccessRoot = ""
     )
 
     $ErrorActionPreference = "Stop"
+    Set-StrictMode -Version Latest
 
-    $releaseName = "RecordsNext_$ReleaseVersion"
-    $distRoot = Join-Path $ProjectRoot "dist"
-    $releaseDir = Join-Path $distRoot $releaseName
+    if ([string]::IsNullOrWhiteSpace($UCanAccessRoot)) {
+        $maintainerRuntime = "E:\FCM\plugin\Mauz_strom2026\RecordsNext\runtime\ucanaccess"
+        if (Test-Path -LiteralPath (Join-Path $maintainerRuntime "ucanaccess-2.0.9.5.jar")) {
+            $UCanAccessRoot = $maintainerRuntime
+        }
+        else {
+            throw "Specificare -UCanAccessRoot con la cartella runtime\ucanaccess di una installazione RecordsNext valida."
+        }
+    }
+
+    $releaseName = "RecordsNext_${ReleaseVersion}_FULL"
+    $releaseDir = Join-Path $ProjectRoot ("release\" + $releaseName)
+    $payloadDir = Join-Path $releaseDir "payload"
     $zipPath = Join-Path $DownloadsDir ($releaseName + ".zip")
     $shaPath = Join-Path $DownloadsDir ($releaseName + "_SHA256.txt")
 
-    Write-Host ""
-    Write-Host "=== RecordsNext $ReleaseVersion - Build Release ==="
-    Write-Host "ProjectRoot    : $ProjectRoot"
-    Write-Host "ReleaseDir     : $releaseDir"
-    Write-Host "Zip            : $zipPath"
-    Write-Host ""
-
-    # 1. Verifiche preliminari
     $requiredFiles = @(
-        (Join-Path $ProjectRoot "target\RecordsNext.jar"),
-        (Join-Path $ProjectRoot "RecordsNext.bat"),
-        (Join-Path $ProjectRoot "README.md"),
-        (Join-Path $ProjectRoot "INSTALL.txt"),
-        (Join-Path $ProjectRoot "CHANGELOG.md"),
-        (Join-Path $ProjectRoot "config\competitions.json"),
-        (Join-Path $ProjectRoot "config\teams.json"),
-        (Join-Path $ProjectRoot "config\culometro.json"),
-        (Join-Path $ProjectRoot "config\manifest.example.json"),
-        (Join-Path $ProjectRoot "release\visualizzatori\recordsnext.html"),
-        (Join-Path $ProjectRoot "release\visualizzatori\js\fcmRecordsNextFunzioni_common.js"),
-        (Join-Path $ProjectRoot "release\visualizzatori\js\fcmRecordsNextFunzioni_viewer.js"),
-        (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md"),
-        (Join-Path $ProjectRoot "docs\CULOMETRO.md"),
-        (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1"),
-        (Join-Path $UCanAccessRoot "ucanaccess-2.0.9.5.jar")
+        "target\RecordsNext.jar",
+        "RecordsNext.bat",
+        "README.md",
+        "INSTALL.txt",
+        "CHANGELOG.md",
+        "tools\Installa-RecordsNext-3.1.ps1",
+        "tools\INSTALLA_RECORDSNEXT.bat",
+        "config\competitions.json",
+        "config\teams.json",
+        "config\culometro.json",
+        "config\manifest.example.json",
+        "release\visualizzatori\recordsnext.html",
+        "release\visualizzatori\js\fcmRecordsNextFunzioni_common.js",
+        "release\visualizzatori\js\fcmRecordsNextFunzioni_viewer.js",
+        "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md",
+        "docs\CULOMETRO.md",
+        "tools\Install-RecordsNextVisualizzatori_v2.ps1"
     )
 
-    foreach ($file in $requiredFiles) {
+    foreach ($relative in $requiredFiles) {
+        $file = Join-Path $ProjectRoot $relative
         if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
             throw "File richiesto mancante: $file"
         }
     }
 
-    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "docs\screenshots") -PathType Container)) {
-        throw "Cartella screenshots mancante: $(Join-Path $ProjectRoot 'docs\screenshots')"
+    if (-not (Test-Path -LiteralPath (Join-Path $UCanAccessRoot "ucanaccess-2.0.9.5.jar"))) {
+        throw "Runtime UCanAccess non trovato: $UCanAccessRoot"
     }
 
-    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "release\visualizzatori\RecordsNext") -PathType Container)) {
-        throw "Cartella visualizzatori RecordsNext mancante."
-    }
-
-    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "release\visualizzatori\profiles") -PathType Container)) {
-        throw "Cartella profili visualizzatori mancante."
-    }
-
-    # 2. Pulizia staging
     Remove-Item -LiteralPath $releaseDir -Recurse -Force -ErrorAction SilentlyContinue
-    New-Item -ItemType Directory -Path $releaseDir -Force | Out-Null
-
-    # 3. File principali
-    Copy-Item (Join-Path $ProjectRoot "target\RecordsNext.jar") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "RecordsNext.bat") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "README.md") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "INSTALL.txt") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "CHANGELOG.md") $releaseDir -Force
-
-    # 4. Runtime UCanAccess completo
-    $runtimeUcan = Join-Path $releaseDir "runtime\ucanaccess"
-    New-Item -ItemType Directory -Path $runtimeUcan -Force | Out-Null
-    Copy-Item (Join-Path $UCanAccessRoot "*") $runtimeUcan -Recurse -Force
-
-    Remove-Item (Join-Path $runtimeUcan "console.bat") -Force -ErrorAction SilentlyContinue
-    Remove-Item (Join-Path $runtimeUcan "console.sh") -Force -ErrorAction SilentlyContinue
-
-    # 5. Config neutra
-    $configDir = Join-Path $releaseDir "config"
-    New-Item -ItemType Directory -Path $configDir -Force | Out-Null
-
-    $neutralConfig = @(
-        "competitions.json",
-        "teams.json",
-        "culometro.json",
-        "manifest.example.json"
-    )
-
-    foreach ($name in $neutralConfig) {
-        Copy-Item (Join-Path $ProjectRoot ("config\" + $name)) $configDir -Force
-    }
-
-    # NON distribuire configurazioni/dati personali
-    $forbiddenConfig = @(
-        "league.json",
-        "seasons.json",
-        "recordsnext-gui.properties",
-        "processing.json"
-    )
-
-    foreach ($name in $forbiddenConfig) {
-        Remove-Item (Join-Path $configDir $name) -Force -ErrorAction SilentlyContinue
-    }
-
-    # 6. Visualizzatori statici
-    $visSrc = Join-Path $ProjectRoot "release\visualizzatori"
-    $visDst = Join-Path $releaseDir "visualizzatori"
-
-    New-Item -ItemType Directory -Path $visDst -Force | Out-Null
-    Copy-Item (Join-Path $visSrc "recordsnext.html") $visDst -Force
-    Copy-Item (Join-Path $visSrc "RecordsNext") $visDst -Recurse -Force
-    Copy-Item (Join-Path $visSrc "profiles") $visDst -Recurse -Force
-
-    $visJsDst = Join-Path $visDst "js"
-    New-Item -ItemType Directory -Path $visJsDst -Force | Out-Null
-    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_common.js") $visJsDst -Force
-    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_viewer.js") $visJsDst -Force
-
-    # Sicurezza: nessun JS dati della lega / nessun backup
-    Get-ChildItem $visJsDst -File -ErrorAction SilentlyContinue |
-        Where-Object {
-            $_.Name -like "fcmRecordsNext_Core.js" -or
-            $_.Name -like "fcmRecordsNext_Manifest.js" -or
-            $_.Name -like "fcmRecordsNext_Classics.js" -or
-            $_.Name -like "fcmRecordsNext_Series.js" -or
-            $_.Name -like "fcmRecordsNext_RU.js" -or
-            $_.Name -like "fcmRecordsNext_Modifiers.js" -or
-            $_.Name -like "fcmRecordsNext_ThresholdsLuck.js" -or
-            $_.Name -like "fcmRecordsNext_Culometro.js" -or
-            $_.Name -like "*BACKUP*"
-        } |
-        Remove-Item -Force
-
-    # 7. Documentazione
-    $docsDst = Join-Path $releaseDir "docs"
-    New-Item -ItemType Directory -Path $docsDst -Force | Out-Null
-
-    Copy-Item `
-        (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md") `
-        $docsDst `
-        -Force
-
-    Copy-Item `
-        (Join-Path $ProjectRoot "docs\CULOMETRO.md") `
-        $docsDst `
-        -Force
-
-    Copy-Item `
-        (Join-Path $ProjectRoot "docs\screenshots") `
-        $docsDst `
-        -Recurse `
-        -Force
-
-    # 8. Tool utente finale
-    $toolsDst = Join-Path $releaseDir "tools"
-    New-Item -ItemType Directory -Path $toolsDst -Force | Out-Null
-
-    Copy-Item `
-        (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1") `
-        (Join-Path $toolsDst "Install_RecordsNextVisualizzatori.ps1") `
-        -Force
-
-    # 9. Controllo file vietati
-    $forbiddenPatterns = @(
-        "*BACKUP*",
-        "*.fcm",
-        "*.fca",
-        "recordsnext.db",
-        "recordsnext-gui.properties",
-        "league.json",
-        "seasons.json",
-        "processing.json",
-        "fcmRecordsNext_Core.js",
-        "fcmRecordsNext_Manifest.js",
-        "fcmRecordsNext_Classics.js",
-        "fcmRecordsNext_Series.js",
-        "fcmRecordsNext_RU.js",
-        "fcmRecordsNext_Modifiers.js",
-        "fcmRecordsNext_ThresholdsLuck.js",
-        "fcmRecordsNext_Culometro.js"
-    )
-
-    $bad = @()
-    foreach ($pattern in $forbiddenPatterns) {
-        $bad += Get-ChildItem $releaseDir -Recurse -File -Filter $pattern -ErrorAction SilentlyContinue
-    }
-
-    $bad = $bad | Sort-Object FullName -Unique
-
-    if ($bad.Count -gt 0) {
-        Write-Host ""
-        Write-Host "ERRORE: file vietati trovati nella release:"
-        $bad | ForEach-Object { Write-Host $_.FullName }
-        throw "Release non pulita."
-    }
-
-    # 10. Elenco contenuto
-    Write-Host ""
-    Write-Host "=== CONTENUTO RELEASE ==="
-    Get-ChildItem $releaseDir -Recurse -File |
-        Sort-Object FullName |
-        ForEach-Object {
-            $_.FullName.Substring($releaseDir.Length + 1)
-        }
-
-    # 11. ZIP finale
-    New-Item -ItemType Directory -Path $DownloadsDir -Force | Out-Null
-    Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $shaPath -Force -ErrorAction SilentlyContinue
-
-    Compress-Archive `
-        -Path $releaseDir `
-        -DestinationPath $zipPath `
-        -CompressionLevel Optimal `
-        -Force
-
-    $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
-    Set-Content `
-        -LiteralPath $shaPath `
-        -Value ("SHA256  " + $hash + "  " + [IO.Path]::GetFileName($zipPath)) `
-        -Encoding ASCII
-
-    Write-Host ""
-    Write-Host "=== RELEASE CREATA ==="
-    Write-Host "ZIP    : $zipPath"
-    Write-Host "SHA256 : $hash"
-    Write-Host "SHA file: $shaPath"
-    Write-Host ""
-    Write-Host "NON pubblicare ancora: eseguire prima il test pulito dalla cartella dist."
-
-## tools\Build_RecordsNext2_Release_v3.ps1
-
-File: tools\Build_RecordsNext2_Release_v3.ps1
-
-    param(
-        [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
-        [string]$ReleaseVersion = "2.1.0",
-        [string]$DownloadsDir = "D:\DEV_APPS\downloads",
-        [string]$UCanAccessRoot = "D:\DEV_APPS\RecordsNext\tools\ucanaccess\2.0.9.5\UCanAccess-2.0.9.5-bin"
-    )
-
-    $ErrorActionPreference = "Stop"
-
-    $releaseName = "RecordsNext_$ReleaseVersion"
-    $distRoot = Join-Path $ProjectRoot "dist"
-    $releaseDir = Join-Path $distRoot $releaseName
-    $zipPath = Join-Path $DownloadsDir ($releaseName + ".zip")
-    $shaPath = Join-Path $DownloadsDir ($releaseName + "_SHA256.txt")
-
-    Write-Host ""
-    Write-Host "=== RecordsNext $ReleaseVersion - Build Release ==="
-    Write-Host "ProjectRoot    : $ProjectRoot"
-    Write-Host "ReleaseDir     : $releaseDir"
-    Write-Host "Zip            : $zipPath"
-    Write-Host ""
-
-    # 1. Verifiche preliminari
-    $requiredFiles = @(
-        (Join-Path $ProjectRoot "target\RecordsNext.jar"),
-        (Join-Path $ProjectRoot "RecordsNext.bat"),
-        (Join-Path $ProjectRoot "README.md"),
-        (Join-Path $ProjectRoot "INSTALL.txt"),
-        (Join-Path $ProjectRoot "CHANGELOG.md"),
-        (Join-Path $ProjectRoot "config\competitions.json"),
-        (Join-Path $ProjectRoot "config\teams.json"),
-        (Join-Path $ProjectRoot "config\culometro.json"),
-        (Join-Path $ProjectRoot "config\manifest.example.json"),
-        (Join-Path $ProjectRoot "release\visualizzatori\recordsnext.html"),
-        (Join-Path $ProjectRoot "release\visualizzatori\js\fcmRecordsNextFunzioni_common.js"),
-        (Join-Path $ProjectRoot "release\visualizzatori\js\fcmRecordsNextFunzioni_viewer.js"),
-        (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md"),
-        (Join-Path $ProjectRoot "docs\CULOMETRO.md"),
-        (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1"),
-        (Join-Path $UCanAccessRoot "ucanaccess-2.0.9.5.jar")
-    )
-
-    foreach ($file in $requiredFiles) {
-        if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
-            throw "File richiesto mancante: $file"
-        }
-    }
-
-    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "docs\screenshots") -PathType Container)) {
-        throw "Cartella screenshots mancante: $(Join-Path $ProjectRoot 'docs\screenshots')"
-    }
-
-    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "release\visualizzatori\RecordsNext") -PathType Container)) {
-        throw "Cartella visualizzatori RecordsNext mancante."
-    }
-
-    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot "release\visualizzatori\profiles") -PathType Container)) {
-        throw "Cartella profili visualizzatori mancante."
-    }
-
-    # 2. Pulizia staging
-    Remove-Item -LiteralPath $releaseDir -Recurse -Force -ErrorAction SilentlyContinue
-    New-Item -ItemType Directory -Path $releaseDir -Force | Out-Null
-
-    # 3. File principali
-    Copy-Item (Join-Path $ProjectRoot "target\RecordsNext.jar") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "RecordsNext.bat") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "README.md") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "INSTALL.txt") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "CHANGELOG.md") $releaseDir -Force
-
-    # 4. Runtime UCanAccess completo
-    $runtimeUcan = Join-Path $releaseDir "runtime\ucanaccess"
-    New-Item -ItemType Directory -Path $runtimeUcan -Force | Out-Null
-    Copy-Item (Join-Path $UCanAccessRoot "*") $runtimeUcan -Recurse -Force
-
-    Remove-Item (Join-Path $runtimeUcan "console.bat") -Force -ErrorAction SilentlyContinue
-    Remove-Item (Join-Path $runtimeUcan "console.sh") -Force -ErrorAction SilentlyContinue
-
-    # 5. Config neutra
-    $configDir = Join-Path $releaseDir "config"
-    New-Item -ItemType Directory -Path $configDir -Force | Out-Null
-
-    $neutralConfig = @(
-        "competitions.json",
-        "teams.json",
-        "culometro.json",
-        "manifest.example.json"
-    )
-
-    foreach ($name in $neutralConfig) {
-        Copy-Item (Join-Path $ProjectRoot ("config\" + $name)) $configDir -Force
-    }
-
-    # NON distribuire configurazioni/dati personali
-    $forbiddenConfig = @(
-        "league.json",
-        "seasons.json",
-        "recordsnext-gui.properties",
-        "processing.json"
-    )
-
-    foreach ($name in $forbiddenConfig) {
-        Remove-Item (Join-Path $configDir $name) -Force -ErrorAction SilentlyContinue
-    }
-
-    # 6. Visualizzatori statici
-    $visSrc = Join-Path $ProjectRoot "release\visualizzatori"
-    $visDst = Join-Path $releaseDir "visualizzatori"
-
-    New-Item -ItemType Directory -Path $visDst -Force | Out-Null
-    Copy-Item (Join-Path $visSrc "recordsnext.html") $visDst -Force
-    Copy-Item (Join-Path $visSrc "RecordsNext") $visDst -Recurse -Force
-    Copy-Item (Join-Path $visSrc "profiles") $visDst -Recurse -Force
-
-    $visJsDst = Join-Path $visDst "js"
-    New-Item -ItemType Directory -Path $visJsDst -Force | Out-Null
-    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_common.js") $visJsDst -Force
-    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_viewer.js") $visJsDst -Force
-
-    # Sicurezza: nessun JS dati della lega / nessun backup
-    Get-ChildItem $visJsDst -File -ErrorAction SilentlyContinue |
-        Where-Object {
-            $_.Name -like "fcmRecordsNext_Core.js" -or
-            $_.Name -like "fcmRecordsNext_Manifest.js" -or
-            $_.Name -like "fcmRecordsNext_Classics.js" -or
-            $_.Name -like "fcmRecordsNext_Series.js" -or
-            $_.Name -like "fcmRecordsNext_RU.js" -or
-            $_.Name -like "fcmRecordsNext_Modifiers.js" -or
-            $_.Name -like "fcmRecordsNext_ThresholdsLuck.js" -or
-            $_.Name -like "fcmRecordsNext_Culometro.js" -or
-            $_.Name -like "fcmRecordsNext_Matches.js" -or
-            $_.Name -like "*BACKUP*"
-        } |
-        Remove-Item -Force
-
-    # 7. Documentazione
-    $docsDst = Join-Path $releaseDir "docs"
-    New-Item -ItemType Directory -Path $docsDst -Force | Out-Null
-
-    Copy-Item `
-        (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md") `
-        $docsDst `
-        -Force
-
-    Copy-Item `
-        (Join-Path $ProjectRoot "docs\CULOMETRO.md") `
-        $docsDst `
-        -Force
-
-    Copy-Item `
-        (Join-Path $ProjectRoot "docs\screenshots") `
-        $docsDst `
-        -Recurse `
-        -Force
-
-    # 8. Tool utente finale
-    $toolsDst = Join-Path $releaseDir "tools"
-    New-Item -ItemType Directory -Path $toolsDst -Force | Out-Null
-
-    Copy-Item `
-        (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1") `
-        (Join-Path $toolsDst "Install_RecordsNextVisualizzatori.ps1") `
-        -Force
-
-    # 9. Controllo file vietati
-    $forbiddenPatterns = @(
-        "*BACKUP*",
-        "*.fcm",
-        "*.fca",
-        "recordsnext.db",
-        "recordsnext-gui.properties",
-        "league.json",
-        "seasons.json",
-        "processing.json",
-        "fcmRecordsNext_Core.js",
-        "fcmRecordsNext_Manifest.js",
-        "fcmRecordsNext_Classics.js",
-        "fcmRecordsNext_Series.js",
-        "fcmRecordsNext_RU.js",
-        "fcmRecordsNext_Modifiers.js",
-        "fcmRecordsNext_ThresholdsLuck.js",
-        "fcmRecordsNext_Culometro.js",
-        "fcmRecordsNext_Matches.js"
-    )
-
-    $bad = @()
-    foreach ($pattern in $forbiddenPatterns) {
-        $bad += Get-ChildItem $releaseDir -Recurse -File -Filter $pattern -ErrorAction SilentlyContinue
-    }
-
-    $bad = $bad | Sort-Object FullName -Unique
-
-    if ($bad.Count -gt 0) {
-        Write-Host ""
-        Write-Host "ERRORE: file vietati trovati nella release:"
-        $bad | ForEach-Object { Write-Host $_.FullName }
-        throw "Release non pulita."
-    }
-
-    # 10. Elenco contenuto
-    Write-Host ""
-    Write-Host "=== CONTENUTO RELEASE ==="
-    Get-ChildItem $releaseDir -Recurse -File |
-        Sort-Object FullName |
-        ForEach-Object {
-            $_.FullName.Substring($releaseDir.Length + 1)
-        }
-
-    # 11. ZIP finale
-    New-Item -ItemType Directory -Path $DownloadsDir -Force | Out-Null
-    Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $shaPath -Force -ErrorAction SilentlyContinue
-
-    Compress-Archive `
-        -Path $releaseDir `
-        -DestinationPath $zipPath `
-        -CompressionLevel Optimal `
-        -Force
-
-    $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
-    Set-Content `
-        -LiteralPath $shaPath `
-        -Value ("SHA256  " + $hash + "  " + [IO.Path]::GetFileName($zipPath)) `
-        -Encoding ASCII
-
-    Write-Host ""
-    Write-Host "=== RELEASE CREATA ==="
-    Write-Host "ZIP    : $zipPath"
-    Write-Host "SHA256 : $hash"
-    Write-Host "SHA file: $shaPath"
-    Write-Host ""
-    Write-Host "NON pubblicare ancora: eseguire prima il test pulito dalla cartella dist."
-
-## tools\Build_RecordsNext2_Update_v1.ps1
-
-File: tools\Build_RecordsNext2_Update_v1.ps1
-
-    param(
-        [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
-        [string]$ReleaseVersion = "2.1.0",
-        [string]$DownloadsDir = "D:\DEV_APPS\downloads"
-    )
-
-    $ErrorActionPreference = "Stop"
-
-    $updateName = "RecordsNext_${ReleaseVersion}_UPDATE"
-    $distRoot = Join-Path $ProjectRoot "dist"
-    $updateDir = Join-Path $distRoot $updateName
-    $payloadDir = Join-Path $updateDir "payload"
-
-    $zipPath = Join-Path $DownloadsDir ($updateName + ".zip")
-    $shaPath = Join-Path $DownloadsDir ($updateName + "_SHA256.txt")
-
-    Write-Host ""
-    Write-Host "=== RecordsNext $ReleaseVersion - Build UPDATE ==="
-    Write-Host ""
-
-    $required = @(
-        (Join-Path $ProjectRoot "target\RecordsNext.jar"),
-        (Join-Path $ProjectRoot "RecordsNext.bat"),
-        (Join-Path $ProjectRoot "tools\Aggiorna-RecordsNext-2.1.ps1"),
-        (Join-Path $ProjectRoot "tools\Aggiorna-RecordsNext-2.1.bat")
-    )
-
-    foreach ($file in $required) {
-        if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
-            throw "File richiesto mancante: $file"
-        }
-    }
-
-    Remove-Item -LiteralPath $updateDir -Recurse -Force -ErrorAction SilentlyContinue
-
     New-Item -ItemType Directory -Path $payloadDir -Force | Out-Null
 
-    Copy-Item `
-        (Join-Path $ProjectRoot "target\RecordsNext.jar") `
-        $payloadDir `
-        -Force
+    Copy-Item (Join-Path $ProjectRoot "tools\Installa-RecordsNext-3.1.ps1") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "tools\INSTALLA_RECORDSNEXT.bat") $releaseDir -Force
 
-    Copy-Item `
-        (Join-Path $ProjectRoot "RecordsNext.bat") `
-        $payloadDir `
-        -Force
+    $readmeInstaller = @"
+    RecordsNext $ReleaseVersion - INSTALLAZIONE
 
-    Copy-Item `
-        (Join-Path $ProjectRoot "tools\Aggiorna-RecordsNext-2.1.ps1") `
-        (Join-Path $updateDir "Aggiorna-RecordsNext-2.1.ps1") `
-        -Force
+    1. Estrarre completamente lo ZIP.
+    2. Eseguire INSTALLA_RECORDSNEXT.bat.
+    3. Indicare la cartella di installazione quando richiesto.
+    4. L'installer verifica Java 21+, runtime e integrita minima del payload.
 
-    Copy-Item `
-        (Join-Path $ProjectRoot "tools\Aggiorna-RecordsNext-2.1.bat") `
-        (Join-Path $updateDir "Aggiorna-RecordsNext-2.1.bat") `
-        -Force
-
-    $readme = @"
-    RecordsNext $ReleaseVersion - AGGIORNAMENTO DA 2.0
-
-    1. Chiudere RecordsNext.
-    2. Estrarre completamente questa cartella.
-    3. Eseguire Aggiorna-RecordsNext-2.1.bat.
-    4. Se l'installazione non viene trovata automaticamente,
-       indicare la cartella della propria installazione RecordsNext 2.0.
-
-    L'aggiornamento sostituisce soltanto il programma.
-
-    NON vengono cancellati o sostituiti:
-    - configurazione della lega;
-    - stagioni configurate;
-    - associazioni storiche;
-    - database RecordsNext;
-    - dati e archivi esistenti.
-
-    Prima della sostituzione viene creato automaticamente un backup
-    del programma precedente, della configurazione e del database.
+    L'installazione NON pubblica file nei siti FCM.
+    L'installazione NON contiene database, FCM/FCA o configurazioni personali.
     "@
-
     [IO.File]::WriteAllText(
-        (Join-Path $updateDir "LEGGIMI-AGGIORNAMENTO.txt"),
-        $readme,
+        (Join-Path $releaseDir "LEGGIMI.txt"),
+        $readmeInstaller,
         (New-Object System.Text.UTF8Encoding($false))
     )
 
-    # Sicurezza assoluta: nell'UPDATE non devono esistere dati/config utente.
-    $forbidden = Get-ChildItem $updateDir -Recurse -File |
-        Where-Object {
-            $_.Name -eq "recordsnext.db" -or
-            $_.Name -eq "league.json" -or
-            $_.Name -eq "seasons.json" -or
-            $_.Name -eq "recordsnext-gui.properties" -or
-            $_.Name -eq "processing.json" -or
-            $_.FullName -match '\\data\\' -or
-            $_.FullName -match '\\config\\'
-        }
+    @("RecordsNext.bat","README.md","INSTALL.txt","CHANGELOG.md") | ForEach-Object {
+        Copy-Item (Join-Path $ProjectRoot $_) $payloadDir -Force
+    }
+    Copy-Item (Join-Path $ProjectRoot "target\RecordsNext.jar") $payloadDir -Force
 
-    if ($forbidden) {
-        Write-Host ""
-        Write-Host "ERRORE: file vietati trovati:"
-        $forbidden | ForEach-Object { Write-Host $_.FullName }
-        throw "UPDATE non sicuro."
+    $runtimeDst = Join-Path $payloadDir "runtime\ucanaccess"
+    New-Item -ItemType Directory -Path $runtimeDst -Force | Out-Null
+    Copy-Item (Join-Path $UCanAccessRoot "*") $runtimeDst -Recurse -Force
+    Remove-Item (Join-Path $runtimeDst "console.bat") -Force -ErrorAction SilentlyContinue
+    Remove-Item (Join-Path $runtimeDst "console.sh") -Force -ErrorAction SilentlyContinue
+
+    $configDst = Join-Path $payloadDir "config"
+    New-Item -ItemType Directory -Path $configDst -Force | Out-Null
+    @("competitions.json","teams.json","culometro.json","manifest.example.json") | ForEach-Object {
+        Copy-Item (Join-Path $ProjectRoot ("config\" + $_)) $configDst -Force
     }
 
-    Write-Host "=== CONTENUTO UPDATE ==="
+    $visSrc = Join-Path $ProjectRoot "release\visualizzatori"
+    $visDst = Join-Path $payloadDir "visualizzatori"
+    New-Item -ItemType Directory -Path $visDst -Force | Out-Null
+    Copy-Item (Join-Path $visSrc "recordsnext.html") $visDst -Force
+    Copy-Item (Join-Path $visSrc "RecordsNext") $visDst -Recurse -Force
+    Copy-Item (Join-Path $visSrc "profiles") $visDst -Recurse -Force
+    New-Item -ItemType Directory -Path (Join-Path $visDst "js") -Force | Out-Null
+    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_common.js") (Join-Path $visDst "js") -Force
+    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_viewer.js") (Join-Path $visDst "js") -Force
 
-    Get-ChildItem $updateDir -Recurse -File |
-        Sort-Object FullName |
-        ForEach-Object {
-            $_.FullName.Substring($updateDir.Length + 1)
-        }
+    $docsDst = Join-Path $payloadDir "docs"
+    New-Item -ItemType Directory -Path $docsDst -Force | Out-Null
+    Copy-Item (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md") $docsDst -Force
+    Copy-Item (Join-Path $ProjectRoot "docs\CULOMETRO.md") $docsDst -Force
+    if (Test-Path -LiteralPath (Join-Path $ProjectRoot "docs\screenshots")) {
+        Copy-Item (Join-Path $ProjectRoot "docs\screenshots") $docsDst -Recurse -Force
+    }
+
+    $toolsDst = Join-Path $payloadDir "tools"
+    New-Item -ItemType Directory -Path $toolsDst -Force | Out-Null
+    Copy-Item (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1") `
+        (Join-Path $toolsDst "Install_RecordsNextVisualizzatori.ps1") -Force
+
+    $forbiddenNames = @(
+        "recordsnext.db",
+        "recordsnext-gui.properties",
+        "league.json",
+        "seasons.json",
+        "processing.json"
+    )
+
+    $bad = Get-ChildItem $releaseDir -Recurse -File | Where-Object {
+        $forbiddenNames -contains $_.Name -or
+        $_.Extension -in @(".fcm", ".fca") -or
+        $_.Name -like "fcmRecordsNext_Core.js" -or
+        $_.Name -like "fcmRecordsNext_Manifest.js" -or
+        $_.Name -like "fcmRecordsNext_Classics.js" -or
+        $_.Name -like "fcmRecordsNext_Series.js" -or
+        $_.Name -like "fcmRecordsNext_RU.js" -or
+        $_.Name -like "fcmRecordsNext_Modifiers.js" -or
+        $_.Name -like "fcmRecordsNext_ThresholdsLuck.js" -or
+        $_.Name -like "fcmRecordsNext_Culometro.js" -or
+        $_.Name -like "fcmRecordsNext_Matches.js"
+    }
+
+    if ($bad) {
+        $bad | ForEach-Object { Write-Host $_.FullName }
+        throw "Release FULL non pulita."
+    }
 
     New-Item -ItemType Directory -Path $DownloadsDir -Force | Out-Null
+    Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $shaPath -Force -ErrorAction SilentlyContinue
 
-    Remove-Item $zipPath -Force -ErrorAction SilentlyContinue
-    Remove-Item $shaPath -Force -ErrorAction SilentlyContinue
-
-    Compress-Archive `
-        -Path $updateDir `
-        -DestinationPath $zipPath `
-        -CompressionLevel Optimal `
-        -Force
-
-    $hash = (Get-FileHash $zipPath -Algorithm SHA256).Hash
-
-    Set-Content `
-        -LiteralPath $shaPath `
+    Compress-Archive -Path $releaseDir -DestinationPath $zipPath -CompressionLevel Optimal -Force
+    $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
+    Set-Content -LiteralPath $shaPath `
         -Value ("SHA256  " + $hash + "  " + [IO.Path]::GetFileName($zipPath)) `
         -Encoding ASCII
 
     Write-Host ""
-    Write-Host "=== UPDATE CREATO ==="
-    Write-Host "ZIP    : $zipPath"
-    Write-Host "SHA256 : $hash"
+    Write-Host "FULL 3.1 creato:"
+    Write-Host "  $zipPath"
+    Write-Host "SHA256:"
+    Write-Host "  $hash"
+
+## tools\Build_RecordsNext2_Release_v5.ps1
+
+File: tools\Build_RecordsNext2_Release_v5.ps1
+
+    param(
+        [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
+        [string]$ReleaseVersion = "3.1.0",
+        [string]$DownloadsDir = "D:\DEV_APPS\downloads",
+        [string]$UCanAccessRoot = ""
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-StrictMode -Version Latest
+
+    if ([string]::IsNullOrWhiteSpace($UCanAccessRoot)) {
+        throw "Specificare -UCanAccessRoot con la cartella runtime\ucanaccess di una installazione RecordsNext valida."
+    }
+
+    if ([string]::IsNullOrWhiteSpace($UCanAccessRoot)) {
+        $maintainerRuntime = "E:\FCM\plugin\Mauz_strom2026\RecordsNext\runtime\ucanaccess"
+        if (Test-Path -LiteralPath (Join-Path $maintainerRuntime "ucanaccess-2.0.9.5.jar")) {
+            $UCanAccessRoot = $maintainerRuntime
+        }
+        else {
+            throw "Specificare -UCanAccessRoot con la cartella runtime\ucanaccess di una installazione RecordsNext valida."
+        }
+    }
+
+    $releaseName = "RecordsNext_${ReleaseVersion}_FULL"
+    $releaseDir = Join-Path $ProjectRoot ("release\" + $releaseName)
+    $payloadDir = Join-Path $releaseDir "payload"
+    $zipPath = Join-Path $DownloadsDir ($releaseName + ".zip")
+    $shaPath = Join-Path $DownloadsDir ($releaseName + "_SHA256.txt")
+
+    $requiredFiles = @(
+        "target\RecordsNext.jar",
+        "RecordsNext.bat",
+        "README.md",
+        "INSTALL.txt",
+        "CHANGELOG.md",
+        "tools\Installa-RecordsNext-3.1.ps1",
+        "tools\INSTALLA_RECORDSNEXT.bat",
+        "config\competitions.json",
+        "config\teams.json",
+        "config\culometro.json",
+        "config\manifest.example.json",
+        "data\calendars\DataA-2026.js",
+        "release\visualizzatori\recordsnext.html",
+        "release\visualizzatori\js\fcmRecordsNextFunzioni_common.js",
+        "release\visualizzatori\js\fcmRecordsNextFunzioni_viewer.js",
+        "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md",
+        "docs\CULOMETRO.md",
+        "tools\Install-RecordsNextVisualizzatori_v2.ps1"
+    )
+
+    foreach ($relative in $requiredFiles) {
+        $file = Join-Path $ProjectRoot $relative
+        if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
+            throw "File richiesto mancante: $file"
+        }
+    }
+
+    if (-not (Test-Path -LiteralPath (Join-Path $UCanAccessRoot "ucanaccess-2.0.9.5.jar"))) {
+        throw "Runtime UCanAccess non trovato: $UCanAccessRoot"
+    }
+
+    Remove-Item -LiteralPath $releaseDir -Recurse -Force -ErrorAction SilentlyContinue
+    New-Item -ItemType Directory -Path $payloadDir -Force | Out-Null
+
+    Copy-Item (Join-Path $ProjectRoot "tools\Installa-RecordsNext-3.1.ps1") $releaseDir -Force
+    Copy-Item (Join-Path $ProjectRoot "tools\INSTALLA_RECORDSNEXT.bat") $releaseDir -Force
+
+    $readmeInstaller = @"
+    RecordsNext $ReleaseVersion - INSTALLAZIONE
+
+    1. Estrarre completamente lo ZIP.
+    2. Eseguire INSTALLA_RECORDSNEXT.bat.
+    3. Indicare la cartella di installazione quando richiesto.
+    4. L'installer verifica Java 21+, runtime e integrita minima del payload.
+
+    L'installazione NON pubblica file nei siti FCM.
+    L'installazione NON contiene database, FCM/FCA o configurazioni personali.
+    "@
+    [IO.File]::WriteAllText(
+        (Join-Path $releaseDir "LEGGIMI.txt"),
+        $readmeInstaller,
+        (New-Object System.Text.UTF8Encoding($false))
+    )
+
+    @("RecordsNext.bat","README.md","INSTALL.txt","CHANGELOG.md") | ForEach-Object {
+        Copy-Item (Join-Path $ProjectRoot $_) $payloadDir -Force
+    }
+    Copy-Item (Join-Path $ProjectRoot "target\RecordsNext.jar") $payloadDir -Force
+
+    $runtimeDst = Join-Path $payloadDir "runtime\ucanaccess"
+    New-Item -ItemType Directory -Path $runtimeDst -Force | Out-Null
+    Copy-Item (Join-Path $UCanAccessRoot "*") $runtimeDst -Recurse -Force
+    Remove-Item (Join-Path $runtimeDst "console.bat") -Force -ErrorAction SilentlyContinue
+    Remove-Item (Join-Path $runtimeDst "console.sh") -Force -ErrorAction SilentlyContinue
+
+    $configDst = Join-Path $payloadDir "config"
+    New-Item -ItemType Directory -Path $configDst -Force | Out-Null
+    @("competitions.json","teams.json","culometro.json","manifest.example.json") | ForEach-Object {
+        Copy-Item (Join-Path $ProjectRoot ("config\" + $_)) $configDst -Force
+    }
+
+    # Archivio calendari canonici
+    $calendarSrc = Join-Path $ProjectRoot "data\calendars"
+    $calendarDst = Join-Path $payloadDir "data\calendars"
+    New-Item -ItemType Directory -Path $calendarDst -Force | Out-Null
+    Get-ChildItem -LiteralPath $calendarSrc -File -Filter "DataA-*.js" | ForEach-Object {
+        Copy-Item -LiteralPath $_.FullName -Destination $calendarDst -Force
+    }
+
+    $visSrc = Join-Path $ProjectRoot "release\visualizzatori"
+    $visDst = Join-Path $payloadDir "visualizzatori"
+    New-Item -ItemType Directory -Path $visDst -Force | Out-Null
+    Copy-Item (Join-Path $visSrc "recordsnext.html") $visDst -Force
+    Copy-Item (Join-Path $visSrc "RecordsNext") $visDst -Recurse -Force
+    Copy-Item (Join-Path $visSrc "profiles") $visDst -Recurse -Force
+    New-Item -ItemType Directory -Path (Join-Path $visDst "js") -Force | Out-Null
+    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_common.js") (Join-Path $visDst "js") -Force
+    Copy-Item (Join-Path $visSrc "js\fcmRecordsNextFunzioni_viewer.js") (Join-Path $visDst "js") -Force
+
+    $docsDst = Join-Path $payloadDir "docs"
+    New-Item -ItemType Directory -Path $docsDst -Force | Out-Null
+    Copy-Item (Join-Path $ProjectRoot "docs\INSTALLAZIONE_VISUALIZZATORI_HTML.md") $docsDst -Force
+    Copy-Item (Join-Path $ProjectRoot "docs\CULOMETRO.md") $docsDst -Force
+    if (Test-Path -LiteralPath (Join-Path $ProjectRoot "docs\screenshots")) {
+        Copy-Item (Join-Path $ProjectRoot "docs\screenshots") $docsDst -Recurse -Force
+    }
+
+    $toolsDst = Join-Path $payloadDir "tools"
+    New-Item -ItemType Directory -Path $toolsDst -Force | Out-Null
+    Copy-Item (Join-Path $ProjectRoot "tools\Install-RecordsNextVisualizzatori_v2.ps1") `
+        (Join-Path $toolsDst "Install_RecordsNextVisualizzatori.ps1") -Force
+
+    $forbiddenNames = @(
+        "recordsnext.db",
+        "recordsnext-gui.properties",
+        "league.json",
+        "seasons.json",
+        "processing.json"
+    )
+
+    $bad = Get-ChildItem $releaseDir -Recurse -File | Where-Object {
+        $forbiddenNames -contains $_.Name -or
+        $_.Extension -in @(".fcm", ".fca") -or
+        $_.Name -like "fcmRecordsNext_Core.js" -or
+        $_.Name -like "fcmRecordsNext_Manifest.js" -or
+        $_.Name -like "fcmRecordsNext_Classics.js" -or
+        $_.Name -like "fcmRecordsNext_Series.js" -or
+        $_.Name -like "fcmRecordsNext_RU.js" -or
+        $_.Name -like "fcmRecordsNext_Modifiers.js" -or
+        $_.Name -like "fcmRecordsNext_ThresholdsLuck.js" -or
+        $_.Name -like "fcmRecordsNext_Culometro.js" -or
+        $_.Name -like "fcmRecordsNext_Matches.js"
+    }
+
+    if ($bad) {
+        $bad | ForEach-Object { Write-Host $_.FullName }
+        throw "Release FULL non pulita."
+    }
+
+    New-Item -ItemType Directory -Path $DownloadsDir -Force | Out-Null
+    Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $shaPath -Force -ErrorAction SilentlyContinue
+
+    Compress-Archive -Path $releaseDir -DestinationPath $zipPath -CompressionLevel Optimal -Force
+    $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
+    Set-Content -LiteralPath $shaPath `
+        -Value ("SHA256  " + $hash + "  " + [IO.Path]::GetFileName($zipPath)) `
+        -Encoding ASCII
+
+    Write-Host ""
+    Write-Host "FULL 3.1 creato:"
+    Write-Host "  $zipPath"
+    Write-Host "SHA256:"
+    Write-Host "  $hash"
 
 ## tools\Create-RecordsNext2RealJsZip.ps1
 
@@ -29826,13 +30897,33 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     $Builder = New-Object System.Text.StringBuilder
     $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 
-    [void]$Builder.AppendLine("# Codice funzionante RecordsNext 2.1")
+    [void]$Builder.AppendLine("# Codice funzionante RecordsNext 3.1")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("> Documento generato automaticamente.")
     [void]$Builder.AppendLine("> Data generazione: " + $GeneratedAt)
     [void]$Builder.AppendLine("> Directory progetto: " + $ProjectDir)
     [void]$Builder.AppendLine("")
 
+    [void]$Builder.AppendLine("## Stato corrente di sviluppo RecordsNext 3.1.0 - 2026-09-02")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("RecordsNext 3.1.0 e' in sviluppo e collaudo; la release stabile precedente resta 2.1.0.")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("### Multisito 3.1")
+    [void]$Builder.AppendLine("")
+    [void]$Builder.AppendLine("- FCM/FCA/DataA definiscono lo storico; i siti sono destinazioni opzionali di pubblicazione;")
+    [void]$Builder.AppendLine("- il sito locale per stagione e' opzionale; una stagione senza sito resta nello storico;")
+    [void]$Builder.AppendLine("- DataA canonico: ``data/calendars/DataA-YYYY.js``;")
+    [void]$Builder.AppendLine("- la cartella JS deriva sempre da ``<local_site_path>/js``;")
+    [void]$Builder.AppendLine("- cutoff multisito basato su ``rn_season.sort_order``;")
+    [void]$Builder.AppendLine("- ogni sito riceve solo lo storico fino alla propria stagione;")
+    [void]$Builder.AppendLine("- Core e Manifest vengono filtrati/coerenti con la stagione target;")
+    [void]$Builder.AppendLine("- la GUI distingue pubblicazione nel sito corrente e pubblicazione dei siti delle stagioni selezionate;")
+    [void]$Builder.AppendLine("- rimosso il fallback hardcoded verso ``E:/fantacalcio/Lega2025/js``;")
+    [void]$Builder.AppendLine("- fix multisito Culometro: ``config/culometro.json`` disponibile nello scope di staging;")
+    [void]$Builder.AppendLine("- collaudo sandbox: 18 file pubblicati su due target selezionati; nessuna stagione futura rilevata nei JS;")
+    [void]$Builder.AppendLine("- suite verificata: 50 test, 0 failure, 0 errori;")
+    [void]$Builder.AppendLine("- la 3.1 non e' ancora installata nell'ambiente operativo e i siti reali non sono ancora stati modificati.")
+    [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("## Stato consolidato RecordsNext 2.1.0 - 2026-08-27")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("RecordsNext 2.1.0 e' la release stabile corrente.")
@@ -30083,6 +31174,187 @@ File: tools\Initialize-RecordsNext2Project.ps1
         New-Item -ItemType Directory -Path (Join-Path $ProjectDir $relativePath) -Force | Out-Null
     }
     Write-Host "Struttura RecordsNext 2.0 pronta: $ProjectDir" -ForegroundColor Green
+
+## tools\Installa-RecordsNext-3.1.ps1
+
+File: tools\Installa-RecordsNext-3.1.ps1
+
+    param(
+        [string]$InstallDir = ""
+    )
+
+    $ErrorActionPreference = "Stop"
+    Set-StrictMode -Version Latest
+
+    $Version = "3.1.0"
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $payload = Join-Path $scriptDir "payload"
+
+    function Fail([string]$Message) {
+        Write-Host ""
+        Write-Host "ERRORE: $Message" -ForegroundColor Red
+        Write-Host ""
+        throw $Message
+    }
+
+    function Get-JavaMajor {
+        $java = Get-Command java -ErrorAction SilentlyContinue
+        if ($null -eq $java) { return $null }
+
+        $line = (& java -version 2>&1 | Select-Object -First 1)
+        if ($line -notmatch '"([^"]+)"') { return $null }
+
+        $version = $Matches[1]
+        if ($version -match '^1\.(\d+)') { return [int]$Matches[1] }
+        if ($version -match '^(\d+)') { return [int]$Matches[1] }
+        return $null
+    }
+
+    Write-Host ""
+    Write-Host "========================================="
+    Write-Host " RecordsNext $Version - INSTALLAZIONE"
+    Write-Host "========================================="
+    Write-Host ""
+
+    $requiredPayload = @(
+        "RecordsNext.jar",
+        "RecordsNext.bat",
+        "README.md",
+        "INSTALL.txt",
+        "CHANGELOG.md",
+        "runtime\ucanaccess\ucanaccess-2.0.9.5.jar",
+        "runtime\ucanaccess\lib\jackcess-2.1.0.jar",
+        "runtime\ucanaccess\lib\hsqldb.jar",
+        "runtime\ucanaccess\lib\commons-lang-2.6.jar",
+        "runtime\ucanaccess\lib\commons-logging-1.1.1.jar",
+        "config\competitions.json",
+        "config\teams.json",
+        "config\culometro.json",
+        "visualizzatori\recordsnext.html"
+    )
+
+    foreach ($relative in $requiredPayload) {
+        $path = Join-Path $payload $relative
+        if (-not (Test-Path -LiteralPath $path)) {
+            Fail "Payload incompleto. File mancante: $relative"
+        }
+    }
+
+    $javaMajor = Get-JavaMajor
+    if ($null -eq $javaMajor) {
+        Fail "Java non trovato o versione non leggibile. Installare Java 21 o superiore."
+    }
+    if ($javaMajor -lt 21) {
+        Fail "Java $javaMajor non compatibile. RecordsNext richiede Java 21 o superiore."
+    }
+
+    if ([string]::IsNullOrWhiteSpace($InstallDir)) {
+        Write-Host "Indicare la cartella in cui installare RecordsNext."
+        Write-Host "Convenzione consigliata:"
+        Write-Host "  <cartella FCM>\plugin\RecordsNext"
+        Write-Host ""
+        $InstallDir = Read-Host "Cartella di installazione completa"
+    }
+
+    if ([string]::IsNullOrWhiteSpace($InstallDir)) {
+        Fail "Cartella di installazione non specificata."
+    }
+
+    $InstallDir = [IO.Path]::GetFullPath($InstallDir)
+
+    if ($InstallDir.StartsWith($scriptDir, [StringComparison]::OrdinalIgnoreCase)) {
+        Fail "La destinazione non puo' essere dentro la cartella del pacchetto estratto."
+    }
+    if ($scriptDir.StartsWith($InstallDir, [StringComparison]::OrdinalIgnoreCase)) {
+        Fail "La destinazione non puo' contenere la cartella del pacchetto estratto."
+    }
+
+    if (Test-Path -LiteralPath $InstallDir) {
+        $existing = @(Get-ChildItem -LiteralPath $InstallDir -Force -ErrorAction SilentlyContinue)
+        if ($existing.Count -gt 0) {
+            Write-Host ""
+            Write-Host "La cartella non e' vuota:"
+            Write-Host "  $InstallDir"
+            Write-Host ""
+            $answer = Read-Host "Continuare e sovrascrivere i file applicativi? [S/N]"
+            if ($answer -notmatch '^[sS]$') {
+                Write-Host "Installazione annullata."
+                exit 0
+            }
+        }
+    } else {
+        New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+    }
+
+    $forbiddenPayloadNames = @(
+        "recordsnext.db",
+        "recordsnext-gui.properties",
+        "league.json",
+        "seasons.json",
+        "processing.json"
+    )
+
+    $bad = Get-ChildItem -LiteralPath $payload -Recurse -File | Where-Object {
+        $forbiddenPayloadNames -contains $_.Name -or
+        $_.Extension -in @(".fcm", ".fca")
+    }
+
+    if ($bad) {
+        $bad | ForEach-Object { Write-Host $_.FullName }
+        Fail "Il payload contiene dati/configurazioni personali vietati."
+    }
+
+    Write-Host ""
+    Write-Host "Installazione in:"
+    Write-Host "  $InstallDir"
+    Write-Host ""
+
+    Get-ChildItem -LiteralPath $payload -Force | ForEach-Object {
+        Copy-Item -LiteralPath $_.FullName -Destination $InstallDir -Recurse -Force
+    }
+
+    @(
+        "data",
+        "data\database",
+        "data\calendars",
+        "data\reports",
+        "data\records-archive",
+        "data\site-export-staging",
+        "data\consolidation"
+    ) | ForEach-Object {
+        New-Item -ItemType Directory -Path (Join-Path $InstallDir $_) -Force | Out-Null
+    }
+
+    $requiredInstalled = @(
+        "RecordsNext.jar",
+        "RecordsNext.bat",
+        "runtime\ucanaccess\ucanaccess-2.0.9.5.jar",
+        "runtime\ucanaccess\lib\jackcess-2.1.0.jar",
+        "runtime\ucanaccess\lib\hsqldb.jar",
+        "runtime\ucanaccess\lib\commons-lang-2.6.jar",
+        "runtime\ucanaccess\lib\commons-logging-1.1.1.jar"
+    )
+
+    foreach ($relative in $requiredInstalled) {
+        if (-not (Test-Path -LiteralPath (Join-Path $InstallDir $relative) -PathType Leaf)) {
+            Fail "Verifica post-installazione fallita: $relative"
+        }
+    }
+
+    Write-Host ""
+    Write-Host "Installazione RecordsNext $Version completata." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Nessun sito FCM e' stato modificato."
+    Write-Host "Nessun database personale e' stato installato."
+    Write-Host ""
+    Write-Host "Avvio:"
+    Write-Host "  $(Join-Path $InstallDir 'RecordsNext.bat')"
+    Write-Host ""
+
+    $answer = Read-Host "Avviare RecordsNext adesso? [S/N]"
+    if ($answer -match '^[sS]$') {
+        Start-Process -FilePath (Join-Path $InstallDir "RecordsNext.bat") -WorkingDirectory $InstallDir
+    }
 
 ## tools\Install-RecordsNextVisualizzatori_v1.ps1
 
@@ -35243,7 +36515,7 @@ File: tools\Start-RecordsNext2-GUI-v7.ps1
 
     param(
         [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0",
-        [string]$InstalledRoot = "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext-1.0.0"
+        [string]$InstalledRoot = "E:\FCM\plugin\Mauz_strom2026\RecordsNext"
     )
 
     $ErrorActionPreference = "Stop"
@@ -39538,507 +40810,6 @@ File: tools\Test_RecordsNext2_RUSemantic_v26.ps1
     Write-Host ""
     Write-Host "AUDIT SEMANTICO RU: OK"
 
-## tools\Test_RecordsNext2_RUSemantic_v26_BACKUP.ps1
-
-File: tools\Test_RecordsNext2_RUSemantic_v26_BACKUP.ps1
-
-    param(
-        [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0"
-    )
-
-    $ErrorActionPreference = "Stop"
-    Set-Location $ProjectDir
-
-    $outDir = Join-Path $ProjectDir "reports\semantic-audit"
-    $outCsv = Join-Path $outDir "RecordsNext2_RU_SEMANTIC_AUDIT.csv"
-    New-Item -ItemType Directory -Path $outDir -Force | Out-Null
-
-    function Num([object]$Value) {
-        if ($null -eq $Value -or "$Value" -eq "") { return 0.0 }
-        return [double]$Value
-    }
-
-    function EqNum([double]$A, [double]$B, [double]$Tolerance = 0.000001) {
-        return [math]::Abs($A - $B) -le $Tolerance
-    }
-
-    function Key-MatchTeam([object]$Row) {
-        return ([string]$Row.idIncontro + "|" + [string]$Row.idSquadra)
-    }
-
-    function Key-Match([object]$Row) {
-        return [string]$Row.idIncontro
-    }
-
-    function Add-Problem {
-        param(
-            [System.Collections.Generic.List[object]]$List,
-            [string]$Season,
-            [string]$Section,
-            [string]$Key,
-            [string]$Problem,
-            [object]$Expected,
-            [object]$Actual
-        )
-
-        $List.Add([pscustomobject]@{
-            Stagione = $Season
-            Sezione = $Section
-            Chiave = $Key
-            Problema = $Problem
-            Atteso = $Expected
-            Reale = $Actual
-        })
-    }
-
-    function To-Map {
-        param(
-            [object[]]$Rows,
-            [scriptblock]$KeySelector
-        )
-
-        $map = @{}
-        foreach ($row in @($Rows)) {
-            $key = & $KeySelector $row
-            if (-not [string]::IsNullOrWhiteSpace([string]$key)) {
-                $map[[string]$key] = $row
-            }
-        }
-        return $map
-    }
-
-    function Check-EqualNumber {
-        param(
-            [System.Collections.Generic.List[object]]$Problems,
-            [string]$Season,
-            [string]$Section,
-            [string]$Key,
-            [string]$Field,
-            [object]$Expected,
-            [object]$Actual
-        )
-
-        if (-not (EqNum (Num $Expected) (Num $Actual))) {
-            Add-Problem $Problems $Season $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
-        }
-    }
-
-    function Check-EqualText {
-        param(
-            [System.Collections.Generic.List[object]]$Problems,
-            [string]$Season,
-            [string]$Section,
-            [string]$Key,
-            [string]$Field,
-            [object]$Expected,
-            [object]$Actual
-        )
-
-        if ([string]$Expected -ne [string]$Actual) {
-            Add-Problem $Problems $Season $Section $Key ("Campo " + $Field + " errato") $Expected $Actual
-        }
-    }
-
-    $manifest = Get-ChildItem -Path (Join-Path $ProjectDir "data\site-export-staging") -Recurse -File -Filter "fcmRecordsNext_Manifest.js" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-
-    if (-not $manifest) {
-        throw "Manifest JS non trovato."
-    }
-
-    $ruPath = Join-Path $manifest.Directory.FullName "fcmRecordsNext_RU.js"
-
-    if (-not (Test-Path -LiteralPath $ruPath)) {
-        throw "fcmRecordsNext_RU.js non trovato: $ruPath"
-    }
-
-    $js = [System.IO.File]::ReadAllText($ruPath)
-    $eq = $js.IndexOf("=")
-
-    if ($eq -lt 0) {
-        throw "Formato JS RU inatteso."
-    }
-
-    $json = $js.Substring($eq + 1).Trim()
-    if ($json.EndsWith(";")) {
-        $json = $json.Substring(0, $json.Length - 1)
-    }
-
-    $root = $json | ConvertFrom-Json
-    $problems = New-Object 'System.Collections.Generic.List[object]'
-
-    $checks = [ordered]@{
-        "partiteConPiuRU" = 0
-        "partiteConRU" = 0
-        "partiteControRU" = 0
-        "ruDecisiva" = 0
-        "bilancioRUDecisiva" = 0
-        "ruDecisivaContro" = 0
-        "bilancioRUDecisivaContro" = 0
-        "bilancioConRU" = 0
-        "bilancioControRU" = 0
-        "mediaPuntiConRU" = 0
-        "mediaPuntiControRU" = 0
-        "tipoRUUsata" = 0
-    }
-
-    $seasonCount = 0
-    $detailRows = 0
-    $teamMatchRows = 0
-
-    foreach ($seasonAggregate in @($root.seasonAggregates)) {
-        $season = [string]$seasonAggregate.stagione
-        $data = $seasonAggregate.data
-        $views = $data.views
-        $detail = $data.dettaglio
-
-        $seasonCount++
-
-        $ruDetail = @($detail.ruDettaglio)
-        $ruTeamMatch = @($detail.ruTeamMatch)
-        $partiteConRU = @($views.partiteConRU)
-        $partiteControRU = @($views.partiteControRU)
-        $partiteConPiuRU = @($views.partiteConPiuRU)
-        $ruDecisiva = @($views.ruDecisiva)
-        $ruDecisivaContro = @($views.ruDecisivaContro)
-        $bilancioRUDecisiva = @($views.bilancioRUDecisiva)
-        $bilancioRUDecisivaContro = @($views.bilancioRUDecisivaContro)
-        $bilancioConRU = @($views.bilancioConRU)
-        $bilancioControRU = @($views.bilancioControRU)
-        $mediaPuntiConRU = @($views.mediaPuntiConRU)
-        $mediaPuntiControRU = @($views.mediaPuntiControRU)
-        $tipoRUUsata = @($views.tipoRUUsata)
-
-        $detailRows += $ruDetail.Count
-        $teamMatchRows += $ruTeamMatch.Count
-
-        $checkNames = @($checks.Keys | ForEach-Object { $_ })
-        foreach ($name in $checkNames) {
-            $checks[$name]++
-        }
-
-        # 1) ruTeamMatch deve essere la stessa vista di partiteConRU.
-        $teamMap = To-Map $ruTeamMatch { param($r) Key-MatchTeam $r }
-        $withMap = To-Map $partiteConRU { param($r) Key-MatchTeam $r }
-
-        if ($teamMap.Count -ne $withMap.Count) {
-            Add-Problem $problems $season "partiteConRU" "(conteggio)" "Numero righe diverso da ruTeamMatch" $teamMap.Count $withMap.Count
-        }
-
-        foreach ($key in $teamMap.Keys) {
-            if (-not $withMap.ContainsKey($key)) {
-                Add-Problem $problems $season "partiteConRU" $key "Riga ruTeamMatch assente dalla vista" "presente" "assente"
-                continue
-            }
-
-            $expected = $teamMap[$key]
-            $actual = $withMap[$key]
-
-            foreach ($field in @("competizione","squadra","avversaria","tipiRU","dettaglioRU","esito")) {
-                Check-EqualText $problems $season "partiteConRU" $key $field $expected.$field $actual.$field
-            }
-
-            foreach ($field in @("numeroRU","valoreRUTotale","puntiSquadra","puntiAvversaria","golSquadra","golAvversaria")) {
-                Check-EqualNumber $problems $season "partiteConRU" $key $field $expected.$field $actual.$field
-            }
-        }
-
-        # 2) Ricostruisce ruTeamMatch direttamente da ruDettaglio.
-        $detailGroups = $ruDetail | Group-Object { Key-MatchTeam $_ }
-
-        foreach ($group in $detailGroups) {
-            $rows = @($group.Group)
-            $first = $rows[0]
-            $key = [string]$group.Name
-
-            if (-not $teamMap.ContainsKey($key)) {
-                Add-Problem $problems $season "ruTeamMatch" $key "Aggregato mancante" "presente" "assente"
-                continue
-            }
-
-            $actual = $teamMap[$key]
-            $expectedCount = $rows.Count
-            $expectedValue = ($rows | Measure-Object -Property valoreRU -Sum).Sum
-            $expectedTypes = @($rows | ForEach-Object { [string]$_.tipoRU } | Sort-Object -Unique) -join ","
-
-            Check-EqualNumber $problems $season "ruTeamMatch" $key "numeroRU" $expectedCount $actual.numeroRU
-            Check-EqualNumber $problems $season "ruTeamMatch" $key "valoreRUTotale" $expectedValue $actual.valoreRUTotale
-
-            $actualTypes = @(([string]$actual.tipiRU) -split "," | Where-Object { $_ } | Sort-Object -Unique) -join ","
-            Check-EqualText $problems $season "ruTeamMatch" $key "tipiRU" $expectedTypes $actualTypes
-            Check-EqualText $problems $season "ruTeamMatch" $key "competizione" $first.competizione $actual.competizione
-            Check-EqualText $problems $season "ruTeamMatch" $key "squadra" $first.squadra $actual.squadra
-            Check-EqualText $problems $season "ruTeamMatch" $key "avversaria" $first.avversaria $actual.avversaria
-        }
-
-        # 3) partiteConPiuRU: una riga per incontro, somma di tutte le RU della gara.
-        $matchGroups = $ruDetail | Group-Object idIncontro
-        $mostMap = To-Map $partiteConPiuRU { param($r) Key-Match $r }
-
-        if ($matchGroups.Count -ne $mostMap.Count) {
-            Add-Problem $problems $season "partiteConPiuRU" "(conteggio)" "Numero incontri diverso" $matchGroups.Count $mostMap.Count
-        }
-
-        foreach ($group in $matchGroups) {
-            $rows = @($group.Group)
-            $key = [string]$group.Name
-
-            if (-not $mostMap.ContainsKey($key)) {
-                Add-Problem $problems $season "partiteConPiuRU" $key "Incontro RU mancante" "presente" "assente"
-                continue
-            }
-
-            $actual = $mostMap[$key]
-            $expectedCount = $rows.Count
-            $expectedValue = ($rows | Measure-Object -Property valoreRU -Sum).Sum
-
-            Check-EqualNumber $problems $season "partiteConPiuRU" $key "numeroRU" $expectedCount $actual.numeroRU
-            Check-EqualNumber $problems $season "partiteConPiuRU" $key "valoreRUTotale" $expectedValue $actual.valoreRUTotale
-        }
-
-        # 4) partiteControRU deve essere l'inversione di ogni partita con RU.
-        $againstMap = To-Map $partiteControRU { param($r) Key-MatchTeam $r }
-
-        if ($againstMap.Count -ne $partiteConRU.Count) {
-            Add-Problem $problems $season "partiteControRU" "(conteggio)" "Numero righe diverso da partiteConRU" $partiteConRU.Count $againstMap.Count
-        }
-
-        foreach ($with in $partiteConRU) {
-            $key = [string]$with.idIncontro + "|" + [string]$with.idAvversaria
-
-            if (-not $againstMap.ContainsKey($key)) {
-                Add-Problem $problems $season "partiteControRU" $key "Vista contro RU mancante" "presente" "assente"
-                continue
-            }
-
-            $against = $againstMap[$key]
-            Check-EqualText $problems $season "partiteControRU" $key "avversariaConRU" $with.squadra $against.avversariaConRU
-            Check-EqualNumber $problems $season "partiteControRU" $key "numeroRUAvversaria" $with.numeroRU $against.numeroRUAvversaria
-            Check-EqualNumber $problems $season "partiteControRU" $key "valoreRUAvversaria" $with.valoreRUTotale $against.valoreRUAvversaria
-            Check-EqualText $problems $season "partiteControRU" $key "tipiRUAvversaria" $with.tipiRU $against.tipiRUAvversaria
-            Check-EqualText $problems $season "partiteControRU" $key "competizione" $with.competizione $against.competizione
-        }
-
-        # 5) Bilanci con RU e contro RU, ricostruiti dalle rispettive viste gara.
-        foreach ($pair in @(
-            [pscustomobject]@{ Rows=$partiteConRU; Balance=$bilancioConRU; CountField="partiteConRU"; Section="bilancioConRU" },
-            [pscustomobject]@{ Rows=$partiteControRU; Balance=$bilancioControRU; CountField="partiteControRU"; Section="bilancioControRU" }
-        )) {
-            $balanceMap = To-Map $pair.Balance { param($r) [string]$r.idSquadra }
-
-            foreach ($group in ($pair.Rows | Group-Object idSquadra)) {
-                $rows = @($group.Group)
-                $key = [string]$group.Name
-
-                if (-not $balanceMap.ContainsKey($key)) {
-                    Add-Problem $problems $season $pair.Section $key "Squadra mancante" "presente" "assente"
-                    continue
-                }
-
-                $actual = $balanceMap[$key]
-                $wins = @($rows | Where-Object { [string]$_.esito -eq "V" }).Count
-                $draws = @($rows | Where-Object { [string]$_.esito -eq "N" }).Count
-                $losses = @($rows | Where-Object { [string]$_.esito -eq "P" }).Count
-                $count = $rows.Count
-                $avgPts = (($rows | Measure-Object -Property puntiSquadra -Sum).Sum) / $count
-                $avgOppPts = (($rows | Measure-Object -Property puntiAvversaria -Sum).Sum) / $count
-                $avgGoals = (($rows | Measure-Object -Property golSquadra -Sum).Sum) / $count
-                $avgOppGoals = (($rows | Measure-Object -Property golAvversaria -Sum).Sum) / $count
-
-                Check-EqualNumber $problems $season $pair.Section $key $pair.CountField $count $actual.($pair.CountField)
-                Check-EqualNumber $problems $season $pair.Section $key "V" $wins $actual.V
-                Check-EqualNumber $problems $season $pair.Section $key "N" $draws $actual.N
-                Check-EqualNumber $problems $season $pair.Section $key "P" $losses $actual.P
-                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiSquadra" $avgPts $actual.mediaPuntiSquadra
-                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiAvversaria" $avgOppPts $actual.mediaPuntiAvversaria
-                Check-EqualNumber $problems $season $pair.Section $key "mediaGolSquadra" $avgGoals $actual.mediaGolSquadra
-                Check-EqualNumber $problems $season $pair.Section $key "mediaGolAvversaria" $avgOppGoals $actual.mediaGolAvversaria
-            }
-        }
-
-        # 6) Media punti deve essere una proiezione coerente dei bilanci.
-        foreach ($pair in @(
-            [pscustomobject]@{ Balance=$bilancioConRU; Media=$mediaPuntiConRU; CountField="partiteConRU"; Section="mediaPuntiConRU" },
-            [pscustomobject]@{ Balance=$bilancioControRU; Media=$mediaPuntiControRU; CountField="partiteControRU"; Section="mediaPuntiControRU" }
-        )) {
-            $mediaMap = To-Map $pair.Media { param($r) [string]$r.idSquadra }
-
-            foreach ($balance in $pair.Balance) {
-                $key = [string]$balance.idSquadra
-
-                if (-not $mediaMap.ContainsKey($key)) {
-                    Add-Problem $problems $season $pair.Section $key "Squadra mancante" "presente" "assente"
-                    continue
-                }
-
-                $actual = $mediaMap[$key]
-                Check-EqualNumber $problems $season $pair.Section $key $pair.CountField $balance.($pair.CountField) $actual.($pair.CountField)
-                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiSquadra" $balance.mediaPuntiSquadra $actual.mediaPuntiSquadra
-                Check-EqualNumber $problems $season $pair.Section $key "mediaPuntiAvversaria" $balance.mediaPuntiAvversaria $actual.mediaPuntiAvversaria
-                Check-EqualNumber $problems $season $pair.Section $key "differenzaMedia" ((Num $balance.mediaPuntiSquadra) - (Num $balance.mediaPuntiAvversaria)) $actual.differenzaMedia
-            }
-        }
-
-        # 7) Tipo RU usata: conteggi e valori direttamente da ruDettaglio.
-        $typeMap = To-Map $tipoRUUsata { param($r) [string]$r.idSquadra }
-
-        foreach ($group in ($ruDetail | Group-Object idSquadra)) {
-            $rows = @($group.Group)
-            $key = [string]$group.Name
-
-            if (-not $typeMap.ContainsKey($key)) {
-                Add-Problem $problems $season "tipoRUUsata" $key "Squadra mancante" "presente" "assente"
-                continue
-            }
-
-            $actual = $typeMap[$key]
-            $totalValue = 0.0
-
-            foreach ($type in @("PU","DU","CU","AU")) {
-                $typed = @($rows | Where-Object { [string]$_.tipoRU -eq $type })
-                $count = $typed.Count
-                $value = if ($count -gt 0) { ($typed | Measure-Object -Property valoreRU -Sum).Sum } else { 0 }
-                $totalValue += Num $value
-
-                Check-EqualNumber $problems $season "tipoRUUsata" $key $type $count $actual.$type
-                Check-EqualNumber $problems $season "tipoRUUsata" $key ("valore" + $type) $value $actual.("valore" + $type)
-            }
-
-            Check-EqualNumber $problems $season "tipoRUUsata" $key "totaleRU" $rows.Count $actual.totaleRU
-            Check-EqualNumber $problems $season "tipoRUUsata" $key "valoreTotale" $totalValue $actual.valoreTotale
-        }
-
-        # 8) Decisività: coerenza interna dell'effetto e dei punti di classifica.
-        foreach ($row in $ruDecisiva) {
-            $key = Key-MatchTeam $row
-            $expectedPoints = switch ([string]$row.effetto) {
-                "Da sconfitta a pareggio" { 1 }
-                "Da pareggio a vittoria" { 2 }
-                "Da sconfitta a vittoria" { 3 }
-                default { -1 }
-            }
-
-            if ($expectedPoints -lt 0) {
-                Add-Problem $problems $season "ruDecisiva" $key "Effetto sconosciuto" "effetto noto" $row.effetto
-            }
-            else {
-                Check-EqualNumber $problems $season "ruDecisiva" $key "puntiClassificaGuadagnati" $expectedPoints $row.puntiClassificaGuadagnati
-            }
-        }
-
-        foreach ($row in $ruDecisivaContro) {
-            $key = Key-MatchTeam $row
-            $expectedPoints = switch ([string]$row.danno) {
-                "Da vittoria a pareggio" { 2 }
-                "Da pareggio a sconfitta" { 1 }
-                "Da vittoria a sconfitta" { 3 }
-                default { -1 }
-            }
-
-            if ($expectedPoints -lt 0) {
-                Add-Problem $problems $season "ruDecisivaContro" $key "Danno sconosciuto" "danno noto" $row.danno
-            }
-            else {
-                Check-EqualNumber $problems $season "ruDecisivaContro" $key "puntiClassificaPersi" $expectedPoints $row.puntiClassificaPersi
-            }
-        }
-
-        # 9) Bilanci decisività derivati dalle righe decisive.
-        $decBalanceMap = To-Map $bilancioRUDecisiva { param($r) [string]$r.idSquadra }
-
-        foreach ($group in ($ruDecisiva | Group-Object idSquadra)) {
-            $rows = @($group.Group)
-            $key = [string]$group.Name
-
-            if (-not $decBalanceMap.ContainsKey($key)) {
-                Add-Problem $problems $season "bilancioRUDecisiva" $key "Squadra mancante" "presente" "assente"
-                continue
-            }
-
-            $actual = $decBalanceMap[$key]
-            $wins = @($rows | Where-Object { [string]$_.effetto -in @("Da pareggio a vittoria","Da sconfitta a vittoria") }).Count
-            $draws = @($rows | Where-Object { [string]$_.effetto -eq "Da sconfitta a pareggio" }).Count
-            $points = ($rows | Measure-Object -Property puntiClassificaGuadagnati -Sum).Sum
-
-            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "partiteRUDecisiva" $rows.Count $actual.partiteRUDecisiva
-            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "vittorieGrazieRU" $wins $actual.vittorieGrazieRU
-            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "pareggiGrazieRU" $draws $actual.pareggiGrazieRU
-            Check-EqualNumber $problems $season "bilancioRUDecisiva" $key "puntiClassificaGuadagnati" $points $actual.puntiClassificaGuadagnati
-        }
-
-        $decAgainstBalanceMap = To-Map $bilancioRUDecisivaContro { param($r) [string]$r.idSquadra }
-
-        foreach ($group in ($ruDecisivaContro | Group-Object idSquadra)) {
-            $rows = @($group.Group)
-            $key = [string]$group.Name
-
-            if (-not $decAgainstBalanceMap.ContainsKey($key)) {
-                Add-Problem $problems $season "bilancioRUDecisivaContro" $key "Squadra mancante" "presente" "assente"
-                continue
-            }
-
-            $actual = $decAgainstBalanceMap[$key]
-            $winsLost = @($rows | Where-Object { [string]$_.danno -in @("Da vittoria a pareggio","Da vittoria a sconfitta") }).Count
-            $drawsLost = @($rows | Where-Object { [string]$_.danno -eq "Da pareggio a sconfitta" }).Count
-            $points = ($rows | Measure-Object -Property puntiClassificaPersi -Sum).Sum
-
-            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "partiteControRUDecisiva" $rows.Count $actual.partiteControRUDecisiva
-            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "vittoriePerse" $winsLost $actual.vittoriePerse
-            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "pareggiDiventatiSconfitte" $drawsLost $actual.pareggiDiventatiSconfitte
-            Check-EqualNumber $problems $season "bilancioRUDecisivaContro" $key "puntiClassificaPersi" $points $actual.puntiClassificaPersi
-        }
-
-        # 10) Competizione deve essere presente su tutte le viste gara/dettaglio.
-        foreach ($pair in @(
-            [pscustomobject]@{ Name="partiteConPiuRU"; Rows=$partiteConPiuRU },
-            [pscustomobject]@{ Name="partiteConRU"; Rows=$partiteConRU },
-            [pscustomobject]@{ Name="partiteControRU"; Rows=$partiteControRU },
-            [pscustomobject]@{ Name="ruDecisiva"; Rows=$ruDecisiva },
-            [pscustomobject]@{ Name="ruDecisivaContro"; Rows=$ruDecisivaContro },
-            [pscustomobject]@{ Name="ruDettaglio"; Rows=$ruDetail },
-            [pscustomobject]@{ Name="ruTeamMatch"; Rows=$ruTeamMatch }
-        )) {
-            foreach ($row in $pair.Rows) {
-                if ([string]::IsNullOrWhiteSpace([string]$row.competizione)) {
-                    Add-Problem $problems $season $pair.Name (Key-MatchTeam $row) "Competizione mancante" "nome competizione" ""
-                }
-            }
-        }
-    }
-
-    $problems | Export-Csv -LiteralPath $outCsv -NoTypeInformation -Encoding UTF8
-
-    $summary = $checkNames = @($checks.Keys | ForEach-Object { $_ })
-        foreach ($name in $checkNames) {
-        $count = @($problems | Where-Object Sezione -eq $name).Count
-        [pscustomobject]@{
-            Record = $name
-            StagioniControllate = $checks[$name]
-            Problemi = $count
-            Esito = if ($count -eq 0) { "OK" } else { "ERRORE" }
-        }
-    }
-
-    Write-Host ""
-    Write-Host "=== AUDIT SEMANTICO RU v26 ==="
-    $summary | Format-Table -AutoSize
-
-    Write-Host ""
-    Write-Host "Stagioni controllate          : $seasonCount"
-    Write-Host "Righe RU dettaglio            : $detailRows"
-    Write-Host "Partite-squadra con RU        : $teamMatchRows"
-    Write-Host "Problemi totali               : $($problems.Count)"
-    Write-Host "Dettaglio CSV                  : $outCsv"
-
-    if ($problems.Count -gt 0) {
-        Write-Host ""
-        Write-Host "=== PRIMI 25 PROBLEMI ==="
-        $problems | Select-Object -First 25 | Format-Table -AutoSize
-        exit 1
-    }
-
-    Write-Host ""
-    Write-Host "AUDIT SEMANTICO RU: OK"
-
 ## tools\Test_RecordsNext2_SerieSemantic_v22.ps1
 
 File: tools\Test_RecordsNext2_SerieSemantic_v22.ps1
@@ -41762,6 +42533,7 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - src\main\java\it\alterlega\recordsnext\app\model\RecordFamily.java
 - src\main\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExporter.java
 - src\main\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisher.java
+- src\main\java\it\alterlega\recordsnext\app\output\SeasonPublicationTargetRepository.java
 - src\main\java\it\alterlega\recordsnext\app\output\SeasonShardAvailabilityCli.java
 - src\main\java\it\alterlega\recordsnext\app\PipelineConfig.java
 - src\main\java\it\alterlega\recordsnext\app\PipelinePreflight.java
@@ -41806,6 +42578,7 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigLoaderTest.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterGranularTest.java
 - src\test\java\it\alterlega\recordsnext\app\config\ProcessingConfigWriterTest.java
+- src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterSeasonScopeTest.java
 - src\test\java\it\alterlega\recordsnext\app\core\CoreJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\core\LeagueMetadataLoaderTest.java
 - src\test\java\it\alterlega\recordsnext\app\culometro\CulometroConfigLoaderTest.java
@@ -41816,9 +42589,13 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTest.java
 - src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherTest.java
+- src\test\java\it\alterlega\recordsnext\app\output\SeasonPublicationScopeRepositoryTest.java
+- src\test\java\it\alterlega\recordsnext\app\output\SeasonPublicationTargetRepositoryTest.java
 - src\test\java\it\alterlega\recordsnext\app\PipelineConfigDefaultsTest.java
 - src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 - src\test\java\it\alterlega\recordsnext\app\ProcessingOptionsIntegrationTest.java
+- src\test\java\it\alterlega\recordsnext\app\RecordsNextPipelinePublicationModeTest.java
+- src\test\java\it\alterlega\recordsnext\app\RecordsNextPipelineSeasonScopeTest.java
 - src\test\java\it\alterlega\recordsnext\app\ru\RuFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\series\SeriesCompleteIntegrationTest.java
 - src\test\java\it\alterlega\recordsnext\app\series\SeriesFamilyJsExporterTest.java
@@ -41834,15 +42611,14 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - config\recordsnext-gui.properties
 - config\seasons.json
 - config\teams.json
-- tools\Aggiorna-RecordsNext-2.1.ps1
 - tools\Apply_RecordsNext2_RecordDiLegaDirection_v31.ps1
 - tools\Audit-RecordsNext2Js.js
-- tools\Build_RecordsNext2_Release_v2.ps1
-- tools\Build_RecordsNext2_Release_v3.ps1
-- tools\Build_RecordsNext2_Update_v1.ps1
+- tools\Build_RecordsNext2_Release_v4.ps1
+- tools\Build_RecordsNext2_Release_v5.ps1
 - tools\Create-RecordsNext2RealJsZip.ps1
 - tools\Create-RecordsNext2WorkingCodeMd.ps1
 - tools\Initialize-RecordsNext2Project.ps1
+- tools\Installa-RecordsNext-3.1.ps1
 - tools\Install-RecordsNextVisualizzatori_v1.ps1
 - tools\Install-RecordsNextVisualizzatori_v2.ps1
 - tools\Prepare-RecordsNextVisualizzatoriPreview_v2.ps1
@@ -41864,7 +42640,6 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - tools\Test_RecordsNext2_ModifiersSemantic_v27.ps1
 - tools\Test_RecordsNext2_ModifiersSemantic_v28.ps1
 - tools\Test_RecordsNext2_RUSemantic_v26.ps1
-- tools\Test_RecordsNext2_RUSemantic_v26_BACKUP.ps1
 - tools\Test_RecordsNext2_SerieSemantic_v22.ps1
 - tools\Test_RecordsNext2_SerieSemantic_v23.ps1
 - tools\Test_RecordsNext2_SerieSemantic_v24.ps1

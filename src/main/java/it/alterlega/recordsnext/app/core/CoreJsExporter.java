@@ -23,6 +23,15 @@ public final class CoreJsExporter {
             Path outputFile,
             String leagueId,
             String leagueName) throws Exception {
+        return export(database, outputFile, leagueId, leagueName, null);
+    }
+
+    public static ExportResult export(
+            Path database,
+            Path outputFile,
+            String leagueId,
+            String leagueName,
+            String maxSeasonId) throws Exception {
 
         Path db = database.toAbsolutePath().normalize();
         Path out = outputFile.toAbsolutePath().normalize();
@@ -39,7 +48,7 @@ public final class CoreJsExporter {
         Class.forName("org.sqlite.JDBC");
         CoreData data;
         try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + db)) {
-            data = read(c, leagueId.trim(), leagueName.trim());
+            data = read(c, leagueId.trim(), leagueName.trim(), maxSeasonId);
         }
 
         Path parent = out.getParent();
@@ -57,14 +66,27 @@ public final class CoreJsExporter {
         );
     }
 
-    private static CoreData read(Connection c, String leagueId, String leagueName)
-            throws Exception {
+    private static CoreData read(
+            Connection c,
+            String leagueId,
+            String leagueName,
+            String maxSeasonId) throws Exception {
+
+        boolean scoped = maxSeasonId != null && !maxSeasonId.isBlank();
+        String seasonFilter = scoped ? " WHERE s.season_id <= ?" : "";
+        String configuredTeamFilter = scoped ? " WHERE season_id <= ?" : "";
+        String configuredCompetitionFilter = scoped ? " WHERE season_id <= ?" : "";
+
         List<Map<String, Object>> seasons = readRows(c, """
             SELECT
                 s.season_id,
                 s.display_name,
                 s.sort_order,
-                s.is_anchor,
+                CASE
+                    WHEN ? IS NOT NULL AND s.season_id = ? THEN 1
+                    WHEN ? IS NOT NULL THEN 0
+                    ELSE s.is_anchor
+                END AS is_anchor,
                 COALESCE(sc.management_type, 'NON_CONFIGURATA') AS management_type,
                 COALESCE(sc.configuration_status, 'DA_CONFIGURARE') AS configuration_status,
                 sc.local_site_path,
@@ -73,18 +95,61 @@ public final class CoreJsExporter {
             FROM rn_season s
             LEFT JOIN rn_season_configuration sc
               ON sc.season_id = s.season_id
+            """ + seasonFilter + """
             ORDER BY COALESCE(s.sort_order, 999999), s.season_id
-            """);
+            """,
+            scoped
+                ? List.of(maxSeasonId, maxSeasonId, maxSeasonId, maxSeasonId)
+                : java.util.Arrays.asList(null, null, null));
 
-        List<Map<String, Object>> canonicalTeams = readRows(c, """
-            SELECT
-                team_identity_id AS canonical_team_id,
-                canonical_name,
-                anchor_season_id,
-                anchor_team_season_id
-            FROM rn_team_identity
-            ORDER BY canonical_name COLLATE NOCASE, team_identity_id
-            """);
+        List<Map<String, Object>> canonicalTeams;
+        if (scoped) {
+            canonicalTeams = readRows(c, """
+                SELECT
+                    i.team_identity_id AS canonical_team_id,
+                    i.canonical_name,
+                    (
+                        SELECT ts.season_id
+                        FROM rn_team_mapping tm
+                        JOIN rn_team_season ts
+                          ON ts.team_season_id = tm.team_season_id
+                        WHERE tm.team_identity_id = i.team_identity_id
+                          AND ts.season_id <= ?
+                        ORDER BY ts.season_id DESC, ts.team_season_id DESC
+                        LIMIT 1
+                    ) AS anchor_season_id,
+                    (
+                        SELECT ts.team_season_id
+                        FROM rn_team_mapping tm
+                        JOIN rn_team_season ts
+                          ON ts.team_season_id = tm.team_season_id
+                        WHERE tm.team_identity_id = i.team_identity_id
+                          AND ts.season_id <= ?
+                        ORDER BY ts.season_id DESC, ts.team_season_id DESC
+                        LIMIT 1
+                    ) AS anchor_team_season_id
+                FROM rn_team_identity i
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM rn_team_mapping tm
+                    JOIN rn_team_season ts
+                      ON ts.team_season_id = tm.team_season_id
+                    WHERE tm.team_identity_id = i.team_identity_id
+                      AND ts.season_id <= ?
+                )
+                ORDER BY i.canonical_name COLLATE NOCASE, i.team_identity_id
+                """, List.of(maxSeasonId, maxSeasonId, maxSeasonId));
+        } else {
+            canonicalTeams = readRows(c, """
+                SELECT
+                    team_identity_id AS canonical_team_id,
+                    canonical_name,
+                    anchor_season_id,
+                    anchor_team_season_id
+                FROM rn_team_identity
+                ORDER BY canonical_name COLLATE NOCASE, team_identity_id
+                """);
+        }
 
         List<Map<String, Object>> seasonTeams = readRows(c, """
             SELECT
@@ -102,18 +167,58 @@ public final class CoreJsExporter {
                 mapping_method,
                 notes
             FROM rn_configured_team
+            """ + configuredTeamFilter + """
             ORDER BY season_id, canonical_name COLLATE NOCASE, source_name COLLATE NOCASE
-            """);
+            """, scoped ? List.of(maxSeasonId) : List.of());
 
-        List<Map<String, Object>> canonicalCompetitions = readRows(c, """
-            SELECT
-                competition_identity_id AS canonical_competition_id,
-                canonical_name,
-                anchor_season_id,
-                anchor_competition_season_id
-            FROM rn_competition_identity
-            ORDER BY canonical_name COLLATE NOCASE, competition_identity_id
-            """);
+        List<Map<String, Object>> canonicalCompetitions;
+        if (scoped) {
+            canonicalCompetitions = readRows(c, """
+                SELECT
+                    i.competition_identity_id AS canonical_competition_id,
+                    i.canonical_name,
+                    (
+                        SELECT cs.season_id
+                        FROM rn_competition_mapping cm
+                        JOIN rn_competition_season cs
+                          ON cs.competition_season_id = cm.competition_season_id
+                        WHERE cm.competition_identity_id = i.competition_identity_id
+                          AND cs.season_id <= ?
+                        ORDER BY cs.season_id DESC, cs.competition_season_id DESC
+                        LIMIT 1
+                    ) AS anchor_season_id,
+                    (
+                        SELECT cs.competition_season_id
+                        FROM rn_competition_mapping cm
+                        JOIN rn_competition_season cs
+                          ON cs.competition_season_id = cm.competition_season_id
+                        WHERE cm.competition_identity_id = i.competition_identity_id
+                          AND cs.season_id <= ?
+                        ORDER BY cs.season_id DESC, cs.competition_season_id DESC
+                        LIMIT 1
+                    ) AS anchor_competition_season_id
+                FROM rn_competition_identity i
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM rn_competition_mapping cm
+                    JOIN rn_competition_season cs
+                      ON cs.competition_season_id = cm.competition_season_id
+                    WHERE cm.competition_identity_id = i.competition_identity_id
+                      AND cs.season_id <= ?
+                )
+                ORDER BY i.canonical_name COLLATE NOCASE, i.competition_identity_id
+                """, List.of(maxSeasonId, maxSeasonId, maxSeasonId));
+        } else {
+            canonicalCompetitions = readRows(c, """
+                SELECT
+                    competition_identity_id AS canonical_competition_id,
+                    canonical_name,
+                    anchor_season_id,
+                    anchor_competition_season_id
+                FROM rn_competition_identity
+                ORDER BY canonical_name COLLATE NOCASE, competition_identity_id
+                """);
+        }
 
         List<Map<String, Object>> seasonCompetitions = readRows(c, """
             SELECT
@@ -129,8 +234,9 @@ public final class CoreJsExporter {
                 mapping_method,
                 notes
             FROM rn_configured_competition
+            """ + configuredCompetitionFilter + """
             ORDER BY season_id, canonical_name COLLATE NOCASE, source_name COLLATE NOCASE
-            """);
+            """, scoped ? List.of(maxSeasonId) : List.of());
 
         return new CoreData(
             "2.0",
@@ -147,17 +253,29 @@ public final class CoreJsExporter {
 
     private static List<Map<String, Object>> readRows(Connection c, String sql)
             throws Exception {
+        return readRows(c, sql, List.of());
+    }
+
+    private static List<Map<String, Object>> readRows(
+            Connection c,
+            String sql,
+            List<?> parameters) throws Exception {
         List<Map<String, Object>> rows = new ArrayList<>();
-        try (Statement s = c.createStatement(); ResultSet rs = s.executeQuery(sql)) {
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next()) {
-                Map<String, Object> row = new LinkedHashMap<>();
-                for (int i = 1; i <= columns; i++) {
-                    String name = rs.getMetaData().getColumnLabel(i);
-                    Object value = rs.getObject(i);
-                    row.put(toCamelCase(name), value);
+        try (java.sql.PreparedStatement s = c.prepareStatement(sql)) {
+            for (int i = 0; i < parameters.size(); i++) {
+                s.setObject(i + 1, parameters.get(i));
+            }
+            try (ResultSet rs = s.executeQuery()) {
+                int columns = rs.getMetaData().getColumnCount();
+                while (rs.next()) {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    for (int i = 1; i <= columns; i++) {
+                        String name = rs.getMetaData().getColumnLabel(i);
+                        Object value = rs.getObject(i);
+                        row.put(toCamelCase(name), value);
+                    }
+                    rows.add(row);
                 }
-                rows.add(row);
             }
         }
         return rows;

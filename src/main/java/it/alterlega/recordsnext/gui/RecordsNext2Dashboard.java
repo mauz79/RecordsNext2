@@ -38,7 +38,7 @@ public final class RecordsNext2Dashboard {
     private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
     private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
-    private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.0");
+    private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.1");
     private final CardLayout pages = new CardLayout();
     private final JPanel pageHost = new JPanel(pages);
     private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
@@ -48,7 +48,7 @@ public final class RecordsNext2Dashboard {
     private final Map<String, JTextField> modifierNameFields = new LinkedHashMap<>();
 
     private final JCheckBox culometro = new JCheckBox("Genera Culometro");
-    private final JCheckBox publish = new JCheckBox("Pubblica nel sito al termine");
+    private final JCheckBox publish = new JCheckBox("Pubblica nel sito della stagione corrente al termine");
     private final JRadioButton full = new JRadioButton("Completa");
     private final JRadioButton consolidated = new JRadioButton("Consolidata");
     private final JTextArea log = new JTextArea();
@@ -56,6 +56,7 @@ public final class RecordsNext2Dashboard {
     private final JLabel status = new JLabel("Pronto");
     private final JLabel phase = new JLabel("Nessuna elaborazione in corso");
     private final JButton run = new JButton("Elabora");
+    private final JButton publishAllSites = new JButton("Pubblica i siti delle stagioni selezionate");
     private final JTextField exampleSiteDirectory = new JTextField();
     private final JLabel exampleRootTarget = new JLabel("Non selezionata");
     private final JLabel exampleViewsTarget = new JLabel("Non selezionata");
@@ -70,7 +71,7 @@ public final class RecordsNext2Dashboard {
             try {
                 new RecordsNext2Dashboard().show();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.0", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.1", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -130,7 +131,7 @@ public final class RecordsNext2Dashboard {
         brand.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
         brand.setForeground(Color.WHITE);
         side.add(brand);
-        JLabel version = new JLabel("by mauz79 · 2.1");
+        JLabel version = new JLabel("by mauz79 · 3.1");
         version.setAlignmentX(Component.LEFT_ALIGNMENT);
         version.setForeground(new Color(174, 192, 224));
         version.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -204,7 +205,7 @@ public final class RecordsNext2Dashboard {
         c.weightx = 0.0;
         header.add(leftSpacer, c);
 
-        JLabel title = new JLabel("RecordsNext 3.0", SwingConstants.CENTER);
+        JLabel title = new JLabel("RecordsNext 3.1", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
         title.setForeground(RED);
         c.gridx = 1;
@@ -328,7 +329,8 @@ public final class RecordsNext2Dashboard {
         page.add(pageHeader("Configurazione stagioni",
                 "Stagioni, sorgenti, siti e collegamenti storici", true));
         JPanel card = cardPanel(new BorderLayout(10, 10));
-        JLabel text = new JLabel("<html><b>Gestita:</b> FCM/FCA, sito locale e online, DataA.js e tabellini.<br>"
+        JLabel text = new JLabel("<html><b>Gestita:</b> FCM e FCA obbligatori; sito locale e online opzionali.<br>"
+                + "<b>Calendario:</b> gestito automaticamente dall'archivio interno RecordsNext.<br>"
                 + "<b>Manuale:</b> solo anni nel formato YYYY/YYYY e numero stagione.<br>"
                 + "Tabellini compatibili: <b>ris*.htm</b>, <b>ris*.html</b> e <b>ris*.php</b>.</html>");
         card.add(text, BorderLayout.CENTER);
@@ -621,12 +623,21 @@ public final class RecordsNext2Dashboard {
                 "Diagnostica della pubblicazione e utilità per la skin FCM", true));
 
         JPanel publishCard = cardPanel(new BorderLayout(8, 8));
-        JLabel text = new JLabel("<html>Gli output vengono prima validati nello staging. La pubblicazione nel sito "
-                + "avviene solo quando l'opzione è attiva e usa il rollback del publisher.</html>");
+        JLabel text = new JLabel("<html>L'elaborazione normale pubblica, se richiesto, solo nel sito "
+                + "della stagione corrente. La pubblicazione di tutti i siti storici è un'azione separata: "
+                + "ogni sito riceve esclusivamente lo storico disponibile fino alla propria stagione.</html>");
         publishCard.add(text, BorderLayout.CENTER);
-        JPanel options = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        JPanel options = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         options.setOpaque(false);
         options.add(publish);
+        publishAllSites.setToolTipText(
+                "Rigenera e pubblica RecordsNext nei siti configurati delle stagioni selezionate"
+        );
+        publishAllSites.addActionListener(e -> runPipeline(
+                RecordsNextPipeline.PublicationMode.ALL_CONFIGURED_SITES,
+                true
+        ));
+        options.add(publishAllSites);
         publishCard.add(options, BorderLayout.SOUTH);
         page.add(publishCard);
         page.add(Box.createVerticalStrut(10));
@@ -871,7 +882,7 @@ public final class RecordsNext2Dashboard {
         });
         run.setBackground(BLUE);
         run.setForeground(Color.WHITE);
-        run.addActionListener(e -> runPipeline());
+        run.addActionListener(e -> runPipeline(RecordsNextPipeline.PublicationMode.CURRENT_SITE, false));
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         actions.setOpaque(false);
         actions.add(save);
@@ -1142,9 +1153,15 @@ public final class RecordsNext2Dashboard {
         return (int) childChecks.values().stream().filter(AbstractButton::isSelected).count();
     }
 
-    private void runPipeline() {
+    private void runPipeline(
+            RecordsNextPipeline.PublicationMode publicationMode,
+            boolean forcePublish) {
+        if (forcePublish && !publish.isSelected()) {
+            publish.setSelected(true);
+        }
         saveState();
         run.setEnabled(false);
+        publishAllSites.setEnabled(false);
         log.setText("");
         progress.setValue(0);
         phase.setText("Preparazione");
@@ -1159,7 +1176,11 @@ public final class RecordsNext2Dashboard {
                         : PipelineConfig.defaults(root);
                 ProcessingOptions options = ProcessingConfigLoader.load(processingFile);
                 ProcessingMode mode = consolidated.isSelected() ? ProcessingMode.CONSOLIDATED : ProcessingMode.FULL;
-                return new RecordsNextPipeline().run(cfg, options, mode, new RecordsNextPipeline.Listener() {
+                return new RecordsNextPipeline().run(
+                        cfg,
+                        options,
+                        mode,
+                        new RecordsNextPipeline.Listener() {
                     @Override public void phase(String text, int percent) {
                         publish(text);
                         SwingUtilities.invokeLater(() -> {
@@ -1168,7 +1189,9 @@ public final class RecordsNext2Dashboard {
                         });
                     }
                     @Override public void timing(String text) { publish("TEMPO  " + text); }
-                });
+                },
+                        publicationMode
+                );
             }
 
             @Override protected void process(java.util.List<String> chunks) {
@@ -1190,9 +1213,10 @@ public final class RecordsNext2Dashboard {
                     log.append("ERRORE: " + cause + System.lineSeparator());
                     status.setText("Errore");
                     status.setForeground(RED);
-                    JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.0", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.1", JOptionPane.ERROR_MESSAGE);
                 } finally {
                     run.setEnabled(true);
+                    publishAllSites.setEnabled(true);
                 }
             }
         }.execute();

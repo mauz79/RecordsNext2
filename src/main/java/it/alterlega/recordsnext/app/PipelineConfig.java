@@ -97,10 +97,16 @@ public record PipelineConfig(Path projectRoot, Path reports, Path classicArchive
             }
         }
 
-        return resolve(
-            projectRoot,
-            properties.getProperty("siteJs", "E:/fantacalcio/Lega2025/js")
-        );
+        String legacySiteJs = properties.getProperty("siteJs", "").trim();
+        if (!legacySiteJs.isEmpty()) {
+            return resolve(projectRoot, legacySiteJs);
+        }
+
+        // In generate-only serve comunque un Path, ma non deve mai
+        // inventare una destinazione esterna.
+        return projectRoot.resolve("data/site-export-unused/js")
+                .toAbsolutePath()
+                .normalize();
     }
 
     private static Path resolve(Path root, String value) {

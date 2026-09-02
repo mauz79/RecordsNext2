@@ -477,7 +477,7 @@ final class SeasonConfigurationRepository {
         if ("MANUALE".equals(r.managementType())) {
             return "COMPLETA";
         }
-        return !r.fcmPath().isBlank() && !r.fcaPath().isBlank() && !r.localSitePath().isBlank()
+        return !r.fcmPath().isBlank() && !r.fcaPath().isBlank()
                 ? "COMPLETA" : "DA_CONFIGURARE";
     }
 

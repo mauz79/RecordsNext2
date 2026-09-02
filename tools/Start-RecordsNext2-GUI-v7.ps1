@@ -1,6 +1,6 @@
 param(
     [string]$ProjectDir = "D:\DEV_APPS\RecordsNext2.0",
-    [string]$InstalledRoot = "E:\FCM\plugin\Mauz_strom2014Full\RecordsNext-1.0.0"
+    [string]$InstalledRoot = "E:\FCM\plugin\Mauz_strom2026\RecordsNext"
 )
 
 $ErrorActionPreference = "Stop"

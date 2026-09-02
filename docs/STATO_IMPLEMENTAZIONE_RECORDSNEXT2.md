@@ -1,4 +1,82 @@
-# Stato implementazione RecordsNext 2.1
+# Stato implementazione RecordsNext 3.1
+
+## Sviluppo RecordsNext 3.1.0 - multisito - 2026-09-02
+
+RecordsNext 3.1.0 e' attualmente in sviluppo e collaudo. La release stabile precedente resta `2.1.0`; la 3.1 non e' ancora stata installata nell'ambiente operativo e i siti reali non sono ancora stati modificati.
+
+### Architettura multisito consolidata
+
+Principio vincolante:
+
+> FCM/FCA/DataA definiscono lo storico; i siti sono destinazioni opzionali di pubblicazione.
+
+Comportamento implementato e verificato:
+
+- ogni stagione GESTITA continua a richiedere FCM e FCA;
+- la cartella del sito locale e' opzionale;
+- una stagione senza sito resta parte dello storico e puo' contribuire ai record;
+- `DataA` non viene piu' ricercato nel sito storico: il calendario canonico e' `data/calendars/DataA-YYYY.js`;
+- ogni stagione puo' avere una propria destinazione `local_site_path`;
+- la cartella `js` non viene configurata separatamente, ma deriva sempre da `<local_site_path>/js`;
+- la pubblicazione multisito usa come cutoff `rn_season.sort_order`, non il confronto lessicografico del `season_id`;
+- ogni sito riceve soltanto le stagioni fino alla propria stagione target;
+- `fcmRecordsNext_Core.js` viene filtrato per il target, comprese identita canoniche, mapping e anchor coerenti con lo storico disponibile a quella data;
+- `fcmRecordsNext_Manifest.js` usa come `currentSeasonId` la stagione del sito target;
+- Classici, Serie, RU, Modificatori, Soglie/Fortuna, Matches e Culometro vengono generati su uno scope stagionale limitato al target;
+- il Culometro multisito usa una copia controllata di `config/culometro.json` nello staging di scope;
+- il fallback hardcoded a `E:/fantacalcio/Lega2025/js` e' stato eliminato: in assenza di una destinazione reale la pipeline non deve inventare un sito esterno.
+
+### Semantica GUI 3.1
+
+La GUI distingue due casi:
+
+- `Pubblica nel sito della stagione corrente al termine`: uso normale, tipicamente dopo ogni aggiornamento FCM; aggiorna soltanto il sito della stagione corrente;
+- `Pubblica i siti delle stagioni selezionate`: manutenzione/riallineamento storico; pubblica i siti configurati delle sole stagioni selezionate. Ogni sito riceve comunque solo lo storico disponibile fino alla propria stagione.
+
+Le checkbox `Elabora` restano quindi anche un controllo esplicito dell'ambito della pubblicazione storica.
+
+### Collaudo sandbox
+
+Il multisito e' stato provato in una working copy isolata, senza scrivere nei siti reali.
+
+Target sandbox verificati:
+
+- `2024_2025` -> `data/test-sites/Lega2024`;
+- `2025_2026` -> `data/test-sites/Lega2025`;
+- `2026_2027` -> `data/test-sites/Lega2026` quando la stagione e' selezionata.
+
+Risultato del primo collaudo completo sulle stagioni selezionate:
+
+- pubblicazione riuscita su Lega2024 e Lega2025;
+- 9 file JS canonici per sito;
+- 18 file complessivamente pubblicati;
+- nessun errore di pubblicazione;
+- Lega2024 verificata senza `2025_2026` e `2026_2027`;
+- Lega2025 verificata senza `2026_2027`.
+
+La mancata pubblicazione di `2026_2027` nel primo test era dovuta alla checkbox `Elabora` non selezionata ed e' coerente con la semantica scelta per `Pubblica i siti delle stagioni selezionate`.
+
+### Runtime e test
+
+- Maven: `3.1.0`;
+- Java: 21 o superiore;
+- UCanAccess operativo: `2.0.9.5`, caricato dal runtime distribuito (`runtime/ucanaccess` e `runtime/ucanaccess/lib`);
+- avviare la GUI di sviluppo con il launcher/script che include il runtime UCanAccess: l'avvio tramite solo `mvn exec:java` non rappresenta il classpath dell'installazione completa;
+- suite automatica verificata prima dell'aggiornamento documentale: 50 test, 0 failure, 0 errori, BUILD SUCCESS;
+- test specifici aggiunti per eliminazione stagione, target di pubblicazione, cutoff `sort_order`, Core stagionale e modalita di pubblicazione.
+
+### Stato release
+
+La 3.1.0 non deve ancora essere considerata rilasciata.
+
+Prima della release restano da completare:
+
+- pulizia finale di packaging e launcher alla versione 3.1;
+- verifica dei file statici/visualizzatori e della decisione definitiva sugli shard `recordsnext-data`;
+- generazione dei pacchetti FULL e UPDATE 3.1;
+- installazione della nuova GUI nell'ambiente operativo;
+- primo collaudo controllato sui siti reali.
+
 
 ## Correzione eliminazione stagioni - 2026-09-02
 

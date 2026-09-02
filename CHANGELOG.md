@@ -1,5 +1,32 @@
 # Changelog
 
+## RecordsNext 3.1.0 — 2026-09-02
+
+### Multisito
+- sito locale opzionale per stagione;
+- FCM/FCA/DataA definiscono lo storico, i siti sono destinazioni opzionali;
+- DataA canonico in `data/calendars/DataA-YYYY.js`;
+- pubblicazione ordinaria nel solo sito corrente;
+- comando `Pubblica i siti delle stagioni selezionate`;
+- ogni target riceve esclusivamente lo storico fino al proprio `sort_order`;
+- Core e Manifest coerenti con la stagione target;
+- rimosso il fallback hardcoded verso `E:/fantacalcio/Lega2025/js`;
+- corretto il path di `culometro.json` nello staging multisito.
+
+### Packaging
+- versione Maven 3.1.0;
+- launcher RecordsNext 3.1;
+- pacchetto FULL con installer guidato;
+- installer senza dati personali e senza pubblicazione automatica;
+- UPDATE con backup e conservazione di `config` e `data`;
+- UCanAccess 2.0.9.5 invariato.
+
+### Verifiche
+- suite automatica: 50 test, 0 failure, 0 errori;
+- collaudo multisito sandbox riuscito;
+- 9 JS canonici per target;
+- verificata assenza di stagioni future nei siti storici.
+
 ## RecordsNext 3.0.0 — 2026-08-28
 
 ### Architettura dati stagionale
