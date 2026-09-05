@@ -1,5 +1,28 @@
 # Changelog
 
+
+## RecordsNext 3.1.1 â€” 2026-09-06
+
+### Correzione output JavaScript
+
+- corretta la regressione della 3.1.0 che, nel percorso multisito, pubblicava nuovamente file cumulativi da circa 6-11 MiB;
+- introdotta pubblicazione shard stagionali **flat** direttamente nella cartella `js` del sito;
+- eliminata la dipendenza operativa dalla sottocartella `js/recordsnext-data`;
+- mantenuti invariati i nomi canonici `fcmRecordsNext_Classics.js`, `Series`, `RU`, `Modifiers`, `ThresholdsLuck`, `Culometro` e `Matches` come facade leggere;
+- ogni sito resta autosufficiente e contiene localmente gli shard ammessi dal proprio cutoff storico;
+- mantenuto il cutoff multisito basato su `rn_season.sort_order`;
+- pulizia controllata degli shard flat obsoleti durante la ripubblicazione.
+
+### Verifiche
+
+- suite automatica: 52 test, 0 failure, 0 errori;
+- pubblicazione sito corrente verificata: 140 shard + 9 file canonici = 149 file;
+- shard massimo osservato: circa 0,93 MiB;
+- nessun file RecordsNext oltre 1,5 MiB;
+- pubblicazione multisito reale verificata su tutte le stagioni configurate;
+- numero file progressivo coerente col cutoff storico (16 sul sito 2006, +7 per ogni stagione successiva con dati, 149 sui siti piÃ¹ recenti);
+- nessuna sottocartella RecordsNext richiesta sotto `js`;
+- vecchie cartelle `recordsnext-data` rimosse dai siti storici dopo il collaudo.
 ## RecordsNext 3.1.0 — 2026-09-02
 
 ### Architettura e storico

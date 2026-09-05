@@ -1,4 +1,22 @@
-# Stato implementazione RecordsNext 3.1
+# Stato implementazione RecordsNext 3.1.1
+
+## RecordsNext 3.1.1 - flat JS - 2026-09-06
+
+La 3.1.1 corregge la regressione di pubblicazione JavaScript emersa dopo l'introduzione del multisito 3.1.0.
+
+Stato verificato:
+
+- sette famiglie dati pubblicate come shard stagionali flat nella cartella `js`;
+- nessuna cartella `recordsnext-data` richiesta o creata dalla 3.1.1;
+- facade canoniche leggere;
+- pubblicazione sito corrente riuscita con 149 file complessivi (140 shard + 9 canonici);
+- pubblicazione multisito reale riuscita e progressione dei file coerente col cutoff storico;
+- shard massimo osservato circa 0,93 MiB;
+- nessun file oltre 1,5 MiB;
+- 52 test automatici, 0 failure, 0 errori;
+- vecchie cartelle `recordsnext-data` rimosse dai siti storici dopo il collaudo.
+
+La 3.1.0 resta storicamente documentata come release precedente; tag, hash e riferimenti della 3.1.0 non devono essere riscritti.
 
 ## Release RecordsNext 3.1.0 - 2026-09-02
 

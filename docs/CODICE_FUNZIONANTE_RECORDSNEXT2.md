@@ -1,12 +1,12 @@
 # Codice funzionante RecordsNext 3.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-09-02 18:06:53 +02:00
+> Data generazione: 2026-09-06 01:41:55 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
-## Stato release RecordsNext 3.1.0 - 2026-09-02
+## Stato release RecordsNext 3.1.1 - 2026-09-02
 
-RecordsNext 3.1.0 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.
+RecordsNext 3.1.1 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.
 
 - Suite automatica: 50 test, 0 failure, 0 errori.
 - Collaudo multisito reale: 21 target, 189 file validati e 189 pubblicati.
@@ -151,7 +151,23 @@ Le sezioni successive includono documentazione e codice reale del progetto. Le i
 
 File: README.md
 
-    # RecordsNext 3.1
+    # RecordsNext 3.1.1
+
+    ## RecordsNext 3.1.1
+
+    La 3.1.1 corregge la pubblicazione JavaScript introdotta con il multisito 3.1: le sette famiglie dati pesanti vengono ora pubblicate come **shard stagionali flat direttamente nella cartella `js` del sito**, senza creare `recordsnext-data` o altre sottocartelle.
+
+    Caratteristiche della correzione:
+
+    - facade canoniche `fcmRecordsNext_*.js` mantenute e leggere;
+    - shard stagionali nello stesso livello della cartella `js`;
+    - nessuna dipendenza tra siti storici e nessun caricamento dati da sottocartelle;
+    - cutoff storico multisito invariato: ogni sito riceve solo le stagioni fino al proprio target;
+    - collaudo reale su tutti i siti configurati riuscito;
+    - 52 test automatici, 0 failure, 0 errori;
+    - shard massimo osservato nel collaudo reale: circa 0,93 MiB;
+    - nessun file RecordsNext oltre 1,5 MiB nel collaudo;
+    - vecchie cartelle `recordsnext-data` non fanno piÃ¹ parte dell'architettura 3.1.1.
 
     **RecordsNext by mauz79** è il generatore di record e statistiche storiche per leghe gestite con Fantacalcio Manager.
 
@@ -203,7 +219,7 @@ File: README.md
 
     La release pubblica 3.1 viene distribuita come **installazione pulita** tramite:
 
-    `RecordsNext_3.1.0_SETUP.exe`
+    `RecordsNext_3.1.1_SETUP.exe`
 
     Requisiti:
 
@@ -547,7 +563,38 @@ File: README.md
 
 File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
-    # Architettura RecordsNext 3.1.0
+    # Architettura RecordsNext 3.1.1
+
+    ## Output JavaScript flat 3.1.1
+
+    La 3.1.1 mantiene l'architettura multisito della 3.1 ma corregge il livello fisico di pubblicazione dei dataset pesanti.
+
+    Per ciascun sito target:
+
+    1. viene costruito lo scope storico fino al `sort_order` della stagione target;
+    2. vengono generati i nove output canonici RecordsNext;
+    3. le sette famiglie pesanti vengono suddivise per stagione;
+    4. i file stagionali vengono pubblicati **direttamente nella stessa cartella `js` del sito**;
+    5. i sette nomi canonici restano facade leggere che caricano esclusivamente shard locali dello stesso sito.
+
+    Esempio:
+
+    ```text
+    js/
+      fcmRecordsNext_Series.js
+      fcmRecordsNext_Series.2006_2007.js
+      fcmRecordsNext_Series.2007_2008.js
+      ...
+    ```
+
+    Vincoli:
+
+    - nessuna sottocartella `recordsnext-data`;
+    - nessuna dipendenza da siti storici differenti;
+    - nessun URL remoto necessario al caricamento degli shard;
+    - nessuna stagione futura rispetto al target;
+    - obiettivo operativo intorno a 1 MiB per shard, con soglia di sicurezza piÃ¹ permissiva per evitare falsi blocchi su file poco superiori;
+    - Core e Manifest restano file canonici singoli.
 
     ## Architettura multisito 3.1
 
@@ -2588,7 +2635,25 @@ File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
 
 File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
-    # Stato implementazione RecordsNext 3.1
+    # Stato implementazione RecordsNext 3.1.1
+
+    ## RecordsNext 3.1.1 - flat JS - 2026-09-06
+
+    La 3.1.1 corregge la regressione di pubblicazione JavaScript emersa dopo l'introduzione del multisito 3.1.0.
+
+    Stato verificato:
+
+    - sette famiglie dati pubblicate come shard stagionali flat nella cartella `js`;
+    - nessuna cartella `recordsnext-data` richiesta o creata dalla 3.1.1;
+    - facade canoniche leggere;
+    - pubblicazione sito corrente riuscita con 149 file complessivi (140 shard + 9 canonici);
+    - pubblicazione multisito reale riuscita e progressione dei file coerente col cutoff storico;
+    - shard massimo osservato circa 0,93 MiB;
+    - nessun file oltre 1,5 MiB;
+    - 52 test automatici, 0 failure, 0 errori;
+    - vecchie cartelle `recordsnext-data` rimosse dai siti storici dopo il collaudo.
+
+    La 3.1.0 resta storicamente documentata come release precedente; tag, hash e riferimenti della 3.1.0 non devono essere riscritti.
 
     ## Release RecordsNext 3.1.0 - 2026-09-02
 
@@ -3058,6 +3123,29 @@ File: CHANGELOG.md
 
     # Changelog
 
+
+    ## RecordsNext 3.1.1 â€” 2026-09-06
+
+    ### Correzione output JavaScript
+
+    - corretta la regressione della 3.1.0 che, nel percorso multisito, pubblicava nuovamente file cumulativi da circa 6-11 MiB;
+    - introdotta pubblicazione shard stagionali **flat** direttamente nella cartella `js` del sito;
+    - eliminata la dipendenza operativa dalla sottocartella `js/recordsnext-data`;
+    - mantenuti invariati i nomi canonici `fcmRecordsNext_Classics.js`, `Series`, `RU`, `Modifiers`, `ThresholdsLuck`, `Culometro` e `Matches` come facade leggere;
+    - ogni sito resta autosufficiente e contiene localmente gli shard ammessi dal proprio cutoff storico;
+    - mantenuto il cutoff multisito basato su `rn_season.sort_order`;
+    - pulizia controllata degli shard flat obsoleti durante la ripubblicazione.
+
+    ### Verifiche
+
+    - suite automatica: 52 test, 0 failure, 0 errori;
+    - pubblicazione sito corrente verificata: 140 shard + 9 file canonici = 149 file;
+    - shard massimo osservato: circa 0,93 MiB;
+    - nessun file RecordsNext oltre 1,5 MiB;
+    - pubblicazione multisito reale verificata su tutte le stagioni configurate;
+    - numero file progressivo coerente col cutoff storico (16 sul sito 2006, +7 per ogni stagione successiva con dati, 149 sui siti piÃ¹ recenti);
+    - nessuna sottocartella RecordsNext richiesta sotto `js`;
+    - vecchie cartelle `recordsnext-data` rimosse dai siti storici dopo il collaudo.
     ## RecordsNext 3.1.0 — 2026-09-02
 
     ### Architettura e storico
@@ -6711,6 +6799,11 @@ File: src\main\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublish
      */
     public final class SeasonFamilyShardPublisher {
         public static final long DEFAULT_MAX_SHARD_BYTES = 1024L * 1024L;
+        /**
+         * Limite di sicurezza per gli shard flat 3.1.1. L'obiettivo resta circa 1 MiB;
+         * il margine evita di bloccare la pubblicazione per piccoli sforamenti fisiologici.
+         */
+        public static final long DEFAULT_FLAT_MAX_SHARD_BYTES = 1536L * 1024L;
         public static final String DATA_DIR = "recordsnext-data";
         public static final String STATE_FILE_NAME = "recordsnext-shards.properties";
 
@@ -6732,6 +6825,93 @@ File: src\main\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublish
         );
 
         private SeasonFamilyShardPublisher() {}
+
+        /**
+         * Trasforma le sette famiglie pesanti in facade leggere + shard stagionali
+         * direttamente nella stessa cartella JS. Non crea sottocartelle, non usa
+         * routing tra siti e non dipende dallo stato di disponibilita' legacy.
+         *
+         * <p>Questa e' la strategia usata dalla pubblicazione multisito 3.1.1:
+         * ogni target contiene autonomamente tutti gli shard ammessi dal proprio
+         * cutoff storico.</p>
+         */
+        public static FlatPlan prepareFlat(Path generatedDir) throws IOException {
+            return prepareFlat(generatedDir, DEFAULT_FLAT_MAX_SHARD_BYTES);
+        }
+
+        public static FlatPlan prepareFlat(Path generatedDir, long maxShardBytes) throws IOException {
+            Objects.requireNonNull(generatedDir, "generatedDir");
+            if (maxShardBytes < 1) throw new IllegalArgumentException("maxShardBytes deve essere positivo");
+            if (!Files.isDirectory(generatedDir)) {
+                throw new IOException("Cartella JS generata non trovata: " + generatedDir);
+            }
+
+            deleteExistingFlatShards(generatedDir);
+
+            List<FlatShard> shards = new ArrayList<>();
+            List<Path> facades = new ArrayList<>();
+
+            for (FamilySpec spec : FAMILIES) {
+                Path familyFile = generatedDir.resolve(spec.fileName());
+                if (!Files.isRegularFile(familyFile)) continue;
+
+                Assignment assignment = readAssignment(familyFile, spec.globalName());
+                Map<String, Object> root = assignment.root();
+                Map<String, Object> facadeRoot = deepCopyMap(root);
+                for (String field : spec.shardedFields()) facadeRoot.put(field, new ArrayList<>());
+
+                Map<String, Map<String, List<Object>>> bySeason = splitBySeason(root, spec);
+                List<FlatShard> familyShards = new ArrayList<>();
+
+                for (Map.Entry<String, Map<String, List<Object>>> entry : bySeason.entrySet()) {
+                    String seasonId = entry.getKey();
+                    String shardName = "fcmRecordsNext_" + spec.id() + "." + seasonId + ".js";
+                    Path shardFile = generatedDir.resolve(shardName);
+
+                    String shardJs = renderShard(spec, entry.getValue());
+                    Files.writeString(shardFile, shardJs, StandardCharsets.UTF_8);
+
+                    long bytes = Files.size(shardFile);
+                    if (bytes > maxShardBytes) {
+                        throw new IOException("Shard flat oltre il limite di sicurezza di " + maxShardBytes
+                                + " byte: " + shardFile.getFileName() + " = " + bytes);
+                    }
+
+                    FlatShard shard = new FlatShard(spec.id(), seasonId, shardFile, bytes);
+                    shards.add(shard);
+                    familyShards.add(shard);
+                }
+
+                String facadeJs = renderFlatFacade(spec, facadeRoot, familyShards);
+                Files.writeString(familyFile, facadeJs, StandardCharsets.UTF_8);
+                facades.add(familyFile);
+            }
+
+            return new FlatPlan(List.copyOf(shards), List.copyOf(facades));
+        }
+
+        private static void deleteExistingFlatShards(Path generatedDir) throws IOException {
+            try (var files = Files.list(generatedDir)) {
+                for (Path file : files.filter(Files::isRegularFile).toList()) {
+                    if (isFlatShardFileName(file.getFileName().toString())) {
+                        Files.deleteIfExists(file);
+                    }
+                }
+            }
+        }
+
+        public static boolean isFlatShardFileName(String name) {
+            if (name == null) return false;
+            for (FamilySpec spec : FAMILIES) {
+                String prefix = "fcmRecordsNext_" + spec.id() + ".";
+                if (name.startsWith(prefix) && name.endsWith(".js")
+                        && name.length() > prefix.length() + 3) {
+                    String season = name.substring(prefix.length(), name.length() - 3);
+                    return season.matches("\\d{4}_\\d{4}");
+                }
+            }
+            return false;
+        }
 
         public static Plan prepare(Path generatedDir, Path shardStagingRoot) throws IOException {
             Path transientState = shardStagingRoot.resolve(STATE_FILE_NAME);
@@ -6912,6 +7092,33 @@ File: src\main\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublish
                     + "})();\n";
         }
 
+        private static String renderFlatFacade(
+                FamilySpec spec,
+                Map<String, Object> facadeRoot,
+                List<FlatShard> shards) {
+
+            List<String> files = shards.stream()
+                    .sorted(Comparator.comparing(FlatShard::seasonId))
+                    .map(shard -> shard.file().getFileName().toString())
+                    .toList();
+
+            String fields = Json.write(spec.shardedFields());
+            String finalizer = "(function(){var q=window.__recordsNextShardQueue||{},f=q[\"" + spec.id()
+                    + "\"]||{},r=" + spec.globalName() + ",fields=" + fields
+                    + ";for(var x=0;x<fields.length;x++){var k=fields[x],a=f[k]||[];"
+                    + "a.sort(function(A,B){return A[0]-B[0]});r[k]=a.map(function(v){return v[1]});}"
+                    + "if(q[\"" + spec.id() + "\"])delete q[\"" + spec.id() + "\"];})();";
+            String finalizerHtml = finalizer.replace("\\", "\\\\").replace("'", "\\'");
+
+            return spec.globalName() + "=" + Json.write(facadeRoot) + ";\n"
+                    + "(function(){var u=" + Json.write(files)
+                    + ",c=document.currentScript,b=(c&&c.src)?c.src.substring(0,c.src.lastIndexOf('/')+1):'';"
+                    + "if(document.readyState!=='loading')throw new Error('RecordsNext shard loader deve essere caricato durante il parsing HTML');"
+                    + "for(var i=0;i<u.length;i++){var s=String(b+u[i]).replace(/&/g,'&amp;').replace(/\"/g,'&quot;');"
+                    + "document.write('<script src=\"'+s+'\"><\\/script>');}"
+                    + "document.write('<script>" + finalizerHtml + "<\\/script>');})();\n";
+        }
+
         private static String renderFacade(FamilySpec spec, Map<String, Object> facadeRoot, List<Shard> shards)
                 throws IOException {
             List<String> online = new ArrayList<>();
@@ -7038,6 +7245,12 @@ File: src\main\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublish
         private record Assignment(String globalName, Map<String, Object> root) {}
         private record SeasonRoute(String seasonId, Path localSitePath, String onlineSiteUrl, boolean anchor) {}
         private record RawNumber(String value) {}
+
+        public record FlatShard(String familyId, String seasonId, Path file, long bytes) {}
+        public record FlatPlan(List<FlatShard> shards, List<Path> facades) {
+            public long maxShardBytes() { return shards.stream().mapToLong(FlatShard::bytes).max().orElse(0L); }
+            public long totalShardBytes() { return shards.stream().mapToLong(FlatShard::bytes).sum(); }
+        }
 
         public record Shard(String familyId, String seasonId, Path stagedFile, Path target,
                             String onlineUrl, String localUrl, long bytes, String sha256,
@@ -7737,6 +7950,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
     import it.alterlega.recordsnext.app.model.RecordFamily;
     import it.alterlega.recordsnext.app.core.CoreJsExporter;
     import it.alterlega.recordsnext.app.output.SeasonPublicationTargetRepository;
+    import it.alterlega.recordsnext.app.output.SeasonFamilyShardPublisher;
 
     import java.nio.file.Files;
     import java.nio.file.Path;
@@ -7980,7 +8194,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                     ManifestMetadata manifestMetadata =
                             new ManifestMetadata(
                                     "RecordsNext by mauz79",
-                                    "3.1.0",
+                                    "3.1.1",
                                     "2.0",
                                     OffsetDateTime.now(),
                                     leagueMetadata.leagueId(),
@@ -8139,7 +8353,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                             ManifestMetadata targetManifest =
                                     new ManifestMetadata(
                                             "RecordsNext by mauz79",
-                                            "3.1.0",
+                                            "3.1.1",
                                             "2.0",
                                             OffsetDateTime.now(),
                                             leagueMetadata.leagueId(),
@@ -8173,6 +8387,15 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                                     leagueMetadata.leagueId(),
                                     leagueMetadata.leagueName(),
                                     target.seasonId()
+                            );
+
+                            var flatPlan = SeasonFamilyShardPublisher.prepareFlat(generatedDir);
+                            l.phase(
+                                    "Output flat " + target.seasonId()
+                                            + ": shard=" + flatPlan.shards().size()
+                                            + ", max=" + String.format(Locale.ROOT, "%.2f MiB",
+                                                    flatPlan.maxShardBytes() / (1024.0 * 1024.0)),
+                                    -1
                             );
 
                             int published = publishGeneratedDirectory(
@@ -8318,7 +8541,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
             }
         }
 
-        private static int publishGeneratedDirectory(
+        static int publishGeneratedDirectory(
                 Path generatedDir,
                 Path siteJsDir) throws Exception {
 
@@ -8334,14 +8557,43 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                         .toList();
             }
 
+            Set<String> generatedNames = files.stream()
+                    .map(path -> path.getFileName().toString())
+                    .collect(java.util.stream.Collectors.toSet());
+
+            List<Path> staleFlatShards;
+            try (var stream = Files.list(siteJsDir)) {
+                staleFlatShards = stream
+                        .filter(Files::isRegularFile)
+                        .filter(path -> SeasonFamilyShardPublisher.isFlatShardFileName(
+                                path.getFileName().toString()))
+                        .filter(path -> !generatedNames.contains(path.getFileName().toString()))
+                        .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                        .toList();
+            }
+
             Path backupRoot = generatedDir.getParent()
                     .resolve("multisite-publish-backup");
+            deleteTree(backupRoot);
             Files.createDirectories(backupRoot);
 
             List<Path> replaced = new ArrayList<>();
             List<Path> created = new ArrayList<>();
+            List<Path> removedStale = new ArrayList<>();
 
             try {
+                for (Path stale : staleFlatShards) {
+                    Path backup = backupRoot.resolve(stale.getFileName());
+                    Files.copy(
+                            stale,
+                            backup,
+                            StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.COPY_ATTRIBUTES
+                    );
+                    Files.delete(stale);
+                    removedStale.add(stale);
+                }
+
                 for (Path source : files) {
                     Path target = siteJsDir.resolve(source.getFileName());
 
@@ -8389,6 +8641,17 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                 }
 
                 for (Path target : replaced) {
+                    Path backup = backupRoot.resolve(target.getFileName());
+                    if (Files.isRegularFile(backup)) {
+                        Files.copy(
+                                backup,
+                                target,
+                                StandardCopyOption.REPLACE_EXISTING
+                        );
+                    }
+                }
+
+                for (Path target : removedStale) {
                     Path backup = backupRoot.resolve(target.getFileName());
                     if (Files.isRegularFile(backup)) {
                         Files.copy(
@@ -14711,7 +14974,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
         private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
-        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.1");
+        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.1.1");
         private final CardLayout pages = new CardLayout();
         private final JPanel pageHost = new JPanel(pages);
         private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
@@ -14744,7 +15007,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                 try {
                     new RecordsNext2Dashboard().show();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.1", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.1.1", JOptionPane.ERROR_MESSAGE);
                 }
             });
         }
@@ -14804,7 +15067,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             brand.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
             brand.setForeground(Color.WHITE);
             side.add(brand);
-            JLabel version = new JLabel("by mauz79 · 3.1");
+            JLabel version = new JLabel("by mauz79 · 3.1.1");
             version.setAlignmentX(Component.LEFT_ALIGNMENT);
             version.setForeground(new Color(174, 192, 224));
             version.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -14878,7 +15141,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             c.weightx = 0.0;
             header.add(leftSpacer, c);
 
-            JLabel title = new JLabel("RecordsNext 3.1", SwingConstants.CENTER);
+            JLabel title = new JLabel("RecordsNext 3.1.1", SwingConstants.CENTER);
             title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
             title.setForeground(RED);
             c.gridx = 1;
@@ -15886,7 +16149,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                         log.append("ERRORE: " + cause + System.lineSeparator());
                         status.setText("Errore");
                         status.setForeground(RED);
-                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.1", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.1.1", JOptionPane.ERROR_MESSAGE);
                     } finally {
                         run.setEnabled(true);
                         publishAllSites.setEnabled(true);
@@ -20845,15 +21108,6 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 );
             }
 
-            SeasonFamilyShardPublisher.Plan shardPlan = null;
-            if (includeRecordsNextCore) {
-                Path shardStateFile = stagingRoot.toAbsolutePath().normalize().getParent()
-                        .resolve("consolidation").resolve(SeasonFamilyShardPublisher.STATE_FILE_NAME);
-                shardPlan = SeasonFamilyShardPublisher.prepare(
-                        generatedDir, runDir.resolve("season-shards"), shardStateFile
-                );
-            }
-
             ValidationResult validation = validateGenerated(
                     generatedDir,
                     includeClassic,
@@ -20867,15 +21121,24 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                     includeRecordsNextCore
             );
             int published = 0;
+            int validatedFiles = validation.files().size();
             if (!generateOnly) {
-                if (shardPlan != null) {
-                    SeasonFamilyShardPublisher.publishShards(shardPlan);
+                // Pubblicazione 3.1.1: facade + shard stagionali tutti direttamente in js.
+                // Non viene creata alcuna sottocartella recordsnext-data.
+                SeasonFamilyShardPublisher.prepareFlat(generatedDir);
+                List<Path> publishFiles;
+                try (var stream = Files.list(generatedDir)) {
+                    publishFiles = stream
+                            .filter(Files::isRegularFile)
+                            .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                            .toList();
                 }
+                validatedFiles = publishFiles.size();
                 Files.createDirectories(siteJsDir);
-                published = publishWithRollback(generatedDir, siteJsDir, validation.files());
+                published = publishWithRollback(generatedDir, siteJsDir, publishFiles);
             }
             return new PublishResult(classicEntries, ruSeasons, annualFiles,
-                    validation.files().size(), published, runDir);
+                    validatedFiles, published, runDir);
         }
 
         private static ValidationResult validateGenerated(
@@ -29288,6 +29551,70 @@ File: src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExpo
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherFlatTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherFlatTest.java
+
+    package it.alterlega.recordsnext.app.output;
+
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.io.TempDir;
+
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+    import static org.junit.jupiter.api.Assertions.assertFalse;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+
+    class SeasonFamilyShardPublisherFlatTest {
+
+        @TempDir
+        Path temp;
+
+        @Test
+        void createsFlatSeasonShardsBesideFacadeWithoutSubdirectories() throws Exception {
+            Path generated = temp.resolve("js");
+            Files.createDirectories(generated);
+
+            Files.writeString(
+                    generated.resolve("fcmRecordsNext_Matches.js"),
+                    "window.fcmRecordsNextMatches = {\"matches\":["
+                            + "{\"seasonId\":\"2024_2025\",\"matchId\":1},"
+                            + "{\"seasonId\":\"2025_2026\",\"matchId\":2}]};\n"
+            );
+
+            var plan = SeasonFamilyShardPublisher.prepareFlat(generated);
+
+            assertEquals(2, plan.shards().size());
+            assertTrue(Files.isRegularFile(generated.resolve(
+                    "fcmRecordsNext_Matches.2024_2025.js")));
+            assertTrue(Files.isRegularFile(generated.resolve(
+                    "fcmRecordsNext_Matches.2025_2026.js")));
+
+            try (var children = Files.list(generated)) {
+                assertFalse(children.anyMatch(Files::isDirectory));
+            }
+
+            String facade = Files.readString(generated.resolve("fcmRecordsNext_Matches.js"));
+            assertTrue(facade.contains("fcmRecordsNext_Matches.2024_2025.js"));
+            assertTrue(facade.contains("fcmRecordsNext_Matches.2025_2026.js"));
+            assertFalse(facade.contains("recordsnext-data"));
+            assertTrue(facade.contains("document.currentScript"));
+            assertTrue(plan.maxShardBytes() <= SeasonFamilyShardPublisher.DEFAULT_FLAT_MAX_SHARD_BYTES);
+        }
+
+        @Test
+        void recognizesOnlyFlatShardNamesNotFacadeNames() {
+            assertTrue(SeasonFamilyShardPublisher.isFlatShardFileName(
+                    "fcmRecordsNext_Series.2026_2027.js"));
+            assertFalse(SeasonFamilyShardPublisher.isFlatShardFileName(
+                    "fcmRecordsNext_Series.js"));
+            assertFalse(SeasonFamilyShardPublisher.isFlatShardFileName(
+                    "fcmRecordsNext_Core.js"));
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherTest.java
@@ -30791,7 +31118,7 @@ File: tools\Build_RecordsNext2_Release_v5.ps1
 
     param(
         [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
-        [string]$ReleaseVersion = "3.1.0",
+        [string]$ReleaseVersion = "3.1.1",
         [string]$DownloadsDir = "D:\DEV_APPS\downloads",
         [string]$UCanAccessRoot = ""
     )
@@ -31128,9 +31455,9 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     [void]$Builder.AppendLine("> Directory progetto: " + $ProjectDir)
     [void]$Builder.AppendLine("")
 
-    [void]$Builder.AppendLine("## Stato release RecordsNext 3.1.0 - 2026-09-02")
+    [void]$Builder.AppendLine("## Stato release RecordsNext 3.1.1 - 2026-09-02")
     [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("RecordsNext 3.1.0 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.")
+    [void]$Builder.AppendLine("RecordsNext 3.1.1 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("- Suite automatica: 50 test, 0 failure, 0 errori.")
     [void]$Builder.AppendLine("- Collaudo multisito reale: 21 target, 189 file validati e 189 pubblicati.")
@@ -42635,6 +42962,7 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
 - src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTest.java
 - src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExporterTest.java
+- src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherFlatTest.java
 - src\test\java\it\alterlega\recordsnext\app\output\SeasonFamilyShardPublisherTest.java
 - src\test\java\it\alterlega\recordsnext\app\output\SeasonPublicationScopeRepositoryTest.java
 - src\test\java\it\alterlega\recordsnext\app\output\SeasonPublicationTargetRepositoryTest.java

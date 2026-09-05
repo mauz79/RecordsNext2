@@ -35,6 +35,11 @@ import java.util.UUID;
  */
 public final class SeasonFamilyShardPublisher {
     public static final long DEFAULT_MAX_SHARD_BYTES = 1024L * 1024L;
+    /**
+     * Limite di sicurezza per gli shard flat 3.1.1. L'obiettivo resta circa 1 MiB;
+     * il margine evita di bloccare la pubblicazione per piccoli sforamenti fisiologici.
+     */
+    public static final long DEFAULT_FLAT_MAX_SHARD_BYTES = 1536L * 1024L;
     public static final String DATA_DIR = "recordsnext-data";
     public static final String STATE_FILE_NAME = "recordsnext-shards.properties";
 
@@ -56,6 +61,93 @@ public final class SeasonFamilyShardPublisher {
     );
 
     private SeasonFamilyShardPublisher() {}
+
+    /**
+     * Trasforma le sette famiglie pesanti in facade leggere + shard stagionali
+     * direttamente nella stessa cartella JS. Non crea sottocartelle, non usa
+     * routing tra siti e non dipende dallo stato di disponibilita' legacy.
+     *
+     * <p>Questa e' la strategia usata dalla pubblicazione multisito 3.1.1:
+     * ogni target contiene autonomamente tutti gli shard ammessi dal proprio
+     * cutoff storico.</p>
+     */
+    public static FlatPlan prepareFlat(Path generatedDir) throws IOException {
+        return prepareFlat(generatedDir, DEFAULT_FLAT_MAX_SHARD_BYTES);
+    }
+
+    public static FlatPlan prepareFlat(Path generatedDir, long maxShardBytes) throws IOException {
+        Objects.requireNonNull(generatedDir, "generatedDir");
+        if (maxShardBytes < 1) throw new IllegalArgumentException("maxShardBytes deve essere positivo");
+        if (!Files.isDirectory(generatedDir)) {
+            throw new IOException("Cartella JS generata non trovata: " + generatedDir);
+        }
+
+        deleteExistingFlatShards(generatedDir);
+
+        List<FlatShard> shards = new ArrayList<>();
+        List<Path> facades = new ArrayList<>();
+
+        for (FamilySpec spec : FAMILIES) {
+            Path familyFile = generatedDir.resolve(spec.fileName());
+            if (!Files.isRegularFile(familyFile)) continue;
+
+            Assignment assignment = readAssignment(familyFile, spec.globalName());
+            Map<String, Object> root = assignment.root();
+            Map<String, Object> facadeRoot = deepCopyMap(root);
+            for (String field : spec.shardedFields()) facadeRoot.put(field, new ArrayList<>());
+
+            Map<String, Map<String, List<Object>>> bySeason = splitBySeason(root, spec);
+            List<FlatShard> familyShards = new ArrayList<>();
+
+            for (Map.Entry<String, Map<String, List<Object>>> entry : bySeason.entrySet()) {
+                String seasonId = entry.getKey();
+                String shardName = "fcmRecordsNext_" + spec.id() + "." + seasonId + ".js";
+                Path shardFile = generatedDir.resolve(shardName);
+
+                String shardJs = renderShard(spec, entry.getValue());
+                Files.writeString(shardFile, shardJs, StandardCharsets.UTF_8);
+
+                long bytes = Files.size(shardFile);
+                if (bytes > maxShardBytes) {
+                    throw new IOException("Shard flat oltre il limite di sicurezza di " + maxShardBytes
+                            + " byte: " + shardFile.getFileName() + " = " + bytes);
+                }
+
+                FlatShard shard = new FlatShard(spec.id(), seasonId, shardFile, bytes);
+                shards.add(shard);
+                familyShards.add(shard);
+            }
+
+            String facadeJs = renderFlatFacade(spec, facadeRoot, familyShards);
+            Files.writeString(familyFile, facadeJs, StandardCharsets.UTF_8);
+            facades.add(familyFile);
+        }
+
+        return new FlatPlan(List.copyOf(shards), List.copyOf(facades));
+    }
+
+    private static void deleteExistingFlatShards(Path generatedDir) throws IOException {
+        try (var files = Files.list(generatedDir)) {
+            for (Path file : files.filter(Files::isRegularFile).toList()) {
+                if (isFlatShardFileName(file.getFileName().toString())) {
+                    Files.deleteIfExists(file);
+                }
+            }
+        }
+    }
+
+    public static boolean isFlatShardFileName(String name) {
+        if (name == null) return false;
+        for (FamilySpec spec : FAMILIES) {
+            String prefix = "fcmRecordsNext_" + spec.id() + ".";
+            if (name.startsWith(prefix) && name.endsWith(".js")
+                    && name.length() > prefix.length() + 3) {
+                String season = name.substring(prefix.length(), name.length() - 3);
+                return season.matches("\\d{4}_\\d{4}");
+            }
+        }
+        return false;
+    }
 
     public static Plan prepare(Path generatedDir, Path shardStagingRoot) throws IOException {
         Path transientState = shardStagingRoot.resolve(STATE_FILE_NAME);
@@ -236,6 +328,33 @@ public final class SeasonFamilyShardPublisher {
                 + "})();\n";
     }
 
+    private static String renderFlatFacade(
+            FamilySpec spec,
+            Map<String, Object> facadeRoot,
+            List<FlatShard> shards) {
+
+        List<String> files = shards.stream()
+                .sorted(Comparator.comparing(FlatShard::seasonId))
+                .map(shard -> shard.file().getFileName().toString())
+                .toList();
+
+        String fields = Json.write(spec.shardedFields());
+        String finalizer = "(function(){var q=window.__recordsNextShardQueue||{},f=q[\"" + spec.id()
+                + "\"]||{},r=" + spec.globalName() + ",fields=" + fields
+                + ";for(var x=0;x<fields.length;x++){var k=fields[x],a=f[k]||[];"
+                + "a.sort(function(A,B){return A[0]-B[0]});r[k]=a.map(function(v){return v[1]});}"
+                + "if(q[\"" + spec.id() + "\"])delete q[\"" + spec.id() + "\"];})();";
+        String finalizerHtml = finalizer.replace("\\", "\\\\").replace("'", "\\'");
+
+        return spec.globalName() + "=" + Json.write(facadeRoot) + ";\n"
+                + "(function(){var u=" + Json.write(files)
+                + ",c=document.currentScript,b=(c&&c.src)?c.src.substring(0,c.src.lastIndexOf('/')+1):'';"
+                + "if(document.readyState!=='loading')throw new Error('RecordsNext shard loader deve essere caricato durante il parsing HTML');"
+                + "for(var i=0;i<u.length;i++){var s=String(b+u[i]).replace(/&/g,'&amp;').replace(/\"/g,'&quot;');"
+                + "document.write('<script src=\"'+s+'\"><\\/script>');}"
+                + "document.write('<script>" + finalizerHtml + "<\\/script>');})();\n";
+    }
+
     private static String renderFacade(FamilySpec spec, Map<String, Object> facadeRoot, List<Shard> shards)
             throws IOException {
         List<String> online = new ArrayList<>();
@@ -362,6 +481,12 @@ public final class SeasonFamilyShardPublisher {
     private record Assignment(String globalName, Map<String, Object> root) {}
     private record SeasonRoute(String seasonId, Path localSitePath, String onlineSiteUrl, boolean anchor) {}
     private record RawNumber(String value) {}
+
+    public record FlatShard(String familyId, String seasonId, Path file, long bytes) {}
+    public record FlatPlan(List<FlatShard> shards, List<Path> facades) {
+        public long maxShardBytes() { return shards.stream().mapToLong(FlatShard::bytes).max().orElse(0L); }
+        public long totalShardBytes() { return shards.stream().mapToLong(FlatShard::bytes).sum(); }
+    }
 
     public record Shard(String familyId, String seasonId, Path stagedFile, Path target,
                         String onlineUrl, String localUrl, long bytes, String sha256,

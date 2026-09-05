@@ -274,15 +274,6 @@ public final class Records2026SitePublisher {
             );
         }
 
-        SeasonFamilyShardPublisher.Plan shardPlan = null;
-        if (includeRecordsNextCore) {
-            Path shardStateFile = stagingRoot.toAbsolutePath().normalize().getParent()
-                    .resolve("consolidation").resolve(SeasonFamilyShardPublisher.STATE_FILE_NAME);
-            shardPlan = SeasonFamilyShardPublisher.prepare(
-                    generatedDir, runDir.resolve("season-shards"), shardStateFile
-            );
-        }
-
         ValidationResult validation = validateGenerated(
                 generatedDir,
                 includeClassic,
@@ -296,15 +287,24 @@ public final class Records2026SitePublisher {
                 includeRecordsNextCore
         );
         int published = 0;
+        int validatedFiles = validation.files().size();
         if (!generateOnly) {
-            if (shardPlan != null) {
-                SeasonFamilyShardPublisher.publishShards(shardPlan);
+            // Pubblicazione 3.1.1: facade + shard stagionali tutti direttamente in js.
+            // Non viene creata alcuna sottocartella recordsnext-data.
+            SeasonFamilyShardPublisher.prepareFlat(generatedDir);
+            List<Path> publishFiles;
+            try (var stream = Files.list(generatedDir)) {
+                publishFiles = stream
+                        .filter(Files::isRegularFile)
+                        .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                        .toList();
             }
+            validatedFiles = publishFiles.size();
             Files.createDirectories(siteJsDir);
-            published = publishWithRollback(generatedDir, siteJsDir, validation.files());
+            published = publishWithRollback(generatedDir, siteJsDir, publishFiles);
         }
         return new PublishResult(classicEntries, ruSeasons, annualFiles,
-                validation.files().size(), published, runDir);
+                validatedFiles, published, runDir);
     }
 
     private static ValidationResult validateGenerated(

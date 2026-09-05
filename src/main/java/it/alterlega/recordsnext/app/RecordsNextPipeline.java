@@ -9,6 +9,7 @@ import it.alterlega.recordsnext.app.core.LeagueMetadataLoader;
 import it.alterlega.recordsnext.app.model.RecordFamily;
 import it.alterlega.recordsnext.app.core.CoreJsExporter;
 import it.alterlega.recordsnext.app.output.SeasonPublicationTargetRepository;
+import it.alterlega.recordsnext.app.output.SeasonFamilyShardPublisher;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -252,7 +253,7 @@ public final class RecordsNextPipeline {
                 ManifestMetadata manifestMetadata =
                         new ManifestMetadata(
                                 "RecordsNext by mauz79",
-                                "3.1.0",
+                                "3.1.1",
                                 "2.0",
                                 OffsetDateTime.now(),
                                 leagueMetadata.leagueId(),
@@ -411,7 +412,7 @@ public final class RecordsNextPipeline {
                         ManifestMetadata targetManifest =
                                 new ManifestMetadata(
                                         "RecordsNext by mauz79",
-                                        "3.1.0",
+                                        "3.1.1",
                                         "2.0",
                                         OffsetDateTime.now(),
                                         leagueMetadata.leagueId(),
@@ -445,6 +446,15 @@ public final class RecordsNextPipeline {
                                 leagueMetadata.leagueId(),
                                 leagueMetadata.leagueName(),
                                 target.seasonId()
+                        );
+
+                        var flatPlan = SeasonFamilyShardPublisher.prepareFlat(generatedDir);
+                        l.phase(
+                                "Output flat " + target.seasonId()
+                                        + ": shard=" + flatPlan.shards().size()
+                                        + ", max=" + String.format(Locale.ROOT, "%.2f MiB",
+                                                flatPlan.maxShardBytes() / (1024.0 * 1024.0)),
+                                -1
                         );
 
                         int published = publishGeneratedDirectory(
@@ -590,7 +600,7 @@ public final class RecordsNextPipeline {
         }
     }
 
-    private static int publishGeneratedDirectory(
+    static int publishGeneratedDirectory(
             Path generatedDir,
             Path siteJsDir) throws Exception {
 
@@ -606,14 +616,43 @@ public final class RecordsNextPipeline {
                     .toList();
         }
 
+        Set<String> generatedNames = files.stream()
+                .map(path -> path.getFileName().toString())
+                .collect(java.util.stream.Collectors.toSet());
+
+        List<Path> staleFlatShards;
+        try (var stream = Files.list(siteJsDir)) {
+            staleFlatShards = stream
+                    .filter(Files::isRegularFile)
+                    .filter(path -> SeasonFamilyShardPublisher.isFlatShardFileName(
+                            path.getFileName().toString()))
+                    .filter(path -> !generatedNames.contains(path.getFileName().toString()))
+                    .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                    .toList();
+        }
+
         Path backupRoot = generatedDir.getParent()
                 .resolve("multisite-publish-backup");
+        deleteTree(backupRoot);
         Files.createDirectories(backupRoot);
 
         List<Path> replaced = new ArrayList<>();
         List<Path> created = new ArrayList<>();
+        List<Path> removedStale = new ArrayList<>();
 
         try {
+            for (Path stale : staleFlatShards) {
+                Path backup = backupRoot.resolve(stale.getFileName());
+                Files.copy(
+                        stale,
+                        backup,
+                        StandardCopyOption.REPLACE_EXISTING,
+                        StandardCopyOption.COPY_ATTRIBUTES
+                );
+                Files.delete(stale);
+                removedStale.add(stale);
+            }
+
             for (Path source : files) {
                 Path target = siteJsDir.resolve(source.getFileName());
 
@@ -661,6 +700,17 @@ public final class RecordsNextPipeline {
             }
 
             for (Path target : replaced) {
+                Path backup = backupRoot.resolve(target.getFileName());
+                if (Files.isRegularFile(backup)) {
+                    Files.copy(
+                            backup,
+                            target,
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
+                }
+            }
+
+            for (Path target : removedStale) {
                 Path backup = backupRoot.resolve(target.getFileName());
                 if (Files.isRegularFile(backup)) {
                     Files.copy(

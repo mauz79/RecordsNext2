@@ -1,4 +1,20 @@
-# RecordsNext 3.1
+# RecordsNext 3.1.1
+
+## RecordsNext 3.1.1
+
+La 3.1.1 corregge la pubblicazione JavaScript introdotta con il multisito 3.1: le sette famiglie dati pesanti vengono ora pubblicate come **shard stagionali flat direttamente nella cartella `js` del sito**, senza creare `recordsnext-data` o altre sottocartelle.
+
+Caratteristiche della correzione:
+
+- facade canoniche `fcmRecordsNext_*.js` mantenute e leggere;
+- shard stagionali nello stesso livello della cartella `js`;
+- nessuna dipendenza tra siti storici e nessun caricamento dati da sottocartelle;
+- cutoff storico multisito invariato: ogni sito riceve solo le stagioni fino al proprio target;
+- collaudo reale su tutti i siti configurati riuscito;
+- 52 test automatici, 0 failure, 0 errori;
+- shard massimo osservato nel collaudo reale: circa 0,93 MiB;
+- nessun file RecordsNext oltre 1,5 MiB nel collaudo;
+- vecchie cartelle `recordsnext-data` non fanno piÃ¹ parte dell'architettura 3.1.1.
 
 **RecordsNext by mauz79** è il generatore di record e statistiche storiche per leghe gestite con Fantacalcio Manager.
 
@@ -50,7 +66,7 @@ Un vecchio sito quindi non deve esistere perché una stagione resti valida nello
 
 La release pubblica 3.1 viene distribuita come **installazione pulita** tramite:
 
-`RecordsNext_3.1.0_SETUP.exe`
+`RecordsNext_3.1.1_SETUP.exe`
 
 Requisiti:
 

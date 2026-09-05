@@ -1,6 +1,6 @@
 param(
     [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
-    [string]$ReleaseVersion = "3.1.0",
+    [string]$ReleaseVersion = "3.1.1",
     [string]$DownloadsDir = "D:\DEV_APPS\downloads",
     [string]$UCanAccessRoot = ""
 )

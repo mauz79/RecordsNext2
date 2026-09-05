@@ -38,7 +38,7 @@ public final class RecordsNext2Dashboard {
     private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
     private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
-    private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.1");
+    private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.1.1");
     private final CardLayout pages = new CardLayout();
     private final JPanel pageHost = new JPanel(pages);
     private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
@@ -71,7 +71,7 @@ public final class RecordsNext2Dashboard {
             try {
                 new RecordsNext2Dashboard().show();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.1", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.1.1", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -131,7 +131,7 @@ public final class RecordsNext2Dashboard {
         brand.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
         brand.setForeground(Color.WHITE);
         side.add(brand);
-        JLabel version = new JLabel("by mauz79 · 3.1");
+        JLabel version = new JLabel("by mauz79 · 3.1.1");
         version.setAlignmentX(Component.LEFT_ALIGNMENT);
         version.setForeground(new Color(174, 192, 224));
         version.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -205,7 +205,7 @@ public final class RecordsNext2Dashboard {
         c.weightx = 0.0;
         header.add(leftSpacer, c);
 
-        JLabel title = new JLabel("RecordsNext 3.1", SwingConstants.CENTER);
+        JLabel title = new JLabel("RecordsNext 3.1.1", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
         title.setForeground(RED);
         c.gridx = 1;
@@ -1213,7 +1213,7 @@ public final class RecordsNext2Dashboard {
                     log.append("ERRORE: " + cause + System.lineSeparator());
                     status.setText("Errore");
                     status.setForeground(RED);
-                    JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.1", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.1.1", JOptionPane.ERROR_MESSAGE);
                 } finally {
                     run.setEnabled(true);
                     publishAllSites.setEnabled(true);

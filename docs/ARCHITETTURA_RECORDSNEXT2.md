@@ -1,4 +1,35 @@
-# Architettura RecordsNext 3.1.0
+# Architettura RecordsNext 3.1.1
+
+## Output JavaScript flat 3.1.1
+
+La 3.1.1 mantiene l'architettura multisito della 3.1 ma corregge il livello fisico di pubblicazione dei dataset pesanti.
+
+Per ciascun sito target:
+
+1. viene costruito lo scope storico fino al `sort_order` della stagione target;
+2. vengono generati i nove output canonici RecordsNext;
+3. le sette famiglie pesanti vengono suddivise per stagione;
+4. i file stagionali vengono pubblicati **direttamente nella stessa cartella `js` del sito**;
+5. i sette nomi canonici restano facade leggere che caricano esclusivamente shard locali dello stesso sito.
+
+Esempio:
+
+```text
+js/
+  fcmRecordsNext_Series.js
+  fcmRecordsNext_Series.2006_2007.js
+  fcmRecordsNext_Series.2007_2008.js
+  ...
+```
+
+Vincoli:
+
+- nessuna sottocartella `recordsnext-data`;
+- nessuna dipendenza da siti storici differenti;
+- nessun URL remoto necessario al caricamento degli shard;
+- nessuna stagione futura rispetto al target;
+- obiettivo operativo intorno a 1 MiB per shard, con soglia di sicurezza piÃ¹ permissiva per evitare falsi blocchi su file poco superiori;
+- Core e Manifest restano file canonici singoli.
 
 ## Architettura multisito 3.1
 

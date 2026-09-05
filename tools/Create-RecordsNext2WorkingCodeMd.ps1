@@ -67,9 +67,9 @@ $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 [void]$Builder.AppendLine("> Directory progetto: " + $ProjectDir)
 [void]$Builder.AppendLine("")
 
-[void]$Builder.AppendLine("## Stato release RecordsNext 3.1.0 - 2026-09-02")
+[void]$Builder.AppendLine("## Stato release RecordsNext 3.1.1 - 2026-09-02")
 [void]$Builder.AppendLine("")
-[void]$Builder.AppendLine("RecordsNext 3.1.0 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.")
+[void]$Builder.AppendLine("RecordsNext 3.1.1 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.")
 [void]$Builder.AppendLine("")
 [void]$Builder.AppendLine("- Suite automatica: 50 test, 0 failure, 0 errori.")
 [void]$Builder.AppendLine("- Collaudo multisito reale: 21 target, 189 file validati e 189 pubblicati.")
