@@ -15,7 +15,7 @@ where java >nul 2>&1
 if errorlevel 1 (
     echo.
     echo ERRORE: Java non trovato.
-    echo RecordsNext 3.1 richiede Java 21 o superiore.
+    echo RecordsNext 3.1.1 richiede Java 21 o superiore.
     echo.
     pause
     exit /b 1
@@ -43,7 +43,7 @@ if "%JAVA_MAJOR%"=="1" (
 if %JAVA_MAJOR% LSS 21 (
     echo.
     echo ERRORE: Java %JAVA_VERSION% non compatibile.
-    echo RecordsNext 3.1 richiede Java 21 o superiore.
+    echo RecordsNext 3.1.1 richiede Java 21 o superiore.
     echo.
     pause
     exit /b 1
@@ -63,7 +63,7 @@ exit /b 0
 :ucan_missing
 echo.
 echo ERRORE: runtime UCanAccess 2.0.9.5 incompleto.
-echo Reinstalla RecordsNext 3.1 usando il pacchetto FULL.
+echo Reinstalla RecordsNext 3.1.1 usando il pacchetto FULL.
 echo.
 pause
 exit /b 1

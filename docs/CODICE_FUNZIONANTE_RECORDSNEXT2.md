@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 3.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-09-06 01:41:55 +02:00
+> Data generazione: 2026-09-06 02:14:23 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Stato release RecordsNext 3.1.1 - 2026-09-02
@@ -31152,8 +31152,6 @@ File: tools\Build_RecordsNext2_Release_v5.ps1
         "README.md",
         "INSTALL.txt",
         "CHANGELOG.md",
-        "tools\Installa-RecordsNext-3.1.ps1",
-        "tools\INSTALLA_RECORDSNEXT.bat",
         "config\competitions.json",
         "config\teams.json",
         "config\culometro.json",
@@ -31181,14 +31179,11 @@ File: tools\Build_RecordsNext2_Release_v5.ps1
     Remove-Item -LiteralPath $releaseDir -Recurse -Force -ErrorAction SilentlyContinue
     New-Item -ItemType Directory -Path $payloadDir -Force | Out-Null
 
-    Copy-Item (Join-Path $ProjectRoot "tools\Installa-RecordsNext-3.1.ps1") $releaseDir -Force
-    Copy-Item (Join-Path $ProjectRoot "tools\INSTALLA_RECORDSNEXT.bat") $releaseDir -Force
 
     $readmeInstaller = @"
     RecordsNext $ReleaseVersion - INSTALLAZIONE
 
     1. Estrarre completamente lo ZIP.
-    2. Eseguire INSTALLA_RECORDSNEXT.bat.
     3. Indicare la cartella di installazione quando richiesto.
     4. L'installer verifica Java 21+, runtime e integrita minima del payload.
 
