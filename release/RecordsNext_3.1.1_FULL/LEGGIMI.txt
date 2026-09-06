@@ -1,0 +1,8 @@
+RecordsNext 3.1.1 - INSTALLAZIONE
+
+1. Estrarre completamente lo ZIP.
+3. Indicare la cartella di installazione quando richiesto.
+4. L'installer verifica Java 21+, runtime e integrita minima del payload.
+
+L'installazione NON pubblica file nei siti FCM.
+L'installazione NON contiene database, FCM/FCA o configurazioni personali.

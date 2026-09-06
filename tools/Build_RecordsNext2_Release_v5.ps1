@@ -34,8 +34,6 @@ $requiredFiles = @(
     "README.md",
     "INSTALL.txt",
     "CHANGELOG.md",
-    "tools\Installa-RecordsNext-3.1.ps1",
-    "tools\INSTALLA_RECORDSNEXT.bat",
     "config\competitions.json",
     "config\teams.json",
     "config\culometro.json",
@@ -63,14 +61,11 @@ if (-not (Test-Path -LiteralPath (Join-Path $UCanAccessRoot "ucanaccess-2.0.9.5.
 Remove-Item -LiteralPath $releaseDir -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Path $payloadDir -Force | Out-Null
 
-Copy-Item (Join-Path $ProjectRoot "tools\Installa-RecordsNext-3.1.ps1") $releaseDir -Force
-Copy-Item (Join-Path $ProjectRoot "tools\INSTALLA_RECORDSNEXT.bat") $releaseDir -Force
 
 $readmeInstaller = @"
 RecordsNext $ReleaseVersion - INSTALLAZIONE
 
 1. Estrarre completamente lo ZIP.
-2. Eseguire INSTALLA_RECORDSNEXT.bat.
 3. Indicare la cartella di installazione quando richiesto.
 4. L'installer verifica Java 21+, runtime e integrita minima del payload.
 
