@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 3.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-09-16 12:33:24 +02:00
+> Data generazione: 2026-09-16 13:09:55 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Stato release RecordsNext 3.1.1 - 2026-09-02
@@ -16401,17 +16401,6 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                 "ru.role-distribution", "Distribuzione PU, DU, CU e AU"
         );
 
-        private static final Map<String, String> MODIFIER_LABELS = labels(
-                "modifiers.defence-best-match", "Miglior modificatore difesa in una gara",
-                "modifiers.defence-total", "Totale modificatore difesa",
-                "modifiers.captain-uses", "Utilizzi Capitano",
-                "modifiers.captain-total", "Totale modificatore Capitano",
-                "modifiers.home-field-deciding", "Fattore Campo decisivo",
-                "modifiers.home-field-points-gained", "Punti guadagnati col Fattore Campo",
-                "modifiers.home-field-points-lost", "Punti persi fuori casa",
-                "modifiers.home-field-balance", "Saldo Fattore Campo"
-        );
-
         private static final Map<String, String> THRESHOLD_LABELS = labels(
                 "thresholds.surgical-win", "Vittoria chirurgica",
                 "thresholds.mocking-loss", "Sconfitta beffa",
@@ -31211,7 +31200,7 @@ File: config\processing.json
         "output": {
           "writeManifest": true,
           "writeCore": true,
-          "publishToSite": false
+          "publishToSite": true
         }
       }
     }

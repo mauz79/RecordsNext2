@@ -1276,17 +1276,6 @@ public final class RecordsNext2Dashboard {
             "ru.role-distribution", "Distribuzione PU, DU, CU e AU"
     );
 
-    private static final Map<String, String> MODIFIER_LABELS = labels(
-            "modifiers.defence-best-match", "Miglior modificatore difesa in una gara",
-            "modifiers.defence-total", "Totale modificatore difesa",
-            "modifiers.captain-uses", "Utilizzi Capitano",
-            "modifiers.captain-total", "Totale modificatore Capitano",
-            "modifiers.home-field-deciding", "Fattore Campo decisivo",
-            "modifiers.home-field-points-gained", "Punti guadagnati col Fattore Campo",
-            "modifiers.home-field-points-lost", "Punti persi fuori casa",
-            "modifiers.home-field-balance", "Saldo Fattore Campo"
-    );
-
     private static final Map<String, String> THRESHOLD_LABELS = labels(
             "thresholds.surgical-win", "Vittoria chirurgica",
             "thresholds.mocking-loss", "Sconfitta beffa",
