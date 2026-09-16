@@ -1,4 +1,4 @@
-# Architettura RecordsNext 3.1.1
+# Architettura RecordsNext 3.2.0
 
 ## Output JavaScript flat 3.1.1
 

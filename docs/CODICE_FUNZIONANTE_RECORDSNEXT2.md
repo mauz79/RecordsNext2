@@ -1,12 +1,12 @@
-# Codice funzionante RecordsNext 3.1
+# Codice funzionante RecordsNext 3.2
 
 > Documento generato automaticamente.
-> Data generazione: 2026-09-16 13:09:55 +02:00
+> Data generazione: 2026-09-16 22:03:25 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
-## Stato release RecordsNext 3.1.1 - 2026-09-02
+## Stato release RecordsNext 3.2.0 - 2026-09-16
 
-RecordsNext 3.1.1 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.
+RecordsNext 3.2.0 e' completato, collaudato e impacchettato. Resta la pubblicazione della release.
 
 - Suite automatica: 50 test, 0 failure, 0 errori.
 - Collaudo multisito reale: 21 target, 189 file validati e 189 pubblicati.
@@ -151,24 +151,24 @@ Le sezioni successive includono documentazione e codice reale del progetto. Le i
 
 File: README.md
 
-    # RecordsNext 3.1.1
+    # RecordsNext 3.2.0
 
-    ## RecordsNext 3.1.1
+    ## RecordsNext 3.2.0
 
-    La 3.1.1 corregge la pubblicazione JavaScript introdotta con il multisito 3.1: le sette famiglie dati pesanti vengono ora pubblicate come **shard stagionali flat direttamente nella cartella `js` del sito**, senza creare `recordsnext-data` o altre sottocartelle.
+    La 3.2.0 completa la modularizzazione dei record e porta il catalogo configurabile a copertura completa delle famiglie RecordsNext.
 
-    Caratteristiche della correzione:
+    Principali novita:
 
-    - facade canoniche `fcmRecordsNext_*.js` mantenute e leggere;
-    - shard stagionali nello stesso livello della cartella `js`;
-    - nessuna dipendenza tra siti storici e nessun caricamento dati da sottocartelle;
-    - cutoff storico multisito invariato: ogni sito riceve solo le stagioni fino al proprio target;
-    - collaudo reale su tutti i siti configurati riuscito;
-    - 52 test automatici, 0 failure, 0 errori;
-    - shard massimo osservato nel collaudo reale: circa 0,93 MiB;
-    - nessun file RecordsNext oltre 1,5 MiB nel collaudo;
-    - vecchie cartelle `recordsnext-data` non fanno piÃ¹ parte dell'architettura 3.1.1.
-
+    - catalogo modulare completo: 94 record/figli complessivi;
+    - 93 record configurabili singolarmente piu il Culometro opzionale;
+    - dipendenze preflight valutate a livello di singolo record;
+    - gestione corretta del Fattore Campo come capability dei Modificatori;
+    - Culometro esteso con gli eventi `HOME_FIELD_DECISIVE`;
+    - dettaglio Culometro con frequenza storica evento, frequenza della configurazione, impatto e contributo;
+    - Manifest coerente con selezione, dipendenze ed esito del preflight;
+    - mantenuta l'architettura multisito 3.1 e la pubblicazione tramite shard stagionali flat introdotta in 3.1.1;
+    - collaudi semantici completati sulle famiglie Classici, Serie, RU, Modificatori, Soglie/Fortuna e Culometro;
+    - collaudo operativo finale in modalita Completa riuscito con 72 record selezionati, 72 eseguibili, 72 completi, 0 parziali e 0 saltati.
     **RecordsNext by mauz79** è il generatore di record e statistiche storiche per leghe gestite con Fantacalcio Manager.
 
     RecordsNext legge i dati delle stagioni dai file FCM/FCA, mantiene uno storico normalizzato nel proprio database e genera file JavaScript pronti per essere usati dal sito della lega. La 3.1 introduce la pubblicazione multistagione/multisito: ogni vecchio sito può essere riallineato con i record disponibili **fino a quella stagione**, senza ricevere dati futuri.
@@ -190,7 +190,7 @@ File: README.md
     - [Calendari DataA](#calendari-dataa)
     - [Tabellini storici](#tabellini-storici)
     - [Flusso d'uso consigliato](#flusso-duso-consigliato)
-    - [Stato della release 3.1](#stato-della-release-31)
+    - [Stato della release 3.2](#stato-della-release-32)
 
     ## Cosa fa RecordsNext
 
@@ -217,9 +217,9 @@ File: README.md
 
     ## Installazione
 
-    La release pubblica 3.1 viene distribuita come **installazione pulita** tramite:
+    La release pubblica 3.2 viene distribuita come **installazione pulita** tramite:
 
-    `RecordsNext_3.1.1_SETUP.exe`
+    `RecordsNext_3.2.0_SETUP.exe`
 
     Requisiti:
 
@@ -563,7 +563,7 @@ File: README.md
 
 File: docs\ARCHITETTURA_RECORDSNEXT2.md
 
-    # Architettura RecordsNext 3.1.1
+    # Architettura RecordsNext 3.2.0
 
     ## Output JavaScript flat 3.1.1
 
@@ -1320,23 +1320,37 @@ File: docs\DIPENDENZE_OUTPUT.md
 
 File: docs\DECISIONI_APERTE.md
 
-    # Decisioni aperte RecordsNext 2.0
+    # Decisioni aperte RecordsNext 3.2
 
-    - catalogo definitivo dei figli;
-    - ID pubblici definitivi;
-    - struttura esatta dei JS;
-    - granularita degli eventi;
-    - regole di ex aequo;
-    - soglie minime di partite;
-    - attraversamento stagioni nelle serie;
-    - configurazione Culometro;
-    - modificatori personalizzati;
-    - selezione GUI;
-    - formato configurazione;
-    - compatibilita con output 1.0.2;
-    - tecnologia del motore;
-    - strategia di test comparativo;
-    - forma definitiva del manifest.
+    Aggiornato al 16/09/2026.
+
+    Al momento non risultano decisioni architetturali aperte sulle funzionalita consolidate di RecordsNext.
+
+    Sono definite e implementate:
+
+    - catalogo completo dei record;
+    - ID pubblici dei record;
+    - struttura degli output JavaScript;
+    - granularita delle selezioni GUI;
+    - dipendenze a livello di singolo record;
+    - gestione del Fattore Campo;
+    - Modificatori personalizzati e standard FCM;
+    - Soglie e Fortuna;
+    - Culometro configurabile e opzionale;
+    - Manifest;
+    - output canonico Matches;
+    - pubblicazione multistagione e multisito;
+    - shard stagionali flat nella cartella `js`;
+    - associazioni canoniche di squadre e competizioni;
+    - tabellini storici;
+    - configurazione e persistenza delle stagioni.
+
+    ## Chiusura RecordsNext 3.2 ancora da completare
+
+    Non sono decisioni progettuali aperte, ma attivita di rilascio:
+
+    - rigenerazione della bibbia dopo l'aggiornamento della documentazione;
+    - commit finale, tag 3.2.0 e pubblicazione della release 3.2.0.
 
 ## Modello dati
 
@@ -2635,7 +2649,137 @@ File: docs\CONFIGURAZIONE_RECORDSNEXT2.md
 
 File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 
-    # Stato implementazione RecordsNext 3.1.1
+    # Stato implementazione RecordsNext 3.2.0
+
+    ## RecordsNext 3.2.0 - 2026-09-16
+
+    Stato corrente verificato della linea 3.2:
+
+    - catalogo modulare completo: 94 record/figli complessivi, inclusi i 93 record configurabili e il Culometro opzionale;
+    - preflight corretto per il Fattore Campo: la capability `modifier.home-field` viene resa disponibile quando sono selezionati record Fattore Campo;
+    - `modifiers.home-field-deciding` non viene piu saltato erroneamente per dipendenza mancante;
+    - Culometro integrato con gli eventi `HOME_FIELD_DECISIVE`;
+    - `config/culometro.json` include il componente `HOME_FIELD_DECISIVE`;
+    - gli eventi Culometro espongono frequenza storica evento, frequenza storica configurazione, chiave configurazione, contributo e impatto;
+    - verifica reale Culometro con Fattore Campo completata: `homeFieldCandidateCount=1304`, 2608 occorrenze `HOME_FIELD_DECISIVE` nel JS generato;
+    - contratto checkbox -> vista verificato con `Test_RecordsNext2_CheckboxViews_v15.ps1`: 96 controlli, 0 problemi;
+    - Manifest verificato coerente con la selezione reale: 67 selezionati, 67 eseguibili, 67 completi, 0 parziali, 0 saltati;
+    - audit finale `Test_RecordsNext2_FinalSemantic_v31.ps1` superato:
+      - Culometro - contributi: OK;
+      - Culometro - overlap: OK;
+      - Culometro - ranking: OK;
+      - Culometro - ranking competizione: OK;
+      - Culometro - metadata: OK;
+      - Record di lega: OK;
+      - eventi Culometro verificati: 17083;
+      - ranking Culometro: 438;
+      - ranking per competizione: 1403;
+      - righe `puntiSquadraMin`: 2312;
+      - problemi totali: 0;
+      - audit semantico `Test_RecordsNext2_ModifiersSemantic_v28.ps1` superato:
+      - 156 competizioni controllate;
+      - 10210 righe modificatori sorgente;
+      - 10930 righe squadra in casa;
+      - `modDifesaMax`: OK;
+      - `modDifesaTotaleSquadre`: OK;
+      - `modDifesaMediaSquadre`: OK;
+      - `modDifesaUtilizziSquadre`: OK;
+      - `capitanoTotaleSquadre`: OK;
+      - `capitanoUtilizziSquadre`: OK;
+      - `modDifesaFcmMax`: OK;
+      - `modDifesaFcmTotaleSquadre`: OK;
+      - `modDifesaFcmMediaSquadre`: OK;
+      - `modDifesaFcmUtilizziSquadre`: OK;
+      - `fattoreCampoDecisivo`: OK;
+      - `fattoreCampoTotaleSquadre`: OK;
+      - `fattoreCampoPuntiGuadagnatiSquadre`: OK;
+      - `fattoreCampoPuntiPersiSquadre`: OK;
+      - problemi totali: 0;
+      - audit semantico `Test_RecordsNext2_RUSemantic_v26.ps1` superato:
+      - 20 stagioni controllate;
+      - 3685 righe RU di dettaglio;
+      - 3046 partite-squadra con RU;
+      - `partiteConPiuRU`: OK;
+      - `partiteConRU`: OK;
+      - `partiteControRU`: OK;
+      - `ruDecisiva`: OK;
+      - `bilancioRUDecisiva`: OK;
+      - `ruDecisivaContro`: OK;
+      - `bilancioRUDecisivaContro`: OK;
+      - `bilancioConRU`: OK;
+      - `bilancioControRU`: OK;
+      - `mediaPuntiConRU`: OK;
+      - `mediaPuntiControRU`: OK;
+      - `tipoRUUsata`: OK;
+      - problemi totali: 0;
+      - audit semantico `Test_RecordsNext2_SerieSemantic_v24.ps1` superato:
+      - 156 file competizione controllati;
+      - 21860 righe partita valide;
+      - 1465 squadre controllate;
+      - `Clean sheet consecutivi`: OK;
+      - `Pareggi consecutivi`: OK;
+      - `Sconfitte consecutive`: OK;
+      - `Senza sconfitte`: OK;
+      - `Senza vittorie`: OK;
+      - `Serie Capitano`: OK;
+      - `Serie Modificatore Difesa`: OK;
+      - `Serie Modificatore Difesa FCM`: OK;
+      - `Vittorie consecutive`: OK;
+      - problemi totali: 0;
+      - audit semantico `Test_RecordsNext2_ThresholdsSemantic_v29.ps1` superato:
+      - 156 file normalizzati;
+      - 24318 righe partita analizzate;
+      - 17685 eventi attesi;
+      - 17685 eventi esportati;
+      - 438 aggregati squadra attesi;
+      - 438 aggregati squadra esportati;
+      - `EXACT_THRESHOLD`: 1906 / 1906, OK;
+      - `JUST_ENOUGH`: 491 / 491, OK;
+      - `MISSED_WIN_HALF_POINT`: 501 / 501, OK;
+      - `LOSS_BY_A_WHISKER`: 377 / 377, OK;
+      - `MIRACLE_DRAW`: 2620 / 2620, OK;
+      - `TIGHT_DRAW`: 2620 / 2620, OK;
+      - `ONE_GOAL_WIN`: 4585 / 4585, OK;
+      - `ONE_GOAL_LOSS`: 4585 / 4585, OK;
+      - `UNUSED_BAND_POINTS`: 0 / 0, OK;
+      - problemi totali: 0;
+      - audit semantico `Test_RecordsNext2_ClassiciSemantic_v21.ps1` superato:
+      - 156 file competizione controllati;
+      - 21860 righe partita valide;
+      - 1465 aggregati squadra controllati;
+      - `Minor punteggio`: OK;
+      - `Più gol regolamentari`: OK;
+      - `Maggior scarto regolamentare`: OK;
+      - `Media punti`: OK;
+      - `Somma punti`: OK;
+      - `Punti classifica`: OK;
+      - `Vittorie`: OK;
+      - `Pareggi`: OK;
+      - `Sconfitte`: OK;
+      - `Gol fatti`: OK;
+      - `Gol subiti`: OK;
+      - problemi totali: 0;
+      - regressione Maven finale dopo gli audit semantici:
+      - 57 test eseguiti;
+      - 0 failure;
+      - 0 errori;
+      - 0 skipped;
+      - build success.
+      - collaudo operativo finale in modalita Completa con il JAR 3.2 candidato: preflight 72 selezionati, 72 eseguibili, 72 completi, 0 parziali, 0 saltati; storico 2006_2007-2025_2026 riconosciuto invariato, stagione corrente 2026_2027 reimportata e normalizzata; elaborazione completata con consolidamento aggiornato, 9 file validi e 0 pubblicati;
+    - regressione Maven finale sulla versione 3.2.0:
+      - 57 test eseguiti;
+      - 0 failure;
+      - 0 errori;
+      - 0 skipped;
+      - BUILD SUCCESS;
+    - gli `outputStatus` dei family JS descrivono lo stato tecnico del dataset generato e non devono essere reinterpretati come duplicazione dello stato del preflight/Manifest;
+    - il Culometro resta un output opzionale separato dalla famiglia dati Soglie/Fortuna.
+    - packaging finale completato:
+      - `RecordsNext_3.2.0_FULL.zip` - SHA256 `BFE32FBBA14A5E45E3EA110C31A6C207F0E82048162B7572610D6E5A0A38AD71`;
+      - `RecordsNext_3.2.0_SETUP.exe` - SHA256 `760FF711920869BF3FFA031747A2BF192C46266A76C3698F520D55BE9FC14B22`;
+      - JAR 3.2.0 installato anche nella directory operativa usata da FCM;
+
+    La versione applicativa e Maven e stata portata a 3.2.0 dopo il completamento dei test semantici e del collaudo operativo finale. Packaging FULL e SETUP completato; resta da completare la pubblicazione della release.
 
     ## RecordsNext 3.1.1 - flat JS - 2026-09-06
 
@@ -3122,6 +3266,43 @@ File: docs\STATO_IMPLEMENTAZIONE_RECORDSNEXT2.md
 File: CHANGELOG.md
 
     # Changelog
+
+    ## RecordsNext 3.2.0 - 2026-09-16
+
+    ### Catalogo modulare e preflight
+
+    - completato il catalogo modulare RecordsNext: 94 record/figli complessivi, di cui 93 configurabili e Culometro opzionale;
+    - completata la corrispondenza tra controlli GUI e viste generate;
+    - dipendenze valutate a livello di singolo record;
+    - corretta la capability `modifier.home-field` nel preflight;
+    - `modifiers.home-field-deciding` viene ora eseguito quando il Fattore Campo e selezionato.
+
+    ### Culometro
+
+    - aggiunto il componente `HOME_FIELD_DECISIVE`;
+    - integrati gli eventi derivati da `fattoreCampoDecisivo`;
+    - aggiunti frequenza storica dell'evento, frequenza storica della configurazione, impatto e contributo;
+    - verifica reale: `homeFieldCandidateCount=1304` e 2608 occorrenze `HOME_FIELD_DECISIVE`.
+
+    ### Verifiche
+
+    - contratto checkbox/vista: 96 controlli verificati, 0 problemi;
+    - audit semantici Classici, Serie, RU, Modificatori, Soglie/Fortuna e Culometro superati;
+    - suite Maven: 57 test, 0 failure, 0 errori, 0 skipped;
+    - collaudo operativo finale in modalita Completa: 72 selezionati, 72 eseguibili, 72 completi, 0 parziali, 0 saltati;
+    - storico `2006_2007-2025_2026` riconosciuto invariato;
+    - stagione corrente `2026_2027` reimportata e normalizzata;
+    - generazione finale: 9 file validi, 0 pubblicati;
+    - consolidamento aggiornato correttamente.
+
+    ### Packaging 3.2.0
+
+    - `RecordsNext_3.2.0_FULL.zip` - SHA256 `BFE32FBBA14A5E45E3EA110C31A6C207F0E82048162B7572610D6E5A0A38AD71`;
+    - `RecordsNext_3.2.0_SETUP.exe` - SHA256 `760FF711920869BF3FFA031747A2BF192C46266A76C3698F520D55BE9FC14B22`;
+    - installer pubblico compilato con Inno Setup 7;
+    - JAR 3.2.0 copiato anche nell'installazione operativa usata da FCM.
+
+
 
 
     ## RecordsNext 3.1.1 â€” 2026-09-06
@@ -8383,7 +8564,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                     ManifestMetadata manifestMetadata =
                             new ManifestMetadata(
                                     "RecordsNext by mauz79",
-                                    "3.1.1",
+                                    "3.2.0",
                                     "2.0",
                                     OffsetDateTime.now(),
                                     leagueMetadata.leagueId(),
@@ -8542,7 +8723,7 @@ File: src\main\java\it\alterlega\recordsnext\app\RecordsNextPipeline.java
                             ManifestMetadata targetManifest =
                                     new ManifestMetadata(
                                             "RecordsNext by mauz79",
-                                            "3.1.1",
+                                            "3.2.0",
                                             "2.0",
                                             OffsetDateTime.now(),
                                             leagueMetadata.leagueId(),
@@ -15163,7 +15344,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
         private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
         private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
-        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.1.1");
+        private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.2.0");
         private final CardLayout pages = new CardLayout();
         private final JPanel pageHost = new JPanel(pages);
         private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
@@ -15196,7 +15377,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                 try {
                     new RecordsNext2Dashboard().show();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.1.1", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.2.0", JOptionPane.ERROR_MESSAGE);
                 }
             });
         }
@@ -15256,7 +15437,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             brand.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
             brand.setForeground(Color.WHITE);
             side.add(brand);
-            JLabel version = new JLabel("by mauz79 · 3.1.1");
+            JLabel version = new JLabel("by mauz79 · 3.2.0");
             version.setAlignmentX(Component.LEFT_ALIGNMENT);
             version.setForeground(new Color(174, 192, 224));
             version.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -15330,7 +15511,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
             c.weightx = 0.0;
             header.add(leftSpacer, c);
 
-            JLabel title = new JLabel("RecordsNext 3.1.1", SwingConstants.CENTER);
+            JLabel title = new JLabel("RecordsNext 3.2.0", SwingConstants.CENTER);
             title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
             title.setForeground(RED);
             c.gridx = 1;
@@ -16338,7 +16519,7 @@ File: src\main\java\it\alterlega\recordsnext\gui\RecordsNext2Dashboard.java
                         log.append("ERRORE: " + cause + System.lineSeparator());
                         status.setText("Errore");
                         status.setForeground(RED);
-                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.1.1", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.2.0", JOptionPane.ERROR_MESSAGE);
                     } finally {
                         run.setEnabled(true);
                         publishAllSites.setEnabled(true);
@@ -31200,7 +31381,7 @@ File: config\processing.json
         "output": {
           "writeManifest": true,
           "writeCore": true,
-          "publishToSite": true
+          "publishToSite": false
         }
       }
     }
@@ -31502,7 +31683,7 @@ File: tools\Build_RecordsNext2_Release_v5.ps1
 
     param(
         [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
-        [string]$ReleaseVersion = "3.1.1",
+        [string]$ReleaseVersion = "3.2.0",
         [string]$DownloadsDir = "D:\DEV_APPS\downloads",
         [string]$UCanAccessRoot = ""
     )
@@ -31666,7 +31847,7 @@ File: tools\Build_RecordsNext2_Release_v5.ps1
         -Encoding ASCII
 
     Write-Host ""
-    Write-Host "FULL 3.1 creato:"
+    Write-Host "FULL $ReleaseVersion creato:"
     Write-Host "  $zipPath"
     Write-Host "SHA256:"
     Write-Host "  $hash"
@@ -31827,16 +32008,16 @@ File: tools\Create-RecordsNext2WorkingCodeMd.ps1
     $Builder = New-Object System.Text.StringBuilder
     $GeneratedAt = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 
-    [void]$Builder.AppendLine("# Codice funzionante RecordsNext 3.1")
+    [void]$Builder.AppendLine("# Codice funzionante RecordsNext 3.2")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("> Documento generato automaticamente.")
     [void]$Builder.AppendLine("> Data generazione: " + $GeneratedAt)
     [void]$Builder.AppendLine("> Directory progetto: " + $ProjectDir)
     [void]$Builder.AppendLine("")
 
-    [void]$Builder.AppendLine("## Stato release RecordsNext 3.1.1 - 2026-09-02")
+    [void]$Builder.AppendLine("## Stato release RecordsNext 3.2.0 - 2026-09-16")
     [void]$Builder.AppendLine("")
-    [void]$Builder.AppendLine("RecordsNext 3.1.1 e' completato, collaudato e pubblicato. La distribuzione pubblica avviene tramite installer clean-install.")
+    [void]$Builder.AppendLine("RecordsNext 3.2.0 e' completato, collaudato e impacchettato. Resta la pubblicazione della release.")
     [void]$Builder.AppendLine("")
     [void]$Builder.AppendLine("- Suite automatica: 50 test, 0 failure, 0 errori.")
     [void]$Builder.AppendLine("- Collaudo multisito reale: 21 target, 189 file validati e 189 pubblicati.")

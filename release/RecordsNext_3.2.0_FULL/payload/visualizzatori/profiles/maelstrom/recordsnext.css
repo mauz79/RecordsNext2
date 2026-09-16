@@ -1,0 +1,260 @@
+/*
+ * RecordsNext 2.0 - profilo maelstrom
+ * v50: adeguato alla schermata FCM originale fornita dall'utente.
+ * Fondo generale azzurrino; intestazioni blu; righe tabella alternate
+ * bianco/ciano; carattere Verdana e uso deciso del grassetto.
+ */
+
+:root{
+  --rn-blue:#2323B3;
+  --rn-blue-dark:#000099;
+  --rn-cyan:#CCFFFF;
+  --rn-cyan-bright:#33FFFF;
+  --rn-white:#FFFFFF;
+  --rn-black:#000000;
+  --rn-red:#CC0000;
+  --rn-green:#336600;
+  --rn-border:#2323B3;
+}
+
+*{box-sizing:border-box}
+
+html,body{min-height:100%;margin:0;padding:0}
+
+body,
+body.rn-page,
+body.recordsnext-page{
+  margin:10px 3px;
+  background:var(--rn-cyan);
+  color:var(--rn-black);
+  font-family:Verdana,Arial,Helvetica,sans-serif;
+  font-size:12px;
+  line-height:1.25;
+}
+
+a{color:var(--rn-blue);text-decoration:underline}
+a:visited{color:var(--rn-blue)}
+a:hover,a:focus{color:var(--rn-blue-dark)}
+
+.rn-shell{
+  width:min(980px,calc(100vw - 12px));
+  margin:0 auto;
+  padding:0;
+}
+
+/* La zona contenuto della skin resta azzurrina. */
+.rn-header{
+  margin-bottom:10px;
+  padding:10px;
+  border:1px solid var(--rn-border);
+  background:var(--rn-cyan);
+  color:var(--rn-blue);
+}
+
+.rn-header h1,
+.rn-header h2,
+.rn-title{
+  margin:.15em 0;
+  color:var(--rn-blue);
+  font-family:Verdana,Arial,Helvetica,sans-serif;
+}
+
+.rn-header h1,.rn-title{font-size:20px;font-weight:normal}
+.rn-header h2{font-size:14px;font-weight:bold}
+.rn-kicker{color:var(--rn-blue);font-weight:bold}
+
+/* Card e pannelli sul fondo azzurrino; niente stile moderno. */
+.rn-card-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+
+.rn-family-card,
+.rn-toolbar,
+.rn-meta-item,
+.rn-empty-state,
+.rn-error-state,
+.rn-status-row,
+.rn-panel{
+  border:1px solid var(--rn-border);
+  border-radius:0;
+  box-shadow:none;
+  background:var(--rn-cyan);
+}
+
+.rn-family-card{
+  display:flex;
+  flex-direction:column;
+  min-height:180px;
+  padding:10px;
+}
+
+.rn-family-card h2,
+.rn-panel-title,
+.rn-meta-item strong,
+.rn-toolbar label,
+.rn-field,
+.rn-count{
+  color:var(--rn-blue);
+  font-weight:bold;
+}
+
+.rn-family-card p{flex:1;color:var(--rn-black)}
+.rn-availability{font-weight:bold;color:var(--rn-blue)}
+.rn-positive{color:var(--rn-green);font-weight:bold}
+.rn-negative{color:var(--rn-red);font-weight:bold}
+
+.rn-breadcrumb{margin:8px 0}
+.rn-breadcrumb a{color:var(--rn-blue)}
+
+.rn-button,
+.rn-navigation a,
+.rn-tab{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:28px;
+  padding:4px 10px;
+  border:1px solid var(--rn-border);
+  border-radius:0;
+  background:var(--rn-white);
+  color:var(--rn-blue);
+  font:inherit;
+  font-weight:bold;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.rn-button:hover,
+.rn-navigation a:hover,
+.rn-tab:hover,
+.rn-tab.is-active{
+  background:var(--rn-cyan-bright);
+  color:var(--rn-blue);
+}
+
+.rn-meta-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:4px;
+  margin:10px 0;
+}
+.rn-meta-item{padding:8px}
+.rn-meta-item span{display:block;font-size:10px}
+.rn-meta-item strong{display:block;margin-top:2px}
+
+.rn-toolbar{
+  display:flex;
+  gap:8px;
+  align-items:end;
+  margin-bottom:8px;
+  padding:8px;
+}
+.rn-toolbar label{display:flex;flex-direction:column;gap:2px}
+.rn-grow{flex:1}
+
+.rn-toolbar input,
+.rn-toolbar select,
+.rn-field input,
+.rn-field select{
+  min-height:28px;
+  padding:2px 5px;
+  border:1px solid var(--rn-border);
+  border-radius:0;
+  background:var(--rn-white);
+  color:var(--rn-black);
+  font:inherit;
+}
+
+/* Titoli sezione: barra blu con testo bianco, come nelle tabelle della skin. */
+.rn-panel{overflow:hidden}
+.rn-panel-header{
+  padding:5px 8px;
+  border-bottom:1px solid var(--rn-border);
+  background:var(--rn-blue);
+  color:var(--rn-white);
+}
+.rn-panel-header .rn-panel-title,
+.rn-panel-header h2,
+.rn-panel-header p{
+  color:var(--rn-white);
+  font-weight:bold;
+}
+.rn-panel-body{
+  padding:8px;
+  background:var(--rn-cyan);
+}
+
+/* Tabelle: intestazione blu; dati bianco/ciano alternati. */
+.rn-table-wrap{
+  width:100%;
+  overflow:auto;
+  border:1px solid var(--rn-border);
+  background:var(--rn-cyan);
+}
+
+.rn-table{
+  width:100%;
+  border-collapse:collapse;
+  border-spacing:0;
+  background:var(--rn-white);
+  color:var(--rn-black);
+  font-variant-numeric:tabular-nums;
+}
+
+.rn-table th,
+.rn-table td{
+  padding:4px 6px;
+  border:1px solid var(--rn-border);
+  text-align:left;
+  vertical-align:middle;
+}
+
+.rn-table th{
+  background:var(--rn-blue);
+  color:var(--rn-white);
+  font-size:11px;
+  font-weight:bold;
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+.rn-table tbody tr:nth-child(odd){background:var(--rn-white)}
+.rn-table tbody tr:nth-child(even){background:var(--rn-cyan)}
+.rn-table tbody tr:hover{background:#BFFFFF}
+
+.rn-table .rn-team,
+.rn-table .rn-competition{
+  color:var(--rn-blue);
+  font-weight:bold;
+}
+
+.rn-table .rn-rank{
+  color:var(--rn-black);
+  font-weight:bold;
+  text-align:center;
+}
+
+.rn-table .rn-number{text-align:right}
+.rn-match-link{color:var(--rn-blue);font-weight:bold;text-decoration:underline}
+
+.rn-status{display:grid;gap:4px;margin-bottom:8px}
+.rn-status-row{display:flex;gap:8px;padding:8px}
+.rn-empty-state,.rn-error-state{padding:14px;text-align:center}
+.rn-empty-state{color:var(--rn-blue)}
+.rn-error-state{color:var(--rn-red);border-color:var(--rn-red)}
+
+.rn-footer{
+  margin-top:10px;
+  color:#666666;
+  font-size:10px;
+  text-align:center;
+}
+
+@media(max-width:700px){
+  body,body.rn-page,body.recordsnext-page{margin:6px}
+  .rn-card-grid,.rn-meta-grid{grid-template-columns:1fr}
+  .rn-toolbar{flex-direction:column;align-items:stretch}
+}

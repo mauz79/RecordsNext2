@@ -1,6 +1,6 @@
 param(
     [string]$ProjectRoot = "D:\DEV_APPS\RecordsNext2.0",
-    [string]$ReleaseVersion = "3.1.1",
+    [string]$ReleaseVersion = "3.2.0",
     [string]$DownloadsDir = "D:\DEV_APPS\downloads",
     [string]$UCanAccessRoot = ""
 )
@@ -164,7 +164,7 @@ Set-Content -LiteralPath $shaPath `
     -Encoding ASCII
 
 Write-Host ""
-Write-Host "FULL 3.1 creato:"
+Write-Host "FULL $ReleaseVersion creato:"
 Write-Host "  $zipPath"
 Write-Host "SHA256:"
 Write-Host "  $hash"

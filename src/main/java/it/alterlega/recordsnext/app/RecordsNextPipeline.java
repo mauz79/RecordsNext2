@@ -253,7 +253,7 @@ public final class RecordsNextPipeline {
                 ManifestMetadata manifestMetadata =
                         new ManifestMetadata(
                                 "RecordsNext by mauz79",
-                                "3.1.1",
+                                "3.2.0",
                                 "2.0",
                                 OffsetDateTime.now(),
                                 leagueMetadata.leagueId(),
@@ -412,7 +412,7 @@ public final class RecordsNextPipeline {
                         ManifestMetadata targetManifest =
                                 new ManifestMetadata(
                                         "RecordsNext by mauz79",
-                                        "3.1.1",
+                                        "3.2.0",
                                         "2.0",
                                         OffsetDateTime.now(),
                                         leagueMetadata.leagueId(),

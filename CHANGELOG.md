@@ -1,5 +1,42 @@
 # Changelog
 
+## RecordsNext 3.2.0 - 2026-09-16
+
+### Catalogo modulare e preflight
+
+- completato il catalogo modulare RecordsNext: 94 record/figli complessivi, di cui 93 configurabili e Culometro opzionale;
+- completata la corrispondenza tra controlli GUI e viste generate;
+- dipendenze valutate a livello di singolo record;
+- corretta la capability `modifier.home-field` nel preflight;
+- `modifiers.home-field-deciding` viene ora eseguito quando il Fattore Campo e selezionato.
+
+### Culometro
+
+- aggiunto il componente `HOME_FIELD_DECISIVE`;
+- integrati gli eventi derivati da `fattoreCampoDecisivo`;
+- aggiunti frequenza storica dell'evento, frequenza storica della configurazione, impatto e contributo;
+- verifica reale: `homeFieldCandidateCount=1304` e 2608 occorrenze `HOME_FIELD_DECISIVE`.
+
+### Verifiche
+
+- contratto checkbox/vista: 96 controlli verificati, 0 problemi;
+- audit semantici Classici, Serie, RU, Modificatori, Soglie/Fortuna e Culometro superati;
+- suite Maven: 57 test, 0 failure, 0 errori, 0 skipped;
+- collaudo operativo finale in modalita Completa: 72 selezionati, 72 eseguibili, 72 completi, 0 parziali, 0 saltati;
+- storico `2006_2007-2025_2026` riconosciuto invariato;
+- stagione corrente `2026_2027` reimportata e normalizzata;
+- generazione finale: 9 file validi, 0 pubblicati;
+- consolidamento aggiornato correttamente.
+
+### Packaging 3.2.0
+
+- `RecordsNext_3.2.0_FULL.zip` - SHA256 `BFE32FBBA14A5E45E3EA110C31A6C207F0E82048162B7572610D6E5A0A38AD71`;
+- `RecordsNext_3.2.0_SETUP.exe` - SHA256 `760FF711920869BF3FFA031747A2BF192C46266A76C3698F520D55BE9FC14B22`;
+- installer pubblico compilato con Inno Setup 7;
+- JAR 3.2.0 copiato anche nell'installazione operativa usata da FCM.
+
+
+
 
 ## RecordsNext 3.1.1 â€” 2026-09-06
 

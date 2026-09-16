@@ -1,4 +1,134 @@
-# Stato implementazione RecordsNext 3.1.1
+# Stato implementazione RecordsNext 3.2.0
+
+## RecordsNext 3.2.0 - 2026-09-16
+
+Stato corrente verificato della linea 3.2:
+
+- catalogo modulare completo: 94 record/figli complessivi, inclusi i 93 record configurabili e il Culometro opzionale;
+- preflight corretto per il Fattore Campo: la capability `modifier.home-field` viene resa disponibile quando sono selezionati record Fattore Campo;
+- `modifiers.home-field-deciding` non viene piu saltato erroneamente per dipendenza mancante;
+- Culometro integrato con gli eventi `HOME_FIELD_DECISIVE`;
+- `config/culometro.json` include il componente `HOME_FIELD_DECISIVE`;
+- gli eventi Culometro espongono frequenza storica evento, frequenza storica configurazione, chiave configurazione, contributo e impatto;
+- verifica reale Culometro con Fattore Campo completata: `homeFieldCandidateCount=1304`, 2608 occorrenze `HOME_FIELD_DECISIVE` nel JS generato;
+- contratto checkbox -> vista verificato con `Test_RecordsNext2_CheckboxViews_v15.ps1`: 96 controlli, 0 problemi;
+- Manifest verificato coerente con la selezione reale: 67 selezionati, 67 eseguibili, 67 completi, 0 parziali, 0 saltati;
+- audit finale `Test_RecordsNext2_FinalSemantic_v31.ps1` superato:
+  - Culometro - contributi: OK;
+  - Culometro - overlap: OK;
+  - Culometro - ranking: OK;
+  - Culometro - ranking competizione: OK;
+  - Culometro - metadata: OK;
+  - Record di lega: OK;
+  - eventi Culometro verificati: 17083;
+  - ranking Culometro: 438;
+  - ranking per competizione: 1403;
+  - righe `puntiSquadraMin`: 2312;
+  - problemi totali: 0;
+  - audit semantico `Test_RecordsNext2_ModifiersSemantic_v28.ps1` superato:
+  - 156 competizioni controllate;
+  - 10210 righe modificatori sorgente;
+  - 10930 righe squadra in casa;
+  - `modDifesaMax`: OK;
+  - `modDifesaTotaleSquadre`: OK;
+  - `modDifesaMediaSquadre`: OK;
+  - `modDifesaUtilizziSquadre`: OK;
+  - `capitanoTotaleSquadre`: OK;
+  - `capitanoUtilizziSquadre`: OK;
+  - `modDifesaFcmMax`: OK;
+  - `modDifesaFcmTotaleSquadre`: OK;
+  - `modDifesaFcmMediaSquadre`: OK;
+  - `modDifesaFcmUtilizziSquadre`: OK;
+  - `fattoreCampoDecisivo`: OK;
+  - `fattoreCampoTotaleSquadre`: OK;
+  - `fattoreCampoPuntiGuadagnatiSquadre`: OK;
+  - `fattoreCampoPuntiPersiSquadre`: OK;
+  - problemi totali: 0;
+  - audit semantico `Test_RecordsNext2_RUSemantic_v26.ps1` superato:
+  - 20 stagioni controllate;
+  - 3685 righe RU di dettaglio;
+  - 3046 partite-squadra con RU;
+  - `partiteConPiuRU`: OK;
+  - `partiteConRU`: OK;
+  - `partiteControRU`: OK;
+  - `ruDecisiva`: OK;
+  - `bilancioRUDecisiva`: OK;
+  - `ruDecisivaContro`: OK;
+  - `bilancioRUDecisivaContro`: OK;
+  - `bilancioConRU`: OK;
+  - `bilancioControRU`: OK;
+  - `mediaPuntiConRU`: OK;
+  - `mediaPuntiControRU`: OK;
+  - `tipoRUUsata`: OK;
+  - problemi totali: 0;
+  - audit semantico `Test_RecordsNext2_SerieSemantic_v24.ps1` superato:
+  - 156 file competizione controllati;
+  - 21860 righe partita valide;
+  - 1465 squadre controllate;
+  - `Clean sheet consecutivi`: OK;
+  - `Pareggi consecutivi`: OK;
+  - `Sconfitte consecutive`: OK;
+  - `Senza sconfitte`: OK;
+  - `Senza vittorie`: OK;
+  - `Serie Capitano`: OK;
+  - `Serie Modificatore Difesa`: OK;
+  - `Serie Modificatore Difesa FCM`: OK;
+  - `Vittorie consecutive`: OK;
+  - problemi totali: 0;
+  - audit semantico `Test_RecordsNext2_ThresholdsSemantic_v29.ps1` superato:
+  - 156 file normalizzati;
+  - 24318 righe partita analizzate;
+  - 17685 eventi attesi;
+  - 17685 eventi esportati;
+  - 438 aggregati squadra attesi;
+  - 438 aggregati squadra esportati;
+  - `EXACT_THRESHOLD`: 1906 / 1906, OK;
+  - `JUST_ENOUGH`: 491 / 491, OK;
+  - `MISSED_WIN_HALF_POINT`: 501 / 501, OK;
+  - `LOSS_BY_A_WHISKER`: 377 / 377, OK;
+  - `MIRACLE_DRAW`: 2620 / 2620, OK;
+  - `TIGHT_DRAW`: 2620 / 2620, OK;
+  - `ONE_GOAL_WIN`: 4585 / 4585, OK;
+  - `ONE_GOAL_LOSS`: 4585 / 4585, OK;
+  - `UNUSED_BAND_POINTS`: 0 / 0, OK;
+  - problemi totali: 0;
+  - audit semantico `Test_RecordsNext2_ClassiciSemantic_v21.ps1` superato:
+  - 156 file competizione controllati;
+  - 21860 righe partita valide;
+  - 1465 aggregati squadra controllati;
+  - `Minor punteggio`: OK;
+  - `Più gol regolamentari`: OK;
+  - `Maggior scarto regolamentare`: OK;
+  - `Media punti`: OK;
+  - `Somma punti`: OK;
+  - `Punti classifica`: OK;
+  - `Vittorie`: OK;
+  - `Pareggi`: OK;
+  - `Sconfitte`: OK;
+  - `Gol fatti`: OK;
+  - `Gol subiti`: OK;
+  - problemi totali: 0;
+  - regressione Maven finale dopo gli audit semantici:
+  - 57 test eseguiti;
+  - 0 failure;
+  - 0 errori;
+  - 0 skipped;
+  - build success.
+  - collaudo operativo finale in modalita Completa con il JAR 3.2 candidato: preflight 72 selezionati, 72 eseguibili, 72 completi, 0 parziali, 0 saltati; storico 2006_2007-2025_2026 riconosciuto invariato, stagione corrente 2026_2027 reimportata e normalizzata; elaborazione completata con consolidamento aggiornato, 9 file validi e 0 pubblicati;
+- regressione Maven finale sulla versione 3.2.0:
+  - 57 test eseguiti;
+  - 0 failure;
+  - 0 errori;
+  - 0 skipped;
+  - BUILD SUCCESS;
+- gli `outputStatus` dei family JS descrivono lo stato tecnico del dataset generato e non devono essere reinterpretati come duplicazione dello stato del preflight/Manifest;
+- il Culometro resta un output opzionale separato dalla famiglia dati Soglie/Fortuna.
+- packaging finale completato:
+  - `RecordsNext_3.2.0_FULL.zip` - SHA256 `BFE32FBBA14A5E45E3EA110C31A6C207F0E82048162B7572610D6E5A0A38AD71`;
+  - `RecordsNext_3.2.0_SETUP.exe` - SHA256 `760FF711920869BF3FFA031747A2BF192C46266A76C3698F520D55BE9FC14B22`;
+  - JAR 3.2.0 installato anche nella directory operativa usata da FCM;
+
+La versione applicativa e Maven e stata portata a 3.2.0 dopo il completamento dei test semantici e del collaudo operativo finale. Packaging FULL e SETUP completato; resta da completare la pubblicazione della release.
 
 ## RecordsNext 3.1.1 - flat JS - 2026-09-06
 
