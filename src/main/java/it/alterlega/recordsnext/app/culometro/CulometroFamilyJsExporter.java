@@ -21,10 +21,16 @@ public final class CulometroFamilyJsExporter {
     public static final String GLOBAL_NAME = "window.fcmRecordsNextCulometro";
     private static final String THRESHOLDS_PREFIX = "window.fcmRecordsNextThresholdsLuck = ";
     private static final String RU_PREFIX = "window.fcmRecordsNextRU = ";
+    private static final String MODIFIERS_PREFIX = "window.fcmRecordsNextModifiers = ";
 
     private CulometroFamilyJsExporter() {}
 
     public static ExportResult export(Path thresholdsJs, Path ruJs, Path configFile, Path outputFile) throws IOException {
+        return export(thresholdsJs, ruJs, null, configFile, outputFile);
+    }
+
+    public static ExportResult export(Path thresholdsJs, Path ruJs, Path modifiersJs,
+                                      Path configFile, Path outputFile) throws IOException {
         CulometroConfig config = CulometroConfigLoader.load(configFile);
         if (!config.enabled()) throw new IOException("Culometro richiesto ma config.enabled=false: " + configFile);
 
@@ -32,6 +38,9 @@ public final class CulometroFamilyJsExporter {
         List<Map<String,Object>> thresholdEvents = rows(thresholds.get("events"));
         List<Map<String,Object>> ruEvents = Files.isRegularFile(ruJs)
                 ? findRuEvents(parseAssignment(ruJs, RU_PREFIX))
+                : List.of();
+        List<Map<String,Object>> homeFieldEvents = modifiersJs != null && Files.isRegularFile(modifiersJs)
+                ? findHomeFieldEvents(parseAssignment(modifiersJs, MODIFIERS_PREFIX))
                 : List.of();
 
         List<Event> candidates = new ArrayList<>();
@@ -52,6 +61,12 @@ public final class CulometroFamilyJsExporter {
             if (component == null || !component.enabled()) continue;
             Event ru = Event.fromRu(event, component.weight());
             if (ru != null) candidates.add(ru);
+        }
+        for (Map<String,Object> event : homeFieldEvents) {
+            CulometroConfig.Component component = config.components().get("HOME_FIELD_DECISIVE");
+            if (component == null || !component.enabled()) continue;
+            Event homeField = Event.fromHomeField(event, component.weight());
+            if (homeField != null) candidates.add(homeField);
         }
 
         Set<String> performances = new LinkedHashSet<>();
@@ -120,6 +135,7 @@ public final class CulometroFamilyJsExporter {
                 "engineVersion", "2.0",
                 "thresholdEventCount", thresholdEvents.size(),
                 "ruCandidateCount", ruEvents.size(),
+                "homeFieldCandidateCount", homeFieldEvents.size(),
                 "scoredEventCount", scoredEvents.size(),
                 "performanceCount", performances.size(),
                 "historicalMeanPerMatch", BigDecimal.valueOf(rawMean).setScale(6, RoundingMode.HALF_UP),
@@ -192,6 +208,27 @@ public final class CulometroFamilyJsExporter {
         walk(root, out);
         return out;
     }
+
+    private static List<Map<String,Object>> findHomeFieldEvents(Object root) {
+        List<Map<String,Object>> out = new ArrayList<>();
+        walkHomeField(root, out);
+        return out;
+    }
+
+    private static void walkHomeField(Object value, List<Map<String,Object>> out) {
+        if (value instanceof Map<?,?> raw) {
+            Map<String,Object> map = object(raw);
+            Object section = map.get("fattoreCampoDecisivo");
+            if (section instanceof List<?> list) {
+                for (Object row : list) {
+                    if (row instanceof Map<?,?>) out.add(object(row));
+                }
+            }
+            for (Object child : map.values()) walkHomeField(child, out);
+        } else if (value instanceof List<?> list) {
+            for (Object child : list) walkHomeField(child, out);
+        }
+    }
     private static void walk(Object value, List<Map<String,Object>> out) {
         if (value instanceof Map<?,?> raw) {
             Map<String,Object> map = object(raw);
@@ -219,6 +256,38 @@ public final class CulometroFamilyJsExporter {
                     + "|" + text(m.get("numeroRU")) + "|" + canonicalNumber(m.get("valoreRUTotale"))
                     + "|" + text(m.get("tipiRU"));
             return new Event("RU_DECISIVE",direction,weight,text(m.get("stagione")),text(m.get("competizione")),text(m.get("idIncontro")),text(m.get("idSquadra")),text(m.get("squadra")),text(m.get("avversaria")),text(m.get("urlTabellino")),"RU decisiva dimostrata dal dataset",config);
+        }
+        static Event fromHomeField(Map<String,Object> m,BigDecimal weight){
+            int standingsPoints = number(m.get("puntiClassificaGuadagnati")).intValue();
+            if(standingsPoints <= 0)return null;
+
+            String url = text(m.get("urlTabellinoOnline"));
+            if(url.isBlank())url=text(m.get("urlTabellino"));
+
+            String config = "HOME_FIELD_DECISIVE|FAVOURABLE"
+                    + "|" + standingsPoints
+                    + "|" + canonicalNumber(m.get("valore"))
+                    + "|" + text(m.get("risultatoSenzaFattoreCampo"))
+                    + "|" + text(m.get("risultatoConFattoreCampo"));
+
+            String detail = "Fattore Campo decisivo: +"
+                    + standingsPoints
+                    + " punti di classifica";
+
+            return new Event(
+                    "HOME_FIELD_DECISIVE",
+                    1,
+                    weight,
+                    text(m.get("stagione")),
+                    text(m.get("competizioneStoricaId")),
+                    text(m.get("idIncontro")),
+                    text(m.get("idSquadra")),
+                    text(m.get("squadra")),
+                    text(m.get("avversaria")),
+                    url,
+                    detail,
+                    config
+            );
         }
         String performanceKey(){return seasonId+"|"+matchId+"|"+teamId;}
         String teamKey(){return seasonId+"|"+teamId;}

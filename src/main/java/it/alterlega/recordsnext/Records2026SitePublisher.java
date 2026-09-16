@@ -243,6 +243,7 @@ public final class Records2026SitePublisher {
             CulometroFamilyJsExporter.export(
                     generatedDir.resolve(THRESHOLDS_2_FILE),
                     generatedDir.resolve(RU_2_FILE),
+                    generatedDir.resolve(MODIFIERS_2_FILE),
                     projectRoot.resolve("config/culometro.json"),
                     generatedDir.resolve(CULOMETRO_2_FILE)
             );

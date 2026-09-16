@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 3.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-09-16 12:11:57 +02:00
+> Data generazione: 2026-09-16 12:33:24 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Stato release RecordsNext 3.1.1 - 2026-09-02
@@ -4869,10 +4869,16 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
         public static final String GLOBAL_NAME = "window.fcmRecordsNextCulometro";
         private static final String THRESHOLDS_PREFIX = "window.fcmRecordsNextThresholdsLuck = ";
         private static final String RU_PREFIX = "window.fcmRecordsNextRU = ";
+        private static final String MODIFIERS_PREFIX = "window.fcmRecordsNextModifiers = ";
 
         private CulometroFamilyJsExporter() {}
 
         public static ExportResult export(Path thresholdsJs, Path ruJs, Path configFile, Path outputFile) throws IOException {
+            return export(thresholdsJs, ruJs, null, configFile, outputFile);
+        }
+
+        public static ExportResult export(Path thresholdsJs, Path ruJs, Path modifiersJs,
+                                          Path configFile, Path outputFile) throws IOException {
             CulometroConfig config = CulometroConfigLoader.load(configFile);
             if (!config.enabled()) throw new IOException("Culometro richiesto ma config.enabled=false: " + configFile);
 
@@ -4880,6 +4886,9 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
             List<Map<String,Object>> thresholdEvents = rows(thresholds.get("events"));
             List<Map<String,Object>> ruEvents = Files.isRegularFile(ruJs)
                     ? findRuEvents(parseAssignment(ruJs, RU_PREFIX))
+                    : List.of();
+            List<Map<String,Object>> homeFieldEvents = modifiersJs != null && Files.isRegularFile(modifiersJs)
+                    ? findHomeFieldEvents(parseAssignment(modifiersJs, MODIFIERS_PREFIX))
                     : List.of();
 
             List<Event> candidates = new ArrayList<>();
@@ -4900,6 +4909,12 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                 if (component == null || !component.enabled()) continue;
                 Event ru = Event.fromRu(event, component.weight());
                 if (ru != null) candidates.add(ru);
+            }
+            for (Map<String,Object> event : homeFieldEvents) {
+                CulometroConfig.Component component = config.components().get("HOME_FIELD_DECISIVE");
+                if (component == null || !component.enabled()) continue;
+                Event homeField = Event.fromHomeField(event, component.weight());
+                if (homeField != null) candidates.add(homeField);
             }
 
             Set<String> performances = new LinkedHashSet<>();
@@ -4968,6 +4983,7 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                     "engineVersion", "2.0",
                     "thresholdEventCount", thresholdEvents.size(),
                     "ruCandidateCount", ruEvents.size(),
+                    "homeFieldCandidateCount", homeFieldEvents.size(),
                     "scoredEventCount", scoredEvents.size(),
                     "performanceCount", performances.size(),
                     "historicalMeanPerMatch", BigDecimal.valueOf(rawMean).setScale(6, RoundingMode.HALF_UP),
@@ -5040,6 +5056,27 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
             walk(root, out);
             return out;
         }
+
+        private static List<Map<String,Object>> findHomeFieldEvents(Object root) {
+            List<Map<String,Object>> out = new ArrayList<>();
+            walkHomeField(root, out);
+            return out;
+        }
+
+        private static void walkHomeField(Object value, List<Map<String,Object>> out) {
+            if (value instanceof Map<?,?> raw) {
+                Map<String,Object> map = object(raw);
+                Object section = map.get("fattoreCampoDecisivo");
+                if (section instanceof List<?> list) {
+                    for (Object row : list) {
+                        if (row instanceof Map<?,?>) out.add(object(row));
+                    }
+                }
+                for (Object child : map.values()) walkHomeField(child, out);
+            } else if (value instanceof List<?> list) {
+                for (Object child : list) walkHomeField(child, out);
+            }
+        }
         private static void walk(Object value, List<Map<String,Object>> out) {
             if (value instanceof Map<?,?> raw) {
                 Map<String,Object> map = object(raw);
@@ -5067,6 +5104,38 @@ File: src\main\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                         + "|" + text(m.get("numeroRU")) + "|" + canonicalNumber(m.get("valoreRUTotale"))
                         + "|" + text(m.get("tipiRU"));
                 return new Event("RU_DECISIVE",direction,weight,text(m.get("stagione")),text(m.get("competizione")),text(m.get("idIncontro")),text(m.get("idSquadra")),text(m.get("squadra")),text(m.get("avversaria")),text(m.get("urlTabellino")),"RU decisiva dimostrata dal dataset",config);
+            }
+            static Event fromHomeField(Map<String,Object> m,BigDecimal weight){
+                int standingsPoints = number(m.get("puntiClassificaGuadagnati")).intValue();
+                if(standingsPoints <= 0)return null;
+
+                String url = text(m.get("urlTabellinoOnline"));
+                if(url.isBlank())url=text(m.get("urlTabellino"));
+
+                String config = "HOME_FIELD_DECISIVE|FAVOURABLE"
+                        + "|" + standingsPoints
+                        + "|" + canonicalNumber(m.get("valore"))
+                        + "|" + text(m.get("risultatoSenzaFattoreCampo"))
+                        + "|" + text(m.get("risultatoConFattoreCampo"));
+
+                String detail = "Fattore Campo decisivo: +"
+                        + standingsPoints
+                        + " punti di classifica";
+
+                return new Event(
+                        "HOME_FIELD_DECISIVE",
+                        1,
+                        weight,
+                        text(m.get("stagione")),
+                        text(m.get("competizioneStoricaId")),
+                        text(m.get("idIncontro")),
+                        text(m.get("idSquadra")),
+                        text(m.get("squadra")),
+                        text(m.get("avversaria")),
+                        url,
+                        detail,
+                        config
+                );
             }
             String performanceKey(){return seasonId+"|"+matchId+"|"+teamId;}
             String teamKey(){return seasonId+"|"+teamId;}
@@ -21197,6 +21266,7 @@ File: src\main\java\it\alterlega\recordsnext\Records2026SitePublisher.java
                 CulometroFamilyJsExporter.export(
                         generatedDir.resolve(THRESHOLDS_2_FILE),
                         generatedDir.resolve(RU_2_FILE),
+                        generatedDir.resolve(MODIFIERS_2_FILE),
                         projectRoot.resolve("config/culometro.json"),
                         generatedDir.resolve(CULOMETRO_2_FILE)
                 );
@@ -29271,6 +29341,66 @@ File: src\test\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExpo
                 String js=Files.readString(out); assertTrue(js.startsWith(CulometroFamilyJsExporter.GLOBAL_NAME)); assertTrue(js.contains("\"ranking\"")); assertTrue(js.contains("\"competitionRanking\"")); assertTrue(js.contains("\"competitionId\":\"serie_a\"")); assertTrue(js.contains("\"competitionName\":\"Serie A\"")); assertTrue(js.contains("Fortuna eccezionale")); assertEquals(2,result.teamCount());
             } finally { try(var s=Files.walk(dir)){for(Path p:s.sorted((a,b)->b.compareTo(a)).toList())Files.deleteIfExists(p);} }
         }
+
+        @Test void includesDecisiveHomeFieldEvents() throws Exception {
+            Path dir=Files.createTempDirectory("culometro-home-field-");
+            try {
+                Path thresholds=dir.resolve("fcmRecordsNext_ThresholdsLuck.js");
+                Files.writeString(thresholds,
+                        "window.fcmRecordsNextThresholdsLuck = {\"events\":[]};\n");
+
+                Path modifiers=dir.resolve("fcmRecordsNext_Modifiers.js");
+                Files.writeString(modifiers,
+                        "window.fcmRecordsNextModifiers = {\"seasonAggregates\":[{" +
+                        "\"stagione\":\"2025_2026\",\"id\":\"serie_a\",\"data\":{\"records\":{" +
+                        "\"fattoreCampoDecisivo\":[{" +
+                        "\"recordId\":\"fattoreCampoDecisivo\"," +
+                        "\"valore\":2.0," +
+                        "\"puntiClassificaGuadagnati\":2," +
+                        "\"stagione\":\"2025_2026\"," +
+                        "\"competizioneStoricaId\":\"serie_a\"," +
+                        "\"competizioneNome\":\"Serie A\"," +
+                        "\"idSquadra\":\"10\"," +
+                        "\"squadra\":\"A\"," +
+                        "\"idAvversaria\":\"11\"," +
+                        "\"avversaria\":\"B\"," +
+                        "\"idIncontro\":\"123\"," +
+                        "\"urlTabellinoOnline\":\"https://example.test/123\"," +
+                        "\"risultatoConFattoreCampo\":\"V\"," +
+                        "\"risultatoSenzaFattoreCampo\":\"1-1\"" +
+                        "}]}}}]};\n");
+
+                Path config=dir.resolve("culometro.json");
+                Files.writeString(config,Files.readString(Path.of("config/culometro.json")));
+
+                Path out=dir.resolve(CulometroFamilyJsExporter.FILE_NAME);
+
+                CulometroFamilyJsExporter.ExportResult result =
+                        CulometroFamilyJsExporter.export(
+                                thresholds,
+                                dir.resolve("missing-ru.js"),
+                                modifiers,
+                                config,
+                                out
+                        );
+
+                String js=Files.readString(out);
+
+                assertTrue(js.contains("\"eventType\":\"HOME_FIELD_DECISIVE\""));
+                assertTrue(js.contains("\"direction\":\"FAVOURABLE\""));
+                assertTrue(js.contains("\"homeFieldCandidateCount\":1"));
+                assertTrue(js.contains("\"componentWeight\":1.5"));
+                assertTrue(js.contains("\"team\":\"A\""));
+                assertTrue(js.contains("\"matchId\":\"123\""));
+                assertEquals(1,result.eventCount());
+                assertEquals(1,result.teamCount());
+            } finally {
+                try(var s=Files.walk(dir)){
+                    for(Path p:s.sorted((a,b)->b.compareTo(a)).toList())
+                        Files.deleteIfExists(p);
+                }
+            }
+        }
     }
 
 ## src\test\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriterTest.java
@@ -30859,6 +30989,7 @@ File: config\culometro.json
       "rarity": { "enabled": true, "profile": "NORMAL", "maximumMultiplier": 6.5, "minimumHistoricalOccurrences": 3 },
       "components": [
         { "componentId": "RU_DECISIVE", "enabled": true, "weight": 1.4, "allowedRange": { "min": 0.75, "max": 2.5 } },
+        { "componentId": "HOME_FIELD_DECISIVE", "enabled": true, "weight": 1.5, "allowedRange": { "min": 0.75, "max": 2.5 } },
         { "componentId": "ONE_GOAL_WIN", "enabled": true, "weight": 0.7, "allowedRange": { "min": 0.5, "max": 1.5 } },
         { "componentId": "MISSED_WIN_HALF_POINT", "enabled": true, "weight": 1.35, "allowedRange": { "min": 0.75, "max": 2.5 } },
         { "componentId": "MIRACLE_DRAW", "enabled": true, "weight": 1.1, "allowedRange": { "min": 0.5, "max": 2 } },
@@ -31080,7 +31211,7 @@ File: config\processing.json
         "output": {
           "writeManifest": true,
           "writeCore": true,
-          "publishToSite": true
+          "publishToSite": false
         }
       }
     }
