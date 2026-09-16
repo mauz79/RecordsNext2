@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 3.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-09-16 11:59:45 +02:00
+> Data generazione: 2026-09-16 12:11:57 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Stato release RecordsNext 3.1.1 - 2026-09-02
@@ -7793,6 +7793,7 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelinePreflight.java
     import it.alterlega.recordsnext.app.model.ExecutionPlanItem;
     import it.alterlega.recordsnext.app.model.ExecutionPlanner;
     import it.alterlega.recordsnext.app.model.OutputStatus;
+    import it.alterlega.recordsnext.app.model.RecordFamily;
 
     import java.util.List;
     import java.util.Objects;
@@ -7810,8 +7811,8 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelinePreflight.java
 
             Set<String> availableDependencies = DependencyInventory.legacyCapabilities(
                     false,
-                    false,
-                    options.familyEnabled(it.alterlega.recordsnext.app.model.RecordFamily.RU),
+                    homeFieldEnabled(options),
+                    options.familyEnabled(RecordFamily.RU),
                     options.culometroEnabled()
             );
 
@@ -7823,6 +7824,27 @@ File: src\main\java\it\alterlega\recordsnext\app\PipelinePreflight.java
             return new Result(plan, availableDependencies);
         }
 
+        private static boolean homeFieldEnabled(ProcessingOptions options) {
+            if (!options.familyEnabled(RecordFamily.MODIFIERS)) {
+                return false;
+            }
+
+            Set<String> enabledChildren = options.selection().enabledChildren();
+
+            if (enabledChildren.isEmpty()) {
+                return true;
+            }
+
+            return enabledChildren.stream()
+                    .anyMatch(PipelinePreflight::isHomeFieldChild);
+        }
+
+        private static boolean isHomeFieldChild(String childId) {
+            return childId.equals("modifiers.home-field-deciding")
+                    || childId.equals("modifiers.home-field-points-gained")
+                    || childId.equals("modifiers.home-field-points-lost")
+                    || childId.equals("modifiers.home-field-balance");
+        }
         public record Result(
                 ExecutionPlan plan,
                 Set<String> availableDependencies
@@ -30166,6 +30188,65 @@ File: src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
 
             assertTrue(easterEggResult.relevantItems().stream()
                     .anyMatch(item -> item.child().id().equals(CoreRecordCatalog.CULOMETRO_ID)));
+        }
+
+        @Test
+        void selectedHomeFieldDecidingIsExecutable() {
+            var selection = new ProcessingSelection(
+                    Set.of(RecordFamily.MODIFIERS),
+                    Set.of("modifiers.home-field-deciding"),
+                    false,
+                    true,
+                    false
+            );
+
+            var result = PipelinePreflight.evaluate(
+                    ProcessingOptions.modular(selection)
+            );
+
+            assertEquals(1, result.selectedCount());
+            assertEquals(1, result.executableCount());
+            assertEquals(1, result.completeCount());
+            assertEquals(0, result.skippedDependencyCount());
+        }
+
+        @Test
+        void nonHomeFieldModifierDoesNotExposeHomeFieldCapability() {
+            var selection = new ProcessingSelection(
+                    Set.of(
+                            RecordFamily.MODIFIERS,
+                            RecordFamily.THRESHOLDS_LUCK
+                    ),
+                    Set.of(
+                            "modifiers.modm1pers.max",
+                            CoreRecordCatalog.CULOMETRO_ID
+                    ),
+                    true,
+                    true,
+                    false
+            );
+
+            var result = PipelinePreflight.evaluate(
+                    ProcessingOptions.modular(selection)
+            );
+
+            assertFalse(
+                    result.availableDependencies().contains("modifier.home-field")
+            );
+
+            assertEquals(2, result.selectedCount());
+            assertEquals(2, result.executableCount());
+            assertEquals(1, result.completeCount());
+            assertEquals(1, result.partialCount());
+            assertEquals(0, result.skippedDependencyCount());
+
+            var culometro = result.relevantItems().stream()
+                    .filter(item -> item.child().id().equals(CoreRecordCatalog.CULOMETRO_ID))
+                    .findFirst()
+                    .orElseThrow();
+
+            assertEquals(OutputStatus.GENERATED_PARTIAL, culometro.status());
+            assertTrue(culometro.missingOptional().contains("modifier.home-field"));
         }
     }
 

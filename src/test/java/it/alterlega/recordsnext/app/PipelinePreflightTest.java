@@ -61,4 +61,63 @@ class PipelinePreflightTest {
         assertTrue(easterEggResult.relevantItems().stream()
                 .anyMatch(item -> item.child().id().equals(CoreRecordCatalog.CULOMETRO_ID)));
     }
+
+    @Test
+    void selectedHomeFieldDecidingIsExecutable() {
+        var selection = new ProcessingSelection(
+                Set.of(RecordFamily.MODIFIERS),
+                Set.of("modifiers.home-field-deciding"),
+                false,
+                true,
+                false
+        );
+
+        var result = PipelinePreflight.evaluate(
+                ProcessingOptions.modular(selection)
+        );
+
+        assertEquals(1, result.selectedCount());
+        assertEquals(1, result.executableCount());
+        assertEquals(1, result.completeCount());
+        assertEquals(0, result.skippedDependencyCount());
+    }
+
+    @Test
+    void nonHomeFieldModifierDoesNotExposeHomeFieldCapability() {
+        var selection = new ProcessingSelection(
+                Set.of(
+                        RecordFamily.MODIFIERS,
+                        RecordFamily.THRESHOLDS_LUCK
+                ),
+                Set.of(
+                        "modifiers.modm1pers.max",
+                        CoreRecordCatalog.CULOMETRO_ID
+                ),
+                true,
+                true,
+                false
+        );
+
+        var result = PipelinePreflight.evaluate(
+                ProcessingOptions.modular(selection)
+        );
+
+        assertFalse(
+                result.availableDependencies().contains("modifier.home-field")
+        );
+
+        assertEquals(2, result.selectedCount());
+        assertEquals(2, result.executableCount());
+        assertEquals(1, result.completeCount());
+        assertEquals(1, result.partialCount());
+        assertEquals(0, result.skippedDependencyCount());
+
+        var culometro = result.relevantItems().stream()
+                .filter(item -> item.child().id().equals(CoreRecordCatalog.CULOMETRO_ID))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(OutputStatus.GENERATED_PARTIAL, culometro.status());
+        assertTrue(culometro.missingOptional().contains("modifier.home-field"));
+    }
 }

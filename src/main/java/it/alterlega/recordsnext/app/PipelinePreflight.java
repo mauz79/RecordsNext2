@@ -5,6 +5,7 @@ import it.alterlega.recordsnext.app.model.ExecutionPlan;
 import it.alterlega.recordsnext.app.model.ExecutionPlanItem;
 import it.alterlega.recordsnext.app.model.ExecutionPlanner;
 import it.alterlega.recordsnext.app.model.OutputStatus;
+import it.alterlega.recordsnext.app.model.RecordFamily;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,8 +23,8 @@ public final class PipelinePreflight {
 
         Set<String> availableDependencies = DependencyInventory.legacyCapabilities(
                 false,
-                false,
-                options.familyEnabled(it.alterlega.recordsnext.app.model.RecordFamily.RU),
+                homeFieldEnabled(options),
+                options.familyEnabled(RecordFamily.RU),
                 options.culometroEnabled()
         );
 
@@ -35,6 +36,27 @@ public final class PipelinePreflight {
         return new Result(plan, availableDependencies);
     }
 
+    private static boolean homeFieldEnabled(ProcessingOptions options) {
+        if (!options.familyEnabled(RecordFamily.MODIFIERS)) {
+            return false;
+        }
+
+        Set<String> enabledChildren = options.selection().enabledChildren();
+
+        if (enabledChildren.isEmpty()) {
+            return true;
+        }
+
+        return enabledChildren.stream()
+                .anyMatch(PipelinePreflight::isHomeFieldChild);
+    }
+
+    private static boolean isHomeFieldChild(String childId) {
+        return childId.equals("modifiers.home-field-deciding")
+                || childId.equals("modifiers.home-field-points-gained")
+                || childId.equals("modifiers.home-field-points-lost")
+                || childId.equals("modifiers.home-field-balance");
+    }
     public record Result(
             ExecutionPlan plan,
             Set<String> availableDependencies
