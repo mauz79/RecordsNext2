@@ -19,9 +19,9 @@ class PipelinePreflightTest {
                 new ProcessingOptions(true, true, true, false)
         );
 
-        assertEquals(2, result.selectedCount());
-        assertEquals(2, result.executableCount());
-        assertEquals(2, result.completeCount());
+        assertEquals(31, result.selectedCount());
+        assertEquals(31, result.executableCount());
+        assertEquals(31, result.completeCount());
         assertEquals(0, result.skippedDependencyCount());
     }
 

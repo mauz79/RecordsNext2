@@ -90,6 +90,6 @@ class ExecutionPlannerTest {
                 DependencyInventory.legacyCapabilities(false, true, false, false)
         );
 
-        assertEquals(4, plan.byFamily().size());
+        assertEquals(5, plan.byFamily().size());
     }
 }

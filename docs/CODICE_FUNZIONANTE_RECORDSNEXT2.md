@@ -1,7 +1,7 @@
 # Codice funzionante RecordsNext 3.1
 
 > Documento generato automaticamente.
-> Data generazione: 2026-09-06 02:14:23 +02:00
+> Data generazione: 2026-09-16 11:59:45 +02:00
 > Directory progetto: D:\DEV_APPS\RecordsNext2.0
 
 ## Stato release RecordsNext 3.1.1 - 2026-09-02
@@ -5609,11 +5609,18 @@ File: src\main\java\it\alterlega\recordsnext\app\model\CoreRecordCatalog.java
 
     package it.alterlega.recordsnext.app.model;
 
+    import it.alterlega.recordsnext.app.config.ProcessingConfigWriter;
+
+    import java.util.ArrayList;
     import java.util.List;
     import java.util.Set;
 
     /**
-     * Primo catalogo minimo usato per validare il modello modulare.
+     * Catalogo canonico dei record elaborabili.
+     *
+     * Deve restare allineato 1:1 con gli ID granulari esposti da
+     * ProcessingConfigWriter, più gli eventuali record opt-in che non appartengono
+     * alle checkbox granulari delle famiglie (attualmente il Culometro).
      */
     public final class CoreRecordCatalog {
         public static final String CULOMETRO_ID = "easter-egg.culometro";
@@ -5622,7 +5629,40 @@ File: src\main\java\it\alterlega\recordsnext\app\model\CoreRecordCatalog.java
         }
 
         public static List<RecordChild> children() {
-            return List.of(
+            List<RecordChild> children = new ArrayList<>();
+
+            addFamilyChildren(
+                    children,
+                    ProcessingConfigWriter.CLASSICS,
+                    RecordFamily.CLASSICS
+            );
+
+            addFamilyChildren(
+                    children,
+                    ProcessingConfigWriter.SERIES,
+                    RecordFamily.SERIES
+            );
+
+            addFamilyChildren(
+                    children,
+                    ProcessingConfigWriter.RU,
+                    RecordFamily.RU
+            );
+
+            addFamilyChildren(
+                    children,
+                    ProcessingConfigWriter.MODIFIERS,
+                    RecordFamily.MODIFIERS
+            );
+
+            addFamilyChildren(
+                    children,
+                    ProcessingConfigWriter.THRESHOLDS,
+                    RecordFamily.THRESHOLDS_LUCK
+            );
+
+            replace(
+                    children,
                     new RecordChild(
                             "classics.highest-match-score",
                             "Maggior punteggio in una partita",
@@ -5632,7 +5672,11 @@ File: src\main\java\it\alterlega\recordsnext\app\model\CoreRecordCatalog.java
                                     RecordDependency.required("data.scores", DependencyType.DATA)
                             ),
                             false
-                    ),
+                    )
+            );
+
+            replace(
+                    children,
                     new RecordChild(
                             "ru.deciding",
                             "Riserve d'ufficio decisive",
@@ -5642,7 +5686,11 @@ File: src\main\java\it\alterlega\recordsnext\app\model\CoreRecordCatalog.java
                                     RecordDependency.required("simulation.without-ru", DependencyType.SIMULATION)
                             ),
                             false
-                    ),
+                    )
+            );
+
+            replace(
+                    children,
                     new RecordChild(
                             "modifiers.home-field-deciding",
                             "Fattore Campo decisivo",
@@ -5652,7 +5700,11 @@ File: src\main\java\it\alterlega\recordsnext\app\model\CoreRecordCatalog.java
                                     RecordDependency.required("configuration.goal-bands", DependencyType.CONFIGURATION)
                             ),
                             false
-                    ),
+                    )
+            );
+
+            replace(
+                    children,
                     new RecordChild(
                             "thresholds.surgical-win",
                             "Vittoria chirurgica",
@@ -5662,17 +5714,63 @@ File: src\main\java\it\alterlega\recordsnext\app\model\CoreRecordCatalog.java
                                     RecordDependency.required("configuration.goal-bands", DependencyType.CONFIGURATION)
                             ),
                             false
-                    ),
+                    )
+            );
+
+            children.add(
                     new RecordChild(
                             CULOMETRO_ID,
                             "Culometro",
                             RecordFamily.THRESHOLDS_LUCK,
                             Set.of(
-                                    RecordDependency.required("configuration.culometro", DependencyType.CONFIGURATION),
-                                    RecordDependency.optional("modifier.home-field", DependencyType.FAMILY_CHILD)
+                                    RecordDependency.required(
+                                            "configuration.culometro",
+                                            DependencyType.CONFIGURATION
+                                    ),
+                                    RecordDependency.optional(
+                                            "modifier.home-field",
+                                            DependencyType.FAMILY_CHILD
+                                    )
                             ),
                             true
                     )
+            );
+
+            return List.copyOf(children);
+        }
+
+        private static void addFamilyChildren(
+                List<RecordChild> target,
+                String[] ids,
+                RecordFamily family
+        ) {
+            for (String id : ids) {
+                target.add(
+                        new RecordChild(
+                                id,
+                                id,
+                                family,
+                                Set.of(),
+                                false
+                        )
+                );
+            }
+        }
+
+        private static void replace(
+                List<RecordChild> children,
+                RecordChild replacement
+        ) {
+            for (int i = 0; i < children.size(); i++) {
+                if (children.get(i).id().equals(replacement.id())) {
+                    children.set(i, replacement);
+                    return;
+                }
+            }
+
+            throw new IllegalStateException(
+                    "Record da specializzare assente dal catalogo base: "
+                            + replacement.id()
             );
         }
     }
@@ -29243,6 +29341,91 @@ File: src\test\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupp
         }
     }
 
+## src\test\java\it\alterlega\recordsnext\app\model\CoreRecordCatalogCompletenessTest.java
+
+File: src\test\java\it\alterlega\recordsnext\app\model\CoreRecordCatalogCompletenessTest.java
+
+    package it.alterlega.recordsnext.app.model;
+
+    import it.alterlega.recordsnext.app.config.ProcessingConfigWriter;
+    import org.junit.jupiter.api.Test;
+
+    import java.util.Arrays;
+    import java.util.LinkedHashSet;
+    import java.util.Set;
+    import java.util.stream.Stream;
+
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+    import static org.junit.jupiter.api.Assertions.assertTrue;
+
+    class CoreRecordCatalogCompletenessTest {
+
+        @Test
+        void catalogContainsEveryGranularProcessingId() {
+            Set<String> configuredIds = new LinkedHashSet<>();
+
+            Stream.of(
+                    ProcessingConfigWriter.CLASSICS,
+                    ProcessingConfigWriter.SERIES,
+                    ProcessingConfigWriter.RU,
+                    ProcessingConfigWriter.MODIFIERS,
+                    ProcessingConfigWriter.THRESHOLDS
+            ).flatMap(Arrays::stream).forEach(configuredIds::add);
+
+            Set<String> catalogIds = CoreRecordCatalog.children().stream()
+                    .map(RecordChild::id)
+                    .collect(java.util.stream.Collectors.toSet());
+
+            Set<String> missing = new LinkedHashSet<>(configuredIds);
+            missing.removeAll(catalogIds);
+
+            assertTrue(
+                    missing.isEmpty(),
+                    "ID presenti in ProcessingConfigWriter ma assenti da CoreRecordCatalog: " + missing
+            );
+        }
+
+        @Test
+        void catalogContainsAllGranularRecordsPlusCulometroExactlyOnce() {
+            Set<String> configuredIds = new LinkedHashSet<>();
+
+            Stream.of(
+                    ProcessingConfigWriter.CLASSICS,
+                    ProcessingConfigWriter.SERIES,
+                    ProcessingConfigWriter.RU,
+                    ProcessingConfigWriter.MODIFIERS,
+                    ProcessingConfigWriter.THRESHOLDS
+            ).flatMap(Arrays::stream).forEach(configuredIds::add);
+
+            assertEquals(
+                    93,
+                    configuredIds.size(),
+                    "Il numero degli ID granulari configurabili è cambiato: aggiornare il contratto del catalogo"
+            );
+
+            Set<String> catalogIds = CoreRecordCatalog.children().stream()
+                    .map(RecordChild::id)
+                    .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+
+            assertEquals(
+                    CoreRecordCatalog.children().size(),
+                    catalogIds.size(),
+                    "CoreRecordCatalog contiene ID duplicati"
+            );
+
+            assertEquals(
+                    94,
+                    catalogIds.size(),
+                    "Il catalogo deve contenere i 93 record granulari più il Culometro"
+            );
+
+            assertTrue(
+                    catalogIds.contains(CoreRecordCatalog.CULOMETRO_ID),
+                    "Il Culometro deve essere presente nel catalogo"
+            );
+        }
+    }
+
 ## src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
 
 File: src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
@@ -29339,7 +29522,7 @@ File: src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
                     DependencyInventory.legacyCapabilities(false, true, false, false)
             );
 
-            assertEquals(4, plan.byFamily().size());
+            assertEquals(5, plan.byFamily().size());
         }
     }
 
@@ -29942,9 +30125,9 @@ File: src\test\java\it\alterlega\recordsnext\app\PipelinePreflightTest.java
                     new ProcessingOptions(true, true, true, false)
             );
 
-            assertEquals(2, result.selectedCount());
-            assertEquals(2, result.executableCount());
-            assertEquals(2, result.completeCount());
+            assertEquals(31, result.selectedCount());
+            assertEquals(31, result.executableCount());
+            assertEquals(31, result.completeCount());
             assertEquals(0, result.skippedDependencyCount());
         }
 
@@ -42954,6 +43137,7 @@ File: tools\Test_RecordsNext2_ThresholdsSemantic_v29.ps1
 - src\test\java\it\alterlega\recordsnext\app\culometro\CulometroFamilyJsExporterTest.java
 - src\test\java\it\alterlega\recordsnext\app\manifest\ManifestJsWriterTest.java
 - src\test\java\it\alterlega\recordsnext\app\manifest\ManifestPublishingSupportTest.java
+- src\test\java\it\alterlega\recordsnext\app\model\CoreRecordCatalogCompletenessTest.java
 - src\test\java\it\alterlega\recordsnext\app\model\ExecutionPlannerTest.java
 - src\test\java\it\alterlega\recordsnext\app\model\ModularProcessingModelTest.java
 - src\test\java\it\alterlega\recordsnext\app\modifiers\ModifiersFamilyJsExporterTest.java
