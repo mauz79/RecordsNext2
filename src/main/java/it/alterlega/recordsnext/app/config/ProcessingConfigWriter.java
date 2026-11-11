@@ -16,6 +16,7 @@ public final class ProcessingConfigWriter {
             boolean ru,
             boolean modifiers,
             boolean thresholdsLuck,
+            boolean topFlop,
             boolean culometro,
             boolean publishToSite,
             Map<String, Boolean> children,
@@ -26,6 +27,7 @@ public final class ProcessingConfigWriter {
             modifierNames = Map.copyOf(modifierNames == null ? defaultModifierNames() : modifierNames);
         }
 
+        /** Costruttore 3.2 invariato: Top & Flop non si attiva mai implicitamente. */
         public State(
                 boolean classics,
                 boolean series,
@@ -35,11 +37,24 @@ public final class ProcessingConfigWriter {
                 boolean culometro,
                 boolean publishToSite
         ) {
-            this(classics, series, ru, modifiers, thresholdsLuck, culometro,
+            this(classics, series, ru, modifiers, thresholdsLuck, false, culometro,
                     publishToSite, Map.of(), defaultModifierNames());
         }
 
+        /** Compatibilita' con le precedenti GUI e suite di test 3.2. */
+        public State(
+                boolean classics, boolean series, boolean ru, boolean modifiers,
+                boolean thresholdsLuck, boolean culometro, boolean publishToSite,
+                Map<String, Boolean> children, Map<String, String> modifierNames
+        ) {
+            this(classics, series, ru, modifiers, thresholdsLuck, false, culometro,
+                    publishToSite, children, modifierNames);
+        }
+
         public boolean childEnabled(String id) {
+            if (id.startsWith("topFlop.")) {
+                return topFlopImplemented(id) && children.getOrDefault(id, true);
+            }
             return children.getOrDefault(id, true);
         }
 
@@ -66,6 +81,7 @@ public final class ProcessingConfigWriter {
         readChildren(json, "ru", RU, children);
         readChildren(json, "modifiers", MODIFIERS, children);
         readChildren(json, "thresholdsLuck", THRESHOLDS, children);
+        readChildren(json, "topFlop", TOP_FLOP, children);
 
         return new State(
                 enabled(json, "classics"),
@@ -73,6 +89,7 @@ public final class ProcessingConfigWriter {
                 enabled(json, "ru"),
                 enabled(json, "modifiers"),
                 enabled(json, "thresholdsLuck"),
+                enabled(json, "topFlop"),
                 blockBoolean(json, "culometro", "enabled"),
                 blockBoolean(json, "output", "publishToSite"),
                 children,
@@ -106,6 +123,10 @@ public final class ProcessingConfigWriter {
                       "thresholdsLuck": {
                         "enabled": %s,
                         "children": %s
+                      },
+                      "topFlop": {
+                        "enabled": %s,
+                        "children": %s
                       }
                     },
                     "modifierNames": {
@@ -130,6 +151,7 @@ public final class ProcessingConfigWriter {
                 state.ru(), childrenJson(state, RU),
                 state.modifiers(), childrenJson(state, MODIFIERS),
                 state.thresholdsLuck(), childrenJson(state, THRESHOLDS),
+                state.topFlop(), childrenJson(state, TOP_FLOP),
                 jsonEscape(state.modifierName("MODM1PERS")),
                 jsonEscape(state.modifierName("MODM2PERS")),
                 jsonEscape(state.modifierName("MODM3PERS")),
@@ -259,6 +281,25 @@ public final class ProcessingConfigWriter {
             "modifiers.modmodulo.max", "modifiers.modmodulo.total", "modifiers.modmodulo.average", "modifiers.modmodulo.uses", "modifiers.modmodulo.series",
             "modifiers.home-field-deciding", "modifiers.home-field-points-gained", "modifiers.home-field-points-lost", "modifiers.home-field-balance"
     };
+
+    /** I venti record approvati sono ID stabili. Le voci non implementate restano visibili e disabilitate. */
+    public static final String[] TOP_FLOP = {
+            "topFlop.tf01", "topFlop.tf02", "topFlop.tf03", "topFlop.tf04",
+            "topFlop.tf05", "topFlop.tf06", "topFlop.tf07", "topFlop.tf08",
+            "topFlop.tf09", "topFlop.tf10", "topFlop.tf11", "topFlop.tf12",
+            "topFlop.tf13", "topFlop.tf14", "topFlop.tf15", "topFlop.tf16",
+            "topFlop.tf17", "topFlop.tf18", "topFlop.tf19", "topFlop.tf20"
+    };
+
+    public static boolean topFlopImplemented(String id) {
+        return switch (id) {
+            case "topFlop.tf01", "topFlop.tf02", "topFlop.tf03", "topFlop.tf04",
+                    "topFlop.tf05", "topFlop.tf06", "topFlop.tf07", "topFlop.tf08", "topFlop.tf09", "topFlop.tf10",
+                    "topFlop.tf16", "topFlop.tf17", "topFlop.tf18", "topFlop.tf19",
+                    "topFlop.tf20" -> true;
+            default -> false;
+        };
+    }
 
     public static final String[] THRESHOLDS = {
             "thresholds.surgical-win", "thresholds.mocking-loss",

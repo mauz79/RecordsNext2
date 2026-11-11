@@ -7,6 +7,9 @@ import it.alterlega.recordsnext.app.manifest.ManifestMetadata;
 import it.alterlega.recordsnext.app.core.LeagueMetadata;
 import it.alterlega.recordsnext.app.core.LeagueMetadataLoader;
 import it.alterlega.recordsnext.app.model.RecordFamily;
+import it.alterlega.recordsnext.app.topflop.TopFlopViewsPublication;
+import it.alterlega.recordsnext.app.topflop.TopFlopPublicViewsStageExporter;
+import it.alterlega.recordsnext.app.manifest.ManifestPublishingSupport;
 import it.alterlega.recordsnext.app.core.CoreJsExporter;
 import it.alterlega.recordsnext.app.output.SeasonPublicationTargetRepository;
 import it.alterlega.recordsnext.app.output.SeasonFamilyShardPublisher;
@@ -29,7 +32,8 @@ public final class RecordsNextPipeline {
                     RecordFamily.SERIES,
                     RecordFamily.RU,
                     RecordFamily.MODIFIERS,
-                    RecordFamily.THRESHOLDS_LUCK
+                    RecordFamily.THRESHOLDS_LUCK,
+                    RecordFamily.TOP_FLOP
             )
     );
 
@@ -220,7 +224,29 @@ public final class RecordsNextPipeline {
         }
 
         Result result;
+        Path topFlopScratch = null;
+        TopFlopViewsPublication.Prepared topFlopPrepared = null;
+        if (o.generateJs() && o.familyEnabled(RecordFamily.TOP_FLOP)) {
+            Files.createDirectories(c.staging());
+            topFlopScratch = Files.createTempDirectory(c.staging(), "recordsnext4-topflop-");
+            try {
+                l.phase("Elaborazione delle viste Top & Flop selezionate (SQLite locale)", 79);
+                topFlopPrepared = TopFlopViewsPublication.prepare(
+                        database, c.reports(), c.seasons(),
+                        TopFlopViewsPublication.selectedIds(o.selection()), topFlopScratch,
+                        it.alterlega.recordsnext.app.topflop.TopFlopSettings.load(
+                                c.projectRoot().resolve("config/topflop.json")),
+                        c.projectRoot().resolve("config/player-identities.json")
+                );
+                l.phase("Top & Flop: " + topFlopPrepared.files()
+                        + " JS verificati, una sola elaborazione per tutte le destinazioni", -1);
+            } catch (Exception ex) {
+                deleteTree(topFlopScratch);
+                throw ex;
+            }
+        }
 
+        try {
         if (!o.generateJs()) {
             l.phase(
                     "Archivi elaborati; generazione JavaScript non richiesta",
@@ -278,10 +304,29 @@ public final class RecordsNextPipeline {
                         c.reports()
                 );
 
+                // In modalita solo generazione i sette JS legacy sono ancora cumulativi.
+                // Applichiamo lo stesso sharding flat 3.2 del ramo multisito PRIMA del
+                // controllo 1.500.000 byte, conservando facade e nomi pubblici.
+                Path generatedJs = r.stagingDirectory().resolve("js");
+                var flatPlan = SeasonFamilyShardPublisher.prepareFlat(
+                        generatedJs, TopFlopPublicViewsStageExporter.LIMIT_BYTES);
+
+                int addedTopFlop = 0;
+                if (topFlopPrepared != null) {
+                    addedTopFlop = TopFlopViewsPublication.attachScoped(
+                            topFlopPrepared, c.seasons(), generatedJs);
+                }
+                // Il manifest descrive i file effettivamente generati, inclusi
+                // gli shard. Validiamo TUTTI i JS, anche se Top & Flop e' disattivato.
+                ManifestPublishingSupport.write(generatedJs, o, preflight, manifestMetadata);
+                int validatedFiles = TopFlopViewsPublication.validateStaging(generatedJs);
+                l.phase("Staging JS di prova: " + flatPlan.shards().size()
+                        + " shard legacy flat, " + addedTopFlop + " file Top & Flop, "
+                        + validatedFiles + " JS verificati (massimo 1.500.000 byte)", -1);
                 result = new Result(
                         r.classicEntries(),
                         r.ruSeasons(),
-                        r.validatedFiles(),
+                        validatedFiles,
                         0
                 );
             } else {
@@ -448,7 +493,19 @@ public final class RecordsNextPipeline {
                                 target.seasonId()
                         );
 
-                        var flatPlan = SeasonFamilyShardPublisher.prepareFlat(generatedDir);
+                        if (topFlopPrepared != null) {
+                            int appended = TopFlopViewsPublication.attachScoped(
+                                    topFlopPrepared, targetSeasons, generatedDir);
+                            l.phase("Top & Flop " + target.seasonId()
+                                    + ": " + appended + " JS nel cutoff storico", -1);
+                        }
+
+                        var flatPlan = SeasonFamilyShardPublisher.prepareFlat(
+                                generatedDir, TopFlopPublicViewsStageExporter.LIMIT_BYTES);
+                        // Anche nei siti 3.2/4.0 senza Top & Flop la validazione
+                        // si applica a facade, shard e altri JS dopo lo split.
+                        ManifestPublishingSupport.write(generatedDir, o, preflight, targetManifest);
+                        TopFlopViewsPublication.validateStaging(generatedDir);
                         l.phase(
                                 "Output flat " + target.seasonId()
                                         + ": shard=" + flatPlan.shards().size()
@@ -487,6 +544,10 @@ public final class RecordsNextPipeline {
                     )
                             + elapsed(started)
             );
+        }
+
+        } finally {
+            if (topFlopScratch != null) deleteTree(topFlopScratch);
         }
 
         preparation.saveConsolidation(
@@ -625,7 +686,12 @@ public final class RecordsNextPipeline {
             staleFlatShards = stream
                     .filter(Files::isRegularFile)
                     .filter(path -> SeasonFamilyShardPublisher.isFlatShardFileName(
-                            path.getFileName().toString()))
+                            path.getFileName().toString())
+                            || path.getFileName().toString().equals(
+                                    "fcmRecordsNext_TopFlopViews.js")
+                            || path.getFileName().toString().matches(
+                                    "fcmRecordsNext_TopFlopViews\\.(?:Careers|Teams|Records|Highlights)\\."
+                                    + "[0-9]{4}_[0-9]{4}\\.[0-9]{3}\\.js"))
                     .filter(path -> !generatedNames.contains(path.getFileName().toString()))
                     .sorted(Comparator.comparing(path -> path.getFileName().toString()))
                     .toList();

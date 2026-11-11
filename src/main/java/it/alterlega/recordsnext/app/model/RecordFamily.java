@@ -8,7 +8,8 @@ public enum RecordFamily {
     SERIES("series"),
     RU("ru"),
     MODIFIERS("modifiers"),
-    THRESHOLDS_LUCK("thresholdsLuck");
+    THRESHOLDS_LUCK("thresholdsLuck"),
+    TOP_FLOP("topFlop");
 
     private final String id;
 

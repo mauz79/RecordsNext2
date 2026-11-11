@@ -22,7 +22,8 @@ class CoreRecordCatalogCompletenessTest {
                 ProcessingConfigWriter.SERIES,
                 ProcessingConfigWriter.RU,
                 ProcessingConfigWriter.MODIFIERS,
-                ProcessingConfigWriter.THRESHOLDS
+                ProcessingConfigWriter.THRESHOLDS,
+                ProcessingConfigWriter.TOP_FLOP
         ).flatMap(Arrays::stream).forEach(configuredIds::add);
 
         Set<String> catalogIds = CoreRecordCatalog.children().stream()
@@ -47,11 +48,12 @@ class CoreRecordCatalogCompletenessTest {
                 ProcessingConfigWriter.SERIES,
                 ProcessingConfigWriter.RU,
                 ProcessingConfigWriter.MODIFIERS,
-                ProcessingConfigWriter.THRESHOLDS
+                ProcessingConfigWriter.THRESHOLDS,
+                ProcessingConfigWriter.TOP_FLOP
         ).flatMap(Arrays::stream).forEach(configuredIds::add);
 
         assertEquals(
-                93,
+                113,
                 configuredIds.size(),
                 "Il numero degli ID granulari configurabili è cambiato: aggiornare il contratto del catalogo"
         );
@@ -67,9 +69,9 @@ class CoreRecordCatalogCompletenessTest {
         );
 
         assertEquals(
-                94,
+                114,
                 catalogIds.size(),
-                "Il catalogo deve contenere i 93 record granulari più il Culometro"
+                "Il catalogo deve contenere i 113 record granulari più il Culometro"
         );
 
         assertTrue(

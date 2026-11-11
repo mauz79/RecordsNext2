@@ -61,6 +61,11 @@ public final class ProcessingConfigLoader {
         Map<String, Object> children = object(node, "children of " + family.id());
         for (Map.Entry<String, Object> entry : children.entrySet()) {
             if (!bool(entry.getValue(), false)) continue;
+            if (family == RecordFamily.TOP_FLOP &&
+                    !ProcessingConfigWriter.topFlopImplemented("topFlop." + entry.getKey())) {
+                throw new IllegalArgumentException(
+                        "Record Top & Flop non ancora verificato: " + entry.getKey());
+            }
             String id = switch (family) {
                 case MODIFIERS -> switch (entry.getKey()) {
                     case "defence" -> "modifiers.defence";

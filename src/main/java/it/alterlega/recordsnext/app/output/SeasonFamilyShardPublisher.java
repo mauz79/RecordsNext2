@@ -36,10 +36,11 @@ import java.util.UUID;
 public final class SeasonFamilyShardPublisher {
     public static final long DEFAULT_MAX_SHARD_BYTES = 1024L * 1024L;
     /**
-     * Limite di sicurezza per gli shard flat 3.1.1. L'obiettivo resta circa 1 MiB;
-     * il margine evita di bloccare la pubblicazione per piccoli sforamenti fisiologici.
+     * Limite fisico 4.0: 1.500.000 byte (non 1.536 KiB).
+     * Condiviso dai percorsi di generazione e pubblicazione; lo split deve
+     * avvenire prima della validazione finale dei JS distribuiti.
      */
-    public static final long DEFAULT_FLAT_MAX_SHARD_BYTES = 1536L * 1024L;
+    public static final long DEFAULT_FLAT_MAX_SHARD_BYTES = 1_500_000L;
     public static final String DATA_DIR = "recordsnext-data";
     public static final String STATE_FILE_NAME = "recordsnext-shards.properties";
 

@@ -52,6 +52,8 @@ public final class CoreRecordCatalog {
                 RecordFamily.THRESHOLDS_LUCK
         );
 
+        addFamilyChildren(children, ProcessingConfigWriter.TOP_FLOP, RecordFamily.TOP_FLOP);
+
         replace(
                 children,
                 new RecordChild(

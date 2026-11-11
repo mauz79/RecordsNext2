@@ -1,3 +1,18 @@
+# Addendum: collaudo sviluppo RecordsNext 4.0 / v46
+
+La release 3.2.0 sottostante resta operativa; questa sezione riguarda **soltanto** la cartella test `D:\DEV_APPS\RecordsNext4.0_TEST_v37`.
+
+1. Usare il pacchetto v46 con preflight SHA-256 e backup; non sovrascrivere sorgenti inattesi.
+2. Non usare `RecordsNext.bat` della 3.2 per lanciare la build di sviluppo.
+3. Per testare l'importazione con UCanAccess, usare `tools/Start-RecordsNext4-Test-v46.ps1` incluso nella patch: carica il JAR 4.0 e i JAR del runtime ufficiale 3.2 in **sola lettura**.
+4. Tenere **Pubblica sui siti = No**, scegliere Completa e avviare la GUI; la suddivisione dei 7 output pesanti avviene anche sullo staging non pubblicato.
+5. Verificare file fisici, facade, manifest, identita' e cutoff. Solo successivamente testare su siti clonati.
+6. GitHub: le modifiche v46 restano locali fino a `git commit`/`git push` sul ramo di sviluppo 4.0, dopo le verifiche. Non committare database, siti o `player-identities.json`.
+
+Riferimenti: `docs/DIARIO_IMPLEMENTAZIONE_RECORDSNEXT4_v38.md` e `docs/VERIFICA_STAGING_JS_v46.md`.
+
+---
+
 # Installazione RecordsNext 3.1.0
 
 ## Requisiti

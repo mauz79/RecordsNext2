@@ -1,3 +1,21 @@
+# RecordsNext 4.0 — ramo di sviluppo Renewo (copia TEST)
+
+> **Stato 11/11/2026:** il codice 4.0 e' ancora in collaudo e **non** sostituisce la release pubblica 3.2.0 descritta nel README originale sottostante. Il repository principale non va aggiornato con una release 4.0 non certificata. La v46 corregge la generazione senza pubblicazione: il cumulativo `fcmRecordsNext_Classics.js` (8.398.766 byte nel log Windows) viene trasformato in facade + shard 3.2 **prima** del controllo fisico da 1.500.000 byte per JS.
+
+## Percorso operativo 4.0 TEST
+
+- Copia di prova: `D:\DEV_APPS\RecordsNext4.0_TEST_v37` (base v45b installata).
+- GUI globale: **Completa/Consolidata** nella barra inferiore; nessuna seconda elaborazione nella famiglia Top & Flop.
+- Output preesistenti 3.2: **inalterati nei dati e nei nomi pubblici**; facade + shard flat accanto al file principale nella `js` dello staging/sito.
+- Output aggiuntivi 4.0: Top & Flop, `History` per identita' approvate, rendimento reale e per fantasquadra/competizione con cutoff storico.
+- Identita' calciatori: approvazione esplicita iniziale e decisioni persistenti (`config/player-identities.json`); nessuna fusione automatica o modifica degli FCA/FCM. Il motore squadre/competizioni rimane quello della 3.2.
+- Soglia di pubblicazione: **1.500.000 byte reali** per ciascun `.js` (non 1536 KiB); lo staging senza publish applica lo stesso sharding multisito.
+- Per collaudare l'importazione FCM/FCA su Windows e' richiesto Java 21 con UCanAccess 2.0.9.5 e dipendenze gia' presenti nel runtime 3.2, in sola lettura.
+- Verifica tecnica: [diario v38](docs/DIARIO_IMPLEMENTAZIONE_RECORDSNEXT4_v38.md), [checklist JS v46](docs/VERIFICA_STAGING_JS_v46.md), [INSTALL](INSTALL.md).
+- Non pubblicare sui siti reali ne' dichiarare conclusa la 4.0 prima del collaudo completo dell'esportazione e del rollback.
+
+---
+
 # RecordsNext 3.2.0
 
 ## RecordsNext 3.2.0

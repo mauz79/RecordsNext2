@@ -7,6 +7,7 @@ import it.alterlega.recordsnext.app.ProcessingOptions;
 import it.alterlega.recordsnext.app.RecordsNextPipeline;
 import it.alterlega.recordsnext.app.config.ProcessingConfigLoader;
 import it.alterlega.recordsnext.app.config.ProcessingConfigWriter;
+import it.alterlega.recordsnext.app.topflop.TopFlopSettings;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -35,10 +36,11 @@ public final class RecordsNext2Dashboard {
     private final Path root = Path.of("").toAbsolutePath().normalize();
     private final Path processingFile = root.resolve("config/processing.json");
     private final Path culometroFile = root.resolve("config/culometro.json");
+    private final Path topFlopSettingsFile = root.resolve("config/topflop.json");
     private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
     private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
-    private final JFrame frame = new JFrame("RecordsNext by mauz79 · 3.2.0");
+    private final JFrame frame = new JFrame("RecordsNext by mauz79 · 4.0 (sviluppo)");
     private final CardLayout pages = new CardLayout();
     private final JPanel pageHost = new JPanel(pages);
     private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
@@ -46,6 +48,7 @@ public final class RecordsNext2Dashboard {
     private final Map<String, JCheckBox> childChecks = new LinkedHashMap<>();
     private final Map<String, JLabel> familySummaries = new LinkedHashMap<>();
     private final Map<String, JTextField> modifierNameFields = new LinkedHashMap<>();
+    private final Map<String, JSpinner> topFlopThresholdFields = new LinkedHashMap<>();
 
     private final JCheckBox culometro = new JCheckBox("Genera Culometro");
     private final JCheckBox publish = new JCheckBox("Pubblica nel sito della stagione corrente al termine");
@@ -66,12 +69,35 @@ public final class RecordsNext2Dashboard {
     private ProcessingConfigWriter.State state;
     private JPanel dashboardPage;
 
+    private static final Map<String, String> TOP_FLOP_LABELS = Map.ofEntries(
+        Map.entry("topFlop.tf01", "TF01 - Miglior voto reale"),
+        Map.entry("topFlop.tf02", "TF02 - Peggior voto reale"),
+        Map.entry("topFlop.tf03", "TF03 - Miglior fantavoto apportato"),
+        Map.entry("topFlop.tf04", "TF04 - Peggior fantavoto apportato"),
+        Map.entry("topFlop.tf05", "TF05 - Medie voto (soglia configurabile)"),
+        Map.entry("topFlop.tf06", "TF06 - Fantamedie (soglia configurabile)"),
+        Map.entry("topFlop.tf07", "TF07 - Gol reali e apportati"),
+        Map.entry("topFlop.tf08", "TF08 - Assist reali e apportati"),
+        Map.entry("topFlop.tf09", "TF09 - Malus"),
+        Map.entry("topFlop.tf10", "TF10 - Presenze reali e fantasy"),
+        Map.entry("topFlop.tf11", "TF11 - Voti sprecati (da verificare)"),
+        Map.entry("topFlop.tf12", "TF12 - Errori pesati (da verificare)"),
+        Map.entry("topFlop.tf13", "TF13 - Fantavoti sprecati (da verificare)"),
+        Map.entry("topFlop.tf14", "TF14 - Stagione schillaciana (da definire)"),
+        Map.entry("topFlop.tf15", "TF15 - Stagione sbagliata (da definire)"),
+        Map.entry("topFlop.tf16", "TF16 - Rendimento per fantasquadra"),
+        Map.entry("topFlop.tf17", "TF17 - Rigori parati"),
+        Map.entry("topFlop.tf18", "TF18 - Gol subiti"),
+        Map.entry("topFlop.tf19", "TF19 - Giornate con zero gol subiti"),
+        Map.entry("topFlop.tf20", "TF20 - Portieri goleador e assist")
+    );
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
                 new RecordsNext2Dashboard().show();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 3.2.0", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 4.0 (sviluppo)", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -131,7 +157,7 @@ public final class RecordsNext2Dashboard {
         brand.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
         brand.setForeground(Color.WHITE);
         side.add(brand);
-        JLabel version = new JLabel("by mauz79 · 3.2.0");
+        JLabel version = new JLabel("by mauz79 · 4.0 dev");
         version.setAlignmentX(Component.LEFT_ALIGNMENT);
         version.setForeground(new Color(174, 192, 224));
         version.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -141,6 +167,7 @@ public final class RecordsNext2Dashboard {
         ButtonGroup group = new ButtonGroup();
         addNav(side, group, "dashboard", "Dashboard");
         addNav(side, group, "seasons", "Configurazione stagioni");
+        addNav(side, group, "topflop", "Top & Flop");
         addNav(side, group, "project", "Progetto e motore");
         addNav(side, group, "tools", "Debug e strumenti");
         addNav(side, group, "log", "Log e diagnostica");
@@ -180,6 +207,7 @@ public final class RecordsNext2Dashboard {
         pageHost.add(buildSeasonsPage(), "seasons");
         pageHost.add(buildFamiliesPage(), "families");
         pageHost.add(buildCulometroPage(), "culometro");
+        pageHost.add(buildTopFlopPage(), "topflop");
         pageHost.add(buildProjectPage(), "project");
         pageHost.add(buildPublishPage(), "tools");
         pageHost.add(buildLogPage(), "log");
@@ -205,7 +233,7 @@ public final class RecordsNext2Dashboard {
         c.weightx = 0.0;
         header.add(leftSpacer, c);
 
-        JLabel title = new JLabel("RecordsNext 3.2.0", SwingConstants.CENTER);
+        JLabel title = new JLabel("RecordsNext 4.0 (sviluppo)", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
         title.setForeground(RED);
         c.gridx = 1;
@@ -231,10 +259,10 @@ public final class RecordsNext2Dashboard {
                 "Configura RecordsNext e avvia l’elaborazione dalla barra inferiore"
         ), BorderLayout.NORTH);
 
-        JPanel cards = new JPanel(new GridLayout(1, 3, 12, 0));
+        JPanel cards = new JPanel(new GridLayout(2, 2, 12, 12));
         cards.setOpaque(false);
-        cards.setPreferredSize(new Dimension(0, 185));
-        cards.setMaximumSize(new Dimension(Integer.MAX_VALUE, 185));
+        cards.setPreferredSize(new Dimension(0, 352));
+        cards.setMaximumSize(new Dimension(Integer.MAX_VALUE, 352));
         cards.add(actionCard(
                 "Configurazione stagioni",
                 seasonSummary() + "\nGestite e manuali\nSorgenti, siti e tabellini",
@@ -246,6 +274,12 @@ public final class RecordsNext2Dashboard {
                 activeFamiliesSummary() + "\n\nSelezione granulare dei sottorecord",
                 activeFamilyCountFromState() + " famiglie selezionate",
                 () -> showPage("families")
+        ));
+        cards.add(actionCard(
+                "Top & Flop",
+                "Record e portieri\nMedie e soglie configurabili\nCarriere e fantasquadre",
+                state.topFlop() ? "Apri Top & Flop" : "Configura Top & Flop",
+                () -> showPage("topflop")
         ));
         cards.add(actionCard(
                 "Soglie, Fortuna e Culometro",
@@ -298,6 +332,7 @@ public final class RecordsNext2Dashboard {
         if (state.series()) names.add("Serie");
         if (state.ru()) names.add("Riserve d'Ufficio");
         if (state.modifiers()) names.add("Modificatori");
+        if (state.topFlop()) names.add("Top & Flop");
         if (names.isEmpty()) return "Nessuna famiglia selezionata";
         return String.join("\n", names);
     }
@@ -321,6 +356,7 @@ public final class RecordsNext2Dashboard {
         if (state.series()) count++;
         if (state.ru()) count++;
         if (state.modifiers()) count++;
+        if (state.topFlop()) count++;
         return count;
     }
 
@@ -366,6 +402,143 @@ public final class RecordsNext2Dashboard {
         bottom.add(save);
         page.add(bottom, BorderLayout.SOUTH);
         return page;
+    }
+
+    private JPanel buildTopFlopPage() {
+        JPanel page = new JPanel(new BorderLayout(0, 8));
+        page.setOpaque(false);
+        page.add(pageHeader("Records Top & Flop",
+                "Record, soglie e modalita' di elaborazione della famiglia", true),BorderLayout.NORTH);
+        JTabbedPane tabs = new JTabbedPane();
+        JPanel records = familySelectionPanel("topFlop", "Top & Flop",
+                ProcessingConfigWriter.TOP_FLOP, TOP_FLOP_LABELS);
+        JLabel info = new JLabel("<html>Le classifiche senza prova del possesso o identita' storica "
+                + "restano disabilitate. TF05 e TF06 usano le soglie della seconda scheda.</html>");
+        info.setForeground(MUTED);
+        info.setBorder(new EmptyBorder(6, 12, 6, 12));
+        records.add(info, BorderLayout.NORTH);
+        for (String id : ProcessingConfigWriter.TOP_FLOP) {
+            if (!ProcessingConfigWriter.topFlopImplemented(id)) {
+                JCheckBox check = childChecks.get(id);
+                check.setSelected(false);
+                check.setEnabled(false);
+                check.setToolTipText("Non ancora attivo: occorrono verifiche di possesso e/o baseline storica");
+            }
+        }
+        tabs.addTab("Selezione record", records);
+        tabs.addTab("Soglie e criteri", buildTopFlopSettingsPage());
+        JPanel buttons=new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton identities=new JButton("Riconcilia identita' storiche dei calciatori");
+        identities.addActionListener(e->openPlayerIdentityConfiguration());
+        buttons.add(identities);
+        buttons.add(new JLabel("Proposte da approvare nella GUI; la 3.2 resta invariata."));
+        page.add(buttons,BorderLayout.SOUTH);
+        page.add(tabs,BorderLayout.CENTER);
+        return page;
+    }
+
+    private JComponent buildTopFlopSettingsPage() {
+        JPanel content = new JPanel(new GridBagLayout());
+        content.setBackground(Color.WHITE);
+        content.setBorder(new EmptyBorder(14,18,14,18));
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor=GridBagConstraints.WEST;
+        c.fill=GridBagConstraints.HORIZONTAL;
+        c.insets=new Insets(6,5,6,12);
+        c.gridy=0;
+        addTopFlopSettingsHeading(content,c,"Medie abilitate: TF05 e TF06");
+        addTopFlopIntSetting(content,c,"realSeasonVotes","Voti reali minimi per stagione",5,1,1000);
+        addTopFlopIntSetting(content,c,"fantasyLeagueMatches","Gare conteggiate minime - campionato",5,1,1000);
+        addTopFlopIntSetting(content,c,"fantasyCupMatches","Gare conteggiate minime - coppe",3,1,1000);
+        addTopFlopSettingsHeading(content,c,"Soglie conservate per funzioni non ancora abilitate");
+        addTopFlopIntSetting(content,c,"realCareerVotes","Voti minimi per carriera verificata",20,1,10000);
+        addTopFlopIntSetting(content,c,"fantasyCareerMatches","Gare minime per carriera fantasy",20,1,10000);
+        addTopFlopIntSetting(content,c,"verifiedExclusions","Esclusioni certe minime (TF11-13)",3,1,1000);
+        addTopFlopIntSetting(content,c,"exclusionsWithVote","Esclusioni con voto minime (TF11-13)",2,1,1000);
+        addTopFlopIntSetting(content,c,"anomalySeasonVotes","Voti minimi stagione anomala (TF14-15)",8,1,1000);
+        addTopFlopIntSetting(content,c,"anomalyBaselineVotes","Voti minimi altre stagioni (TF14-15)",20,1,10000);
+        addTopFlopIntSetting(content,c,"anomalyBaselineSeasons","Altre stagioni minime (TF14-15)",2,1,100);
+        addTopFlopDoubleSetting(content,c,"anomalyDelta","Scostamento minimo media voto (TF14-15)",0.75);
+        c.gridx=0;c.gridwidth=2;c.weightx=1.0;
+        JLabel note = new JLabel("<html>Le soglie sono salvate in <b>config/topflop.json</b>. "
+          + "TF05/TF06 le applicano nei JS; TF11-15 e la carriera trasversale "
+          + "restano inattive finche' non saranno validate le rispettive fonti.</html>");
+        note.setForeground(MUTED);
+        content.add(note,c);
+        c.gridy++;
+        JButton save=new JButton("Salva parametri Top & Flop");
+        save.addActionListener(e->saveState());
+        JPanel actions=new JPanel(new FlowLayout(FlowLayout.LEFT));actions.setOpaque(false);
+        actions.add(save);
+        content.add(actions,c);
+        JScrollPane scroll=new JScrollPane(content);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        return scroll;
+    }
+
+    private void addTopFlopSettingsHeading(JPanel panel, GridBagConstraints c,String text) {
+        c.gridx=0;c.gridwidth=2;c.weightx=1.0;
+        JLabel title = new JLabel(text);
+        title.setFont(new Font("Segoe UI",Font.BOLD,14));
+        title.setForeground(NAVY);
+        panel.add(title,c);c.gridy++;
+        c.gridwidth=1;
+    }
+    private void addTopFlopIntSetting(JPanel panel,GridBagConstraints c,String key,
+                                     String label,int value,int min,int max) {
+        c.gridx=0;c.weightx=1.0;
+        panel.add(new JLabel(label),c);
+        JSpinner spinner=new JSpinner(new SpinnerNumberModel(value,min,max,1));
+        spinner.setPreferredSize(new Dimension(110,27));
+        topFlopThresholdFields.put(key,spinner);
+        c.gridx=1;c.weightx=0;
+        panel.add(spinner,c);c.gridy++;
+    }
+    private void addTopFlopDoubleSetting(JPanel panel,GridBagConstraints c,String key,
+                                        String label,double value) {
+        c.gridx=0;c.weightx=1.0;
+        panel.add(new JLabel(label),c);
+        JSpinner spinner=new JSpinner(new SpinnerNumberModel(value,0.05,10.0,0.05));
+        topFlopThresholdFields.put(key,spinner);
+        c.gridx=1;c.weightx=0;
+        panel.add(spinner,c);c.gridy++;
+    }
+
+    private void openPlayerIdentityConfiguration() {
+        try {
+            new TopFlopIdentityReviewDialog(frame,root).setVisible(true);
+        } catch(Exception ex) {
+            JOptionPane.showMessageDialog(frame,ex.getMessage(),
+                "Configurazione identita' calciatori",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private TopFlopSettings readTopFlopSettings() {
+        return new TopFlopSettings(
+            topFlopInt("realSeasonVotes"),topFlopInt("realCareerVotes"),
+            topFlopInt("fantasyLeagueMatches"),topFlopInt("fantasyCupMatches"),
+            topFlopInt("fantasyCareerMatches"),topFlopInt("verifiedExclusions"),
+            topFlopInt("exclusionsWithVote"),topFlopInt("anomalySeasonVotes"),
+            topFlopInt("anomalyBaselineVotes"),topFlopInt("anomalyBaselineSeasons"),
+            java.math.BigDecimal.valueOf(((Number)topFlopThresholdFields.get("anomalyDelta").getValue()).doubleValue()));
+    }
+    private int topFlopInt(String name) {
+        return ((Number)topFlopThresholdFields.get(name).getValue()).intValue();
+    }
+    private void populateTopFlopSettings(TopFlopSettings x) {
+        Map<String,Object> values=Map.ofEntries(
+            Map.entry("realSeasonVotes",x.realSeasonVotes()),
+            Map.entry("realCareerVotes",x.realCareerVotes()),
+            Map.entry("fantasyLeagueMatches",x.fantasyLeagueMatches()),
+            Map.entry("fantasyCupMatches",x.fantasyCupMatches()),
+            Map.entry("fantasyCareerMatches",x.fantasyCareerMatches()),
+            Map.entry("verifiedExclusions",x.verifiedExclusions()),
+            Map.entry("exclusionsWithVote",x.exclusionsWithVote()),
+            Map.entry("anomalySeasonVotes",x.anomalySeasonVotes()),
+            Map.entry("anomalyBaselineVotes",x.anomalyBaselineVotes()),
+            Map.entry("anomalyBaselineSeasons",x.anomalyBaselineSeasons()),
+            Map.entry("anomalyDelta",x.anomalyDelta().doubleValue()));
+        values.forEach((key,val)->topFlopThresholdFields.get(key).setValue(val));
     }
 
     private JPanel seriesSelectionPanel() {
@@ -520,7 +693,8 @@ public final class RecordsNext2Dashboard {
         gridTop.add(grid, BorderLayout.NORTH);
         master.addActionListener(e -> {
             boolean enabled = master.isSelected();
-            for (String id : ids) childChecks.get(id).setEnabled(enabled);
+            for (String id : ids) childChecks.get(id).setEnabled(enabled &&
+                    (!familyId.equals("topFlop") || ProcessingConfigWriter.topFlopImplemented(id)));
             updateFamilySummary(familyId, ids);
         });
         JScrollPane scroll = new JScrollPane(gridTop);
@@ -604,6 +778,7 @@ public final class RecordsNext2Dashboard {
         card.add(infoLine("Cartella progetto", root.toString()));
         card.add(infoLine("Configurazione elaborazione", processingFile.toString()));
         card.add(infoLine("Configurazione Culometro", culometroFile.toString()));
+        card.add(infoLine("Configurazione Top & Flop", topFlopSettingsFile.toString()));
         card.add(infoLine("Database predefinito", root.resolve("data/database/recordsnext.db").toString()));
         card.add(infoLine("Configurazione GUI", Files.isRegularFile(propertiesFile)
                 ? propertiesFile.toString() : "Default PipelineConfig"));
@@ -1016,7 +1191,8 @@ public final class RecordsNext2Dashboard {
     }
 
     private void setChildren(String[] ids, boolean selected, String familyId) {
-        for (String id : ids) childChecks.get(id).setSelected(selected);
+        for (String id : ids) childChecks.get(id).setSelected(selected &&
+                (!familyId.equals("topFlop") || ProcessingConfigWriter.topFlopImplemented(id)));
         updateFamilySummary(familyId, ids);
     }
 
@@ -1025,10 +1201,44 @@ public final class RecordsNext2Dashboard {
         familySummaries.get(familyId).setText(selected + " / " + ids.length + " selezionati");
     }
 
+    private boolean playerIdentityAlertChecked = false;
+
     private void showPage(String id) {
         pages.show(pageHost, id);
         JToggleButton button = navButtons.get(id);
         if (button != null) button.setSelected(true);
+        if ("topflop".equals(id) && !playerIdentityAlertChecked) {
+            playerIdentityAlertChecked=true;
+            new SwingWorker<Boolean,Void>() {
+                @Override protected Boolean doInBackground() throws Exception {
+                    Path file=root.resolve("config/player-identities.json");
+                    Path db=root.resolve("data/database/recordsnext.db");
+                    if(!Files.isRegularFile(file))return true; // First use: require explicit approval.
+                    if(!Files.isRegularFile(db))return false;
+                    try(java.sql.Connection connection=java.sql.DriverManager.getConnection(
+                        "jdbc:sqlite:"+db.toUri()+"?mode=ro")) {
+                        var audit=it.alterlega.recordsnext.app.topflop.TopFlopPlayerIdentities.scanAvailable(connection);
+                        return it.alterlega.recordsnext.app.topflop.TopFlopPlayerIdentities
+                            .load(file).requiresReview(audit);
+                    }
+                }
+                @Override protected void done() {
+                    try {
+                        if(Boolean.TRUE.equals(get())) {
+                            int choice=JOptionPane.showConfirmDialog(frame,
+                                "Ci sono identita' storiche da verificare. Le proposte non sono mai applicate automaticamente. " +
+                                "Aprire la configurazione? (Richiede le annate FCA gia' importate)",
+                                "Top & Flop - identita' calciatori",JOptionPane.YES_NO_OPTION,
+                                JOptionPane.WARNING_MESSAGE);
+                            if(choice==JOptionPane.YES_OPTION)openPlayerIdentityConfiguration();
+                        }
+                    } catch(Exception ex) {
+                        JOptionPane.showMessageDialog(frame,ex.getMessage(),
+                            "Avviso identita' storiche",JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+            }.execute();
+        }
     }
 
 
@@ -1071,13 +1281,20 @@ public final class RecordsNext2Dashboard {
         familyChecks.get("ru").setSelected(state.ru());
         familyChecks.get("modifiers").setSelected(state.modifiers());
         familyChecks.get("thresholdsLuck").setSelected(state.thresholdsLuck());
+        familyChecks.get("topFlop").setSelected(state.topFlop());
         loadChildren(ProcessingConfigWriter.CLASSICS, "classics");
         loadChildren(ProcessingConfigWriter.SERIES, "series");
         loadChildren(ProcessingConfigWriter.RU, "ru");
         loadChildren(ProcessingConfigWriter.MODIFIERS, "modifiers");
         loadChildren(ProcessingConfigWriter.THRESHOLDS, "thresholdsLuck");
+        loadChildren(ProcessingConfigWriter.TOP_FLOP, "topFlop");
         culometro.setSelected(state.culometro());
         publish.setSelected(state.publishToSite());
+        try {populateTopFlopSettings(TopFlopSettings.load(topFlopSettingsFile));}
+        catch (Exception ex) {
+            JOptionPane.showMessageDialog(frame,"Parametri Top & Flop: " + ex.getMessage(),
+                    "Configurazione",JOptionPane.ERROR_MESSAGE);
+        }
         // La disponibilita della modalita Consolidata viene aggiornata
         // da refreshProcessingModeAvailability().
         modifierNameFields.forEach((sourceField, field) ->
@@ -1089,7 +1306,8 @@ public final class RecordsNext2Dashboard {
         for (String id : ids) {
             JCheckBox child = childChecks.get(id);
             child.setSelected(state.childEnabled(id));
-            child.setEnabled(familyEnabled);
+            child.setEnabled(familyEnabled &&
+                    (!familyId.equals("topFlop") || ProcessingConfigWriter.topFlopImplemented(id)));
         }
         updateFamilySummary(familyId, ids);
     }
@@ -1109,8 +1327,9 @@ public final class RecordsNext2Dashboard {
         }
     }
 
-    private void saveState() {
+    private boolean saveState() {
         try {
+            for (JSpinner spinner:topFlopThresholdFields.values()) spinner.commitEdit();
             Map<String, Boolean> children = new LinkedHashMap<>();
             childChecks.forEach((id, check) -> children.put(id, check.isSelected()));
             state = new ProcessingConfigWriter.State(
@@ -1119,16 +1338,22 @@ public final class RecordsNext2Dashboard {
                     familyChecks.get("ru").isSelected(),
                     familyChecks.get("modifiers").isSelected(),
                     familyChecks.get("thresholdsLuck").isSelected(),
+                    familyChecks.get("topFlop").isSelected(),
                     culometro.isSelected(),
                     publish.isSelected(),
                     children,
                     readModifierNamesFromFields()
             );
+            TopFlopSettings configured = readTopFlopSettings();
+            configured.save(topFlopSettingsFile);
             ProcessingConfigWriter.save(processingFile, state);
+            refreshDashboard();
             status.setText("Configurazione salvata");
             status.setForeground(new Color(35, 105, 62));
+            return true;
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(frame, ex.getMessage(), "Salvataggio", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
     }
 
@@ -1159,7 +1384,7 @@ public final class RecordsNext2Dashboard {
         if (forcePublish && !publish.isSelected()) {
             publish.setSelected(true);
         }
-        saveState();
+        if (!saveState()) return;
         run.setEnabled(false);
         publishAllSites.setEnabled(false);
         log.setText("");
@@ -1213,10 +1438,10 @@ public final class RecordsNext2Dashboard {
                     log.append("ERRORE: " + cause + System.lineSeparator());
                     status.setText("Errore");
                     status.setForeground(RED);
-                    JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 3.2.0", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 4.0 (sviluppo)", JOptionPane.ERROR_MESSAGE);
                 } finally {
                     run.setEnabled(true);
-                    publishAllSites.setEnabled(true);
+                                publishAllSites.setEnabled(true);
                 }
             }
         }.execute();

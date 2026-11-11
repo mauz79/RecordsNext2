@@ -1,3 +1,15 @@
+# Modifiche di sviluppo 4.0 — v46 (11 novembre 2026, non pubblicata)
+
+- Corretto `RecordsNextPipeline` in modalita generazione senza pubblicare: shard flat 3.2 prima del limite fisico JS.
+- Validazione finale di tutti i JS anche senza la famiglia Top & Flop.
+- Limite rigoroso **1.500.000 byte** applicato a facade, shard e altri JS, anche nel multisito; il precedente valore 1536 KiB non e' la soglia 4.0.
+- Manifest staging riallineato ai file effettivi; conteggio output corretto.
+- Regressione con Classics cumulativo di oltre 9 MB, verificati 20 shard (20 stagioni) sotto il limite.
+- Documentazione 4.0 versionata v38, README e INSTALL aggiornati; nessuna modifica ai calcoli dei Classici o al motore storico squadre 3.2.
+- Stato: build Java 21 testata; esecuzione integrale sulla copia Windows da confermare prima del push/release.
+
+---
+
 # Changelog
 
 ## RecordsNext 3.2.0 - 2026-09-16

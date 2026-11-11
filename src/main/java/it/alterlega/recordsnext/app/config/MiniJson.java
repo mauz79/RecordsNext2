@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-final class MiniJson {
+public final class MiniJson {
     private final String text;
     private int pos;
 
@@ -13,7 +13,7 @@ final class MiniJson {
         this.text = text != null && text.startsWith("\uFEFF") ? text.substring(1) : text;
     }
 
-    static Object parse(String text) {
+    public static Object parse(String text) {
         MiniJson parser = new MiniJson(text);
         Object value = parser.readValue();
         parser.skipWhitespace();
