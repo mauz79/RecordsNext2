@@ -261,3 +261,6 @@ Il preflight può indicare dipendenze opzionali mancanti. In questo caso il Culo
 ### Il link al tabellino apre la stagione sbagliata
 
 Controllare il sito online configurato sulla singola stagione e salvarlo nuovamente per applicare la normalizzazione URL.
+
+## Aggiornamento RC v67
+La RC migrata si trova in `D:\DEV_APPS\RecordsNext4.0_RC_v64`. Non reinstallare o reimportare le 21 stagioni; FCA 2012/13 recuperato obbligatorio. GUI `Avvia-RecordsNext4-RC-v64.ps1`. Prima della pubblicazione reale: controllare destinazioni, backup, browser e rollback. La documentazione v47 non pubblica nulla.

@@ -40,7 +40,7 @@ public final class RecordsNext2Dashboard {
     private final Path propertiesFile = root.resolve("config/recordsnext-gui.properties");
     private final Path consolidationStateFile = root.resolve("data/consolidation/recordsnext-consolidation.properties");
 
-    private final JFrame frame = new JFrame("RecordsNext by mauz79 · 4.0 (sviluppo)");
+    private final JFrame frame = new JFrame("RecordsNext by mauz79 · 4.0");
     private final CardLayout pages = new CardLayout();
     private final JPanel pageHost = new JPanel(pages);
     private final Map<String, JToggleButton> navButtons = new LinkedHashMap<>();
@@ -97,7 +97,7 @@ public final class RecordsNext2Dashboard {
             try {
                 new RecordsNext2Dashboard().show();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 4.0 (sviluppo)", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, ex.toString(), "RecordsNext 4.0", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -134,8 +134,8 @@ public final class RecordsNext2Dashboard {
         frame.addWindowListener(new WindowAdapter() {
             @Override public void windowClosing(WindowEvent e) { saveQuietly(); frame.dispose(); }
         });
-        frame.setMinimumSize(new Dimension(900, 620));
-        frame.setSize(1040, 700);
+        frame.setMinimumSize(new Dimension(940, 640));
+        frame.setSize(1060, 720);
         frame.setLocationRelativeTo(null);
 
         JPanel rootPanel = new JPanel(new BorderLayout());
@@ -147,7 +147,7 @@ public final class RecordsNext2Dashboard {
 
     private JPanel buildSidebar() {
         JPanel side = new JPanel();
-        side.setPreferredSize(new Dimension(180, 700));
+        side.setPreferredSize(new Dimension(200, 700));
         side.setBackground(NAVY);
         side.setLayout(new BoxLayout(side, BoxLayout.Y_AXIS));
         side.setBorder(new EmptyBorder(18, 12, 16, 12));
@@ -157,7 +157,7 @@ public final class RecordsNext2Dashboard {
         brand.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
         brand.setForeground(Color.WHITE);
         side.add(brand);
-        JLabel version = new JLabel("by mauz79 · 4.0 dev");
+        JLabel version = new JLabel("by mauz79 · 4.0");
         version.setAlignmentX(Component.LEFT_ALIGNMENT);
         version.setForeground(new Color(174, 192, 224));
         version.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -166,8 +166,11 @@ public final class RecordsNext2Dashboard {
 
         ButtonGroup group = new ButtonGroup();
         addNav(side, group, "dashboard", "Dashboard");
+        // Tutte le sezioni delle card hanno la stessa voce nel menu laterale.
         addNav(side, group, "seasons", "Configurazione stagioni");
+        addNav(side, group, "families", "Famiglie record");
         addNav(side, group, "topflop", "Top & Flop");
+        addNav(side, group, "culometro", "Soglie e Culometro");
         addNav(side, group, "project", "Progetto e motore");
         addNav(side, group, "tools", "Debug e strumenti");
         addNav(side, group, "log", "Log e diagnostica");
@@ -233,7 +236,7 @@ public final class RecordsNext2Dashboard {
         c.weightx = 0.0;
         header.add(leftSpacer, c);
 
-        JLabel title = new JLabel("RecordsNext 4.0 (sviluppo)", SwingConstants.CENTER);
+        JLabel title = new JLabel("RecordsNext 4.0", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI Black", Font.BOLD, 25));
         title.setForeground(RED);
         c.gridx = 1;
@@ -261,8 +264,8 @@ public final class RecordsNext2Dashboard {
 
         JPanel cards = new JPanel(new GridLayout(2, 2, 12, 12));
         cards.setOpaque(false);
-        cards.setPreferredSize(new Dimension(0, 352));
-        cards.setMaximumSize(new Dimension(Integer.MAX_VALUE, 352));
+        // Altezza flessibile: evita il taglio di descrizioni e azioni.
+        // Le card occupano l'area disponibile anche con font/DPI maggiorati.
         cards.add(actionCard(
                 "Configurazione stagioni",
                 seasonSummary() + "\nGestite e manuali\nSorgenti, siti e tabellini",
@@ -271,7 +274,7 @@ public final class RecordsNext2Dashboard {
         ));
         cards.add(actionCard(
                 "Famiglie record",
-                activeFamiliesSummary() + "\n\nSelezione granulare dei sottorecord",
+                activeFamiliesSummary() + "\nSelezione granulare dei sottorecord",
                 activeFamilyCountFromState() + " famiglie selezionate",
                 () -> showPage("families")
         ));
@@ -288,10 +291,8 @@ public final class RecordsNext2Dashboard {
                 () -> showPage("culometro")
         ));
 
-        JPanel cardsTop = new JPanel(new BorderLayout());
-        cardsTop.setOpaque(false);
-        cardsTop.add(cards, BorderLayout.NORTH);
-        page.add(cardsTop, BorderLayout.CENTER);
+        // GridLayout distribuisce l'altezza disponibile equamente tra le quattro card.
+        page.add(cards, BorderLayout.CENTER);
         return page;
     }
 
@@ -1141,8 +1142,7 @@ public final class RecordsNext2Dashboard {
                 new EmptyBorder(12, 10, 10, 10)
         ));
         card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        card.setPreferredSize(new Dimension(230, 185));
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 185));
+        card.setMinimumSize(new Dimension(235, 190));
 
         JLabel t = new JLabel(title, SwingConstants.CENTER);
         t.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -1170,10 +1170,11 @@ public final class RecordsNext2Dashboard {
         MouseAdapter click = new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) { action.run(); }
         };
+        // L'intera card deve rispondere al primo clic, anche su spazi e distanziatori.
         card.addMouseListener(click);
-        t.addMouseListener(click);
-        body.addMouseListener(click);
-        v.addMouseListener(click);
+        for (Component child : card.getComponents()) {
+            child.addMouseListener(click);
+        }
         return card;
     }
 
@@ -1420,7 +1421,7 @@ public final class RecordsNext2Dashboard {
                     log.append("ERRORE: " + cause + System.lineSeparator());
                     status.setText("Errore");
                     status.setForeground(RED);
-                    JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 4.0 (sviluppo)", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, String.valueOf(cause), "RecordsNext 4.0", JOptionPane.ERROR_MESSAGE);
                 } finally {
                     run.setEnabled(true);
                                 publishAllSites.setEnabled(true);

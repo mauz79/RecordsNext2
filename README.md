@@ -469,3 +469,6 @@ SHA256 del setup 3.1.0 pubblicato:
 
 RecordsNext 3.1.0
 RecordsNext by mauz79
+
+## Stato RC 4.0 / v67
+Avvio: `Avvia-RecordsNext4-RC-v64.ps1`. Migrazione v64b e GUI v65/v66 documentate in `docs/STATO_MIGRAZIONE_GUI_RELEASE_v67.md`; codice completo in Bibbia v46 + aggiornamento v47. Pubblicazione reale e collaudo browser **non ancora eseguiti**.

@@ -1,3 +1,12 @@
+## RecordsNext4 v67 - RC migrata e GUI corretta (non produzione)
+- Configurazione 3.2 recuperata su 21 stagioni nella RC v64 senza importazioni; 2005/06 manuale esclusa.
+- FCA corretto 2012/13 conservato: 9936 voti e 255 G1, SHA-256 verificato.
+- GUI v65: card apribili al primo clic, niente scansione FCM/UCanAccess aprendo la configurazione.
+- GUI v66: titoli senza dev/sviluppo, card flessibili, menu coerente.
+- Motore 87/87 record; 339 JS staging, sandbox 21 siti/3730 JS/1617 shard certificata.
+- Siti reali ancora intatti; browser e cutover 3.2->4.0 pendenti.
+- Continuita': docs/CODICE_FUNZIONANTE_RECORDSNEXT4_v47.md, docs/STATO_MIGRAZIONE_GUI_RELEASE_v67.md.
+
 ## RecordsNext 4.0 - v63: sandbox multisito certificata, frontend statico integrato (RC, NON release)
 - 21 siti in sandbox con 3730 JS e 1617 shard verificati; 339 JS staging, cutoff storico e vincolo 1.500.000 byte OK.
 - Skin v53b integrata e verificata staticamente per 2025/26 e 2026/27.
@@ -742,3 +751,5 @@ Prima release stabile della nuova linea RecordsNext 2.0.
 
 
 Le stringhe interne che citano RecordsNext 1.0.2 negli exporter indicano la provenienza/compatibilitÃƒÂ  degli archivi normalizzati e non la versione corrente del prodotto.
+
+

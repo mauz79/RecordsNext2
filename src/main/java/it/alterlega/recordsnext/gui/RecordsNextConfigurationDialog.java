@@ -190,7 +190,9 @@ final class RecordsNextConfigurationDialog extends JDialog {
         );
         try{
             for(var loaded:repository.load()) {
-                var row = refreshManagedMetadata(loaded);
+                // Usa i metadati gia' salvati: riaprire ogni FCM tramite UCanAccess
+                // blocca la GUI e genera centinaia di warning all'apertura.
+                var row = loaded;
                 boolean includeByDefault = !selectionInitialized || selected.contains(row.seasonId());
                 addEditor(new SeasonEditor(row, includeByDefault));
             }
