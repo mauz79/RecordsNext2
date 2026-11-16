@@ -90,6 +90,6 @@ class ExecutionPlannerTest {
                 DependencyInventory.legacyCapabilities(false, true, false, false)
         );
 
-        assertEquals(5, plan.byFamily().size());
+        assertEquals(java.util.EnumSet.allOf(RecordFamily.class), plan.byFamily().keySet());
     }
 }

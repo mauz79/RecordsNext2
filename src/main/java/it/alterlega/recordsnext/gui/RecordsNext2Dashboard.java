@@ -80,11 +80,11 @@ public final class RecordsNext2Dashboard {
         Map.entry("topFlop.tf08", "TF08 - Assist reali e apportati"),
         Map.entry("topFlop.tf09", "TF09 - Malus"),
         Map.entry("topFlop.tf10", "TF10 - Presenze reali e fantasy"),
-        Map.entry("topFlop.tf11", "TF11 - Voti sprecati (da verificare)"),
-        Map.entry("topFlop.tf12", "TF12 - Errori pesati (da verificare)"),
-        Map.entry("topFlop.tf13", "TF13 - Fantavoti sprecati (da verificare)"),
-        Map.entry("topFlop.tf14", "TF14 - Stagione schillaciana (da definire)"),
-        Map.entry("topFlop.tf15", "TF15 - Stagione sbagliata (da definire)"),
+        Map.entry("topFlop.tf11", "TF11 - Voti non utilizzati (panchina documentata)"),
+        Map.entry("topFlop.tf12", "TF12 - Errore pesato voto (panchina documentata)"),
+        Map.entry("topFlop.tf13", "TF13 - Fantavoti non utilizzati (panchina documentata)"),
+        Map.entry("topFlop.tf14", "TF14 - Stagione schillaciana (confronto storico verificato)"),
+        Map.entry("topFlop.tf15", "TF15 - Stagione sbagliata (confronto storico verificato)"),
         Map.entry("topFlop.tf16", "TF16 - Rendimento per fantasquadra"),
         Map.entry("topFlop.tf17", "TF17 - Rigori parati"),
         Map.entry("topFlop.tf18", "TF18 - Gol subiti"),
@@ -412,8 +412,9 @@ public final class RecordsNext2Dashboard {
         JTabbedPane tabs = new JTabbedPane();
         JPanel records = familySelectionPanel("topFlop", "Top & Flop",
                 ProcessingConfigWriter.TOP_FLOP, TOP_FLOP_LABELS);
-        JLabel info = new JLabel("<html>Le classifiche senza prova del possesso o identita' storica "
-                + "restano disabilitate. TF05 e TF06 usano le soglie della seconda scheda.</html>");
+        JLabel info = new JLabel("<html>TF11-TF13: panchine documentate; "
+                + "la tribuna e' un'esclusione solo con possesso provato nella giornata. "
+                + "Le soglie sono modificabili nella seconda scheda.</html>");
         info.setForeground(MUTED);
         info.setBorder(new EmptyBorder(6, 12, 6, 12));
         records.add(info, BorderLayout.NORTH);
@@ -422,7 +423,7 @@ public final class RecordsNext2Dashboard {
                 JCheckBox check = childChecks.get(id);
                 check.setSelected(false);
                 check.setEnabled(false);
-                check.setToolTipText("Non ancora attivo: occorrono verifiche di possesso e/o baseline storica");
+                check.setToolTipText("Non attivo: origine o confronto storico non verificabile");
             }
         }
         tabs.addTab("Selezione record", records);
@@ -431,14 +432,14 @@ public final class RecordsNext2Dashboard {
         JButton identities=new JButton("Riconcilia identita' storiche dei calciatori");
         identities.addActionListener(e->openPlayerIdentityConfiguration());
         buttons.add(identities);
-        buttons.add(new JLabel("Proposte da approvare nella GUI; la 3.2 resta invariata."));
+        buttons.add(new JLabel("Revisione solo su richiesta: nessuna fusione automatica."));
         page.add(buttons,BorderLayout.SOUTH);
         page.add(tabs,BorderLayout.CENTER);
         return page;
     }
 
     private JComponent buildTopFlopSettingsPage() {
-        JPanel content = new JPanel(new GridBagLayout());
+        JPanel content = new ViewportWidthPanel(new GridBagLayout());
         content.setBackground(Color.WHITE);
         content.setBorder(new EmptyBorder(14,18,14,18));
         GridBagConstraints c = new GridBagConstraints();
@@ -446,11 +447,11 @@ public final class RecordsNext2Dashboard {
         c.fill=GridBagConstraints.HORIZONTAL;
         c.insets=new Insets(6,5,6,12);
         c.gridy=0;
-        addTopFlopSettingsHeading(content,c,"Medie abilitate: TF05 e TF06");
+        addTopFlopSettingsHeading(content,c,"Medie e record attivi: TF05, TF06, TF11-TF15");
         addTopFlopIntSetting(content,c,"realSeasonVotes","Voti reali minimi per stagione",5,1,1000);
         addTopFlopIntSetting(content,c,"fantasyLeagueMatches","Gare conteggiate minime - campionato",5,1,1000);
         addTopFlopIntSetting(content,c,"fantasyCupMatches","Gare conteggiate minime - coppe",3,1,1000);
-        addTopFlopSettingsHeading(content,c,"Soglie conservate per funzioni non ancora abilitate");
+        addTopFlopSettingsHeading(content,c,"Soglie per panchine documentate e anomalie storiche");
         addTopFlopIntSetting(content,c,"realCareerVotes","Voti minimi per carriera verificata",20,1,10000);
         addTopFlopIntSetting(content,c,"fantasyCareerMatches","Gare minime per carriera fantasy",20,1,10000);
         addTopFlopIntSetting(content,c,"verifiedExclusions","Esclusioni certe minime (TF11-13)",3,1,1000);
@@ -460,9 +461,11 @@ public final class RecordsNext2Dashboard {
         addTopFlopIntSetting(content,c,"anomalyBaselineSeasons","Altre stagioni minime (TF14-15)",2,1,100);
         addTopFlopDoubleSetting(content,c,"anomalyDelta","Scostamento minimo media voto (TF14-15)",0.75);
         c.gridx=0;c.gridwidth=2;c.weightx=1.0;
-        JLabel note = new JLabel("<html>Le soglie sono salvate in <b>config/topflop.json</b>. "
-          + "TF05/TF06 le applicano nei JS; TF11-15 e la carriera trasversale "
-          + "restano inattive finche' non saranno validate le rispettive fonti.</html>");
+        JLabel note = new JLabel("<html><body style='width:440px'>Le soglie sono salvate in "
+          + "<b>config/topflop.json</b>. TF05/TF06 e TF11-TF15 applicano queste soglie. "
+          + "TF11-TF13 conteggiano solo riserve FCM documentate; per i giocatori "
+          + "in tribuna manca in molte stagioni una cronologia di possesso giornaliera "
+          + "affidabile, quindi non li classificano come errori certi.</body></html>");
         note.setForeground(MUTED);
         content.add(note,c);
         c.gridy++;
@@ -472,8 +475,19 @@ public final class RecordsNext2Dashboard {
         actions.add(save);
         content.add(actions,c);
         JScrollPane scroll=new JScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         return scroll;
+    }
+
+    /** Keep numerical editors inside the visible viewport, even with long explanations. */
+    private static final class ViewportWidthPanel extends JPanel implements Scrollable {
+        ViewportWidthPanel(LayoutManager layout) { super(layout); }
+        @Override public Dimension getPreferredScrollableViewportSize() {return getPreferredSize();}
+        @Override public int getScrollableUnitIncrement(Rectangle r,int o,int d) {return 20;}
+        @Override public int getScrollableBlockIncrement(Rectangle r,int o,int d) {return Math.max(40,r.height-40);}
+        @Override public boolean getScrollableTracksViewportWidth() {return true;}
+        @Override public boolean getScrollableTracksViewportHeight() {return false;}
     }
 
     private void addTopFlopSettingsHeading(JPanel panel, GridBagConstraints c,String text) {
@@ -1201,46 +1215,14 @@ public final class RecordsNext2Dashboard {
         familySummaries.get(familyId).setText(selected + " / " + ids.length + " selezionati");
     }
 
-    private boolean playerIdentityAlertChecked = false;
-
     private void showPage(String id) {
         pages.show(pageHost, id);
         JToggleButton button = navButtons.get(id);
         if (button != null) button.setSelected(true);
-        if ("topflop".equals(id) && !playerIdentityAlertChecked) {
-            playerIdentityAlertChecked=true;
-            new SwingWorker<Boolean,Void>() {
-                @Override protected Boolean doInBackground() throws Exception {
-                    Path file=root.resolve("config/player-identities.json");
-                    Path db=root.resolve("data/database/recordsnext.db");
-                    if(!Files.isRegularFile(file))return true; // First use: require explicit approval.
-                    if(!Files.isRegularFile(db))return false;
-                    try(java.sql.Connection connection=java.sql.DriverManager.getConnection(
-                        "jdbc:sqlite:"+db.toUri()+"?mode=ro")) {
-                        var audit=it.alterlega.recordsnext.app.topflop.TopFlopPlayerIdentities.scanAvailable(connection);
-                        return it.alterlega.recordsnext.app.topflop.TopFlopPlayerIdentities
-                            .load(file).requiresReview(audit);
-                    }
-                }
-                @Override protected void done() {
-                    try {
-                        if(Boolean.TRUE.equals(get())) {
-                            int choice=JOptionPane.showConfirmDialog(frame,
-                                "Ci sono identita' storiche da verificare. Le proposte non sono mai applicate automaticamente. " +
-                                "Aprire la configurazione? (Richiede le annate FCA gia' importate)",
-                                "Top & Flop - identita' calciatori",JOptionPane.YES_NO_OPTION,
-                                JOptionPane.WARNING_MESSAGE);
-                            if(choice==JOptionPane.YES_OPTION)openPlayerIdentityConfiguration();
-                        }
-                    } catch(Exception ex) {
-                        JOptionPane.showMessageDialog(frame,ex.getMessage(),
-                            "Avviso identita' storiche",JOptionPane.WARNING_MESSAGE);
-                    }
-                }
-            }.execute();
-        }
+        // Identity review is always available by the explicit Top & Flop button.
+        // Do not nag on every new launch for already-known pending proposals.
+        // This never changes or approves a historical identity.
     }
-
 
     private void refreshDashboard() {
         if (dashboardPage != null) pageHost.remove(dashboardPage);

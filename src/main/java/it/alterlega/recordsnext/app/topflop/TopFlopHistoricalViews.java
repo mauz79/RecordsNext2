@@ -35,6 +35,10 @@ public final class TopFlopHistoricalViews {
         final List<Map<String,Object>> seasons=new ArrayList<>();
         final List<Map<String,Object>> fantasyContexts=new ArrayList<>();
         final Set<String> seenContexts=new HashSet<>();
+        final List<Map<String,Object>> anomalies=new ArrayList<>();
+        int verifiedRealFantasyVotes;
+        BigDecimal verifiedRealFantasySum=BigDecimal.ZERO;
+        final Set<String> verifiedRealRules=new HashSet<>();
         BigDecimal votes=BigDecimal.ZERO;
         int valid=0;
         int costObservations=0;
@@ -126,7 +130,14 @@ public final class TopFlopHistoricalViews {
             result.put("rigoriSbagliati",events.getOrDefault("RIGSBA",BigDecimal.ZERO));
             result.put("golSubiti",events.getOrDefault("GOLSUBITI",BigDecimal.ZERO));
             result.put("rigoriParati",events.getOrDefault("RIGPAR",BigDecimal.ZERO));
-            result.put("fantamediaReale",null); // Never invent a score from FCM team contributions.
+            boolean complete=valid>0 && valid==verifiedRealFantasyVotes;
+            result.put("fantamediaReale",complete?
+                verifiedRealFantasySum.divide(BigDecimal.valueOf(valid),MC):null);
+            result.put("fantamediaRealeDisponibilita",complete?
+                "FONTE_FCA_O_REGOLAMENTO_VERIFICATO_COPERTURA_COMPLETA":"FONTE_REALE_MANCANTE_O_COPERTURA_INCOMPLETA");
+            result.put("votiFantamediaRealeCoperti",verifiedRealFantasyVotes);
+            result.put("fontiRegolamentiReali",verifiedRealRules.stream().sorted().toList());
+            result.put("anomalieStagionali",anomalies);
             Map<String,Object> costs=new LinkedHashMap<>();
             costs.put("registrazioniConCosto",costObservations);
             costs.put("minimo",costMin);costs.put("massimo",costMax);
@@ -147,6 +158,24 @@ public final class TopFlopHistoricalViews {
     public static List<Map<String,Object>> aggregate(List<Map<String,Object>> seasonCareers,
                                                        List<Map<String,Object>> teams,
                                                        Map<String,String> approved) {
+        return aggregate(seasonCareers,teams,approved,TopFlopSettings.defaults(),Set.of());
+    }
+    /** TF14/TF15 are produced only for explicit approved identities and selected records. */
+    public static List<Map<String,Object>> aggregate(List<Map<String,Object>> seasonCareers,
+                                                       List<Map<String,Object>> teams,
+                                                       Map<String,String> approved,
+                                                       TopFlopSettings settings,
+                                                       Set<String> selectedIds) {
+        return aggregate(seasonCareers,teams,approved,settings,selectedIds,List.of());
+    }
+    public static List<Map<String,Object>> aggregate(List<Map<String,Object>> seasonCareers,
+                                                       List<Map<String,Object>> teams,
+                                                       Map<String,String> approved,
+                                                       TopFlopSettings settings,
+                                                       Set<String> selectedIds,
+                                                       List<Map<String,Object>> realFantasyRows) {
+        Objects.requireNonNull(realFantasyRows);
+        Objects.requireNonNull(settings);Objects.requireNonNull(selectedIds);
         Objects.requireNonNull(seasonCareers);Objects.requireNonNull(teams);Objects.requireNonNull(approved);
         Map<String,Career> byIdentity=new LinkedHashMap<>();
         Map<String,String> seenKeys=new LinkedHashMap<>();
@@ -167,6 +196,27 @@ public final class TopFlopHistoricalViews {
                 throw new IllegalArgumentException("Contesto fantasy senza carriera FCA nello scope: "+key);
             career.addTeam(row);
         }
+        Set<String> verifiedFantasyKeys=new HashSet<>();
+        for(Map<String,Object> score:realFantasyRows) {
+            String key=String.valueOf(score.get("playerKey"));
+            if(!verifiedFantasyKeys.add(key))throw new IllegalArgumentException("Fantavoto reale doppio: "+key);
+            String identity=approved.get(key);
+            if(identity==null)continue;
+            Career career=byIdentity.get(identity);
+            if(career==null)throw new IllegalArgumentException("Fantavoto reale fuori cutoff: "+key);
+            Map<String,Object> seasonRow=null;
+            for(var row:career.seasons)if(key.equals(row.get("playerKey")))seasonRow=row;
+            if(seasonRow==null)throw new IllegalArgumentException("Fantavoto reale senza carriera: "+key);
+            int n=asInt(score.get("votiRealiValidi"));
+            if(n<=0 || n!=asInt(seasonRow.get("votiValidi")))
+                throw new IllegalArgumentException("Fantavoto reale con denominatore errato: "+key);
+            career.verifiedRealFantasyVotes+=n;
+            career.verifiedRealFantasySum=career.verifiedRealFantasySum.add(asDecimal(score.get("sommaFantavotiReali")));
+            career.verifiedRealRules.add(String.valueOf(score.get("regolamentoFonte")));
+            seasonRow.put("fantamediaReale",asDecimal(score.get("sommaFantavotiReali"))
+                .divide(BigDecimal.valueOf(n),MC));
+            seasonRow.put("fantamediaRealeFonte",score.get("regolamentoFonte"));
+        }
         List<Map<String,Object>> out=new ArrayList<>();
         for(Career c:byIdentity.values()) {
             c.seasons.sort(Comparator.comparing(x->String.valueOf(x.get("stagione"))));
@@ -175,10 +225,50 @@ public final class TopFlopHistoricalViews {
             c.fantasyContexts.sort(Comparator.comparing((Map<String,Object> x)->String.valueOf(x.get("stagione")))
                 .thenComparing(x->String.valueOf(x.get("fantasquadra")))
                 .thenComparing(x->String.valueOf(x.get("competizione"))));
-            if(c.seasons.size()>1)out.add(c.view());
+            if(c.seasons.size()>1) {
+                if(selectedIds.contains("TF14") || selectedIds.contains("TF15"))
+                    calculateAnomalies(c,settings,selectedIds);
+                out.add(c.view());
+            }
         }
         out.sort(Comparator.comparing(x->String.valueOf(x.get("playerIdentityId"))));
         return List.copyOf(out);
+    }
+
+    /** Leave-one-season-out: the candidate season NEVER appears in its baseline. */
+    private static void calculateAnomalies(Career c, TopFlopSettings settings, Set<String> selectedIds) {
+        for(Map<String,Object> candidate:c.seasons) {
+            int votes=asInt(candidate.get("votiValidi"));
+            if(votes<settings.anomalySeasonVotes())continue;
+            BigDecimal mean=asDecimal(candidate.get("sommaVoti"))
+                .divide(BigDecimal.valueOf(votes),MC);
+            int baselineVotes=0;
+            BigDecimal sum=BigDecimal.ZERO;
+            List<String> years=new ArrayList<>();
+            for(Map<String,Object> other:c.seasons) {
+                if(other==candidate)continue;
+                int n=asInt(other.get("votiValidi"));
+                if(n<=0)continue;
+                baselineVotes+=n;
+                sum=sum.add(asDecimal(other.get("sommaVoti")));
+                years.add(String.valueOf(other.get("stagione")));
+            }
+            if(baselineVotes<settings.anomalyBaselineVotes()
+                    || years.size()<settings.anomalyBaselineSeasons())continue;
+            BigDecimal baseline=sum.divide(BigDecimal.valueOf(baselineVotes),MC);
+            BigDecimal delta=mean.subtract(baseline);
+            String id=delta.signum()>0?"TF14":"TF15";
+            if(delta.abs().compareTo(settings.anomalyDelta())<0 || !selectedIds.contains(id))continue;
+            c.anomalies.add(Map.ofEntries(Map.entry("recordId",id),
+                Map.entry("stagione",String.valueOf(candidate.get("stagione"))),
+                Map.entry("playerKey",String.valueOf(candidate.get("playerKey"))),
+                Map.entry("votiValidiStagione",votes),Map.entry("mediaStagione",mean),
+                Map.entry("votiValidiBaseline",baselineVotes),Map.entry("mediaBaseline",baseline),
+                Map.entry("stagioniBaseline",List.copyOf(years)),Map.entry("numeroStagioniBaseline",years.size()),
+                Map.entry("delta",delta),Map.entry("sogliaDelta",settings.anomalyDelta()),
+                Map.entry("criterio","CONFRONTO_MEDIA_PONDERATA_ESCLUSA_STAGIONE_IN_ESAME")));
+        }
+        c.anomalies.sort(Comparator.comparing(x->String.valueOf(x.get("stagione"))));
     }
 
     /** Parse the same audited, compact JS staged by the Java 4.0 exporter. */
@@ -187,6 +277,16 @@ public final class TopFlopHistoricalViews {
         for(Path source:files) {
             if(!source.getFileName().toString().contains(".Careers."))continue;
             for(Object raw:readRows(directory,source))out.add(decodeCareer(raw));
+        }
+        return out;
+    }
+
+    /** Real scores come from audited FCA Statistiche or explicitly verified season rulebooks. */
+    public static List<Map<String,Object>> readRealFantasy(Path directory,List<Path> files) throws IOException {
+        List<Map<String,Object>> out=new ArrayList<>();
+        for(Path source:files) {
+            if(!source.getFileName().toString().contains(".RealFantasy."))continue;
+            for(Object raw:readRows(directory,source))out.add(asObject(raw));
         }
         return out;
     }

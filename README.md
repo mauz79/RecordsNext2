@@ -1,3 +1,49 @@
+# RecordsNext 4.0 v49 — soglie GUI, riconciliazione e diagnostica tribuna (TEST)
+
+**Stato 12/11/2026:** v48 ha completato sul Windows dell'utente 87 record, 302 JS validi, 0 pubblicati. v49 non modifica le formule TF11–TF13 o l'archivio: rende le soglie davvero accessibili, impedisce la richiesta ripetitiva di riconciliazione e aggiunge alla facade un audit separato sulle tribune possibili. **Non afferma che tutte le esclusioni storiche siano provate.**
+
+- 11 soglie numeriche visibili nella scheda senza scorrimento orizzontale, salvataggio invariato `config/topflop.json`.
+- Riconciliazione solo tramite pulsante, nessuna approvazione automatica, registro identita' invariato.
+- `fcmRecordsNext_TopFlopViews.js`: in ogni stagione `contatori.auditTribuna` distingue chi figura in un'altra formazione della stessa squadra e giornata dai soli nominativi del tesseramento stagionale. **Contatori diagnostici, non record TF11-TF13.**
+- Leggere [verifica e limiti v49](docs/VERIFICA_TRIBUNA_GUI_v49.md), [bibbia v41](docs/CODICE_FUNZIONANTE_RECORDSNEXT4_v41.md).
+- Sorgenti 3.2, FCM/FCA, SQLite, identita' e siti operativi non vengono alterati dall'installazione. Pubblicazione sempre disabilitata nel TEST.
+
+---
+
+# RecordsNext 4.0 v48 — TF11–TF13 con panchina FCM verificata (solo TEST)
+
+**Stato 12/11/2026:** v47 gia' collaudata via GUI su Windows con **83 record e 282 JS validi, 0 pubblicati**. v48 aggiunge i 3 record TF11–TF13 in perimetro documentato e corregge etichette TF14/15. La v48 e' compilata e testata offline; necessita collaudo GUI Windows, quindi non e' ancora release pubblica.
+
+- TF11 `S_V/P_V`, TF12 `S_V/E`, TF13 `S_F/P_F` e `S_F/E`, **solo** riserve presenti nella formazione FCM di incontro giocato, non conteggiate nel tabellino, senza ingresso. Non si inferiscono giocatori assenti dalla formazione: la copertura non e' completa e viene dichiarata in JSON.
+- L'algoritmo separa stagione, calciatore, squadra, competizione e famiglia e applica le soglie salvate nella GUI; conserva pareggi e link a tabellini canonici quando presenti.
+- Nuovi shard lazy `Bench`, adattatore di pubblicazione compatibile con cutoff multisito e decoder V2 aggiornato. Limite fisico 1.500.000 byte per JS invariato.
+- Nessuna modifica a SQLite, registri identita', configurazioni personali, FCA/FCM o engine Classics. L'indice economico e' ancora non confrontabile e la fantamedia reale necessita regolamento verificato, come in v47.
+
+Documento tecnico: [verifica panchina v48](docs/VERIFICA_TF11_TF13_PANCHINA_v48.md); [bibbia v40](docs/CODICE_FUNZIONANTE_RECORDSNEXT4_v40.md).
+
+---
+
+# RecordsNext 4.0 - v47 / completamento metriche Top & Flop (TEST)
+
+**Stato 12/11/2026:** codice Java 21 compilato e smoke test offline superati; **NON ancora collaudato con elaborazione GUI su Windows v47, NON pubblicato sui siti, NON versione stabile**. La v46 ha già completato l'elaborazione reale Windows di 80 record con 261 JS validi, ma non sostituisce il collaudo della v47.
+
+## Funzionalità introdotte nella v47
+
+- **TF14/TF15**: rendimento reale stagionale eccezionale/flop con confronto *leave-one-season-out*; baseline di altre stagioni ponderata sui voti validi, soglie configurabili `anomalySeasonVotes=8`, `anomalyBaselineVotes=20`, `anomalyBaselineSeasons=2`, `anomalyDelta=0.75`. Solo identità storiche **esplicitamente approvate** e stagione nel cutoff del singolo sito. Graduatorie `storico.recordStorici` nella facade e dettaglio `History.anomalieStagionali`; selezione tramite GUI. Nessun collegamento automatico per nome/codice Gazzetta.
+- **Costi storici**: nuovi shard `Economy` per stagione caricabili a richiesta; ogni riga conserva `playerKey`, squadra, ID tesserato, costo acquisto/cessione, zero distinto da dato mancante, anomalie costo oltre `CREDITITOTALI`. La somma e media prezzo nei profili usano solo valori di acquisto **positivi**. Non si presume che un contratto annuale provi il possesso in una specifica giornata.
+- **Fantamedia reale indipendente**: nuovo lettore opzionale `config/topflop-real-rules.json` con regolamenti **stagionali documentati, esplicitamente confermati e completi**. Solo allora la v47 genera shard `RealFantasy`; il calcolo usa un unico giorno FCA (non `TOT` fantasy) e non conta doppiamente i rigori compresi nei gol. Senza regola comprovata, media e copertura restano **null / NON_VERIFICABILE**; una carriera multistagionale mostra un valore globale solo con copertura completa dei voti reali.
+- **Decoder browser v2**: `visualizzatori/js/fcmRecordsNextTopFlopViewsDecoder-v2.js` mantiene la lettura lazy delle vecchie viste e supporta `Economy`, `RealFantasy`, storico e record TF14/TF15. Il decoder v1 rimane disponibile per compatibilità.
+- **TF05/TF06**: medie già implementate nella v46, mantenute con soglie e denominatori reali; TF11-TF13 restano volutamente **NON ATTIVI** finché non è dimostrabile l'esclusione e il possesso al giorno. L'**indice economico interstagionale** rimane `null` finché non sono verificati base crediti e regolamento: nessuna formula arbitraria.
+- Il vincolo **1.500.000 byte reali per singolo JS** resta assoluto; i dati economici vengono divisi in shard stagionali e caricati solo su richiesta.
+
+## Ordine di lavoro concordato
+
+**3 -> 1 -> 2**: chiusura metriche dimostrabili -> **unico audit dei JS reali v47** -> prova pubblicazione FULL e CONSOLIDATED in copie isolate dei siti. Nessuna pubblicazione reale, nessun merge su main e nessuna dichiarazione di completamento fino ai gate finali.
+
+Riferimenti: [verifica v47](docs/VERIFICA_METRICHE_TOPFLOP_v47.md), [regolamenti reali](docs/SPECIFICA_CONFIG_REGOLE_REALI_v47.md), [diario v39](docs/DIARIO_IMPLEMENTAZIONE_RECORDSNEXT4_v39.md), [bibbia v39](docs/CODICE_FUNZIONANTE_RECORDSNEXT4_v39.md).
+
+---
+
 # RecordsNext 4.0 — ramo di sviluppo Renewo (copia TEST)
 
 > **Stato 11/11/2026:** il codice 4.0 e' ancora in collaudo e **non** sostituisce la release pubblica 3.2.0 descritta nel README originale sottostante. Il repository principale non va aggiornato con una release 4.0 non certificata. La v46 corregge la generazione senza pubblicazione: il cumulativo `fcmRecordsNext_Classics.js` (8.398.766 byte nel log Windows) viene trasformato in facade + shard 3.2 **prima** del controllo fisico da 1.500.000 byte per JS.

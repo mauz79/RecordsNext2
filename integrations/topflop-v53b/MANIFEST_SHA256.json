@@ -1,0 +1,65 @@
+{
+  "schema": "rn4.v53b.skin-integrated.v2",
+  "files": [
+    {
+      "path": "LEGGIMI_PRIMA.md",
+      "sha256": "e27c861f1006c2a80c761e8842fdbd860f2c879bd880cabc4ef949ed9d8c9fc1",
+      "size": 1855
+    },
+    {
+      "path": "RecordsNext/top_flop.html",
+      "sha256": "bdfcd5ec682820164cc8e40d59f50d2b53c970afb4e153e6918ab9e29b0e3d51",
+      "size": 2762
+    },
+    {
+      "path": "RecordsNext/top_flop_v53.css",
+      "sha256": "f348970bc92b988e22ae58846df06666dfd858f0474f843698f4347e44f2ae36",
+      "size": 1128
+    },
+    {
+      "path": "docs/CONTRATTO_RENEWO_RECORDSNEXT4_v53.md",
+      "sha256": "d1e8594bf516bc2b42a95adf336e23632b68dc4d4ffae6b535712b3f3b1ced77",
+      "size": 5281
+    },
+    {
+      "path": "js/fcmRecordsNextFunzioni_topflop_index_v53.js",
+      "sha256": "19dead63e9684fe004abafd79ffe0f1bfa2ef6e09cce32eb7cbf9f698b00a3b1",
+      "size": 876
+    },
+    {
+      "path": "js/fcmRecordsNextFunzioni_topflop_v53.js",
+      "sha256": "1defbf33c018e76ae245af508fecca07f402e7caf4d175b78c8e03cfb89e021a",
+      "size": 13007
+    },
+    {
+      "path": "js/fcmRecordsNextTopFlopViewsDecoder-v2.js",
+      "sha256": "a26c46801025d2786fa32b52a715b9634aa63edbb5238bf307526c7acafa6eba",
+      "size": 7118
+    },
+    {
+      "path": "profiles/fantablue2/recordsnext.css",
+      "sha256": "30b1fc0058414e41f7f368b5895350bfa9ba524f9812c90b7a274b357e6e80f3",
+      "size": 4663
+    },
+    {
+      "path": "profiles/maelstrom/recordsnext.css",
+      "sha256": "a605104b2762adc7db4316bb5204969c0afc4d5ced7adc286d9b518ffde1eca8",
+      "size": 5830
+    },
+    {
+      "path": "profiles/mauzstrom/recordsnext.css",
+      "sha256": "b3c38a110df20661591030529e2ee8a6d8bd43e0d4f08abbae5699123262ecf9",
+      "size": 6595
+    },
+    {
+      "path": "profiles/neutral/recordsnext.css",
+      "sha256": "b95c6730f2ac9f2c5121ae4d55ddd1c4c097a9ad639e7b4ff4ad7f0ede739119",
+      "size": 3365
+    },
+    {
+      "path": "tools/Installa-TopFlop-Skin-v53b.ps1",
+      "sha256": "321efc948c6619b9254c476dddeb0fc51c63c33add3d6d1f9e903d6fd0009415",
+      "size": 8250
+    }
+  ]
+}

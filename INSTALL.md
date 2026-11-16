@@ -1,3 +1,47 @@
+# Patch RecordsNext4 v49 — solo TEST
+
+Richiede la v48 installata in `D:\DEV_APPS\RecordsNext4.0_TEST_v37`. Il programma va chiuso prima dell'installazione. Eseguire preflight e installatore v49. Il preflight verifica SHA-256 dei sorgenti v48 e bibbia v40, oltre alla pubblicazione disabilitata. Backup/rollback automatici; nessun accesso in scrittura a database, identita' o siti reali.
+
+Dopo l'installazione avviare `tools/Start-RecordsNext4-Test-v46.ps1` (riusa il launcher UCanAccess). Controllare **solo l'apertura di Top & Flop e la modifica visiva delle soglie**; non occorre una nuova elaborazione lunga per questa prova. L'audit tribuna viene scritto nei JS soltanto alla successiva elaborazione completa, da raggruppare con l'audit finale.
+
+---
+
+# RecordsNext 4.0 v48 — installazione TEST
+
+**Solo** nella cartella `D:\DEV_APPS\RecordsNext4.0_TEST_v37` con la v47 gia' installata. Non toccare la 3.2 o la cartella `RecordsNext4.0` principale. Il preflight SHA-256 rifiuta basi diverse; l'installatore crea backup, compila con Java21 e ripristina automaticamente i file e il JAR in caso di errore. Pubblicazione OFF obbligatoria.
+
+Eseguire una riga PowerShell per volta:
+
+```powershell
+Expand-Archive -LiteralPath 'D:\DEV_APPS\downloads\RecordsNext4_v48.zip' -DestinationPath 'D:\DEV_APPS\downloads\RecordsNext4_v48' -Force
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'D:\DEV_APPS\downloads\RecordsNext4_v48\Install-RecordsNext4-v48.ps1' -VerifyOnly
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'D:\DEV_APPS\downloads\RecordsNext4_v48\Install-RecordsNext4-v48.ps1'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'D:\DEV_APPS\RecordsNext4.0_TEST_v37\tools\Start-RecordsNext4-Test-v46.ps1'
+```
+
+Nella GUI Top & Flop selezionare **TF11–TF13** (ora cliccabili), eventualmente **TF15**, salvare e avviare **Completa** senza pubblicare. La patch non cambia la selezione personale automaticamente. La popolazione comprende **soltanto riserve documentate non conteggiate**; verificare `Bench` e i record TF11–TF13 sul sito di prova prima di qualunque distribuzione reale.
+
+---
+
+# RecordsNext 4.0 v47 - aggiornamento TEST
+
+**Non installare sulla v3.2 o sulla cartella 4.0 principale.** Solo `D:\DEV_APPS\RecordsNext4.0_TEST_v37`, basata su v46 e con `publishToSite=false`. L'installatore esegue preflight hash di tutte le basi, crea backup completo dei file toccati e del JAR, compila con Maven/Java 21, esegue smoke test; in caso di errore ripristina automaticamente.
+
+Comandi PowerShell, **una riga per comando**:
+
+```powershell
+Expand-Archive -LiteralPath 'D:\DEV_APPS\downloads\RecordsNext4_v47.zip' -DestinationPath 'D:\DEV_APPS\downloads\RecordsNext4_v47' -Force
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'D:\DEV_APPS\downloads\RecordsNext4_v47\Install-RecordsNext4-v47.ps1' -VerifyOnly
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'D:\DEV_APPS\downloads\RecordsNext4_v47\Install-RecordsNext4-v47.ps1'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'D:\DEV_APPS\RecordsNext4.0_TEST_v37\tools\Start-RecordsNext4-Test-v46.ps1'
+```
+
+Dalla GUI lasciare **pubblicazione disattivata**. Selezionare TF14/TF15 dalla famiglia Top & Flop se la selezione locale li conserva su `false` dalla versione precedente. Non modificare `config/player-identities.json` per questa installazione. Il file `config/topflop-real-rules.json` e' opzionale e non viene installato o compilato automaticamente: prima di introdurlo verificare le fonti per ogni stagione (vedi SPECIFICA_CONFIG_REGOLE_REALI_v47.md). Nessun costo viene normalizzato automaticamente sul budget.
+
+**Atteso**: log completo, shard `Economy` stagionali, `History` con TF14/TF15 solo su identita' approvate, stato `RealFantasy=NON_VERIFICABILE` dove manca il rulebook, ogni JS <=1.500.000 byte. Registrare l'esito prima di autorizzare il punto 1 e poi il punto 2.
+
+---
+
 # Addendum: collaudo sviluppo RecordsNext 4.0 / v46
 
 La release 3.2.0 sottostante resta operativa; questa sezione riguarda **soltanto** la cartella test `D:\DEV_APPS\RecordsNext4.0_TEST_v37`.

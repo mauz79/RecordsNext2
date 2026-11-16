@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Top &amp; Flop · RecordsNext by mauz79</title>
+<link id="rn-tf-skin" rel="stylesheet" href="../profiles/mauzstrom/recordsnext.css">
+<link rel="stylesheet" href="top_flop_v53.css">
+</head>
+<body class="rn-page" data-family="topFlop">
+<main class="rn-shell">
+<nav class="rn-breadcrumb"><a href="../recordsnext.html">Record e statistiche</a><span aria-hidden="true">›</span><strong>Top &amp; Flop</strong></nav>
+<header class="rn-header"><p class="rn-kicker">RecordsNext by mauz79 · 4.0</p><h1>Records Top &amp; Flop</h1><p>Classifiche, calciatori e storico dalle viste JS generate da RecordsNext.</p></header>
+<section class="rn-toolbar rn-tf-toolbar" aria-label="Selezione dati">
+<label>Skin<select id="tf-skin"><option value="mauzstrom">Mauzstrom</option><option value="fantablue2">Fantablue2</option><option value="maelstrom">Maelstrom</option><option value="neutral">Neutral</option></select></label>
+<label>Stagione<select id="tf-season" aria-label="Stagione"></select></label>
+<label>Record<select id="tf-record"><option value="">Tutti i record disponibili</option></select></label>
+<label class="rn-grow">Calciatore<input id="tf-search" type="search" placeholder="Nome o codice storico" autocomplete="off"></label>
+</section>
+<div class="rn-tf-tabs" role="group" aria-label="Sezioni Top & Flop">
+<button class="rn-button is-current" type="button" id="tf-tab-records">Record selezionati</button>
+<button class="rn-button" type="button" id="tf-tab-careers">Calciatori della stagione</button>
+<button class="rn-button" type="button" id="tf-tab-history">Carriere storiche approvate</button>
+</div>
+<div id="tf-feedback" class="rn-status-row" role="status" aria-live="polite">Caricamento della facade Top &amp; Flop…</div>
+<section class="rn-meta-grid" id="tf-metrics" aria-label="Copertura dati"></section>
+<div class="rn-table-wrap"><table class="rn-table"><thead id="tf-head"></thead><tbody id="tf-body"></tbody></table></div>
+<div id="tf-detail" class="rn-panel rn-tf-detail" hidden></div>
+<div class="rn-tf-footer"><button id="tf-more" class="rn-button" type="button" hidden>Mostra altri risultati</button><span id="tf-count" aria-live="polite"></span></div>
+<p class="rn-tf-disclaimer">I record sono quelli effettivamente presenti nei JS del plugin. TF11–TF13 coprono soltanto riserve non utilizzate documentate nei tabellini FCM. Le carriere storiche uniscono esclusivamente identità approvate. Nessun fantavoto o tabellino viene ricostruito.</p>
+</main>
+<script src="../js/fcmRecordsNextTopFlopViewsDecoder-v2.js"></script>
+<script src="../js/fcmRecordsNextFunzioni_topflop_v53.js"></script>
+</body>
+</html>

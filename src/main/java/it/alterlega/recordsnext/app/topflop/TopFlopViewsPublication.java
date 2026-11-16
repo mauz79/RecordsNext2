@@ -78,7 +78,10 @@ public final class TopFlopViewsPublication {
         Class.forName("org.sqlite.JDBC");
         TopFlopPublicViewsStageExporter.Result result;
         try (Connection db = DriverManager.getConnection("jdbc:sqlite:" + sqlite.toUri() + "?mode=ro")) {
-            result = TopFlopPublicViewsStageExporter.export(db, seasonIds, output, reports, selectedIds, settings);
+            TopFlopRealFantasyRules rulebook=TopFlopRealFantasyRules.load(identitiesFile==null
+                ?null:identitiesFile.getParent().resolve("topflop-real-rules.json"));
+            result = TopFlopPublicViewsStageExporter.export(db, seasonIds, output, reports,
+                selectedIds, settings,rulebook);
         }
         for (var file : result.files()) {
             Path path = output.resolve(file.name());
@@ -93,7 +96,8 @@ public final class TopFlopViewsPublication {
             // A confirmed separation must also hold during publication, not only in GUI.
             identities=reg.approved();
         }
-        return new Prepared(output, Set.copyOf(seasonIds), result.files().size(),identities);
+        return new Prepared(output, Set.copyOf(seasonIds), result.files().size(),identities,
+            Set.copyOf(selectedIds),settings);
     }
 
     /** Preserva esattamente le stagioni ammesse dalla 3.2 per il singolo sito. */
@@ -126,7 +130,7 @@ public final class TopFlopViewsPublication {
             if(files==null)throw new IOException("Elenco file mancante per "+season);
             for(var file:files) {
                 String name=String.valueOf(file.get("nome"));
-                if(!name.matches("fcmRecordsNext_TopFlopViews\\.(?:Careers|Teams|Records|Highlights)\\."
+                if(!name.matches("fcmRecordsNext_TopFlopViews\\.(?:Careers|Teams|Records|Highlights|Economy|RealFantasy|Bench)\\."
                     +season+"\\.[0-9]{3}\\.js")) {
                     throw new IOException("Nome shard TF non valido: "+name);
                 }
@@ -147,17 +151,26 @@ public final class TopFlopViewsPublication {
         List<Map<String,Object>> history = TopFlopHistoricalViews.aggregate(
             TopFlopHistoricalViews.readCareers(prepared.jsDirectory(),sources),
             TopFlopHistoricalViews.readTeams(prepared.jsDirectory(),sources,scopedMetadata),
-            prepared.approvedIdentities());
+            prepared.approvedIdentities(),prepared.settings(),prepared.selectedIds(),
+            TopFlopHistoricalViews.readRealFantasy(prepared.jsDirectory(),sources));
         List<TopFlopPublicViewsStageExporter.FileInfo> historyFiles=history.isEmpty()
             ?List.of():TopFlopPublicViewsStageExporter.shard(generatedJs,"Storico","History",
                 new ArrayList<Object>(history));
         if(!historyFiles.isEmpty()) {
-            scoped.put("viste",List.of("Careers","Teams","Records","Highlights","History"));
+            scoped.put("viste",List.of("Careers","Teams","Records","Highlights","Economy","RealFantasy","Bench","History"));
         }
-        scoped.put("storico",Map.of("status",history.isEmpty()?"NESSUNA_IDENTITA_APPROVATA_NEL_CUTOFF":"IDENTITA_APPROVATE",
-            "identita",history.size(),"file",historyFiles.stream().map(f->Map.of(
-                "nome",f.name(),"tipo",f.kind(),"righe",f.rows(),"byte",f.bytes(),"sha256",f.sha256())).toList(),
-            "fonte","config/player-identities.json"));
+        Map<String,Object> historicalStatus=new LinkedHashMap<>();
+        historicalStatus.put("status",history.isEmpty()?"NESSUNA_IDENTITA_APPROVATA_NEL_CUTOFF":"IDENTITA_APPROVATE");
+        historicalStatus.put("identita",history.size());
+        historicalStatus.put("file",historyFiles.stream().map(f->Map.of(
+            "nome",f.name(),"tipo",f.kind(),"righe",f.rows(),"byte",f.bytes(),"sha256",f.sha256())).toList());
+        historicalStatus.put("fonte","config/player-identities.json");
+        historicalStatus.put("soglieAnomalia",Map.of("votiStagione",prepared.settings().anomalySeasonVotes(),
+            "votiBaseline",prepared.settings().anomalyBaselineVotes(),
+            "stagioniBaseline",prepared.settings().anomalyBaselineSeasons(),
+            "deltaMinimo",prepared.settings().anomalyDelta()));
+        historicalStatus.put("recordStorici",TopFlopHistoricAnomalyWinners.winners(history,prepared.selectedIds()));
+        scoped.put("storico",historicalStatus);
         byte[] facadeJs=(PREFIX+TopFlopCompactStageJsExporter.Json.write(scoped)+";\n")
                 .getBytes(StandardCharsets.UTF_8);
         if(facadeJs.length>TopFlopPublicViewsStageExporter.LIMIT_BYTES)
@@ -211,9 +224,17 @@ public final class TopFlopViewsPublication {
     }
 
     public record Prepared(Path jsDirectory,Set<String> seasons,int files,
-                           Map<String,String> approvedIdentities) {
+                           Map<String,String> approvedIdentities,Set<String> selectedIds,
+                           TopFlopSettings settings) {
         public Prepared {
             approvedIdentities=Map.copyOf(approvedIdentities);
+            selectedIds=Set.copyOf(selectedIds);
+            Objects.requireNonNull(settings);
+        }
+        /** Backwards-compatible constructor for v45/v46 tests and callers. */
+        public Prepared(Path jsDirectory,Set<String> seasons,int files,
+                        Map<String,String> approvedIdentities) {
+            this(jsDirectory,seasons,files,approvedIdentities,Set.of(),TopFlopSettings.defaults());
         }
     }
 }

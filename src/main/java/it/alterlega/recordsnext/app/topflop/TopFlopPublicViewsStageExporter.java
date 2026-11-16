@@ -27,9 +27,8 @@ import java.util.TreeMap;
  * All historical facts remain in local SQLite. No scorecard URL is synthesized.
  * No publisher, manifest, CSS or site is modified by this class.
  *
- * Averages (TF05/TF06), wasted votes (TF11-13), and baseline-derived
- * rankings (TF14-15) are NOT promoted to definitive rankings while their
- * policy/evidence is incomplete. Their available raw aggregates are exposed.
+ * TF11-TF13 include ONLY proven unused FCM bench submissions, never presumed
+ * ownership or unsubmitted exclusions. TF14/TF15 use approved identities.
  */
 public final class TopFlopPublicViewsStageExporter {
     private TopFlopPublicViewsStageExporter() {}
@@ -91,18 +90,21 @@ public final class TopFlopPublicViewsStageExporter {
         }
     }
     static final class Costs {
-        int n;
+        int n, zero, missing;
         BigDecimal sum=BigDecimal.ZERO,min,max;
         void add(String raw) {
-            if(raw==null || !raw.matches("[0-9]+(?:[,.][0-9]+)?"))return;
-            BigDecimal value=new BigDecimal(raw.replace(',','.'));
+            BigDecimal value=TopFlopEconomicEvidence.nonnegative(raw,"COSTOACQ");
+            if(value==null){missing++;return;}
+            if(value.signum()==0){zero++;return;}
             n++;sum=sum.add(value);
             if(min==null || value.compareTo(min)<0)min=value;
             if(max==null || value.compareTo(max)>0)max=value;
         }
         Map<String,Object> view() {
             return obj("registrazioniConCosto",n,"minimo",min,"massimo",max,
-                "medio",n==0?null:mean(sum,n),"origine","FCM.Tesserato.COSTOACQ");
+                "medio",n==0?null:mean(sum,n),"origine","FCM.Tesserato.COSTOACQ",
+                "registrazioniZero",zero,"registrazioniMancanti",missing,
+                "denominatoreMedia","SOLO_COSTI_POSITIVI");
         }
     }
     static final class Player {
@@ -258,7 +260,8 @@ public final class TopFlopPublicViewsStageExporter {
         for(Team team:teams.values()) {
             Costs registered=costsByTeam.get(team.player.profile.player().fcaPlayerId()+":"+team.teamId);
             if(registered!=null) {
-                team.costs.n=registered.n;team.costs.sum=registered.sum;
+                team.costs.n=registered.n;team.costs.zero=registered.zero;
+                team.costs.missing=registered.missing;team.costs.sum=registered.sum;
                 team.costs.min=registered.min;team.costs.max=registered.max;
             }
         }
@@ -571,6 +574,13 @@ public final class TopFlopPublicViewsStageExporter {
 
     public static Result export(Connection c,List<String> seasonIds,Path output,Path reports,
                                 Set<String> selectedIds,TopFlopSettings settings) throws SQLException,IOException {
+        return export(c,seasonIds,output,reports,selectedIds,settings,TopFlopRealFantasyRules.empty());
+    }
+
+    public static Result export(Connection c,List<String> seasonIds,Path output,Path reports,
+                                Set<String> selectedIds,TopFlopSettings settings,
+                                TopFlopRealFantasyRules verifiedRules) throws SQLException,IOException {
+        Objects.requireNonNull(verifiedRules);
         Objects.requireNonNull(settings);
         Objects.requireNonNull(c);Objects.requireNonNull(seasonIds);Objects.requireNonNull(output);
         Objects.requireNonNull(selectedIds);
@@ -590,6 +600,13 @@ public final class TopFlopPublicViewsStageExporter {
             var canonical=reports==null ? Map.<TopFlopCanonicalScorecards.MatchTeam,String>of()
                 :TopFlopCanonicalScorecards.load(reports,season);
             SeasonView view=build(loaded,canonical,settings);
+            TopFlopBenchEvidence.Result bench=TopFlopBenchEvidence.analyze(loaded,canonical,settings);
+            view.records.addAll(bench.records());
+            view.highlights.addAll(bench.highlights());
+            view.counters.putAll(bench.counters());
+            // Separate diagnostic: tribuna matters, but a seasonal roster snapshot
+            // is not a dated possession ledger. Never silently inflate TF11-TF13.
+            view.counters.put("auditTribuna",TopFlopTribunaAuditV49.analyze(loaded.archive()));
             if (!selectedIds.isEmpty()) filterSelected(view, selectedIds);
             players+=view.careers.size();real+=loaded.archive().realDayCount();
             fantasy+=loaded.archive().fantasyFactCount();
@@ -598,8 +615,19 @@ public final class TopFlopPublicViewsStageExporter {
             seasonFiles.addAll(shard(output,season,"Teams",packs("Teams",view.teams)));
             seasonFiles.addAll(shard(output,season,"Records",packs("Records",view.records)));
             seasonFiles.addAll(shard(output,season,"Highlights",packs("Highlights",view.highlights)));
+            if(selectedIds.isEmpty() || selectedIds.contains("TF11") ||
+               selectedIds.contains("TF12") || selectedIds.contains("TF13"))
+                seasonFiles.addAll(shard(output,season,"Bench",new ArrayList<Object>(bench.aggregates())));
+            // Complete but compact source tesseramenti: no invented transaction dates.
+            var economic=TopFlopEconomicEvidence.collect(loaded.rosterEvents(),
+                TopFlopEconomicEvidence.readBudget(c,season));
+            seasonFiles.addAll(shard(output,season,"Economy",new ArrayList<Object>(economic.contracts())));
+            var realScore=TopFlopFcaOfficialFantasy.extract(c,season,loaded,verifiedRules.forSeason(season));
+            seasonFiles.addAll(shard(output,season,"RealFantasy",new ArrayList<Object>(realScore.rows())));
             files.addAll(seasonFiles);
-            metadata.add(obj("stagione",season,"contatori",view.counters,"dizionari",dictionaries(view),
+            metadata.add(obj("stagione",season,"contatori",view.counters,
+                "economia",economic.summary(),"fantamediaRealeFonte",realScore.quality(),
+                "dizionari",dictionaries(view),
                 "files",seasonFiles.stream().map(f->obj("nome",f.name(),"tipo",f.kind(),
                     "righe",f.rows(),"byte",f.bytes(),"sha256",f.sha256())).toList()));
             System.out.println("VIEWS_SEASON_OK "+season+" players="+view.careers.size()+
@@ -610,8 +638,9 @@ public final class TopFlopPublicViewsStageExporter {
         for(int i=1;i<=20;i++) status.put(String.format("TF%02d",i),"ATTIVA");
         status.put("TF05","ATTIVA_SOGLIA_MEDIA_VOTO_STAGIONALE");
         status.put("TF06","ATTIVA_SOGLIA_FANTAMEDIA_PER_SQUADRA_E_COMPETIZIONE");
-        for(String id:List.of("TF11","TF12","TF13"))status.put(id,"NON_ATTIVA_ESCLUSIONI_NON_VERIFICATE");
-        for(String id:List.of("TF14","TF15"))status.put(id,"NON_ATTIVA_BASELINE_E_SOGLIE_DA_VALIDARE");
+        for(String id:List.of("TF11","TF12","TF13"))
+            status.put(id,"ATTIVA_SOLO_PANCHINA_FCM_DOCUMENTATA_COPERTURA_NON_COMPLETA");
+        for(String id:List.of("TF14","TF15"))status.put(id,"ATTIVA_STORICO_SOLO_IDENTITA_APPROVATE");
         status.put("TF16","CONFRONTO_PER_SQUADRA_SENZA_VINCITORE_ARBITRARIO");
         if (!selectedIds.isEmpty())
             for (String id : new ArrayList<>(status.keySet()))
@@ -619,10 +648,17 @@ public final class TopFlopPublicViewsStageExporter {
         Map<String,Object> facade=obj("schemaVersion","4.0-public-views-v1",
             "catalogo","TF01-TF20","status","STAGING_ONLY_NOT_PUBLISHED",
             "limitBytesPerJs",LIMIT_BYTES,"identity","SEASON_LOCAL_NO_AUTO_MERGE",
-            "viste",List.of("Careers","Teams","Records","Highlights"),"eventi",EVENTS,
+            "viste",List.of("Careers","Teams","Records","Highlights","Economy","RealFantasy","Bench"),
+            "coperturaTF11_TF13",TopFlopBenchEvidence.COVERAGE,"eventi",EVENTS,
             "soglie",obj("votiMinimiStagione",settings.realSeasonVotes(),
                 "gareMinimeCampionato",settings.fantasyLeagueMatches(),
-                "gareMinimeCoppe",settings.fantasyCupMatches()),
+                "gareMinimeCoppe",settings.fantasyCupMatches(),
+                "votiAnomaliaStagione",settings.anomalySeasonVotes(),
+                "votiAnomaliaBaseline",settings.anomalyBaselineVotes(),
+                "stagioniAnomaliaBaseline",settings.anomalyBaselineSeasons(),
+                "deltaAnomalia",settings.anomalyDelta(),
+                "esclusioniDocumentateMinime",settings.verifiedExclusions(),
+                "esclusioniConVotoMinime",settings.exclusionsWithVote()),
             "attivazioneRecord",status,"stagioni",metadata);
         byte[] b=("window.fcmRecordsNextTopFlopViews = "+json(facade)+";\n")
             .getBytes(StandardCharsets.UTF_8);

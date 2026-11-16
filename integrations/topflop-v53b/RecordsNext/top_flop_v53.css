@@ -1,0 +1,18 @@
+/* Solo struttura della vista Top & Flop. Colori, font, bordi e tabelle vengono dai profili originali RecordsNext. */
+.rn-tf-toolbar{flex-wrap:wrap}
+.rn-tf-toolbar label{min-width:130px}
+.rn-tf-toolbar .rn-grow{min-width:170px}
+.rn-tf-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.rn-tf-tabs .is-current{outline:2px solid currentColor;outline-offset:1px}
+.rn-tf-detail{padding:16px;margin:14px 0}
+.rn-tf-detail h2{margin:0 0 12px}
+.rn-tf-detail ul{padding-left:18px}
+.rn-tf-detail li{margin:5px 0}
+.rn-tf-footer{display:flex;align-items:center;gap:12px;margin:12px 0 18px}
+.rn-tf-disclaimer{font-size:12px;line-height:1.5;opacity:.85;margin:16px 0 36px}
+.rn-tf-badge{display:inline-block;border:1px solid currentColor;padding:2px 6px;font-size:.86em;margin:0 3px 3px 0}
+.rn-tf-link{white-space:nowrap}
+.rn-tf-muted{opacity:.7}
+.rn-tf-num{font-variant-numeric:tabular-nums}
+.rn-table td{max-width:340px;overflow-wrap:anywhere}
+@media(max-width:720px){.rn-tf-toolbar{display:flex;flex-direction:column;align-items:stretch}.rn-tf-toolbar label{width:100%}.rn-tf-tabs .rn-button{flex:1 1 auto}.rn-table{min-width:740px}}
