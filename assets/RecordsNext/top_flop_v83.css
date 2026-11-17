@@ -1,0 +1,12 @@
+/* RecordsNext v83: common additions, four existing skin styles retain priority. */
+.rn-tf-global-results{max-height:280px;overflow:auto}
+.rn-tf-global-option{display:block;margin:.3rem 0;padding:.5rem;text-align:left;cursor:pointer;max-width:100%;background:transparent;border:1px solid #a4a4a4;border-radius:4px;color:inherit}
+.rn-tf-squad-summary{min-width:1680px}
+.rn-tf-competition-table{min-width:1440px}
+.rn-tf-profile-badges{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0}
+.rn-tf-stat{padding:.6rem;border:1px solid #9996;border-radius:6px;min-width:135px;display:flex;flex-direction:column;gap:.3rem}
+.rn-tf-sort{color:inherit;background:none;border:0;cursor:pointer;text-align:left}
+.rn-tf-player{color:inherit;text-decoration:underline;cursor:pointer;background:none;border:0}
+.rn-table-wrap{overflow-x:auto}
+.rn-toolbar label{display:flex;flex-direction:column;gap:.25rem}
+.rn-tf-drilldown{min-width:170px}

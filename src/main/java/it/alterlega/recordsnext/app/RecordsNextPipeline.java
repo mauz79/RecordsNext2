@@ -315,6 +315,7 @@ public final class RecordsNextPipeline {
                 if (topFlopPrepared != null) {
                     addedTopFlop = TopFlopViewsPublication.attachScoped(
                             topFlopPrepared, c.seasons(), generatedJs);
+                    addedTopFlop += attachTopFlopV92Assets(c.projectRoot(), generatedJs);
                 }
                 // Il manifest descrive i file effettivamente generati, inclusi
                 // gli shard. Validiamo TUTTI i JS, anche se Top & Flop e' disattivato.
@@ -496,6 +497,7 @@ public final class RecordsNextPipeline {
                         if (topFlopPrepared != null) {
                             int appended = TopFlopViewsPublication.attachScoped(
                                     topFlopPrepared, targetSeasons, generatedDir);
+                            appended += attachTopFlopV92Assets(c.projectRoot(), generatedDir);
                             l.phase("Top & Flop " + target.seasonId()
                                     + ": " + appended + " JS nel cutoff storico", -1);
                         }
@@ -516,7 +518,8 @@ public final class RecordsNextPipeline {
 
                         int published = publishGeneratedDirectory(
                                 generatedDir,
-                                target.siteJs()
+                                target.siteJs(),
+                                topFlopPrepared == null ? List.of() : topFlopV92Pages(c.projectRoot())
                         );
 
                         totalClassicEntries += generated.classicEntries();
@@ -661,9 +664,43 @@ public final class RecordsNextPipeline {
         }
     }
 
+    private static final List<String> TOPFLOP_V92_JS = List.of(
+            "fcmRecordsNextTopFlopViewsDecoder-v2.js",
+            "fcmRecordsNextTopFlopRankingEngine_v83.js",
+            "fcmRecordsNextEventRanking_v83.js",
+            "fcmRecordsNextFunzioni_topflop_v92.js",
+            "fcmRecordsNextPlayerProfile_v79.js",
+            "fcmRecordsNextGlobalSearch_v79.js",
+            "fcmRecordsNextCalciatori_v92.js"
+    );
+    private static int attachTopFlopV92Assets(Path project, Path generatedJs) throws Exception {
+        Path sourceRoot = project.resolve("assets/js");
+        for (String name : TOPFLOP_V92_JS) {
+            Path source = sourceRoot.resolve(name);
+            if (!Files.isRegularFile(source)) throw new java.io.IOException("Asset RN4 v83 non disponibile: " + source);
+            Path dest = generatedJs.resolve(name);
+            if (Files.exists(dest)) throw new java.io.IOException("Collisione asset RN4: " + dest);
+            if (Files.size(source) > TopFlopPublicViewsStageExporter.LIMIT_BYTES)
+                throw new java.io.IOException("Asset RN4 troppo grande: " + source);
+            Files.copy(source, dest);
+        }
+        return TOPFLOP_V92_JS.size();
+    }
+    private static List<Path> topFlopV92Pages(Path project) throws Exception {
+        Path dir = project.resolve("assets/RecordsNext");
+        List<Path> sources = List.of(dir.resolve("top_flop.html"),dir.resolve("calciatori.html"),
+            dir.resolve("top_flop_v92.css"));
+        for(Path src : sources) if(!Files.isRegularFile(src))
+            throw new java.io.IOException("Pagina o CSS RN4 v83 non disponibile: " + src);
+        return sources;
+    }
+    static int publishGeneratedDirectory(Path generatedDir, Path siteJsDir) throws Exception {
+        return publishGeneratedDirectory(generatedDir,siteJsDir,List.of());
+    }
     static int publishGeneratedDirectory(
             Path generatedDir,
-            Path siteJsDir) throws Exception {
+            Path siteJsDir,
+            List<Path> pages) throws Exception {
 
         Files.createDirectories(siteJsDir);
 
@@ -691,7 +728,14 @@ public final class RecordsNextPipeline {
                                     "fcmRecordsNext_TopFlopViews.js")
                             || path.getFileName().toString().matches(
                                     "fcmRecordsNext_TopFlopViews\\.(?:Careers|Teams|Records|Highlights)\\."
-                                    + "[0-9]{4}_[0-9]{4}\\.[0-9]{3}\\.js"))
+                                    + "[0-9]{4}_[0-9]{4}\\.[0-9]{3}\\.js")
+                            || path.getFileName().toString().matches(
+                                    "fcmRecordsNext_TopFlopViews\\.(?:RealPerformances|CountedPerformances|Economy|RealFantasy|Bench)\\."
+                                    + "[0-9]{4}_[0-9]{4}\\.[0-9]{3}\\.js")
+                            || path.getFileName().toString().matches(
+                                    "fcmRecordsNext_(?:ProfilePoints|PlayerIndex)_v(?:79|83)_[0-9]{4}_[0-9]{4}_[0-9]{3}\\.js")
+                            || path.getFileName().toString().matches(
+                                    "fcmRecordsNext_TopFlopFcaFmt_v83_[0-9]{4}_[0-9]{4}\\.js"))
                     .filter(path -> !generatedNames.contains(path.getFileName().toString()))
                     .sorted(Comparator.comparing(path -> path.getFileName().toString()))
                     .toList();
@@ -705,6 +749,8 @@ public final class RecordsNextPipeline {
         List<Path> replaced = new ArrayList<>();
         List<Path> created = new ArrayList<>();
         List<Path> removedStale = new ArrayList<>();
+        List<Path> replacedPages = new ArrayList<>();
+        List<Path> createdPages = new ArrayList<>();
 
         try {
             for (Path stale : staleFlatShards) {
@@ -760,7 +806,32 @@ public final class RecordsNextPipeline {
                     );
                 }
             }
+            // The two HTML pages and the CSS belong to the same transaction as JS.
+            // A failure here restores every HTML/CSS and every JS changed above.
+            Path pagesDir = siteJsDir.getParent().resolve("RecordsNext");
+            if(!pages.isEmpty()) Files.createDirectories(pagesDir);
+            for(Path source : pages) {
+                if(!Files.isRegularFile(source) || !List.of("top_flop.html","calciatori.html","top_flop_v92.css")
+                        .contains(source.getFileName().toString()))
+                    throw new java.io.IOException("Asset di pagina non autorizzato: " + source);
+                Path target = pagesDir.resolve(source.getFileName());
+                if(Files.exists(target)){
+                    Files.copy(target,backupRoot.resolve("page."+source.getFileName()),
+                            StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
+                    replacedPages.add(target);
+                }else createdPages.add(target);
+                Path temp = pagesDir.resolve("."+source.getFileName()+".recordsnext.tmp");
+                Files.copy(source,temp,StandardCopyOption.REPLACE_EXISTING);
+                try{Files.move(temp,target,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}
+                catch(java.nio.file.AtomicMoveNotSupportedException ex){
+                    Files.move(temp,target,StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
         } catch (Exception ex) {
+            for(Path target:createdPages)Files.deleteIfExists(target);
+            for(Path target:replacedPages){Path backup=backupRoot.resolve("page."+target.getFileName());
+                if(Files.isRegularFile(backup))Files.copy(backup,target,StandardCopyOption.REPLACE_EXISTING);
+            }
             for (Path target : created) {
                 Files.deleteIfExists(target);
             }
@@ -790,7 +861,7 @@ public final class RecordsNextPipeline {
             throw ex;
         }
 
-        return files.size();
+        return files.size() + pages.size();
     }
 
     private static void deleteTree(

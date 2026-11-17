@@ -96,6 +96,13 @@ public final class TopFlopViewsPublication {
             // A confirmed separation must also hold during publication, not only in GUI.
             identities=reg.approved();
         }
+        // v83: a single native Java stage, shared by rankings and the historical player archive.
+        // The same approved registry and same cutoff are used for both pages.
+        try (Connection db = DriverManager.getConnection("jdbc:sqlite:" + sqlite.toUri() + "?mode=ro")) {
+            TopFlopIntegratedV83.stage(db, reports, seasonIds, output, identities,
+                TopFlopRealFantasyRules.load(identitiesFile == null ? null :
+                    identitiesFile.getParent().resolve("topflop-real-rules.json")));
+        }
         return new Prepared(output, Set.copyOf(seasonIds), result.files().size(),identities,
             Set.copyOf(selectedIds),settings);
     }
@@ -183,7 +190,7 @@ public final class TopFlopViewsPublication {
             Files.copy(source,target);
         }
         Files.write(targetFacade,facadeJs);
-        return sources.size()+historyFiles.size()+1;
+        return sources.size()+historyFiles.size()+1 + TopFlopIntegratedV83.attach(prepared.jsDirectory(),scope,generatedJs);
     }
 
     /** Controlla tutti i JS dello staging prima che parta il publish 3.2. */

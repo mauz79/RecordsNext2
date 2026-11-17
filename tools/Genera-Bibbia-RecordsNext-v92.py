@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""Rebuilds Bible v49 from complete canonical v48 and v92 changes. No destructive overwrites.
+Does not run untrusted scripts and does not remove any previous Bible/report.
+"""
+from pathlib import Path
+import argparse, datetime, hashlib, json, sys
+
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def emit(project,baseline,output):
+    if not baseline.is_file():raise FileNotFoundError('Bibbia v47 canonica assente: '+str(baseline))
+    if output.exists():raise FileExistsError('Versione v49 esistente: preservare, non sovrascrivere: '+str(output))
+    snippets=[
+        'src/main/java/it/alterlega/recordsnext/app/topflop/TopFlopIntegratedV83.java',
+        'src/main/java/it/alterlega/recordsnext/app/topflop/TopFlopViewsPublication.java',
+        'src/main/java/it/alterlega/recordsnext/app/RecordsNextPipeline.java',
+        'src/main/java/it/alterlega/recordsnext/gui/RecordsNext2Dashboard.java',
+        'src/test/java/it/alterlega/recordsnext/app/topflop/TopFlopIntegratedV83Test.java',
+        'src/test/java/it/alterlega/recordsnext/app/RecordsNextPipelineV83PublishTest.java',
+        'tests/regression_v83.js',
+        *('assets/js/'+s for s in (
+          'fcmRecordsNextTopFlopRankingEngine_v83.js','fcmRecordsNextEventRanking_v83.js',
+          'fcmRecordsNextFunzioni_topflop_v92.js','fcmRecordsNextCalciatori_v92.js',
+          'fcmRecordsNextTopFlopViewsDecoder-v2.js', 'fcmRecordsNextPlayerProfile_v79.js',
+          'fcmRecordsNextGlobalSearch_v79.js')),
+        *('assets/RecordsNext/'+s for s in ('top_flop.html','calciatori.html','top_flop_v92.css')),
+        'tools/Genera-Bibbia-RecordsNext-v83.py',
+        'tools/Genera-Bibbia-RecordsNext-v86.py',
+        'tools/Genera-Bibbia-RecordsNext-v92.py',
+        'src/test/java/it/alterlega/recordsnext/app/topflop/TopFlopIntegratedV86MultiCompetitionTest.java',
+        'tools/Verifica-RN4-Integrazione-v83.py',
+        'tools/Oracolo-FCM-v79-readonly.py',
+        *('docs/'+s for s in (
+          'RECORDSNEXT4_INTEGRAZIONE_NATIVA_v83.md',
+          'DIARIO_IMPLEMENTAZIONE_RECORDSNEXT4_v83.md',
+          'REGISTRO_DECISIONI_RECORDSNEXT4_v43.md',
+          'CHANGELOG_RECORDSNEXT4_v83.md',
+          'CATALOGO_VERIFICHE_RECORDSNEXT4_v83.md',
+          'TEST_E_GIT_RECORDSNEXT4_v83.md',
+          'CONTINUITA_RECORDSNEXT4_v86.md',
+          'DIARIO_IMPLEMENTAZIONE_RECORDSNEXT4_v86.md',
+          'REGISTRO_DECISIONI_RECORDSNEXT4_v44.md',
+          'CHANGELOG_RECORDSNEXT4_v86.md',
+          'TEST_E_GIT_RECORDSNEXT4_v86.md',
+          'DIARIO_IMPLEMENTAZIONE_RECORDSNEXT4_v92.md',
+          'CHANGELOG_RECORDSNEXT4_v92.md',
+          'CONTINUITA_RECORDSNEXT4_v92.md')),
+    ]
+    missing=[s for s in snippets if not (project/s).is_file()]
+    if missing:raise FileNotFoundError('File di integrazione assenti: '+', '.join(missing))
+    output.parent.mkdir(parents=True,exist_ok=True)
+    with output.open('w',encoding='utf-8',newline='\n') as w:
+        w.write('# CODICE FUNZIONANTE RECORDSNEXT4 — Bibbia v49 (layout e classifiche portieri v92)\n\n')
+        w.write('Stato: **v86 operativa generata e verificata sui confronti v88; correzioni UI v92 da collaudare nel browser**.\n\n')
+        w.write('La sezione A conserva integralmente la Bibbia v48 installata nella RC.\n')
+        w.write('La sezione B contiene le fonti aggiornate (inclusi file v92) che prevalgono sulle versioni precedenti.\n')
+        w.write('La verifica del DB Windows e Git restano gate separati.\n\n')
+        w.write('## A — Bibbia canonica installata v48, integra\n\n')
+        w.write('Origine SHA256 `'+sha(baseline)+'`. I passaggi di codice sostituiti dalla sezione B non sono piu autoritativi.\n\n')
+        w.write(baseline.read_text(encoding='utf-8-sig'))
+        w.write('\n\n## B — Codice e documentazione v92, autorevoli\n\n')
+        for relative in snippets:
+            file=project/relative
+            ext=file.suffix.lower()
+            lang={'.java':'java','.js':'javascript','.py':'python','.html':'html','.css':'css','.md':'markdown'}.get(ext,'text')
+            content=file.read_text(encoding='utf-8-sig')
+            fence='`'*(max((len(x) for x in __import__('re').findall(r'`+',content)),default=2)+2)
+            w.write('\n### `'+relative+'`\n\nSHA256 `'+sha(file)+'`; bytes '+str(file.stat().st_size)+'\n\n')
+            w.write(fence+lang+'\n'+content.rstrip()+'\n'+fence+'\n')
+    return {'path':str(output),'bytes':output.stat().st_size,'sha256':sha(output),'sources':len(snippets)}
+
+if __name__=='__main__':
+    a=argparse.ArgumentParser()
+    a.add_argument('--root',type=Path,required=True)
+    a.add_argument('--baseline',type=Path,default=None)
+    a.add_argument('--output',type=Path,default=None)
+    args=a.parse_args()
+    p=args.root.resolve();baseline=(args.baseline or p/'docs/CODICE_FUNZIONANTE_RECORDSNEXT4_v48.md').resolve()
+    output=(args.output or p/'docs/CODICE_FUNZIONANTE_RECORDSNEXT4_v49.md').resolve()
+    try:print('RN4_V92_BIBBIA_GENERATA',json.dumps(emit(p,baseline,output),ensure_ascii=False))
+    except Exception as ex:print('RN4_V92_BIBBIA_BLOCCATA',ex,file=sys.stderr);sys.exit(2)

@@ -411,7 +411,7 @@ public final class RecordsNext2Dashboard {
         page.add(pageHeader("Records Top & Flop",
                 "Record, soglie e modalita' di elaborazione della famiglia", true),BorderLayout.NORTH);
         JTabbedPane tabs = new JTabbedPane();
-        JPanel records = familySelectionPanel("topFlop", "Top & Flop",
+        JPanel records = familySelectionPanel("topFlop", "Top & Flop + Archivio calciatori",
                 ProcessingConfigWriter.TOP_FLOP, TOP_FLOP_LABELS);
         JLabel info = new JLabel("<html>TF11-TF13: panchine documentate; "
                 + "la tribuna e' un'esclusione solo con possesso provato nella giornata. "
@@ -821,7 +821,7 @@ public final class RecordsNext2Dashboard {
         options.setOpaque(false);
         options.add(publish);
         publishAllSites.setToolTipText(
-                "Rigenera e pubblica RecordsNext nei siti configurati delle stagioni selezionate"
+                "Un solo flusso Java: genera, verifica e pubblica JS, Top & Flop e Archivio calciatori rispettando il cutoff di ogni sito"
         );
         publishAllSites.addActionListener(e -> runPipeline(
                 RecordsNextPipeline.PublicationMode.ALL_CONFIGURED_SITES,
