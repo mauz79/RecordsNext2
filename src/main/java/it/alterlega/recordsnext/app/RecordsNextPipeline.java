@@ -670,8 +670,10 @@ public final class RecordsNextPipeline {
             "fcmRecordsNextEventRanking_v83.js",
             "fcmRecordsNextFunzioni_topflop_v92.js",
             "fcmRecordsNextPlayerProfile_v79.js",
+            "fcmRecordsNextPlayerProfile_v101.js",
             "fcmRecordsNextGlobalSearch_v79.js",
-            "fcmRecordsNextCalciatori_v92.js"
+            "fcmRecordsNextCalciatori_v92.js",
+            "fcmRecordsNextCalciatori_v101.js"
     );
     private static int attachTopFlopV92Assets(Path project, Path generatedJs) throws Exception {
         Path sourceRoot = project.resolve("assets/js");
