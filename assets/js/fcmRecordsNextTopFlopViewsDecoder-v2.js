@@ -1,3 +1,4 @@
+// RN4_V114_CAREER_EXTREMA
 /* RecordsNext 4.0 - public Top & Flop VIEWS decoder v2 (v48).
  * Only selected records and aggregated careers/teams; no complete FCM/FCA dump.
  * Lazy loading: do NOT preload all years or sections. Caller applies historical cutoff.
@@ -44,8 +45,16 @@
       eventiRealiNonApportati:pairs(row[4]),
       origine:'FCM_FORMAZIONE_NON_CONTEGGIATA_E_VOTO_FCA'};
   }
+  function decodeExtremo(raw) {
+    if (!Array.isArray(raw)) throw Error('Prestazione FCM non valida');
+    if (raw.length === 0) return null;
+    if (raw.length !== 5 || !Number.isFinite(Number(raw[0])))
+      throw Error('Prestazione FCM incompleta');
+    return {valore:Number(raw[0]),fantasquadra:raw[1],competizione:raw[2],
+      giornataCompetizione:raw[3],giornataSerieA:raw[4]};
+  }
   function decodeCareer(row) {
-    if (!Array.isArray(row) || (row.length !== 6 && row.length !== 7)) throw new Error('Invalid career row');
+    if (!Array.isArray(row) || (row.length !== 6 && row.length !== 7 && row.length !== 8)) throw new Error('Invalid career row');
     var r = row[4], f = row[5];
     if (r.length !== 6 || (f.length !== 9 && f.length !== 10)) throw new Error('Invalid aggregates');
     return {
@@ -60,7 +69,9 @@
         sommaFantavotiApportati:f[4],fantamediaApportata:average(f[4],f[1]),
         panchinaNonConteggiata:f[5],fuoriLista:f[6],utilizzoDaVerificare:f[7],
         eventiApportati:pairs(f[8]),nonUtilizzatoOsservato:unused(f[9])},
-      costoAcquisto:cost(row[6])
+      costoAcquisto:cost(row[6]),
+      estremiFCM:row.length === 8 ? {top:decodeExtremo(row[7][0]),
+        flop:decodeExtremo(row[7][1])} : null
     };
   }
   function dict(rows) {
@@ -92,7 +103,7 @@
   function loadScript(url) {
     if (pending[url]) return pending[url];
     pending[url] = new Promise(function (resolve,reject) {
-      var script=document.createElement('script');script.async=true;script.src=url;
+      var script=document.createElement('script');script.async=true;script.src=url+(url.includes('?')?'&':'?')+'v=114';
       script.onload=resolve;
       script.onerror=function () {delete pending[url];reject(new Error('Failed to load '+url));};
       document.head.appendChild(script);

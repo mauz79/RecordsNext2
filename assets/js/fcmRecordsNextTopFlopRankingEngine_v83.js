@@ -99,11 +99,23 @@
    }
    return out;
  }
+ // RN4 TF14/TF15 v116: all comparison values use the already published approved History.
+ // A missing verified FCA fantasy average remains null; never use FCM COUNTED as a substitute.
  function historicAnomalies(history,id,seasons){const out=[];history.forEach(h=>{(h.anomalieStagionali||[]).forEach(a=>{
    if(a.recordId!==id||!seasons.includes(a.stagione))return;
-   const year=(h.stagioni||[]).find(x=>x.stagione===a.stagione);if(!year)return;
+   const years=h.stagioni||[],year=years.find(x=>x.stagione===a.stagione);if(!year)return;
+   const otherYears=years.filter(x=>x.stagione!==a.stagione&&num(x.votiValidi)!==null&&num(x.votiValidi)>0);
+   const verified=otherYears.length>0&&otherYears.every(x=>num(x.fantamediaReale)!==null);
+   const otherVotes=otherYears.reduce((n,x)=>n+Number(x.votiValidi),0);
+   const fantasyBaseline=verified&&otherVotes>0?
+     otherYears.reduce((sum,x)=>sum+Number(x.votiValidi)*Number(x.fantamediaReale),0)/otherVotes:null;
+   const fantasySeason=num(year.fantamediaReale);
+   const fantasyDelta=fantasySeason===null||fantasyBaseline===null?null:fantasySeason-fantasyBaseline;
    out.push(label({season:a.stagione,playerKey:year.playerKey,name:year.nome},id,'deltaMediaVoto',num(a.delta),
-     {sample:year.votiValidi,baseline:a.mediaBaseline,baselineVotes:a.votiValidiBaseline,source:'FCA - baseline altre stagioni'}));
+     {sample:num(a.votiValidiStagione),mediaStagione:num(a.mediaStagione),baseline:num(a.mediaBaseline),
+      mediaCarriera:num(h.mediaVotoReale),baselineVotes:num(a.votiValidiBaseline),
+      fantamediaStagione:fantasySeason,fantamediaBaseline:fantasyBaseline,fantamediaDelta:fantasyDelta,
+      source:'FCA reale: stagione confrontata con altre stagioni, ponderate per voti validi'}));
  });});return out;}
  function build(all,opts){const ss=all.seasons||[];const id=opts.id;let rows=[];
    ss.forEach(s=>{if(id==='TF14'||id==='TF15')return;rows.push(...listRank(s,opts));});

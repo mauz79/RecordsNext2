@@ -281,8 +281,19 @@ public final class TopFlopIdentityReviewDialog extends JDialog {
                 for(Row r:selected())if(r.proposal()!=null)registry.ignore(r.proposal());
             });
         });
+        JButton careers=new JButton("Carriere spezzate (audit v108)");
+        careers.addActionListener(e->{
+            try {
+                new TopFlopHistoricalCareerDialogV109(this,registry,audit,file,projectRoot).setVisible(true);
+                ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                updateStatus(); updateFilter();
+            }catch(Exception ex){
+                JOptionPane.showMessageDialog(this,ex.getMessage(),"Carriere storiche",JOptionPane.ERROR_MESSAGE);
+            }
+        });
         JButton close=new JButton("Chiudi");close.addActionListener(e->dispose());
         for(JButton b:new JButton[]{exact,approve,distinct,internal,same,undo,ignore,close})actions.add(b);
+        selectors.add(careers);
         add(actions,BorderLayout.SOUTH);
         setSize(1460,790);setLocationRelativeTo(owner);
         updateFilter();updateStatus();

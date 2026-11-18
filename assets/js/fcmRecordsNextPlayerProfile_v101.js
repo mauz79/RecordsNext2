@@ -1,3 +1,4 @@
+// RN4_V114_CAREER_EXTREMA
 /* RecordsNext 4.0 - player profiles v101 (compatible V79 API): verified FCA real fantasy and weighted FCM club-season totals.
  * No invented TOT/FMT and no unapproved cross-season player identity links.
  */
@@ -167,10 +168,24 @@
      return {...c,scorecard};
    });
  }
+ function careerExtremes(years){
+   const extremes={top:null,flop:null};
+   for(const year of years){
+     for(const key of ['top','flop']){
+       const value=year.estremiFCM?.[key];
+       if(!value||numeric(value.valore)===null)continue;
+       const row={...value,valore:Number(value.valore),stagione:year.stagione};
+       if(!extremes[key] || (key==='top'?row.valore>extremes[key].valore:
+           row.valore<extremes[key].valore))extremes[key]=row;
+     }
+   }
+   return extremes;
+ }
  function composeProfile(approved,individual,season,seasonTeams,official,allSeasonContexts,scorecardRows){
    const real=individual.reale||{};
    const years=approved?(approved.stagioni||[]):[{stagione:season,playerKey:individual.playerKey,nome:individual.nome,
-       votiValidi:real.votiValidi,mediaVoto:real.mediaVoto,eventi:real.eventi||{}}];
+       votiValidi:real.votiValidi,mediaVoto:real.mediaVoto,eventi:real.eventi||{},
+       ruoloFca:individual.ruoloFca,estremiFCM:individual.estremiFCM}];
    const contexts=approved?
      (allSeasonContexts||[]).slice():seasonTeamContexts(seasonTeams,season,individual.playerKey);
    if(approved){
@@ -184,7 +199,7 @@
    const realEvents=approved?(approved.eventiReali||{}):(real.eventi||{});
    const isGoalkeeper=Number(individual.ruoloFca)===1;
    return {years:fmt.years,fmt,contexts,seasonSummary,best:bestTeams(seasonSummary),
-     ruoloFca:individual.ruoloFca,isGoalkeeper,
+     ruoloFca:individual.ruoloFca,isGoalkeeper,estremiFCM:careerExtremes(years),
      events:realEvents,approved:!!approved,name:fmt.years.at(-1)?.nome||individual.nome,
      voti:approved?approved.votiRealiValidi:real.votiValidi,
      mediaVoto:approved?approved.mediaVotoReale:real.mediaVoto};

@@ -1,3 +1,4 @@
+// RN4_V114_CAREER_EXTREMA
 /* RecordsNext 4.0 v101 - Inline expanded rows; same FCM/FCA v79 arithmetic, no recalculation. */
 (function(w,d){'use strict';
  const api=w.RecordsNextTopFlopViewsV2,profile=w.RecordsNextPlayerProfileV79,search=w.RecordsNextGlobalSearchV79;
@@ -5,7 +6,7 @@
  const state={facade:null,history:null,manifest:null,cache:new Map(),busy:new Map(),points:new Map(),fmt:new Map(),index:null,token:0};
  const seasonLabel=id=>String(id).replace('_','/');
  const fmt=v=>v===null||v===undefined||v===''?'—':typeof v==='number'?v.toLocaleString('it-IT',{maximumFractionDigits:3}):String(v);
- const load=name=>new Promise((ok,fail)=>{const e=element('script');e.async=true;e.src='../js/'+name;e.onload=ok;e.onerror=()=>fail(Error('Impossibile caricare '+name));d.head.append(e);});
+ const load=name=>new Promise((ok,fail)=>{const e=element('script');e.async=true;e.src='../js/'+name+(name.includes('?')?'&':'?')+'v=114';e.onload=ok;e.onerror=()=>fail(Error('Impossibile caricare '+name));d.head.append(e);});
  const put=(parent,tag,value)=>{const el=element(tag,value);parent.append(el);return el;};
  const seasonAllowed=s=>!!state.facade?.stagioni.some(x=>x.stagione===s);
  function badge(parent,label,value){const n=put(parent,'div');n.className='rn-tf-stat';put(n,'small',label);put(n,'strong',fmt(value));}
@@ -59,7 +60,7 @@
  function showError(e){$('rn-calc-status').textContent='Errore: '+e.message;}
  const visibleCols=[['stagione','Stagione'],['fantasquadra','Fantasquadra'],['gare','Gare'],
    ['fantamedia','Fantamedia'],['mediaVoto','Media voto'],['gol','Gol'],['assist','Assist'],
-   ['saldoPunti','Saldo'],['riconciliazione','Stato punti']];
+   ['saldoPunti','Saldo']];
  const metrics=[['fantamedia','Fantamedia'],['mediaVoto','Media voto'],['gol','Gol'],['assist','Assist'],
    ['golSuRigore','Gol su rigore'],['rigoriSbagliati','Rigori sbagliati'],
    ['ammonizioni','Ammonizioni'],['espulsioni','Espulsioni'],['autogol','Autogol'],
@@ -92,7 +93,6 @@
      const name=put(title,'strong',competition.competizione);
      const meta=put(title,'span',fmt(competition.gare)+' gare · FM '+fmt(competition.fantamedia)+' · saldo '+fmt(competition.saldoPunti));
      metricGrid(section,competition);
-     const quality=put(section,'p','Stato punti: '+fmt(competition.riconciliazione));quality.className='rn-calc-verify';
    }
    if(!row.competizioni?.length)put(list,'p','Nessuna competizione documentata.');
  }
@@ -136,17 +136,29 @@
      });
    };render();
  }
+ function roleName(n){
+   return ({1:'Portiere',2:'Difensore',3:'Centrocampista',4:'Attaccante'})[Number(n)]||'—';
+ }
+ function matchCaption(item){
+   if(!item)return '—';
+   const round=item.giornataCompetizione!=null?' · giornata '+item.giornataCompetizione:'';
+   return fmt(item.valore)+' · '+seasonLabel(item.stagione)+' · '+item.fantasquadra+
+     (item.competizione?' · '+item.competizione:'')+round;
+ }
  function renderPlayer(data,playerKey,season){
    const target=$('rn-calc-detail');target.replaceChildren();target.hidden=false;
-   put(target,'h2',data.name);put(target,'p',data.approved?'Identità storica approvata · '+data.years.length+' stagioni':'Identità stagionale (nessuna fusione implicita)');
+   put(target,'h2',data.name);
+   const careerRoles=[...new Set(data.years.map(y=>roleName(y.ruoloFca ?? data.ruoloFca)).filter(x=>x!=='—'))];
+   put(target,'p','Ruolo FCA: '+(careerRoles.join(' / ')||'—')+' · '+
+     (data.approved?'Identità storica approvata · '+data.years.length+' stagioni':'Identità stagionale (nessuna fusione implicita)'));
    const real=put(target,'div');real.className='rn-tf-profile-badges';
    badge(real,'Voti reali',data.voti);badge(real,'Media voto reale',data.mediaVoto);
    badge(real,'Fantamedia FCA',data.fmt.media);
    badge(real,'Gol reali',data.events?.GOLFATTI1||0);badge(real,'Assist reali',data.events?.ASSIST||0);
-   const years=data.years.map(y=>({stagione:y.stagione,voti:y.votiValidi,media:y.mediaVoto,fantamedia:y.fantamediaReale,
+   const years=data.years.map(y=>({stagione:y.stagione,ruolo:roleName(y.ruoloFca ?? data.ruoloFca),voti:y.votiValidi,media:y.mediaVoto,fantamedia:y.fantamediaReale,
      gol:y.eventi?.GOLFATTI1||0,assist:y.eventi?.ASSIST||0}));
    put(target,'h3','Carriera reale FCA');
-   statTable(target,years,[['stagione','Stagione'],['voti','Voti validi'],['media','Media voto'],['fantamedia','Fantamedia reale'],['gol','Gol'],['assist','Assist']]);
+   statTable(target,years,[['stagione','Stagione'],['ruolo','Ruolo'],['voti','Voti validi'],['media','Media voto'],['fantamedia','Fantamedia reale'],['gol','Gol'],['assist','Assist']]);
    put(target,'h3','Carriera nelle fantasquadre FCM');
    const b=data.best,summary=put(target,'div');summary.className='rn-tf-profile-badges';
    badge(summary,'Più gare utilizzate',b.mostGames?b.mostGames.fantasquadra+' · '+b.mostGames.gare:'—');
@@ -154,6 +166,8 @@
    badge(summary,'Fantamedia minima',b.min?b.min.fantasquadra+' · '+fmt(b.min.fantamedia)+' ('+b.min.gare+' gare)':'—');
    badge(summary,'Saldo annuale massimo',b.saldoMax?seasonLabel(b.saldoMax.stagione)+' · '+b.saldoMax.fantasquadra+' · '+fmt(b.saldoMax.saldoPunti)+' punti ('+b.saldoMax.gare+' gare)':'—');
    badge(summary,'Saldo annuale minimo',b.saldoMin?seasonLabel(b.saldoMin.stagione)+' · '+b.saldoMin.fantasquadra+' · '+fmt(b.saldoMin.saldoPunti)+' punti ('+b.saldoMin.gare+' gare)':'—');
+   badge(summary,'Punteggio TOP · singola gara FCM',matchCaption(data.estremiFCM?.top));
+   badge(summary,'Punteggio FLOP · singola gara FCM',matchCaption(data.estremiFCM?.flop));
    put(target,'p','Bonus e malus sono punti fantasy solo quando la scomposizione riconcilia ogni tabellino; saldo = somma MODIF FCM COUNTED. Il trattino indica dato non verificabile, non zero.');
    teamRows(target,data.seasonSummary);
    target.scrollIntoView({block:'start',behavior:'smooth'});

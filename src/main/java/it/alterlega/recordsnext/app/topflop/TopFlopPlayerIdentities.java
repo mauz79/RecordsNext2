@@ -60,6 +60,10 @@ public final class TopFlopPlayerIdentities {
         // Reversible cross-code mergers: fingerprint -> full pre-merge assignments.
         // A change is stored ONLY after explicit approval. No existing registry is rewritten on load.
         private final Map<String,Map<String,String>> mergeUndo = new LinkedHashMap<>();
+        // Explicitly reviewed SAME-PERSON duplicate FCA source rows within a season.
+        // secondary playerKey -> primary playerKey. Neither source is deleted.
+        private final Map<String,String> sameSeasonAliases = new LinkedHashMap<>();
+        public Map<String,String> sameSeasonAliases() { return Map.copyOf(sameSeasonAliases); }
         // Derived from explicit, persisted distinct fingerprints and current FCA evidence.
         // Not stored as new identity assignments: no implicit reconciliation.
         private final Map<String,Collision> distinctEvidence = new LinkedHashMap<>();
@@ -68,6 +72,7 @@ public final class TopFlopPlayerIdentities {
         public Registry snapshot() {
             Registry copy=new Registry();
             copy.approved.putAll(approved);
+            copy.sameSeasonAliases.putAll(sameSeasonAliases);
             copy.ignored.addAll(ignored);
             copy.distinct.addAll(distinct);
             mergeUndo.forEach((k,v)->copy.mergeUndo.put(k,new LinkedHashMap<>(v)));
@@ -76,6 +81,7 @@ public final class TopFlopPlayerIdentities {
         }
         public void restore(Registry snapshot) {
             approved.clear(); approved.putAll(snapshot.approved);
+            sameSeasonAliases.clear(); sameSeasonAliases.putAll(snapshot.sameSeasonAliases);
             ignored.clear(); ignored.addAll(snapshot.ignored);
             distinct.clear(); distinct.addAll(snapshot.distinct);
             mergeUndo.clear(); snapshot.mergeUndo.forEach((k,v)->mergeUndo.put(k,new LinkedHashMap<>(v)));
@@ -99,6 +105,7 @@ public final class TopFlopPlayerIdentities {
             distinctEvidence.clear();
             for(Collision c:audit.collisions())if(isDistinct(c))distinctEvidence.put(c.fingerprint(),c);
             validateDistinctAssignments();
+            validateSameSeasonAliases();
         }
         public void approveSame(Collision collision) {
             boolean previous=distinct.remove(collision.fingerprint());
@@ -191,14 +198,9 @@ public final class TopFlopPlayerIdentities {
             for(var entry:approved.entrySet())
                 if(existingIds.contains(entry.getValue()))previous.put(entry.getKey(),entry.getValue());
             for(Source member:p.members())previous.putIfAbsent(member.key(),approved.get(member.key()));
-            Map<String,String> seasonToKey=new HashMap<>();
-            for(String key:previous.keySet()) {
-                String season=key.substring(0,key.indexOf(':'));
-                String existing=seasonToKey.putIfAbsent(season,key);
-                if(existing!=null&&!existing.equals(key))
-                    throw new IllegalArgumentException("Carriere sovrapposte nella stagione "+season+
-                        ": non possono essere unite senza risolvere l'identita'.");
-            }
+            // Prior reviewed same-season aliases are valid; no new overlapping
+            // season can be joined by the ordinary approval method.
+            checkSeasonPairs(previous.keySet(),sameSeasonAliases);
             String chosen=existingIds.isEmpty()?
                 "rn4p-"+p.members().stream().map(Source::key).sorted().findFirst().orElseThrow().replace(':','-'):
                 existingIds.stream().sorted().findFirst().orElseThrow();
@@ -206,10 +208,84 @@ public final class TopFlopPlayerIdentities {
             try {
                 for(String key:previous.keySet())approved.put(key,chosen);
                 validateDistinctAssignments();
+                validateSameSeasonAliases();
                 if(!existingIds.isEmpty())mergeUndo.put(p.fingerprint(),new LinkedHashMap<>(previous));
             }catch(RuntimeException ex){approved.clear();approved.putAll(checkpoint);throw ex;}
             ignored.remove(p.fingerprint());
         }
+        /**
+         * Only for explicit, evidence-reviewed FCA duplicates in ONE season. The
+         * caller must verify the two source rows, DOB/name, and disjoint real
+         * giornate against SQLite before calling. The approval is all-or-nothing.
+         * The normal approve(Proposal) NEVER permits a season overlap.
+         */
+        public void approveReviewedSameSeason(Proposal p, String primaryKey, String secondaryKey) {
+            if(primaryKey==null || secondaryKey==null || primaryKey.equals(secondaryKey))
+                throw new IllegalArgumentException("Coppia FCA duplicata non valida");
+            String season=primaryKey.split(":",2)[0];
+            if(!secondaryKey.startsWith(season+":"))
+                throw new IllegalArgumentException("Alias di stagioni differenti");
+            if(p.members().stream().noneMatch(x->x.key().equals(primaryKey)) ||
+               p.members().stream().noneMatch(x->x.key().equals(secondaryKey)))
+                throw new IllegalArgumentException("Le due anagrafiche non sono nella proposta approvata");
+            String previousAlias=sameSeasonAliases.get(secondaryKey);
+            if(previousAlias!=null && !previousAlias.equals(primaryKey))
+                throw new IllegalArgumentException("Alias gia' approvato verso un altro giocatore");
+            Set<String> existingIds=new LinkedHashSet<>();
+            for(Source member:p.members()) {
+                String id=approved.get(member.key());
+                if(id!=null)existingIds.add(id);
+            }
+            Map<String,String> previous=new LinkedHashMap<>();
+            for(var entry:approved.entrySet())
+                if(existingIds.contains(entry.getValue())) previous.put(entry.getKey(),entry.getValue());
+            for(Source member:p.members()) previous.putIfAbsent(member.key(),approved.get(member.key()));
+            if(!previous.containsKey(primaryKey)||!previous.containsKey(secondaryKey))
+                throw new IllegalArgumentException("Anagrafiche mancanti dal perimetro");
+            Map<String,String> aliases=new LinkedHashMap<>(sameSeasonAliases);
+            aliases.put(secondaryKey,primaryKey);
+            checkSeasonPairs(previous.keySet(),aliases);
+            String chosen=existingIds.isEmpty() ?
+                "rn4p-"+p.members().stream().map(Source::key).sorted().findFirst().orElseThrow().replace(':','-'):
+                existingIds.stream().sorted().findFirst().orElseThrow();
+            Map<String,String> checkpoint=new LinkedHashMap<>(approved);
+            Map<String,String> aliasCheckpoint=new LinkedHashMap<>(sameSeasonAliases);
+            try {
+                for(String key:previous.keySet()) approved.put(key,chosen);
+                sameSeasonAliases.clear();sameSeasonAliases.putAll(aliases);
+                validateDistinctAssignments();
+                validateSameSeasonAliases();
+                mergeUndo.put(p.fingerprint(),new LinkedHashMap<>(previous));
+            }catch(RuntimeException ex){
+                approved.clear();approved.putAll(checkpoint);
+                sameSeasonAliases.clear();sameSeasonAliases.putAll(aliasCheckpoint);
+                throw ex;
+            }
+            ignored.remove(p.fingerprint());
+        }
+        private static void checkSeasonPairs(Collection<String> keys,Map<String,String> aliases) {
+            Map<String,Set<String>> bySeason=new LinkedHashMap<>();
+            for(String key:keys)bySeason.computeIfAbsent(key.split(":",2)[0],x->new LinkedHashSet<>()).add(key);
+            for(var e:bySeason.entrySet()) if(e.getValue().size()>1) {
+                if(e.getValue().size()!=2)throw new IllegalArgumentException("Oltre due schede FCA nella stagione "+e.getKey());
+                boolean proved=false;
+                for(var a:aliases.entrySet())if(e.getValue().contains(a.getKey()) &&
+                    e.getValue().contains(a.getValue()))proved=true;
+                if(!proved)throw new IllegalArgumentException("Stagione sovrapposta senza alias verificato: "+e.getKey());
+            }
+        }
+        public void validateSameSeasonAliases() {
+            for(var entry:sameSeasonAliases.entrySet()) {
+                String a=approved.get(entry.getKey()), b=approved.get(entry.getValue());
+                if(a==null || !a.equals(b) ||
+                   !entry.getKey().split(":",2)[0].equals(entry.getValue().split(":",2)[0]))
+                    throw new IllegalArgumentException("Alias stessa stagione incoerente: "+entry.getKey());
+            }
+            Map<String,Set<String>> byIdentity=new LinkedHashMap<>();
+            for(var e:approved.entrySet())byIdentity.computeIfAbsent(e.getValue(),x->new LinkedHashSet<>()).add(e.getKey());
+            for(Set<String> keys:byIdentity.values())checkSeasonPairs(keys,sameSeasonAliases);
+        }
+
         /** Read-only indicator for explicit cross-code merging confirmation. */
         public int existingCareerGroups(Proposal p) {
             return (int)p.members().stream().map(s->approved.get(s.key()))
@@ -281,6 +357,18 @@ public final class TopFlopPlayerIdentities {
                 r.mergeUndo.put(fingerprint,before);
             }
         }
+        Object duplicateLinks=map.get("sameSeasonAliases");
+        if(duplicateLinks!=null) {
+            if(!(duplicateLinks instanceof Map<?,?> links))throw new IOException("Alias FCA stessa stagione invalidi");
+            for(var e:links.entrySet()) {
+                String secondary=String.valueOf(e.getKey()),primary=String.valueOf(e.getValue());
+                if(!secondary.matches("[0-9]{4}_[0-9]{4}:[0-9]+") ||
+                    !primary.matches("[0-9]{4}_[0-9]{4}:[0-9]+"))throw new IOException("Chiave alias invalida");
+                r.sameSeasonAliases.put(secondary,primary);
+            }
+        }
+        try{r.validateSameSeasonAliases();}
+        catch(RuntimeException ex){throw new IOException("Registro alias FCA incoerente",ex);}
         return r;
     }
     private static void readFingerprints(Object raw,Set<String> out) throws IOException {
@@ -296,6 +384,7 @@ public final class TopFlopPlayerIdentities {
         data.put("ignored",r.ignored.stream().sorted().toList());
         data.put("distinct",r.distinct.stream().sorted().toList());
         data.put("mergeUndo",new TreeMap<>(r.mergeUndo));
+        data.put("sameSeasonAliases",new TreeMap<>(r.sameSeasonAliases));
         String json=TopFlopCompactStageJsExporter.Json.write(data)+"\n";
         Path tmp=Files.createTempFile(file.getParent(),".player-identities-",".tmp");
         try{

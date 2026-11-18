@@ -6,6 +6,9 @@ import it.alterlega.recordsnext.app.model.ProcessingSelection;
 import it.alterlega.recordsnext.app.model.RecordFamily;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.ResultSetMetaData;
+import java.util.Locale;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,12 +90,14 @@ public final class TopFlopViewsPublication {
             Path path = output.resolve(file.name());
             validate(path, file.bytes(), file.sha256());
         }
-        Map<String,String> identities=Map.of();
+        Map<String,String> identities=Map.of(), sameSeasonAliases=Map.of();
         if(identitiesFile!=null) {
             TopFlopPlayerIdentities.Registry reg=TopFlopPlayerIdentities.load(identitiesFile);
             try(Connection db=DriverManager.getConnection("jdbc:sqlite:"+sqlite.toUri()+"?mode=ro")) {
                 reg.bindAudit(TopFlopPlayerIdentities.scanAvailable(db));
+                validateSourceAliases(db,reg.sameSeasonAliases());
             }
+            sameSeasonAliases=reg.sameSeasonAliases();
             // A confirmed separation must also hold during publication, not only in GUI.
             identities=reg.approved();
         }
@@ -104,7 +109,75 @@ public final class TopFlopViewsPublication {
                     identitiesFile.getParent().resolve("topflop-real-rules.json")));
         }
         return new Prepared(output, Set.copyOf(seasonIds), result.files().size(),identities,
-            Set.copyOf(selectedIds),settings);
+            Set.copyOf(selectedIds),settings,sameSeasonAliases);
+    }
+
+    /** FCA calendar rows contain 38 placeholders per profile, irrespective of votes.
+     * Punteggio also contains numeric TECHNICAL fields that must not turn a
+     * placeholder into an appearance. Check ONLY real VOTO1, VALORESPECIALE,
+     * and the 10 event fields consumed by TopFlopHistoricalViews.
+     */
+    private static final Set<String> CAREER_EVENTS = Set.of(
+        "GOLFATTI1","GOLFATTISURIGORE1","ASSIST","GOLSUBITI",
+        "GOLSUBITISURIGORE","RIGPAR","RIGSBA","AUTOGOL1","AMM","ESP");
+    public static Set<Integer> meaningfulFcaDays(Connection db, String season, int playerId)
+            throws Exception {
+        if (!season.matches("[0-9]{4}_[0-9]{4}") || playerId<=0)
+            throw new IOException("Sorgente FCA non valida: "+season+":"+playerId);
+        String prefix="raw_"+season+"_fca_";
+        String sql="SELECT g.\"GIORNATA\" AS RN4_GIORNATA, p.* FROM \""+prefix+"giocain\" g " +
+            "JOIN \""+prefix+"punteggio\" p ON p.\"ID\"=g.\"IDPUNTEGGIO\" " +
+            "WHERE g.\"IDGIOCATORE\"=? ORDER BY g.\"GIORNATA\"";
+        Set<Integer> days=new LinkedHashSet<>();
+        try(var st=db.prepareStatement(sql)) {
+            st.setInt(1,playerId);
+            try(var rs=st.executeQuery()) {
+                ResultSetMetaData meta=rs.getMetaData();
+                Map<String,Integer> columns=new LinkedHashMap<>();
+                for(int col=2;col<=meta.getColumnCount();col++)
+                    columns.put(meta.getColumnLabel(col).toUpperCase(Locale.ROOT),col);
+                if(!columns.containsKey("VOTO1") || !columns.containsKey("VALORESPECIALE"))
+                    throw new IOException("Punteggio FCA senza VOTO1/VALORESPECIALE: "+season);
+                while(rs.next()) {
+                    int day=rs.getInt(1);
+                    if(day<=0)throw new IOException("Giornata FCA non valida: "+season+":"+day);
+                    BigDecimal vote=rs.getBigDecimal(columns.get("VOTO1"));
+                    BigDecimal special=rs.getBigDecimal(columns.get("VALORESPECIALE"));
+                    boolean meaningful=vote!=null && vote.signum()>0 ||
+                        special!=null && special.signum()!=0;
+                    for(String event:CAREER_EVENTS) {
+                        Integer col=columns.get(event);
+                        if(col!=null) {
+                            BigDecimal value=rs.getBigDecimal(col);
+                            if(value!=null && value.signum()!=0)meaningful=true;
+                        }
+                    }
+                    if(meaningful && !days.add(day))throw new IOException(
+                        "Due prestazioni FCA nella stessa scheda: "+season+":"+playerId+" giornata "+day);
+                }
+            }
+        }
+        return days;
+    }
+
+    /** Check possible double counting of ACTUAL evidence, not the ubiquitous
+     * empty rows for 38 championship rounds. Apply on every publication.
+     */
+    public static void validateSourceAliases(Connection db, Map<String,String> aliases) throws Exception {
+        for(var entry:aliases.entrySet()) {
+            String sec=entry.getKey(), prim=entry.getValue();
+            if(!sec.matches("[0-9]{4}_[0-9]{4}:[0-9]+") ||
+               !prim.matches("[0-9]{4}_[0-9]{4}:[0-9]+") ||
+               !sec.substring(0,9).equals(prim.substring(0,9)))
+                throw new IOException("Alias FCA invalido: "+sec+" / "+prim);
+            String season=sec.substring(0,9);
+            Set<Integer> overlap=new LinkedHashSet<>(meaningfulFcaDays(db,season,
+                Integer.parseInt(sec.substring(10))));
+            overlap.retainAll(meaningfulFcaDays(db,season,
+                Integer.parseInt(prim.substring(10))));
+            if(!overlap.isEmpty())throw new IOException(
+                "Prestazioni FCA effettive sovrapposte: "+sec+" / "+prim+" giornate="+overlap);
+        }
     }
 
     /** Preserva esattamente le stagioni ammesse dalla 3.2 per il singolo sito. */
@@ -159,7 +232,8 @@ public final class TopFlopViewsPublication {
             TopFlopHistoricalViews.readCareers(prepared.jsDirectory(),sources),
             TopFlopHistoricalViews.readTeams(prepared.jsDirectory(),sources,scopedMetadata),
             prepared.approvedIdentities(),prepared.settings(),prepared.selectedIds(),
-            TopFlopHistoricalViews.readRealFantasy(prepared.jsDirectory(),sources));
+            TopFlopHistoricalViews.readRealFantasy(prepared.jsDirectory(),sources),
+            prepared.sameSeasonAliases());
         List<TopFlopPublicViewsStageExporter.FileInfo> historyFiles=history.isEmpty()
             ?List.of():TopFlopPublicViewsStageExporter.shard(generatedJs,"Storico","History",
                 new ArrayList<Object>(history));
@@ -232,11 +306,17 @@ public final class TopFlopViewsPublication {
 
     public record Prepared(Path jsDirectory,Set<String> seasons,int files,
                            Map<String,String> approvedIdentities,Set<String> selectedIds,
-                           TopFlopSettings settings) {
+                           TopFlopSettings settings,Map<String,String> sameSeasonAliases) {
         public Prepared {
             approvedIdentities=Map.copyOf(approvedIdentities);
+            sameSeasonAliases=Map.copyOf(sameSeasonAliases);
             selectedIds=Set.copyOf(selectedIds);
             Objects.requireNonNull(settings);
+        }
+        public Prepared(Path jsDirectory,Set<String> seasons,int files,
+                        Map<String,String> approvedIdentities,Set<String> selectedIds,
+                        TopFlopSettings settings) {
+            this(jsDirectory,seasons,files,approvedIdentities,selectedIds,settings,Map.of());
         }
         /** Backwards-compatible constructor for v45/v46 tests and callers. */
         public Prepared(Path jsDirectory,Set<String> seasons,int files,

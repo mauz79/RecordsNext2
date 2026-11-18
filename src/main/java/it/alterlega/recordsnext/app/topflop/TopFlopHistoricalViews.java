@@ -1,4 +1,5 @@
 package it.alterlega.recordsnext.app.topflop;
+// RN4_V114_CAREER_EXTREMA
 
 import it.alterlega.recordsnext.app.config.MiniJson;
 import java.io.IOException;
@@ -60,6 +61,8 @@ public final class TopFlopHistoricalViews {
             Map<String,Object> seasonRow=new LinkedHashMap<>();
             seasonRow.put("stagione",season);seasonRow.put("playerKey",key);
             seasonRow.put("nome",String.valueOf(row.get("nome")));
+            seasonRow.put("ruoloFca",row.get("ruoloFca"));
+            if(row.containsKey("estremiFCM"))seasonRow.put("estremiFCM",row.get("estremiFCM"));
             seasonRow.put("votiValidi",validSeason);seasonRow.put("sommaVoti",sum);
             seasonRow.put("mediaVoto",validSeason==0?null:sum.divide(BigDecimal.valueOf(validSeason),MC));
             seasonRow.put("eventi",srcEvents);
@@ -174,6 +177,16 @@ public final class TopFlopHistoricalViews {
                                                        TopFlopSettings settings,
                                                        Set<String> selectedIds,
                                                        List<Map<String,Object>> realFantasyRows) {
+        return aggregate(seasonCareers,teams,approved,settings,selectedIds,realFantasyRows,Map.of());
+    }
+    public static List<Map<String,Object>> aggregate(List<Map<String,Object>> seasonCareers,
+                                                       List<Map<String,Object>> teams,
+                                                       Map<String,String> approved,
+                                                       TopFlopSettings settings,
+                                                       Set<String> selectedIds,
+                                                       List<Map<String,Object>> realFantasyRows,
+                                                       Map<String,String> sameSeasonAliases) {
+        Objects.requireNonNull(sameSeasonAliases);
         Objects.requireNonNull(realFantasyRows);
         Objects.requireNonNull(settings);Objects.requireNonNull(selectedIds);
         Objects.requireNonNull(seasonCareers);Objects.requireNonNull(teams);Objects.requireNonNull(approved);
@@ -219,6 +232,7 @@ public final class TopFlopHistoricalViews {
         }
         List<Map<String,Object>> out=new ArrayList<>();
         for(Career c:byIdentity.values()) {
+            mergeReviewedDuplicateSeasons(c,sameSeasonAliases);
             c.seasons.sort(Comparator.comparing(x->String.valueOf(x.get("stagione"))));
             if(c.seasons.stream().map(s->s.get("stagione")).distinct().count()!=c.seasons.size())
                 throw new IllegalArgumentException("Identita' approvata compare due volte nella stessa stagione: " + c.identityId);
@@ -233,6 +247,93 @@ public final class TopFlopHistoricalViews {
         }
         out.sort(Comparator.comparing(x->String.valueOf(x.get("playerIdentityId"))));
         return List.copyOf(out);
+    }
+
+    /** Merge the STATS of two disjoint FCA source profiles in the same season.
+     * The raw source identities and original per-row data are retained in
+     * originiFCA; the publisher has already verified disjoint GIORNATA rows
+     * against the ORIGINAL SQLite. Never silently drop or double-count stats.
+     */
+    private static void mergeReviewedDuplicateSeasons(Career career,Map<String,String> aliases) {
+        Map<String,List<Map<String,Object>>> bySeason=new LinkedHashMap<>();
+        for(Map<String,Object> row:career.seasons)
+            bySeason.computeIfAbsent(String.valueOf(row.get("stagione")),x->new ArrayList<>()).add(row);
+        List<Map<String,Object>> merged=new ArrayList<>();
+        for(var entry:bySeason.entrySet()) {
+            List<Map<String,Object>> rows=entry.getValue();
+            if(rows.size()==1) {merged.add(rows.get(0));continue;}
+            if(rows.size()!=2)throw new IllegalArgumentException("Troppe anagrafiche FCA: "+entry.getKey());
+            Map<String,Object> a=rows.get(0),b=rows.get(1);
+            String ka=String.valueOf(a.get("playerKey")), kb=String.valueOf(b.get("playerKey"));
+            String primary=aliases.get(ka)!=null && aliases.get(ka).equals(kb)? kb :
+                aliases.get(kb)!=null && aliases.get(kb).equals(ka)? ka : null;
+            if(primary==null)throw new IllegalArgumentException("Duplicato FCA senza approvazione esplicita: "+ka+" / "+kb);
+            Map<String,Object> first=primary.equals(ka)?a:b;
+            Map<String,Object> second=primary.equals(ka)?b:a;
+            int n1=asInt(first.get("votiValidi")),n2=asInt(second.get("votiValidi"));
+            BigDecimal sum=asDecimal(first.get("sommaVoti")).add(asDecimal(second.get("sommaVoti")));
+            int n=n1+n2;
+            Map<String,Object> row=new LinkedHashMap<>(first);
+            row.put("votiValidi",n);row.put("sommaVoti",sum);
+            row.put("mediaVoto",n==0?null:sum.divide(BigDecimal.valueOf(n),MC));
+            Map<String,BigDecimal> events=new LinkedHashMap<>();
+            for(Map<String,Object> src:rows)for(var e:asObject(src.get("eventi")).entrySet())
+                events.merge(e.getKey(),asDecimal(e.getValue()),BigDecimal::add);
+            row.put("eventi",events);
+            row.put("playerKeys",List.of(ka,kb));
+            row.put("originiFCA",List.of(new LinkedHashMap<>(a),new LinkedHashMap<>(b)));
+            // The two approved FCA profiles are disjoint in effective match days.
+            // Preserve the best/worst COUNTED match across both source profiles.
+            row.put("estremiFCM",mergeExtremi(a.get("estremiFCM"),b.get("estremiFCM")));
+            Map<String,Object> c1=first.get("costoAcquisto") instanceof Map?asObject(first.get("costoAcquisto")):Map.of();
+            Map<String,Object> c2=second.get("costoAcquisto") instanceof Map?asObject(second.get("costoAcquisto")):Map.of();
+            int cn1=c1.get("registrazioniConCosto") instanceof Number num1?num1.intValue():0;
+            int cn2=c2.get("registrazioniConCosto") instanceof Number num2?num2.intValue():0;
+            if(cn1+cn2>0) {
+                Map<String,Object> cost=new LinkedHashMap<>();
+                cost.put("registrazioniConCosto",cn1+cn2);
+                BigDecimal weighted=BigDecimal.ZERO;
+                if(cn1>0)weighted=weighted.add(asDecimal(c1.get("medio")).multiply(BigDecimal.valueOf(cn1)));
+                if(cn2>0)weighted=weighted.add(asDecimal(c2.get("medio")).multiply(BigDecimal.valueOf(cn2)));
+                cost.put("medio",weighted.divide(BigDecimal.valueOf(cn1+cn2),MC));
+                BigDecimal min=cn1>0?asDecimal(c1.get("minimo")):asDecimal(c2.get("minimo"));
+                BigDecimal max=cn1>0?asDecimal(c1.get("massimo")):asDecimal(c2.get("massimo"));
+                if(cn2>0 && asDecimal(c2.get("minimo")).compareTo(min)<0)min=asDecimal(c2.get("minimo"));
+                if(cn2>0 && asDecimal(c2.get("massimo")).compareTo(max)>0)max=asDecimal(c2.get("massimo"));
+                cost.put("minimo",min);cost.put("massimo",max);
+                row.put("costoAcquisto",cost);
+            }
+            if(first.containsKey("fantamediaReale") || second.containsKey("fantamediaReale")) {
+                if(n1>0 && !first.containsKey("fantamediaReale") || n2>0 && !second.containsKey("fantamediaReale")) {
+                    row.remove("fantamediaReale");row.remove("fantamediaRealeFonte");
+                } else if(n>0) {
+                    BigDecimal fantasySum=BigDecimal.ZERO;
+                    if(n1>0)fantasySum=fantasySum.add(asDecimal(first.get("fantamediaReale")).multiply(BigDecimal.valueOf(n1)));
+                    if(n2>0)fantasySum=fantasySum.add(asDecimal(second.get("fantamediaReale")).multiply(BigDecimal.valueOf(n2)));
+                    row.put("fantamediaReale",fantasySum.divide(BigDecimal.valueOf(n),MC));
+                    row.put("fantamediaRealeFonte","FCA_FONTI_VERIFICATE_ENTRAMBE_RIGHE");
+                }
+            }
+            merged.add(row);
+        }
+        career.seasons.clear();career.seasons.addAll(merged);
+    }
+
+    private static Map<String,Object> mergeExtremi(Object left,Object right) {
+        Map<String,Object> a=left instanceof Map<?,?>?asObject(left):Map.of();
+        Map<String,Object> b=right instanceof Map<?,?>?asObject(right):Map.of();
+        Map<String,Object> out=new LinkedHashMap<>();
+        for(String direction:List.of("top","flop")) {
+            Map<String,Object> x=a.get(direction) instanceof Map<?,?>?asObject(a.get(direction)):null;
+            Map<String,Object> y=b.get(direction) instanceof Map<?,?>?asObject(b.get(direction)):null;
+            if(x==null)out.put(direction,y);
+            else if(y==null)out.put(direction,x);
+            else {
+                int cmp=asDecimal(y.get("valore")).compareTo(asDecimal(x.get("valore")));
+                out.put(direction,("top".equals(direction)?cmp>0:cmp<0)?y:x);
+            }
+        }
+        return out;
     }
 
     /** Leave-one-season-out: the candidate season NEVER appears in its baseline. */
@@ -380,19 +481,38 @@ public final class TopFlopHistoricalViews {
     }
     private static Map<String,Object> decodeCareer(Object raw) {
         if(raw instanceof Map<?,?>)return asObject(raw); // controlled tests.
-        if(!(raw instanceof List<?> r) || (r.size()!=6 && r.size()!=7))
+        if(!(raw instanceof List<?> r) || (r.size()!=6 && r.size()!=7 && r.size()!=8))
             throw new IllegalArgumentException("Career compatta non valida: "+raw);
         if(!(r.get(4) instanceof List<?> real) || real.size()!=6)
             throw new IllegalArgumentException("Aggregato reale non valido");
         Map<String,Object> row=new LinkedHashMap<>();
         row.put("playerKey",r.get(0));row.put("nome",r.get(1));
+        row.put("ruoloFca",r.get(2));
+        if(r.size()==8)row.put("estremiFCM",decodeExtremi(r.get(7)));
         row.put("reale",Map.of("votiValidi",real.get(0),"sommaVoti",real.get(1),
             "eventi",decodeEvents(asList(real.get(2)))));
-        if(r.size()==7) {
+        if(r.size()>=7) {
             try {row.put("costoAcquisto",decodeCost(r.get(6)));}
             catch(IOException ex){throw new IllegalArgumentException("Costo Career non valido",ex);}
         }
         return row;
+    }
+    private static Map<String,Object> decodeExtremi(Object raw) {
+        List<?> values=asList(raw);
+        if(values.size()!=2)throw new IllegalArgumentException("Estremi FCM non validi");
+        Map<String,Object> out=new LinkedHashMap<>();
+        out.put("top",decodeExtremo(values.get(0)));
+        out.put("flop",decodeExtremo(values.get(1)));
+        return out;
+    }
+    private static Map<String,Object> decodeExtremo(Object raw) {
+        List<?> a=asList(raw);
+        if(a.isEmpty())return null;
+        if(a.size()!=5)throw new IllegalArgumentException("Prestazione FCM non valida");
+        Map<String,Object> row=new LinkedHashMap<>();
+        row.put("valore",a.get(0));row.put("fantasquadra",a.get(1));
+        row.put("competizione",a.get(2));row.put("giornataCompetizione",a.get(3));
+        row.put("giornataSerieA",a.get(4));return row;
     }
     private static Map<String,Object> decodeEvents(List<?> pairs) {
         if(pairs.size()%2!=0)throw new IllegalArgumentException("Eventi reali non validi");

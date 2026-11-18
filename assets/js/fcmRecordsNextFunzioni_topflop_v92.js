@@ -68,7 +68,8 @@
    render();info(id==='TF09'?'Eventi '+($('tf-event-group').value==='BONUS'?'positivi':'negativi')+
      ' · '+events.LABELS[$('tf-event').value]+' · '+($('tf-event-aggregate').selectedOptions[0].textContent)+
      ' · '+(opts.context==='real'?'FCA reale':'FCM conteggiato')+' · conteggi, non punti fantasy.':
-     'Classifica '+recordTitle()+' — '+(scope==='__ALL__'?'assoluta':'stagione '+seasonLabel(scope))+'.');
+     'Classifica '+recordTitle()+' — '+(scope==='__ALL__'?'assoluta':'stagione '+seasonLabel(scope))+'.'+
+     (id==='TF14'||id==='TF15'?' Δ MV = media voto stagione − media ponderata delle altre stagioni; FM solo da dati reali verificati (— se assente).':''));
  }
  function error(err,token){if(token!==state.token)return;info('ERRORE: '+err.message);$('tf-count').textContent='Dati insufficienti: '+err.message;clear($('tf-body'));}
  function refresh(){const token=++state.token;syncControls();calculate(token).catch(e=>error(e,token));}
@@ -98,7 +99,13 @@
      TF11:[['team','Fantasquadra'],['competition','Competizione'],['value','Media voto'],['sample','Campione']],
      TF12:[['team','Fantasquadra'],['competition','Competizione'],['value','Errore pesato'],['sample','Campione']],
      TF13:[['team','Fantasquadra'],['competition','Competizione'],['value','Fantavoto'],['sample','Campione']],
-     TF14:[['value','Scostamento'],['sample','Voti']],TF15:[['value','Scostamento'],['sample','Voti']],
+     // RN4 TF14/TF15 v116: show the values behind the anomaly, not only its delta.
+     TF14:[['mediaStagione','MV stagione'],['baseline','MV altre stagioni'],['value','Δ MV'],
+       ['fantamediaStagione','FM stagione'],['fantamediaBaseline','FM altre stagioni'],
+       ['fantamediaDelta','Δ FM'],['sample','Voti stagione'],['baselineVotes','Voti altre']],
+     TF15:[['mediaStagione','MV stagione'],['baseline','MV altre stagioni'],['value','Δ MV'],
+       ['fantamediaStagione','FM stagione'],['fantamediaBaseline','FM altre stagioni'],
+       ['fantamediaDelta','Δ FM'],['sample','Voti stagione'],['baselineVotes','Voti altre']],
      TF16:[['team','Fantasquadra'],['competition','Competizione'],['value','Valore'],['sample','Gare']],
      TF17:[['value','Rigori parati'],['sample',source]],
      TF18:[['value','Gol subiti'],['sample',source]],

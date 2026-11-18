@@ -1,4 +1,5 @@
 package it.alterlega.recordsnext.app.topflop;
+// RN4_V114_CAREER_EXTREMA
 
 import it.alterlega.recordsnext.app.topflop.TopFlopFacts.*;
 
@@ -111,7 +112,23 @@ public final class TopFlopPublicViewsStageExporter {
         final TopFlopFcaJdbcReader.PlayerProfile profile;
         final Totals real = new Totals(), fantasy = new Totals();
         final Costs costs = new Costs();
+        BigDecimal topScore, flopScore;
+        Map<String,Object> topPerformance, flopPerformance;
         Player(TopFlopFcaJdbcReader.PlayerProfile profile) {this.profile=profile;}
+        void recordCountedPerformance(FantasyFact fact, Team team) {
+            // Only FCM COUNTED fantasy votes, not the aggregate team score or an FCA real vote.
+            BigDecimal score=fact.fantasyVote();
+            Map<String,Object> occasion=obj("valore",score,
+                "fantasquadra",team.teamName,"competizione",team.competitionName,
+                "giornataCompetizione",fact.fantasyRound(),
+                "giornataSerieA",fact.realDayKey().serieARound());
+            if(topScore==null || score.compareTo(topScore)>0) {
+                topScore=score;topPerformance=occasion;
+            }
+            if(flopScore==null || score.compareTo(flopScore)<0) {
+                flopScore=score;flopPerformance=occasion;
+            }
+        }
         String id() {return profile.player().seasonId()+":"+profile.player().fcaPlayerId();}
         int role() {
             try {return Integer.parseInt(profile.originalFields().get("GiocatoreA.RUOLO"));}
@@ -231,6 +248,7 @@ public final class TopFlopPublicViewsStageExporter {
             RealDay realForFact=archive.realDay(fact.realDayKey());
             addUsage(p.fantasy,fact,realForFact);addUsage(t.totals,fact,realForFact);
             if(fact.usage()!=Usage.COUNTED)continue;
+            p.recordCountedPerformance(fact,t);
             if(realForFact.voteState()==VoteState.VALID) {
                 p.fantasy.countedRealValid++;
                 p.fantasy.countedRealVotes=p.fantasy.countedRealVotes.add(realForFact.vote());
@@ -331,6 +349,7 @@ public final class TopFlopPublicViewsStageExporter {
             Map<String,Object> career=new LinkedHashMap<>(p.label());
             career.put("stagione",p.profile.player().seasonId());
             career.put("reale",p.real.realView());career.put("fantasy",p.fantasy.fantasyView());
+            career.put("estremiFCM",obj("top",p.topPerformance,"flop",p.flopPerformance));
             career.put("costoAcquisto",p.costs.view());
             career.put("identitaStoricaVerificata",false); // no auto-merge of CodiceGazza
             out.careers.add(career);
@@ -518,6 +537,25 @@ public final class TopFlopPublicViewsStageExporter {
             packEvents(f.get("eventiApportati")),packUnused(f.get("nonUtilizzatoOsservato")));
     }
     @SuppressWarnings("unchecked")
+    private static List<Object> packExtremo(Object raw) {
+        if(raw==null)return List.of();
+        Map<String,Object> x=(Map<String,Object>)raw;
+        // RN4_V115_NULLABLE_EXTREMA: real FCM contexts may have an unmapped round.
+        // List.of rejects null; preserve unknown fields rather than fabricating values.
+        List<Object> fields=new ArrayList<>(5);
+        fields.add(x.get("valore"));
+        fields.add(x.get("fantasquadra"));
+        fields.add(x.get("competizione"));
+        fields.add(x.get("giornataCompetizione"));
+        fields.add(x.get("giornataSerieA"));
+        return fields;
+    }
+    @SuppressWarnings("unchecked")
+    private static List<Object> packExtremi(Object raw) {
+        Map<String,Object> x=(Map<String,Object>)raw;
+        return List.of(packExtremo(x.get("top")),packExtremo(x.get("flop")));
+    }
+    @SuppressWarnings("unchecked")
     private static List<Object> packCareer(Map<String,Object> row) {
         Map<String,Object> r=(Map<String,Object>)row.get("reale");
         Map<String,Object> f=(Map<String,Object>)row.get("fantasy");
@@ -526,7 +564,7 @@ public final class TopFlopPublicViewsStageExporter {
             List.of(r.get("votiValidi"),r.get("sommaVoti"),packEvents(r.get("eventi")),
                 r.get("giornateGolSubitiConVoto"),r.get("giornateZeroGolSubitiRegistrati"),
                 r.get("mediaGolSubitiSuGiornateVerificate")==null?"":r.get("mediaGolSubitiSuGiornateVerificate")),
-            packFantasy(f),packCost(row.get("costoAcquisto")));
+            packFantasy(f),packCost(row.get("costoAcquisto")),packExtremi(row.get("estremiFCM")));
     }
     @SuppressWarnings("unchecked")
     private static List<Object> packTeam(Map<String,Object> row) {
